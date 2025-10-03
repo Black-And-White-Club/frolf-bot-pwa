@@ -1,0 +1,100 @@
+@import 'tailwindcss';
+
+/* Dynamic Guild Theme Variables */
+:root {
+	/* Default theme colors */
+	--guild-primary: #10b981;
+	--guild-secondary: #14b8a6;
+	--guild-accent: #06b6d4;
+	--guild-background: #f8fafc;
+	--guild-surface: #ffffff;
+	--guild-text: #0f172a;
+	--guild-text-secondary: #475569;
+	--guild-border: #e2e8f0;
+
+	/* Semantic colors */
+	--guild-error-bg: #fef2f2; /* red-50 */
+	--guild-error-text: #991b1b; /* red-800 */
+	--guild-error-border: #fecaca; /* red-200 */
+}
+
+/* Dark mode overrides */
+:root.dark {
+	--guild-background: #0f172a;
+	--guild-surface: #1e293b;
+	--guild-text: #f8fafc;
+	--guild-text-secondary: #cbd5e1;
+	--guild-border: #334155;
+
+	/* Dark variants for semantic colors */
+	--guild-error-bg: #3b0606; /* darkened red bg */
+	--guild-error-text: #fecaca; /* light red text on dark bg */
+	--guild-error-border: #7f1d1d;
+}
+
+/* Ensure global text and background follow theme variables */
+html, body {
+	height: 100%;
+}
+body {
+	background-color: var(--guild-background);
+	color: var(--guild-text);
+	transition: background-color 200ms ease, color 200ms ease;
+}
+
+/* Custom utility classes using guild theme variables */
+.bg-guild-primary { background-color: var(--guild-primary); }
+.bg-guild-secondary { background-color: var(--guild-secondary); }
+.bg-guild-accent { background-color: var(--guild-accent); }
+.bg-guild-background { background-color: var(--guild-background); }
+.bg-guild-surface { background-color: var(--guild-surface); }
+
+.bg-guild-surface-elevated { background-color: var(--guild-surface-elevated, var(--guild-surface)); transition: background-color 180ms ease; }
+
+.text-guild-disabled { color: var(--guild-text-disabled, rgba(0,0,0,0.4)); }
+
+.bg-guild-primary-20 { background-color: var(--guild-primary-20); }
+
+.text-guild-primary { color: var(--guild-primary); }
+.text-guild-secondary { color: var(--guild-secondary); }
+.text-guild-accent { color: var(--guild-accent); }
+.text-guild-text { color: var(--guild-text); }
+.text-guild-text-secondary { color: var(--guild-text-secondary); }
+
+.border-guild-border { border-color: var(--guild-border); }
+
+/* Semantic utilities */
+.bg-guild-error { background-color: var(--guild-error-bg); }
+.text-guild-error { color: var(--guild-error-text); }
+.border-guild-error { border-color: var(--guild-error-border); }
+
+/* SVG icon theming helpers */
+.icon { display: inline-block; vertical-align: middle; }
+.icon path, .icon circle, .icon rect { vector-effect: non-scaling-stroke; }
+.icon--bg { fill: var(--guild-background); }
+.icon--surface { fill: var(--guild-surface); }
+.icon--primary { fill: var(--guild-primary); }
+.icon--play { fill: currentColor; }
+
+/* Stroke helpers for legacy single-path icons */
+.icon--stroke-primary { stroke: var(--guild-primary); }
+.icon--stroke-secondary { stroke: var(--guild-secondary); }
+.icon--stroke-accent { stroke: var(--guild-accent); }
+
+
+/* Participant avatar helpers: ensure outline follows theme variables and transitions */
+.participant-avatar { transition: background-color 180ms ease, border-color 180ms ease; }
+.participant-avatar { border-width: 2px !important; border-style: solid !important; }
+.participant-avatar--primary { border-color: var(--guild-primary) !important; }
+.participant-avatar--secondary { border-color: var(--guild-border) !important; background-color: var(--guild-secondary) !important; color: var(--guild-text) !important; }
+
+/* Status-based avatar outlines */
+.participant-avatar--status-active { border-color: var(--guild-primary-20, rgba(var(--guild-primary-rgb, 0,116,116), 0.2)) !important; }
+.participant-avatar--status-scheduled { border-color: var(--guild-secondary-20, rgba(var(--guild-secondary-rgb, 139,123,184), 0.2)) !important; }
+.participant-avatar--status-completed { border-color: var(--guild-accent-20, rgba(var(--guild-accent-rgb, 203,165,53), 0.2)) !important; }
+.participant-avatar--status-default { border-color: var(--guild-border) !important; }
+
+/* Photo avatar outline: neutral inner ring with subtle outer tint to help separation
+	Uses surface for the immediate border and a faint status-tint via box-shadow */
+.participant-avatar--photo { border-color: var(--guild-surface) !important; box-shadow: 0 0 0 3px rgba(var(--guild-text-rgb, 26,26,26), 0.04); }
+

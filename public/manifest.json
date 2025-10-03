@@ -1,0 +1,17 @@
+{
+	"name": "Frolf-Bot",
+	"short_name": "Frolf-Bot",
+	"description": "Your intelligent disc golf companion.",
+	"start_url": "/",
+	"display": "standalone",
+	"background_color": "#F5FFFA",
+	"theme_color": "#007474",
+	"icons": [
+		{
+			"src": "/favicon.svg",
+			"sizes": "any",
+			"type": "image/svg+xml",
+			"purpose": "any maskable"
+		}
+	]
+}

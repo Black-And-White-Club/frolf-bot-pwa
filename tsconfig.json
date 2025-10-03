@@ -1,0 +1,22 @@
+{
+	"extends": "./.svelte-kit/tsconfig.json",
+	"include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
+	"exclude": [
+		"tests",
+		"tests/**",
+		"playwright.config.ts",
+		"tests/**",
+		"integration_tests",
+		"integration_tests/**",
+		"**/*.spec.ts",
+		"**/*.e2e.ts",
+		"**/playwright.config.*"
+	],
+	"compilerOptions": {
+		"strict": true,
+		"moduleResolution": "bundler",
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true
+	}
+}
