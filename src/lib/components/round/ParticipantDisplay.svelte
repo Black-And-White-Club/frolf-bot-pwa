@@ -18,15 +18,30 @@
 				return 'participant-avatar--status-default';
 		}
 	}
+
+	// helpers for responsive avatars
+	import { isUnsplashUrl, unsplashSrcset, unsplashSizes } from '$lib/utils/unsplash';
 </script>
 
 {#if !compact}
 	<div class="space-y-2" data-testid={testid}>
-		{#each round.participants.slice(0, 4) as participant}
+		{#each (round.participants ?? []).slice(0, 4) as participant}
 			<div class="flex justify-between items-center text-sm">
 				<div class="flex items-center space-x-2">
 					{#if participant.avatar_url}
-						<img src={participant.avatar_url} alt={participant.username} class="w-6 h-6 rounded-full object-cover flex-shrink-0 participant-avatar participant-avatar--photo {statusAvatarClass(round.status)}" />
+						<img
+							src={participant.avatar_url}
+							alt={participant.username}
+							width="24"
+							height="24"
+							loading="lazy"
+							decoding="async"
+							crossorigin="anonymous"
+							style="aspect-ratio:1/1"
+							class="w-6 h-6 rounded-full object-cover flex-shrink-0 participant-avatar participant-avatar--photo {statusAvatarClass(round.status)}"
+							srcset={isUnsplashUrl(participant.avatar_url) ? unsplashSrcset(participant.avatar_url, [48, 100]) : undefined}
+							sizes={isUnsplashUrl(participant.avatar_url) ? unsplashSizes(24) : undefined}
+						/>
 					{:else}
 						<div class="w-6 h-6 rounded-full bg-guild-surface-elevated border border-[var(--guild-border)] flex items-center justify-center flex-shrink-0 participant-avatar participant-avatar--primary {statusAvatarClass(round.status)}">
 							<span class="text-[var(--guild-text)] font-bold text-xs">{participant.username.charAt(0).toUpperCase()}</span>
@@ -45,9 +60,9 @@
 				{/if}
 			</div>
 		{/each}
-		{#if round.participants.length > 4}
+		{#if (round.participants ?? []).length > 4}
 			<div class="text-xs text-[var(--guild-text)] text-center font-medium">
-				+{round.participants.length - 4} more players
+				+{(round.participants ?? []).length - 4} more players
 			</div>
 		{/if}
 	</div>
@@ -55,9 +70,21 @@
 	<div class="flex justify-between items-center text-sm">
 		<div class="flex items-center space-x-2">
 			<div class="flex -space-x-1">
-				{#each round.participants.slice(0, 3) as participant}
+				{#each (round.participants ?? []).slice(0, 3) as participant}
 							{#if participant.avatar_url}
-								<img src={participant.avatar_url} alt={participant.username} class="w-6 h-6 rounded-full object-cover flex-shrink-0 participant-avatar participant-avatar--photo {statusAvatarClass(round.status)}" />
+									<img
+										src={participant.avatar_url}
+										alt={participant.username}
+										width="24"
+										height="24"
+										loading="lazy"
+										decoding="async"
+										crossorigin="anonymous"
+										style="aspect-ratio:1/1"
+										class="w-6 h-6 rounded-full object-cover flex-shrink-0 participant-avatar participant-avatar--photo {statusAvatarClass(round.status)}"
+										srcset={isUnsplashUrl(participant.avatar_url) ? unsplashSrcset(participant.avatar_url, [48, 100]) : undefined}
+										sizes={isUnsplashUrl(participant.avatar_url) ? unsplashSizes(24) : undefined}
+									/>
 							{:else}
 								<div class="w-6 h-6 rounded-full bg-guild-surface-elevated border-2 border-[var(--guild-primary)] flex items-center justify-center participant-avatar participant-avatar--primary {statusAvatarClass(round.status)}">
 									<span class="text-[var(--guild-text)] font-bold text-xs">
@@ -66,19 +93,19 @@
 								</div>
 							{/if}
 				{/each}
-				{#if round.participants.length > 3}
+				{#if (round.participants ?? []).length > 3}
 							<div class="w-6 h-6 rounded-full bg-[var(--guild-secondary)] border-2 border-[var(--guild-border)] flex items-center justify-center participant-avatar participant-avatar--secondary {statusAvatarClass(round.status)}">
-								<span class="text-[var(--guild-text)] font-bold text-xs">+{round.participants.length - 3}</span>
+								<span class="text-[var(--guild-text)] font-bold text-xs">+{(round.participants ?? []).length - 3}</span>
 							</div>
 				{/if}
 			</div>
 				<span class="text-[var(--guild-text)] ml-2 font-medium">
-				{round.participants.length} players
+				{(round.participants ?? []).length} players
 			</span>
 		</div>
-		{#if round.participants.some(p => p.score !== undefined && p.score !== null)}
+		{#if (round.participants ?? []).some(p => p.score !== undefined && p.score !== null)}
 			<span class="text-[var(--guild-primary)] font-medium">
-				{round.participants.filter(p => p.score !== undefined && p.score !== null).length} scored
+				{(round.participants ?? []).filter(p => p.score !== undefined && p.score !== null).length} scored
 			</span>
 		{/if}
 	</div>

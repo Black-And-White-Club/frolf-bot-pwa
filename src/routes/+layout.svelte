@@ -4,15 +4,48 @@ import '../app.css';
 import { page } from '$app/stores';
 import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 import ThemeProvider from '$lib/components/ThemeProvider.svelte';
+import { onMount, onDestroy } from 'svelte';
+import { browser } from '$app/environment';
+import LiveAnnouncer from '$lib/components/LiveAnnouncer.svelte';
+import UpdateSnackbarClient from '$lib/components/UpdateSnackbar.client.svelte';
+import { showUpdate } from '$lib/pwa/updateSnackbarHelper';
+import { registerServiceWorker } from '$lib/pwa/registerServiceWorker';
+
+let swListener: (ev: Event) => void;
+
+onMount(async () => {
+	try {
+		const reg = await registerServiceWorker();
+		// server may return the registration; we already dispatch sw:waiting from registerServiceWorker
+	} catch {
+		// best-effort
+	}
+
+	swListener = (e: Event) => {
+		const ev = e as CustomEvent<ServiceWorkerRegistration>;
+		try { if (browser) showUpdate(ev.detail) } catch { /* ignore */ }
+	}
+	if (browser) window.addEventListener('sw:waiting', swListener as EventListener);
+});
+
+onDestroy(() => { if (swListener && browser) window.removeEventListener('sw:waiting', swListener as EventListener) })
 
 let { children } = $props();
 </script>
 
 <svelte:head>
 	<link rel="icon" href="/favicon.svg" />
+	<!-- Preconnect to common image CDN to reduce LCP latency (reported by Lighthouse) -->
+	<link rel="dns-prefetch" href="https://images.unsplash.com" />
+	<link rel="preconnect" href="https://images.unsplash.com" crossorigin="anonymous" />
 </svelte:head>
 
+<!-- Skip link for keyboard/mobile users -->
+<a href="#main-content" class="sr-only focus:not-sr-only p-2" data-testid="skip-link">Skip to content</a>
+
 <ThemeProvider>
+	<LiveAnnouncer />
+	<UpdateSnackbarClient />
 {#if $page.data.session}
 	<!-- User is signed in -->
 	<div class="min-h-screen bg-[var(--guild-background)]">

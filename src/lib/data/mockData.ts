@@ -6,7 +6,7 @@ export const mockUsers: User[] = [
 		user_id: '123456789012345678',
 		username: 'Sebastian',
 		discriminator: '1234',
-		avatar_url: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=100&h=100&fit=crop&crop=face',
+	avatar_url: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=100&h=100&fit=crop&crop=face&auto=format&q=60',
 		guild_id: 'mock_guild_123',
 		role: 'User',
 		tag_number: 1,

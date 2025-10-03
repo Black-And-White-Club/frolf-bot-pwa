@@ -35,4 +35,27 @@ describe('registerServiceWorker', () => {
     const res = await registerServiceWorker()
     expect(res).toBeNull();
   });
+
+  it('dispatches sw:waiting when registration.waiting exists', async () => {
+    const waiting = {} as ServiceWorker;
+    const register = vi.fn().mockResolvedValue({ waiting, addEventListener: vi.fn() });
+    Object.defineProperty(globalThis, 'navigator', { value: { serviceWorker: { register } }, configurable: true })
+
+    const handler = vi.fn();
+    window.addEventListener('sw:waiting', handler as EventListener);
+
+    const res = await registerServiceWorker()
+    expect(res).toBeTruthy();
+    // handler should be called synchronously by notifyWaiting(reg)
+    expect(handler).toHaveBeenCalled();
+    window.removeEventListener('sw:waiting', handler as EventListener);
+  });
+
+  it('handles when addEventListener throws', async () => {
+    const register = vi.fn().mockResolvedValue({ waiting: null, addEventListener: () => { throw new Error('fail') } });
+    Object.defineProperty(globalThis, 'navigator', { value: { serviceWorker: { register } }, configurable: true })
+
+    const res = await registerServiceWorker()
+    expect(res).toBeTruthy();
+  });
 });

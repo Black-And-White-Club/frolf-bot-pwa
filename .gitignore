@@ -8,6 +8,26 @@ node_modules
 /.svelte-kit
 /build
 
+# Editor / IDE
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Caches
+.cache
+.parcel-cache
+.vite
+.pnp.*
+/.next
+/.turbo
+
 # OS
 .DS_Store
 Thumbs.db
@@ -34,3 +54,5 @@ storybook-static
 # generated types
 src/lib/types/generated
 coverage*
+dist*
+/coverage

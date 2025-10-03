@@ -1,6 +1,7 @@
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import devtoolsJson from 'vite-plugin-devtools-json';
 import tailwindcss from '@tailwindcss/vite';
+import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vitest/config';
 import { sveltekit } from '@sveltejs/kit/vite';
 
@@ -8,11 +9,12 @@ export default defineConfig({
 	// Prefer browser exports so Svelte's client runtime is used (mount / onMount available)
 	resolve: { conditions: ['browser'] },
 	plugins: [
-		tailwindcss(),
-		sveltekit(),
-		devtoolsJson(),
-		paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' })
-	],
+	 		tailwindcss(),
+	 		sveltekit(),
+	 		devtoolsJson(),
+	 		paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' }),
+	 		...(process.env.ANALYZE ? [visualizer({ filename: 'dist/stats.html', template: 'treemap' })] : [])
+	 	],
 	test: {
 		expect: { requireAssertions: false },
 		// Shared setup for any test that uses jsdom (annotated or client project).
@@ -28,7 +30,8 @@ export default defineConfig({
 						'src/lib/components/**/*.test.{js,ts}',
 						'src/lib/components/**/*.spec.{js,ts}',
 						'src/lib/utils/**/*.test.{js,ts}',
-						'src/demo.spec.{js,ts}'
+						'src/demo.spec.{js,ts}',
+						'src/lib/a11y/**/*.test.{js,ts}'
 					],
 					exclude: ['src/lib/server/**'],
 					server: {

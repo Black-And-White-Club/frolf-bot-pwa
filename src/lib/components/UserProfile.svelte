@@ -31,6 +31,8 @@
 			node.removeAttribute('tabindex');
 		}
 	}
+
+	import { isUnsplashUrl, unsplashSrcset, unsplashSizes } from '$lib/utils/unsplash';
 </script>
 
 <div
@@ -43,7 +45,19 @@
 >
 	<div class="flex items-center space-x-4">
 		{#if user.avatar_url}
-			<img src={user.avatar_url} alt="{user.username}'s avatar" class="w-12 h-12 rounded-full" />
+			<img
+				src={user.avatar_url}
+				alt="{user.username}'s avatar"
+				width="48"
+				height="48"
+				loading="lazy"
+				decoding="async"
+				crossorigin="anonymous"
+				style="aspect-ratio:1/1"
+				class="w-12 h-12 rounded-full"
+				srcset={isUnsplashUrl(user.avatar_url) ? unsplashSrcset(user.avatar_url, [48, 100]) : undefined}
+				sizes={isUnsplashUrl(user.avatar_url) ? unsplashSizes(48) : undefined}
+			/>
 		{:else}
 			<div class="w-12 h-12 rounded-full bg-[var(--guild-border)] flex items-center justify-center">
 				<span class="text-[var(--guild-text-secondary)] font-medium">{user.username.charAt(0).toUpperCase()}</span>

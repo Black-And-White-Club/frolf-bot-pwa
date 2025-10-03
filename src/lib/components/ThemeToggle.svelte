@@ -1,6 +1,7 @@
 <script lang="ts">
 import { onMount, onDestroy } from 'svelte';
 import { prefersDark } from '$lib/stores/theme';
+import { browser } from '$app/environment'
 
 export let testid: string | undefined = undefined;
 
@@ -8,6 +9,7 @@ let checked = false;
 let unsubscribe = () => {};
 
 onMount(() => {
+	if (!browser) return
 	// subscribe to the prefersDark store (theme.ts will persist and toggle DOM class)
 	unsubscribe = prefersDark.subscribe((v) => (checked = v));
 });

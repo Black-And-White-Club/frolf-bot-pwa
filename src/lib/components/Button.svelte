@@ -35,6 +35,6 @@
 	].filter(Boolean).join(' ');
 </script>
 
-<button {type} {disabled} class={classes} on:click={handleClick} data-testid={testid}>
+<button {type} {disabled} class={classes} on:click={handleClick} data-testid={testid} aria-disabled={disabled} {...$$restProps}>
 	<slot />
 </button>

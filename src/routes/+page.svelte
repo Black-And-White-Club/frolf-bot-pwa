@@ -4,15 +4,14 @@
 	import type { DashboardData, Round, User } from '$lib/types/backend';
 	import Button from '$lib/components/Button.svelte';
 	import RoundCard from '$lib/components/round/RoundCard.svelte';
-	import UserProfile from '$lib/components/UserProfile.svelte';
-	import Leaderboard from '$lib/components/Leaderboard.svelte';
 	import ScoreCard from '$lib/components/ScoreCard.svelte';
 	import ThemeProvider from '$lib/components/ThemeProvider.svelte';
-	import ActiveRoundsIcon from '$lib/components/icons/ActiveRounds.svelte';
-	import ScheduledIcon from '$lib/components/icons/Scheduled.svelte';
-	import CompletedIcon from '$lib/components/icons/Completed.svelte';
-	import TotalPlayersIcon from '$lib/components/icons/TotalPlayers.svelte';
-	import { setGuildTheme } from '$lib/stores/theme';
+	// Icons: lazy-load on client to reduce initial bundle
+		let ActiveRoundsIcon = $state<any>(null);
+		let ScheduledIcon = $state<any>(null);
+		let CompletedIcon = $state<any>(null);
+		let TotalPlayersIcon = $state<any>(null);
+		import { setGuildTheme } from '$lib/stores/theme';
 
 	let dashboardData: DashboardData | null = $state(null);
 	let loading = $state(true);
@@ -23,6 +22,10 @@
 	let completedRounds = $state<Round[]>([]);
 	let currentUser = $state<User | null>(null);
 
+	// Lazy-loaded components (client-only, reduce initial bundle)
+	let Leaderboard = $state<any>(null);
+	let UserProfile = $state<any>(null);
+
 	onMount(async () => {
 		try {
 			dashboardData = await mockAPI.getDashboard();
@@ -31,6 +34,22 @@
 
 			// Set theme based on guild
 			    setGuildTheme(selectedGuild);
+			// Dynamically import heavy/right-column components on client
+			// so they don't bloat the initial SSR bundle.
+			const [lb, up, aIcon, sIcon, cIcon, tIcon] = await Promise.all([
+				import('$lib/components/Leaderboard.svelte'),
+				import('$lib/components/UserProfile.svelte'),
+				import('$lib/components/icons/ActiveRounds.svelte'),
+				import('$lib/components/icons/Scheduled.svelte'),
+				import('$lib/components/icons/Completed.svelte'),
+				import('$lib/components/icons/TotalPlayers.svelte')
+			]);
+			Leaderboard = lb?.default ?? lb;
+			UserProfile = up?.default ?? up;
+			ActiveRoundsIcon = aIcon?.default ?? aIcon;
+			ScheduledIcon = sIcon?.default ?? sIcon;
+			CompletedIcon = cIcon?.default ?? cIcon;
+			TotalPlayersIcon = tIcon?.default ?? tIcon;
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to load dashboard';
 		} finally {
@@ -120,7 +139,11 @@
 								<p class="text-2xl font-bold" style="color: var(--guild-text);">{activeRounds.length}</p>
 							</div>
 							<div class="p-2 rounded-lg" style="background-color: {getStatusBgColor('var(--guild-primary)')};">
-								<ActiveRoundsIcon className="w-5 h-5 text-guild-primary" testid="stat-icon-active-rounds" />
+								{#if ActiveRoundsIcon}
+									<ActiveRoundsIcon class="w-5 h-5 text-guild-primary" testid="stat-icon-active-rounds" />
+								{:else}
+									<svg class="w-5 h-5 text-guild-primary" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 2a1 1 0 011 1v6h6a1 1 0 110 2h-6v6a1 1 0 11-2 0v-6H3a1 1 0 110-2h6V3a1 1 0 011-1z"></path></svg>
+								{/if}
 							</div>
 						</div>
 					</div>
@@ -132,7 +155,11 @@
 								<p class="text-2xl font-bold" style="color: var(--guild-text);">{scheduledRounds.length}</p>
 							</div>
 							<div class="p-2 rounded-lg" style="background-color: {getStatusBgColor('var(--guild-secondary)')};">
-								<ScheduledIcon className="w-5 h-5 text-guild-secondary" testid="stat-icon-scheduled" />
+								{#if ScheduledIcon}
+									<ScheduledIcon class="w-5 h-5 text-guild-secondary" testid="stat-icon-scheduled" />
+								{:else}
+									<svg class="w-5 h-5 text-guild-secondary" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M6 2a1 1 0 000 2h8a1 1 0 100-2H6zM4 6a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"></path></svg>
+								{/if}
 							</div>
 						</div>
 					</div>
@@ -144,7 +171,11 @@
 								<p class="text-2xl font-bold" style="color: var(--guild-text);">{completedRounds.length}</p>
 							</div>
 							<div class="p-2 rounded-lg" style="background-color: {getStatusBgColor('var(--guild-accent)')};">
-								<CompletedIcon className="w-5 h-5 text-guild-accent" testid="stat-icon-completed" />
+								{#if CompletedIcon}
+									<CompletedIcon class="w-5 h-5 text-guild-accent" testid="stat-icon-completed" />
+								{:else}
+									<svg class="w-5 h-5 text-guild-accent" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M7 10l2 2 4-4"></path></svg>
+								{/if}
 							</div>
 						</div>
 					</div>
@@ -156,7 +187,11 @@
 								<p class="text-2xl font-bold" style="color: var(--guild-text);">{dashboardData.leaderboard_preview?.length || 0}</p>
 							</div>
 							<div class="p-2 rounded-lg" style="background-color: {getStatusBgColor('var(--guild-primary)')};">
-								<TotalPlayersIcon className="w-5 h-5 text-guild-primary" testid="stat-icon-total-players" />
+								{#if TotalPlayersIcon}
+									<TotalPlayersIcon class="w-5 h-5 text-guild-primary" testid="stat-icon-total-players" />
+								{:else}
+									<svg class="w-5 h-5 text-guild-primary" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 3a3 3 0 100 6 3 3 0 000-6zM4 14a4 4 0 018 0H4z"></path></svg>
+								{/if}
 							</div>
 						</div>
 					</div>
@@ -259,13 +294,17 @@
 								<h2 class="text-xl font-semibold" style="color: var(--guild-text);">Leaderboard</h2>
 								<Button variant="secondary" size="sm" testid="btn-view-all">View All</Button>
 							</div>
-							<Leaderboard
-								entries={dashboardData.leaderboard_preview}
-								limit={10}
-								showRank={true}
-								compact={true}
-								testid="leaderboard-main"
-							/>
+							{#if Leaderboard}
+								<Leaderboard
+									entries={dashboardData.leaderboard_preview}
+									limit={10}
+									showRank={true}
+									compact={true}
+									testid="leaderboard-main"
+								/>
+							{:else}
+								<div class="text-sm text-[var(--guild-text-secondary)]">Loading leaderboard…</div>
+							{/if}
 						</section>
 
 						<!-- User Profile Section -->
@@ -275,11 +314,15 @@
 									<h2 class="text-xl font-semibold" style="color: var(--guild-text);">Your Stats</h2>
 									<Button variant="secondary" size="sm" onClick={handleProfileClick} testid="btn-view-profile">View Profile</Button>
 								</div>
-								<UserProfile
-									user={currentUser}
-									showStats={true}
-									testid="userprofile-current"
-								/>
+								{#if UserProfile}
+									<UserProfile
+										user={currentUser}
+										showStats={true}
+										testid="userprofile-current"
+									/>
+								{:else}
+									<div class="text-sm text-[var(--guild-text-secondary)]">Loading profile…</div>
+								{/if}
 							</section>
 						{/if}
 					</div>

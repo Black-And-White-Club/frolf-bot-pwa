@@ -38,6 +38,75 @@ if (typeof (globalThis as any).scrollTo === 'undefined') {
 	(globalThis as any).scrollTo = () => {}
 }
 
+// navigation / location.reload stub: jsdom throws on full navigation; provide a safe no-op reload
+// which tests can spy on if they need to assert a reload was requested.
+(() => {
+  try {
+    const g = globalThis as unknown as { location?: Location }
+    const origLocation = g.location
+    if (origLocation) {
+      // Create a shallow copy that preserves existing location fields but overrides reload.
+      const safeLocation = Object.create(Object.getPrototypeOf(origLocation))
+      // copy own properties (best-effort)
+      for (const k of Object.getOwnPropertyNames(origLocation)) {
+        try { (safeLocation as any)[k] = (origLocation as any)[k] } catch { console.warn('copy location prop failed') }
+      }
+      ;(safeLocation as any).reload = () => {}
+      // make the global location configurable so tests may replace it
+      try {
+        Object.defineProperty(globalThis, 'location', { value: safeLocation, configurable: true })
+      } catch {
+        // last resort: attach reload directly if defineProperty fails
+        try { ;(globalThis as any).location.reload = () => {} } catch { console.warn('attach reload failed') }
+      }
+    } else {
+      // no location present (very unusual), create a minimal one
+      try {
+        Object.defineProperty(globalThis, 'location', { value: { reload: () => {}, assign: () => {}, replace: () => {} }, configurable: true })
+  } catch { console.warn('define fallback location failed') }
+    }
+  } catch {
+    // swallow any setup-time errors; tests will still run but might need to stub navigation themselves
+    console.warn('vitest-setup-client: navigation stub setup failed')
+  }
+})()
+
+if (typeof (globalThis as any).HTMLCanvasElement !== 'undefined') {
+  const proto = (globalThis as any).HTMLCanvasElement.prototype
+  // Always override, because jsdom ships a stub that throws
+  proto.getContext = function () {
+    return {
+      fillRect: () => {},
+      getImageData: (_x: number, _y: number, w: number, h: number) => ({
+        data: new Uint8ClampedArray(w * h * 4),
+      }),
+      putImageData: () => {},
+      createImageData: () => [],
+      setTransform: () => {},
+      drawImage: () => {},
+      save: () => {},
+      restore: () => {},
+      beginPath: () => {},
+      closePath: () => {},
+      fill: () => {},
+      stroke: () => {},
+      moveTo: () => {},
+      lineTo: () => {},
+      arc: () => {},
+      rect: () => {},
+      clip: () => {},
+      measureText: () => ({ width: 0 }),
+      translate: () => {},
+      scale: () => {},
+      rotate: () => {},
+      clearRect: () => {},
+      createLinearGradient: () => ({ addColorStop: () => {} }),
+      createPattern: () => null,
+    } as unknown as CanvasRenderingContext2D
+  }
+}
+
+
 // Anchor click/navigation stubs intentionally moved to per-test helpers.
 // Use `installAnchorClickStub()` in tests that need to prevent jsdom navigation.
 
