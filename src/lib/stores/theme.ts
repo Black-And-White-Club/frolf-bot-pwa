@@ -6,6 +6,10 @@
 import { writable, get } from 'svelte/store';
 import { hexToRgbString, setRgbAliases } from './theme.helpers';
 
+// re-export helpers so older imports that referenced these from `theme` continue to work
+export { hexToRgbString, setRgbAliases };
+
+
 // Expanded theme interface with full design tokens
 export interface GuildTheme {
 	// Colors
