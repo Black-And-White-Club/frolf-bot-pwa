@@ -12,24 +12,25 @@ import TotalPlayers from '../TotalPlayers.svelte';
 import Tutorials from '../Tutorials.svelte';
 import Youtube from '../Youtube.svelte';
 
+// component constructors — let TypeScript infer the precise constructor types
 const components = [
-	Accessibility,
-	ActiveRounds,
-	Completed,
-	Discord,
-	Github,
-	Scheduled,
-	TotalPlayers,
-	Tutorials,
-	Youtube,
+  Accessibility,
+  ActiveRounds,
+  Completed,
+  Discord,
+  Github,
+  Scheduled,
+  TotalPlayers,
+  Tutorials,
+  Youtube,
 ];
 
 describe('icon components render an svg', () => {
 	for (const C of components) {
 		it(C.name || 'icon', () => {
-			const { container } = render(C as unknown as typeof import('svelte').SvelteComponent);
-			const svg = container.querySelector('svg');
-			expect(svg).toBeTruthy();
-		});
+			const { container } = render(C)
+			const svg = container.querySelector('svg')
+			expect(svg).toBeTruthy()
+		})
 	}
 });

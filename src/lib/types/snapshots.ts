@@ -16,7 +16,7 @@ export interface LeaderboardSnapshot {
   lastUpdated: string
   topTags: TopTag[]
   topPlayers: Player[]
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface SnapshotEnvelope {

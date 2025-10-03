@@ -7,18 +7,19 @@ let _guilds: Guild[] = [
   { id: 'g2', name: 'Casual League', isAdmin: false }
 ]
 
-export async function loginMock() {
+// internal function pointers so tests can override behavior explicitly
+let _loginFn: () => Promise<Session | null> = async () => {
   _session = { user: { id: 'u1', name: 'Dev User', avatar_url: null }, token: 'fake-token' }
   return _session
 }
 
-export async function logoutMock() {
-  _session = null
-}
+let _logoutFn: () => Promise<void> = async () => { _session = null }
 
-export async function getSessionMock() {
-  return _session
-}
+let _getSessionFn: () => Promise<Session | null> = async () => _session
+
+export async function loginMock() { return _loginFn() }
+export async function logoutMock() { return _logoutFn() }
+export async function getSessionMock() { return _getSessionFn() }
 
 export async function listGuildsMock() {
   // simulate network latency
@@ -36,6 +37,20 @@ export async function linkGuildMock(guildId: string) {
 
 export function setMockGuilds(guilds: Guild[]) { _guilds = guilds }
 
+// Test helpers -------------------------------------------------------------
+export function setLoginMock(fn: () => Promise<Session | null>) { _loginFn = fn }
+export function setLogoutMock(fn: () => Promise<void>) { _logoutFn = fn }
+export function setGetSessionMock(fn: () => Promise<Session | null>) { _getSessionFn = fn }
+export function resetMocks() {
+  _session = null
+  _loginFn = async () => {
+    _session = { user: { id: 'u1', name: 'Dev User', avatar_url: null }, token: 'fake-token' }
+    return _session
+  }
+  _logoutFn = async () => { _session = null }
+  _getSessionFn = async () => _session
+}
+
 export default {
   login: loginMock,
   logout: logoutMock,
@@ -43,4 +58,9 @@ export default {
   listGuilds: listGuildsMock,
   linkGuild: linkGuildMock,
   setMockGuilds,
+  // test helpers
+  setLoginMock,
+  setLogoutMock,
+  setGetSessionMock,
+  resetMocks,
 }

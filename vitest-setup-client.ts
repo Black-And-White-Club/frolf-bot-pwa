@@ -38,6 +38,9 @@ if (typeof (globalThis as any).scrollTo === 'undefined') {
 	(globalThis as any).scrollTo = () => {}
 }
 
+// Anchor click/navigation stubs intentionally moved to per-test helpers.
+// Use `installAnchorClickStub()` in tests that need to prevent jsdom navigation.
+
 // Provide a basic fetch if missing (use node's fetch if available):
 if (typeof (globalThis as any).fetch === 'undefined') {
 	// Provide a minimal stub so tests that forget to mock fetch will get a helpful error.

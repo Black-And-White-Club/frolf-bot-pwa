@@ -1,6 +1,5 @@
 /* @vitest-environment jsdom */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render } from '@testing-library/svelte'
 import { test, expect } from 'vitest'
 import RoundDetails from '../RoundDetails.svelte'

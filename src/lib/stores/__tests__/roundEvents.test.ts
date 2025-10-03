@@ -8,11 +8,15 @@ beforeEach(() => {
 	vi.resetModules();
 	vi.useFakeTimers();
 	// ensure fresh crypto for randomUUID
-	if (!globalThis.crypto) {
-		// lightweight stub: cast via unknown to satisfy Crypto shape for tests
-		const fakeCrypto = { randomUUID: () => 'stub-uuid', getRandomValues: (arr: Uint8Array) => arr } as unknown as Crypto;
-		(globalThis as unknown as { crypto?: Crypto }).crypto = fakeCrypto;
-	}
+			if (!globalThis.crypto) {
+				// lightweight stub: define minimal crypto on globalThis
+				// fakeCrypto is intentionally minimal for tests; typed as Partial<Crypto> to avoid unsafe double-casts
+				const fakeCrypto: Partial<Crypto> = {
+					randomUUID: () => '00000000-0000-4000-8000-000000000000',
+					getRandomValues: <T extends ArrayBufferView>(array: T) => array,
+				}
+				try { Object.defineProperty(globalThis, 'crypto', { value: fakeCrypto as Crypto, configurable: true }) } catch { /* best-effort stub */ }
+			}
 	if (typeof window !== 'undefined') {
 		window.localStorage.clear();
 		document.documentElement.className = '';
@@ -116,8 +120,13 @@ describe('roundEvents store and processing', () => {
 		vi.advanceTimersByTime(200);
 
 	expect(get(rounds)[0].status).toBe('completed');
-	// completed_at is added by the processing as a non-typed property
-	expect(typeof (get(rounds)[0] as unknown as { completed_at?: number }).completed_at).toBe('number');
+	// completed_at is added by the processing as a non-typed property; use a small type-guard
+	const firstRound = get(rounds)[0]
+	function hasCompletedAt(r: unknown): r is { completed_at: number } {
+		return !!r && typeof r === 'object' && 'completed_at' in r && typeof (r as Record<string, unknown>)['completed_at'] === 'number'
+	}
+	expect(hasCompletedAt(firstRound)).toBe(true)
+	if (hasCompletedAt(firstRound)) expect(typeof firstRound.completed_at).toBe('number')
 	});
 
 	it('getFilteredEvents returns a derived store filtered by criteria', async () => {

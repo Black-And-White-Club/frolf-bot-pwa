@@ -5,24 +5,26 @@ export class HttpWebSocketTransport implements Transport {
   private ws?: { onopen?: () => void; onmessage?: (ev: { data: unknown }) => void; onerror?: () => void; onclose?: () => void; close?: () => void }
   private cb?: (env: Envelope) => void
 
+  // Test-only accessor: allows tests to inspect the live WebSocket without relying on casts
+  get internalWs() { return this.ws }
+
   constructor(private opts: { snapshotUrl: string; wsUrl: string; token?: string }) {}
 
   async connect(): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
         // global WebSocket may be provided by environment (browser or test harness)
-  // Use unknown cast to avoid direct 'any' usage from globalThis in different environments
-  type WSConstructor = new (url: string) => { onopen?: () => void; onmessage?: (ev: { data: unknown }) => void; onerror?: () => void; onclose?: () => void; close?: () => void }
-  const GlobalWebSocket = (globalThis as unknown as { WebSocket?: WSConstructor }).WebSocket
-  if (!GlobalWebSocket) throw new Error('no WebSocket available')
-  const wsInstance = new GlobalWebSocket(this.opts.wsUrl)
+        const GlobalWebSocket = getGlobalWebSocketConstructor()
+        if (!GlobalWebSocket) throw new Error('no WebSocket available')
+        const wsInstance = new GlobalWebSocket(this.opts.wsUrl)
         this.ws = wsInstance
         wsInstance.onopen = () => resolve()
         wsInstance.onmessage = (ev: { data: unknown }) => {
           try {
             const raw = typeof ev.data === 'string' ? ev.data : String(ev.data)
             const data = JSON.parse(raw)
-            this.cb?.(data as Envelope)
+            // runtime-check envelope-ish shape minimally
+            if (data && typeof data.type === 'string') this.cb?.(data as Envelope)
           } catch {
             // ignore malformed payloads
           }
@@ -65,3 +67,13 @@ export class HttpWebSocketTransport implements Transport {
 }
 
 export default HttpWebSocketTransport
+
+type WSConstructor = new (url: string) => { onopen?: () => void; onmessage?: (ev: { data: unknown }) => void; onerror?: () => void; onclose?: () => void; close?: () => void }
+
+function getGlobalWebSocketConstructor(): WSConstructor | undefined {
+  // avoid double-casts; use a single narrowed typing for the global
+  const g = globalThis as { WebSocket?: unknown }
+  const maybe = g.WebSocket
+  if (typeof maybe === 'function') return maybe as WSConstructor
+  return undefined
+}

@@ -16,13 +16,14 @@ class MockWebSocket {
 }
 
 describe('HttpWebSocketTransport', () => {
-  let OriginalWebSocket: unknown
+  let originalDesc: PropertyDescriptor | undefined
   beforeEach(() => {
-    OriginalWebSocket = (globalThis as unknown as { WebSocket?: unknown }).WebSocket
-    ;(globalThis as unknown as { WebSocket?: unknown }).WebSocket = MockWebSocket
+    originalDesc = Object.getOwnPropertyDescriptor(globalThis, 'WebSocket')
+    Object.defineProperty(globalThis, 'WebSocket', { value: MockWebSocket, configurable: true })
   })
   afterEach(() => {
-    ;(globalThis as unknown as { WebSocket?: unknown }).WebSocket = OriginalWebSocket
+    if (originalDesc) Object.defineProperty(globalThis, 'WebSocket', originalDesc)
+      else try { Object.defineProperty(globalThis, 'WebSocket', { value: undefined, configurable: true }) } catch { /* ignore */ }
     vi.restoreAllMocks()
   })
 
@@ -44,7 +45,8 @@ describe('HttpWebSocketTransport', () => {
     expect(snap).toBeTruthy()
 
     // simulate server message
-    const ws = (transport as unknown as { ws?: MockWebSocket }).ws
+      // use the transport's test-only accessor (single cast)
+      const ws = (transport as { internalWs?: MockWebSocket }).internalWs
     if (ws && ws.onmessage) {
       ws.onmessage({ data: JSON.stringify({ type: 'patch', schema: 'leaderboard.patch.v1', version: 2, op: 'upsert_player', payload: { userId: 'u1' } }) })
     }

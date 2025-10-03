@@ -20,8 +20,9 @@ export function createLeaderboardPreviewStore(transport: Transport) {
   function handleEnvelope(env: Envelope) {
     state.update(s => {
       if (env.type === 'snapshot') {
-        const snap = env.payload as LeaderboardSnapshot
-        s.snapshot = snap
+        if (isProbablySnapshot(env.payload)) {
+          s.snapshot = env.payload as LeaderboardSnapshot
+        }
         s.lastVersion = env.version
         return s
       }
@@ -43,9 +44,8 @@ export function createLeaderboardPreviewStore(transport: Transport) {
         }
       }
 
-      if (patch.op === 'replace_snapshot') {
-        const snap = patch.payload as unknown as LeaderboardSnapshot
-        s.snapshot = snap
+      if (patch.op === 'replace_snapshot' && isProbablySnapshot(patch.payload)) {
+        s.snapshot = patch.payload as LeaderboardSnapshot
       }
 
       s.lastVersion = patch.version
@@ -83,4 +83,10 @@ export function createLeaderboardPreviewStore(transport: Transport) {
     stop,
     handleEnvelope, // exported for tests
   }
+}
+
+function isProbablySnapshot(v: unknown): v is LeaderboardSnapshot {
+  if (!v || typeof v !== 'object') return false
+  const r = v as Record<string, unknown>
+  return typeof r.id === 'string' && typeof r.version === 'number' && Array.isArray(r.topPlayers)
 }

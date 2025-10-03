@@ -1,11 +1,9 @@
 /* @vitest-environment jsdom */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* @vitest-environment jsdom */
 import { render, waitFor } from '@testing-library/svelte'
 import { test, expect } from 'vitest'
 import LeaderboardPreview from '../LeaderboardPreview.svelte'
 import { MockTransport } from '$lib/stores/mockTransport'
+import type { Envelope } from '$lib/types/snapshots'
 
 test('shows empty and updates when snapshot arrives', async () => {
   const transport = new MockTransport()
@@ -14,13 +12,13 @@ test('shows empty and updates when snapshot arrives', async () => {
   // initially empty
   getByText('No snapshot')
 
-  // send snapshot
-  const snap = {
+  // send snapshot using typed envelope
+  const snap: Envelope = {
     type: 'snapshot', schema: 'leaderboard.v1', version: 1, ts: new Date().toISOString(), payload: {
-      id: 'l1', version: 1, lastUpdated: new Date().toISOString(), topTags: [{ tag: 'park', count: 2 }], topPlayers: [{ name: 'Sam', score: 10 }]
+      id: 'l1', version: 1, lastUpdated: new Date().toISOString(), topTags: [{ tag: 'park', count: 2 }], topPlayers: [{ userId: 'u1', name: 'Sam', score: 10 }]
     }
-  } as any
-  await transport.send(snap as any)
+  }
+  await transport.send(snap)
 
   await waitFor(() => expect(queryByText('No snapshot')).toBeNull())
   getByText('Sam — 10')

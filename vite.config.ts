@@ -15,6 +15,9 @@ export default defineConfig({
 	],
 	test: {
 		expect: { requireAssertions: false },
+		// Shared setup for any test that uses jsdom (annotated or client project).
+		// This ensures polyfills and DOM safety stubs are available regardless of project.
+		setupFiles: ['./vitest-setup-client.ts'],
 		projects: [
 			{
 				extends: './vite.config.ts',
@@ -28,7 +31,6 @@ export default defineConfig({
 						'src/demo.spec.{js,ts}'
 					],
 					exclude: ['src/lib/server/**'],
-					setupFiles: ['./vitest-setup-client.ts'],
 					server: {
 						deps: {
 							inline: [
@@ -74,11 +76,27 @@ export default defineConfig({
 				'src/lib/server/**',
 				'src/lib/services/**',
 				'src/lib/types/**',
+				// Also exclude compiled/output folders that appear in v8 reports
+				'lib/**',
+				'lib/**/*.stories.*',
+				'lib/data/**',
+				'lib/mocks/**',
+				'lib/server/**',
+				'lib/services/**',
+				'lib/types/**',
 				'public/**',
 				'tests/**'
 			],
 			// Soft thresholds for the library code. CI can enforce stricter limits.
-				// Coverage focuses on src/lib/**; enforce thresholds in CI if needed.
+			thresholds: {
+				global: {
+					statements: 80,
+					branches: 60,
+					functions: 80,
+					lines: 80
+				}
+			},
+			// Coverage focuses on src/lib/**; enforce stricter thresholds in CI if needed.
 		}
 	}
 });

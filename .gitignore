@@ -33,4 +33,4 @@ storybook-static
 
 # generated types
 src/lib/types/generated
-coverage/*
+coverage*

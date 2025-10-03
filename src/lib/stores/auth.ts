@@ -27,17 +27,17 @@ export const AuthStore = {
 
 // Development-friendly default implementations that dynamically import the mock
 export async function login(): Promise<Session | null> {
-  type MockAuthModule = { login: () => Promise<Session | null> }
-  const m = (await import('$lib/mocks/mockAuth')) as unknown as MockAuthModule
-  const s = await m.login()
+  const m = await import('$lib/mocks/mockAuth')
+  const fn = getFnFromModule<() => Promise<Session | null>>(m, ['login', 'loginMock'])
+  const s = fn ? await fn() : null
   sessionStore.set(s)
   return s
 }
 
 export async function logout(): Promise<void> {
-  type MockAuthModule = { logout: () => Promise<void> }
-  const m = (await import('$lib/mocks/mockAuth')) as unknown as MockAuthModule
-  await m.logout()
+  const m = await import('$lib/mocks/mockAuth')
+  const fn = getFnFromModule<() => Promise<void>>(m, ['logout', 'logoutMock'])
+  if (fn) await fn()
   sessionStore.set(null)
 }
 
@@ -46,11 +46,30 @@ export async function getSession(): Promise<Session | null> {
   let current: Session | null = null
   sessionStore.subscribe(s => { current = s })()
   if (current) return current
-  type MockAuthModule = { getSession: () => Promise<Session | null> }
-  const m = (await import('$lib/mocks/mockAuth')) as unknown as MockAuthModule
-  const s = await m.getSession()
+  const m = await import('$lib/mocks/mockAuth')
+  const fn = getFnFromModule<() => Promise<Session | null>>(m, ['getSession', 'getSessionMock'])
+  const s = fn ? await fn() : null
   if (s) sessionStore.set(s)
   return s
 }
 
 export default AuthStore
+
+// small helper: safely resolve a function from a dynamically imported module
+function getFnFromModule<T extends (...args: unknown[]) => unknown>(mod: unknown, names: string[]): T | undefined {
+  if (!mod || typeof mod !== 'object') return undefined
+  const asRecord = mod as Record<string, unknown>
+  for (const n of names) {
+    const v = asRecord[n]
+    if (typeof v === 'function') return v as T
+  }
+  const def = (asRecord as Record<string, unknown>)['default']
+  if (def && typeof def === 'object') {
+    const asDef = def as Record<string, unknown>
+    for (const n of names) {
+      const v = asDef[n]
+      if (typeof v === 'function') return v as T
+    }
+  }
+  return undefined
+}

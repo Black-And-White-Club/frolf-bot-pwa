@@ -42,7 +42,7 @@ export const Default: Story = {
     round: mockRound,
     showStatus: true,
     compact: false,
-    ...( { dataTestId: 'round-card-round_123' } as any )
+    dataTestId: 'round-card-round_123',
   },
 };
 
@@ -51,7 +51,7 @@ export const Compact: Story = {
     round: mockRound,
     showStatus: true,
     compact: true,
-    ...( { dataTestId: 'round-card-round_123-compact' } as any )
+    dataTestId: 'round-card-round_123-compact',
   },
 };
 
@@ -60,6 +60,6 @@ export const NoStatus: Story = {
     round: mockRound,
     showStatus: false,
     compact: false,
-    ...( { dataTestId: 'round-card-round_123-nostatus' } as any )
+    dataTestId: 'round-card-round_123-nostatus',
   },
 };

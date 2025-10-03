@@ -12,21 +12,21 @@ describe('LeaderboardPreviewStore', () => {
     await store.start()
 
     // send snapshot v1
-    const snap = {
-      type: 'snapshot',
-      schema: 'leaderboard.v1',
-      version: 1,
-      ts: new Date().toISOString(),
-      payload: {
-        id: 'leaderboard:default',
+    const snap: import('../../types/snapshots').Envelope = {
+        type: 'snapshot',
+        schema: 'leaderboard.v1',
         version: 1,
-        lastUpdated: new Date().toISOString(),
-        topTags: [{ tag: 'park', count: 5 }],
-        topPlayers: [{ userId: 'u1', name: 'Sam', score: 10 }],
-      },
-    }
+        ts: new Date().toISOString(),
+        payload: {
+          id: 'leaderboard:default',
+          version: 1,
+          lastUpdated: new Date().toISOString(),
+          topTags: [{ tag: 'park', count: 5 }],
+          topPlayers: [{ userId: 'u1', name: 'Sam', score: 10 }],
+        },
+      }
 
-  await transport.send(snap as unknown as import('../../types/snapshots').Envelope)
+    await transport.send(snap)
 
     await new Promise(r => setTimeout(r, 10))
 
