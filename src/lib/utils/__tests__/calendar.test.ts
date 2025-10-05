@@ -1,6 +1,9 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { installAnchorClickStub, uninstallAnchorClickStub } from '$lib/test-utils/installAnchorStub';
+import {
+	installAnchorClickStub,
+	uninstallAnchorClickStub
+} from '$lib/test-utils/installAnchorStub';
 import { createCalendarEvent } from '../calendar';
 import type { Round } from '$lib/types/backend';
 import { makeRound } from '$lib/test-utils/fixtures';
@@ -28,11 +31,21 @@ describe('calendar utils', () => {
 			status: 'scheduled'
 		};
 
-		const { addToCalendar } = await import('../calendar')
-		const shareMock = vi.fn().mockResolvedValue(undefined)
-		Object.defineProperty(globalThis, 'navigator', { value: { share: shareMock }, configurable: true })
+		const { addToCalendar } = await import('../calendar');
+		const shareMock = vi.fn().mockResolvedValue(undefined);
+		Object.defineProperty(globalThis, 'navigator', {
+			value: { share: shareMock },
+			configurable: true
+		});
 
-		await addToCalendar(makeRound({ round_id: round.round_id, title: round.title, created_at: round.created_at, status: 'scheduled' }))
+		await addToCalendar(
+			makeRound({
+				round_id: round.round_id,
+				title: round.title,
+				created_at: round.created_at,
+				status: 'scheduled'
+			})
+		);
 
 		expect(shareMock).toHaveBeenCalled();
 		const arg = shareMock.mock.calls[0][0];
@@ -49,38 +62,52 @@ describe('calendar utils', () => {
 			status: 'scheduled'
 		};
 
-			const { addToCalendar } = await import('../calendar')
+		const { addToCalendar } = await import('../calendar');
 
-			// Ensure navigator.share is not present (previous tests may set it)
-			Object.defineProperty(globalThis, 'navigator', { value: {}, configurable: true })
+		// Ensure navigator.share is not present (previous tests may set it)
+		Object.defineProperty(globalThis, 'navigator', { value: {}, configurable: true });
 
-			// install anchor click stub to avoid jsdom navigation
-			installAnchorClickStub()
+		// install anchor click stub to avoid jsdom navigation
+		installAnchorClickStub();
 
-			// Provide a temporary createObjectURL if missing
-			const origCreate = (URL as { createObjectURL?: (a: unknown) => string }).createObjectURL
-			if (typeof origCreate !== 'function') {
-				Object.defineProperty(URL, 'createObjectURL', { value: () => 'blob:fake', configurable: true })
+		// Provide a temporary createObjectURL if missing
+		const origCreate = (URL as { createObjectURL?: (a: unknown) => string }).createObjectURL;
+		if (typeof origCreate !== 'function') {
+			Object.defineProperty(URL, 'createObjectURL', {
+				value: () => 'blob:fake',
+				configurable: true
+			});
+		}
+		const createObjSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:fake');
+		const appendSpy = vi.spyOn(document.body, 'appendChild');
+		const removeSpy = vi.spyOn(document.body, 'removeChild');
+
+		await addToCalendar(
+			makeRound({
+				round_id: round.round_id,
+				title: round.title,
+				created_at: round.created_at,
+				status: 'scheduled'
+			})
+		);
+
+		expect(createObjSpy).toHaveBeenCalled();
+		expect(appendSpy).toHaveBeenCalled();
+		expect(removeSpy).toHaveBeenCalled();
+
+		createObjSpy.mockRestore();
+		appendSpy.mockRestore();
+		removeSpy.mockRestore();
+
+		// uninstall anchor stub
+		uninstallAnchorClickStub();
+		if (typeof origCreate !== 'function') {
+			// restore original if replaced
+			try {
+				Object.defineProperty(URL, 'createObjectURL', { value: origCreate, configurable: true });
+			} catch {
+				/* best-effort restore */
 			}
-			const createObjSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:fake')
-			const appendSpy = vi.spyOn(document.body, 'appendChild')
-			const removeSpy = vi.spyOn(document.body, 'removeChild')
-
-			await addToCalendar(makeRound({ round_id: round.round_id, title: round.title, created_at: round.created_at, status: 'scheduled' }))
-
-			expect(createObjSpy).toHaveBeenCalled()
-			expect(appendSpy).toHaveBeenCalled()
-			expect(removeSpy).toHaveBeenCalled()
-
-			createObjSpy.mockRestore()
-			appendSpy.mockRestore()
-			removeSpy.mockRestore()
-
-			// uninstall anchor stub
-			uninstallAnchorClickStub()
-				if (typeof origCreate !== 'function') {
-					// restore original if replaced
-					try { Object.defineProperty(URL, 'createObjectURL', { value: origCreate, configurable: true }) } catch { /* best-effort restore */ }
-				}
+		}
 	});
 });

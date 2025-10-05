@@ -2,4 +2,3 @@
 
 export { default as Button } from './components/Button.svelte';
 export { default as ScoreCard } from './components/ScoreCard.svelte';
-

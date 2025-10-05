@@ -1,16 +1,88 @@
 @import 'tailwindcss';
 
+/* Self-hosted brand fonts (WOFF2) - placed in /static/fonts/ */
+@font-face {
+	font-family: 'Inter';
+	src: url('/fonts/inter-v20-latin-regular.woff2') format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Inter';
+	src: url('/fonts/inter-v20-latin-500.woff2') format('woff2');
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Inter';
+	src: url('/fonts/inter-v20-latin-600.woff2') format('woff2');
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Inter';
+	src: url('/fonts/inter-v20-latin-700.woff2') format('woff2');
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Space Grotesk';
+	src: url('/fonts/space-grotesk-v22-latin-regular.woff2') format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Space Grotesk';
+	src: url('/fonts/space-grotesk-v22-latin-500.woff2') format('woff2');
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Space Grotesk';
+	src: url('/fonts/space-grotesk-v22-latin-600.woff2') format('woff2');
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Space Grotesk';
+	src: url('/fonts/space-grotesk-v22-latin-700.woff2') format('woff2');
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
 /* Dynamic Guild Theme Variables */
 :root {
-	/* Default theme colors */
-	--guild-primary: #10b981;
-	--guild-secondary: #14b8a6;
-	--guild-accent: #06b6d4;
-	--guild-background: #f8fafc;
+	/* Frolf-Bot Brand Colors - Light Mode */
+	--guild-primary: #007474; /* Skobeloff */
+	--guild-secondary: #8b7bb8; /* Amethyst */
+	--guild-accent: #cba135; /* Satin Sheen Gold (brand accent) */
+	--guild-background: #f5fffa; /* Mint Cream */
 	--guild-surface: #ffffff;
-	--guild-text: #0f172a;
-	--guild-text-secondary: #475569;
+	--guild-text: #1a1a1a; /* Deep Charcoal */
+	--guild-text-secondary: #64748b;
 	--guild-border: #e2e8f0;
+
+	/* RGB variants for opacity usage */
+	--guild-primary-rgb: 0, 116, 116;
+	--guild-secondary-rgb: 139, 123, 184;
+	--guild-accent-rgb: 203, 161, 53;
+	--guild-text-rgb: 26, 26, 26;
+
+	/* Matte Gold Gradient */
+	--guild-gold-gradient: linear-gradient(135deg, #cba135 0%, #b38f2a 50%, #8f6e20 100%);
+
+	/* Typography */
+	--guild-font-primary: 'Inter', system-ui, -apple-system, sans-serif;
+	--guild-font-secondary: 'Space Grotesk', system-ui, -apple-system, sans-serif;
 
 	/* Semantic colors */
 	--guild-error-bg: #fef2f2; /* red-50 */
@@ -20,11 +92,17 @@
 
 /* Dark mode overrides */
 :root.dark {
-	--guild-background: #0f172a;
-	--guild-surface: #1e293b;
-	--guild-text: #f8fafc;
-	--guild-text-secondary: #cbd5e1;
+	--guild-background: #0f0f0f; /* Near Black */
+	--guild-surface: #1a1a1a; /* Deep Charcoal */
+	--guild-text: rgba(245, 255, 250, 0.9); /* Mint Cream at 90% */
+	--guild-text-secondary: rgba(245, 255, 250, 0.65); /* Mint Cream at 65% */
 	--guild-border: #334155;
+
+	/* RGB variants for dark mode */
+	--guild-primary-rgb: 0, 116, 116; /* Skobeloff stays vibrant */
+	--guild-secondary-rgb: 150, 135, 200; /* Amethyst slightly lighter for contrast */
+	--guild-accent-rgb: 184, 155, 94; /* Matte Gold maintains matte appearance */
+	--guild-text-rgb: 245, 255, 250; /* Mint Cream */
 
 	/* Dark variants for semantic colors */
 	--guild-error-bg: #3b0606; /* darkened red bg */
@@ -33,68 +111,202 @@
 }
 
 /* Ensure global text and background follow theme variables */
-html, body {
+html,
+body {
 	height: 100%;
+	font-family: var(--guild-font-primary);
 }
 body {
 	background-color: var(--guild-background);
 	color: var(--guild-text);
-	transition: background-color 200ms ease, color 200ms ease;
+	transition:
+		background-color 200ms ease,
+		color 200ms ease;
+}
+
+/* Typography utilities */
+.font-primary {
+	font-family: var(--guild-font-primary);
+}
+.font-secondary {
+	font-family: var(--guild-font-secondary);
+}
+/* Subtle shimmer helper (single pass) */
+
+@keyframes shimmer-once {
+	0% {
+		transform: translateX(-30%);
+		opacity: 0;
+	}
+	50% {
+		transform: translateX(0);
+		opacity: 0.12;
+	}
+	100% {
+		transform: translateX(30%);
+		opacity: 0;
+	}
+}
+
+.shimmer-once {
+	animation: shimmer-once 900ms ease-in-out;
 }
 
 /* Custom utility classes using guild theme variables */
-.bg-guild-primary { background-color: var(--guild-primary); }
-.bg-guild-secondary { background-color: var(--guild-secondary); }
-.bg-guild-accent { background-color: var(--guild-accent); }
-.bg-guild-background { background-color: var(--guild-background); }
-.bg-guild-surface { background-color: var(--guild-surface); }
+.bg-guild-primary {
+	background-color: var(--guild-primary);
+}
+.bg-guild-secondary {
+	background-color: var(--guild-secondary);
+}
+.bg-guild-accent {
+	background-color: var(--guild-accent);
+}
+.bg-guild-background {
+	background-color: var(--guild-background);
+}
+.bg-guild-surface {
+	background-color: var(--guild-surface);
+}
 
-.bg-guild-surface-elevated { background-color: var(--guild-surface-elevated, var(--guild-surface)); transition: background-color 180ms ease; }
+.bg-guild-gold-gradient {
+	background: var(--guild-gold-gradient);
+}
 
-.text-guild-disabled { color: var(--guild-text-disabled, rgba(0,0,0,0.4)); }
+.bg-guild-surface-elevated {
+	background-color: var(--guild-surface-elevated, var(--guild-surface));
+	transition: background-color 180ms ease;
+}
 
-.bg-guild-primary-20 { background-color: var(--guild-primary-20); }
+.text-guild-disabled {
+	color: var(--guild-text-disabled, rgba(0, 0, 0, 0.4));
+}
 
-.text-guild-primary { color: var(--guild-primary); }
-.text-guild-secondary { color: var(--guild-secondary); }
-.text-guild-accent { color: var(--guild-accent); }
-.text-guild-text { color: var(--guild-text); }
-.text-guild-text-secondary { color: var(--guild-text-secondary); }
+.bg-guild-primary-20 {
+	background-color: rgba(var(--guild-primary-rgb), 0.2);
+}
+.bg-guild-secondary-20 {
+	background-color: rgba(var(--guild-secondary-rgb), 0.2);
+}
+.bg-guild-accent-20 {
+	background-color: rgba(var(--guild-accent-rgb), 0.2);
+}
 
-.border-guild-border { border-color: var(--guild-border); }
+.text-guild-primary {
+	color: var(--guild-primary);
+}
+.text-guild-secondary {
+	color: var(--guild-secondary);
+}
+.text-guild-accent {
+	color: var(--guild-accent);
+}
+.text-guild-text {
+	color: var(--guild-text);
+}
+.text-guild-text-secondary {
+	color: var(--guild-text-secondary);
+}
+.text-guild-text-tertiary {
+	color: rgba(var(--guild-text-rgb), 0.4);
+}
+
+.border-guild-border {
+	border-color: var(--guild-border);
+}
+
+/* Matte Gold Gradient Utilities */
+.bg-guild-gold-gradient {
+	background: var(--guild-gold-gradient);
+}
+.text-guild-gold-gradient {
+	background: var(--guild-gold-gradient);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
 
 /* Semantic utilities */
-.bg-guild-error { background-color: var(--guild-error-bg); }
-.text-guild-error { color: var(--guild-error-text); }
-.border-guild-error { border-color: var(--guild-error-border); }
+.bg-guild-error {
+	background-color: var(--guild-error-bg);
+}
+.text-guild-error {
+	color: var(--guild-error-text);
+}
+.border-guild-error {
+	border-color: var(--guild-error-border);
+}
 
 /* SVG icon theming helpers */
-.icon { display: inline-block; vertical-align: middle; }
-.icon path, .icon circle, .icon rect { vector-effect: non-scaling-stroke; }
-.icon--bg { fill: var(--guild-background); }
-.icon--surface { fill: var(--guild-surface); }
-.icon--primary { fill: var(--guild-primary); }
-.icon--play { fill: currentColor; }
+.icon {
+	display: inline-block;
+	vertical-align: middle;
+}
+.icon path,
+.icon circle,
+.icon rect {
+	vector-effect: non-scaling-stroke;
+}
+.icon--bg {
+	fill: var(--guild-background);
+}
+.icon--surface {
+	fill: var(--guild-surface);
+}
+.icon--primary {
+	fill: var(--guild-primary);
+}
+.icon--play {
+	fill: currentColor;
+}
 
 /* Stroke helpers for legacy single-path icons */
-.icon--stroke-primary { stroke: var(--guild-primary); }
-.icon--stroke-secondary { stroke: var(--guild-secondary); }
-.icon--stroke-accent { stroke: var(--guild-accent); }
-
+.icon--stroke-primary {
+	stroke: var(--guild-primary);
+}
+.icon--stroke-secondary {
+	stroke: var(--guild-secondary);
+}
+.icon--stroke-accent {
+	stroke: var(--guild-accent);
+}
 
 /* Participant avatar helpers: ensure outline follows theme variables and transitions */
-.participant-avatar { transition: background-color 180ms ease, border-color 180ms ease; }
-.participant-avatar { border-width: 2px !important; border-style: solid !important; }
-.participant-avatar--primary { border-color: var(--guild-primary) !important; }
-.participant-avatar--secondary { border-color: var(--guild-border) !important; background-color: var(--guild-secondary) !important; color: var(--guild-text) !important; }
+.participant-avatar {
+	transition:
+		background-color 180ms ease,
+		border-color 180ms ease;
+}
+.participant-avatar {
+	border-width: 2px !important;
+	border-style: solid !important;
+}
+.participant-avatar--primary {
+	border-color: var(--guild-primary) !important;
+}
+.participant-avatar--secondary {
+	border-color: var(--guild-border) !important;
+	background-color: var(--guild-secondary) !important;
+	color: var(--guild-text) !important;
+}
 
 /* Status-based avatar outlines */
-.participant-avatar--status-active { border-color: var(--guild-primary-20, rgba(var(--guild-primary-rgb, 0,116,116), 0.2)) !important; }
-.participant-avatar--status-scheduled { border-color: var(--guild-secondary-20, rgba(var(--guild-secondary-rgb, 139,123,184), 0.2)) !important; }
-.participant-avatar--status-completed { border-color: var(--guild-accent-20, rgba(var(--guild-accent-rgb, 203,165,53), 0.2)) !important; }
-.participant-avatar--status-default { border-color: var(--guild-border) !important; }
+.participant-avatar--status-active {
+	border-color: rgba(var(--guild-primary-rgb), 0.2) !important;
+}
+.participant-avatar--status-scheduled {
+	border-color: rgba(var(--guild-secondary-rgb), 0.2) !important;
+}
+.participant-avatar--status-completed {
+	border-color: rgba(var(--guild-accent-rgb), 0.2) !important;
+}
+.participant-avatar--status-default {
+	border-color: var(--guild-border) !important;
+}
 
 /* Photo avatar outline: neutral inner ring with subtle outer tint to help separation
 	Uses surface for the immediate border and a faint status-tint via box-shadow */
-.participant-avatar--photo { border-color: var(--guild-surface) !important; box-shadow: 0 0 0 3px rgba(var(--guild-text-rgb, 26,26,26), 0.04); }
-
+.participant-avatar--photo {
+	border-color: var(--guild-surface) !important;
+	box-shadow: 0 0 0 3px rgba(var(--guild-text-rgb, 26, 26, 26), 0.04);
+}

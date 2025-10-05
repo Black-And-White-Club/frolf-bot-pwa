@@ -7,13 +7,13 @@
 // If you want to run the real Playwright scenario later, uncomment the
 // Playwright snippet below and run Playwright as usual.
 
-import { test } from 'vitest'
+import { test } from 'vitest';
 
 test.skip('offline page E2E (Playwright)', () => {
-  // Skipped: this is a Playwright scenario. To enable E2E with Playwright,
-  // re-enable the original Playwright test in this file (or run tests/e2e
-  // with Playwright directly).
-})
+	// Skipped: this is a Playwright scenario. To enable E2E with Playwright,
+	// re-enable the original Playwright test in this file (or run tests/e2e
+	// with Playwright directly).
+});
 
 /* Playwright snippet (for reference):
 import { test, expect } from '@playwright/test';

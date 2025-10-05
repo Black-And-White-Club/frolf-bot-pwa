@@ -1,26 +1,26 @@
-```svelte
 <script module>
-  import { defineMeta } from '@storybook/addon-svelte-csf';
-  import Button from './Button.svelte';
-  import { fn } from 'storybook/test';
+	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import Button from './Button.svelte';
+	import { fn } from 'storybook/test';
 
-  const { Story } = defineMeta({
-    title: 'Example/Button',
-    component: Button,
-    tags: ['autodocs'],
-    argTypes: {
-      backgroundColor: { control: 'color' },
-      size: {
-        control: { type: 'select' },
-        options: ['small', 'medium', 'large'],
-      },
-    },
-    args: {
-      onclick: fn(),
-    }
-  });
+	const { Story } = defineMeta({
+		title: 'Example/Button',
+		component: Button,
+		tags: ['autodocs'],
+		argTypes: {
+			backgroundColor: { control: 'color' },
+			size: {
+				control: { type: 'select' },
+				options: ['small', 'medium', 'large']
+			}
+		},
+		args: {
+			onclick: fn()
+		}
+	});
 </script>
 
+```svelte
 <Story name="Primary" args={{ primary: true, label: 'Button' }} />
 
 <Story name="Secondary" args={{ label: 'Button' }} />

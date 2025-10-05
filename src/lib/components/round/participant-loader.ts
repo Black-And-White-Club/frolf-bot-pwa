@@ -10,9 +10,11 @@ export function preloadParticipantDisplay(): Promise<unknown> {
 	if (!participantPromise) {
 		// use the global preload queue to avoid many simultaneous imports
 		participantPromise = import('$lib/utils/preload-queue').then((m) =>
-			m.enqueuePreload(() => (
-				__TEST_HOOKS.injectedImport ? __TEST_HOOKS.injectedImport('./ParticipantDisplay.svelte') : import('./ParticipantDisplay.svelte')
-			))
+			m.enqueuePreload(() =>
+				__TEST_HOOKS.injectedImport
+					? __TEST_HOOKS.injectedImport('./ParticipantDisplay.svelte')
+					: import('./ParticipantDisplay.svelte')
+			)
 		);
 	}
 	return participantPromise;

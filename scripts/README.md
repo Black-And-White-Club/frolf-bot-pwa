@@ -1,7 +1,7 @@
 parse-stats-improved.js
 
 Usage:
-  node scripts/parse-stats-improved.js dist/stats.json > dist/stats-ranked.json
+node scripts/parse-stats-improved.js dist/stats.json > dist/stats-ranked.json
 
 This script reads the rollup-visualizer `dist/stats.json` file (or similar) and
 outputs a JSON object containing "chunks" (with resourceBytes and modules list)

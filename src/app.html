@@ -4,6 +4,21 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="manifest" href="/manifest.json" />
+		<!-- Preload critical fonts -->
+		<link
+			rel="preload"
+			href="/fonts/inter-v20-latin-600.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin
+		/>
+		<link
+			rel="preload"
+			href="/fonts/space-grotesk-v22-latin-regular.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin
+		/>
 		<meta name="theme-color" content="#007474" />
 		%sveltekit.head%
 	</head>
@@ -29,7 +44,9 @@
 				try {
 					const meta = document.querySelector('meta[name="theme-color"]');
 					if (!meta) return;
-					const val = getComputedStyle(document.documentElement).getPropertyValue('--guild-primary').trim() || '#007474';
+					const val =
+						getComputedStyle(document.documentElement).getPropertyValue('--guild-primary').trim() ||
+						'#007474';
 					meta.setAttribute('content', val);
 				} catch (e) {
 					// ignore
@@ -39,7 +56,10 @@
 				updateMetaThemeColor();
 				// observe changes to documentElement style attribute (light-weight)
 				const obs = new MutationObserver(() => updateMetaThemeColor());
-				obs.observe(document.documentElement, { attributes: true, attributeFilter: ['style', 'class'] });
+				obs.observe(document.documentElement, {
+					attributes: true,
+					attributeFilter: ['style', 'class']
+				});
 			});
 		</script>
 	</body>

@@ -11,8 +11,10 @@ describe('Button component', () => {
 	});
 
 	it('calls onClick handler when clicked', async () => {
-		const spy = vi.fn()
-		const handler = (e: MouseEvent) => { spy(e) }
+		const spy = vi.fn();
+		const handler = (e: MouseEvent) => {
+			spy(e);
+		};
 		const { getByTestId } = render(Button, { props: { onClick: handler, testid: 'btn-2' } });
 		const el = getByTestId('btn-2');
 		await fireEvent.click(el);
@@ -20,9 +22,13 @@ describe('Button component', () => {
 	});
 
 	it('prevents click when disabled', async () => {
-		const spy = vi.fn()
-		const handler = (e: MouseEvent) => { spy(e) }
-		const { getByTestId } = render(Button, { props: { onClick: handler, disabled: true, testid: 'btn-3' } });
+		const spy = vi.fn();
+		const handler = (e: MouseEvent) => {
+			spy(e);
+		};
+		const { getByTestId } = render(Button, {
+			props: { onClick: handler, disabled: true, testid: 'btn-3' }
+		});
 		const el = getByTestId('btn-3');
 		await fireEvent.click(el);
 		expect(spy).not.toHaveBeenCalled();

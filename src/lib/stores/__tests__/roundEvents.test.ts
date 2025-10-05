@@ -8,15 +8,22 @@ beforeEach(() => {
 	vi.resetModules();
 	vi.useFakeTimers();
 	// ensure fresh crypto for randomUUID
-			if (!globalThis.crypto) {
-				// lightweight stub: define minimal crypto on globalThis
-				// fakeCrypto is intentionally minimal for tests; typed as Partial<Crypto> to avoid unsafe double-casts
-				const fakeCrypto: Partial<Crypto> = {
-					randomUUID: () => '00000000-0000-4000-8000-000000000000',
-					getRandomValues: <T extends ArrayBufferView>(array: T) => array,
-				}
-				try { Object.defineProperty(globalThis, 'crypto', { value: fakeCrypto as Crypto, configurable: true }) } catch { /* best-effort stub */ }
-			}
+	if (!globalThis.crypto) {
+		// lightweight stub: define minimal crypto on globalThis
+		// fakeCrypto is intentionally minimal for tests; typed as Partial<Crypto> to avoid unsafe double-casts
+		const fakeCrypto: Partial<Crypto> = {
+			randomUUID: () => '00000000-0000-4000-8000-000000000000',
+			getRandomValues: <T extends ArrayBufferView>(array: T) => array
+		};
+		try {
+			Object.defineProperty(globalThis, 'crypto', {
+				value: fakeCrypto as Crypto,
+				configurable: true
+			});
+		} catch {
+			/* best-effort stub */
+		}
+	}
 	if (typeof window !== 'undefined') {
 		window.localStorage.clear();
 		document.documentElement.className = '';
@@ -46,7 +53,7 @@ describe('roundEvents store and processing', () => {
 			type: 'round_created',
 			roundId: 'new1',
 			payload: { round: { round_id: 'new1', status: 'scheduled', participants: [] } },
-			guildId: 'g1',
+			guildId: 'g1'
 		});
 
 		// advance timers past debounce window
@@ -62,45 +69,49 @@ describe('roundEvents store and processing', () => {
 		const mod = await import('../roundEvents');
 		const { initializeRounds, emitRoundEvent, rounds } = mod;
 
-	const r2: Partial<Round> = { round_id: 'r2', status: 'active', participants: [{ user_id: 'u1', score: 0 } as Participant] };
+		const r2: Partial<Round> = {
+			round_id: 'r2',
+			status: 'active',
+			participants: [{ user_id: 'u1', score: 0 } as Participant]
+		};
 		initializeRounds([r2 as Round]);
 
 		emitRoundEvent({
 			type: 'participant_joined',
 			roundId: 'r2',
 			payload: { participant: { user_id: 'u2', score: 0 } },
-			guildId: 'g1',
+			guildId: 'g1'
 		});
 
 		vi.advanceTimersByTime(200);
 
-	expect(get(rounds)[0].participants.some((p: Participant) => p.user_id === 'u2')).toBe(true);
+		expect(get(rounds)[0].participants.some((p: Participant) => p.user_id === 'u2')).toBe(true);
 
 		// score update
 		emitRoundEvent({
 			type: 'score_updated',
 			roundId: 'r2',
 			payload: { userId: 'u1', score: 42 },
-			guildId: 'g1',
+			guildId: 'g1'
 		});
 
 		vi.advanceTimersByTime(200);
 
-	const found = get(rounds)[0].participants.find((p: Participant) => p.user_id === 'u1');
-	expect(found).toBeDefined();
-	expect(found!.score).toBe(42);
+		const found = get(rounds)[0].participants.find((p: Participant) => p.user_id === 'u1');
+		expect(found).toBeDefined();
+		expect(found!.score).toBe(42);
 
 		// participant leaves
 		emitRoundEvent({
 			type: 'participant_left',
 			roundId: 'r2',
 			payload: { userId: 'u2' },
-			guildId: 'g1',
+			guildId: 'g1'
 		});
 
 		vi.advanceTimersByTime(200);
 
-	expect(get(rounds)[0].participants.some((p: Participant) => p.user_id === 'u2')).toBe(false);
+		expect(get(rounds)[0].participants.some((p: Participant) => p.user_id === 'u2')).toBe(false);
 	});
 
 	it('round_completed marks round completed and sets completed_at', async () => {
@@ -114,19 +125,24 @@ describe('roundEvents store and processing', () => {
 			type: 'round_completed',
 			roundId: 'r3',
 			payload: {},
-			guildId: 'g1',
+			guildId: 'g1'
 		});
 
 		vi.advanceTimersByTime(200);
 
-	expect(get(rounds)[0].status).toBe('completed');
-	// completed_at is added by the processing as a non-typed property; use a small type-guard
-	const firstRound = get(rounds)[0]
-	function hasCompletedAt(r: unknown): r is { completed_at: number } {
-		return !!r && typeof r === 'object' && 'completed_at' in r && typeof (r as Record<string, unknown>)['completed_at'] === 'number'
-	}
-	expect(hasCompletedAt(firstRound)).toBe(true)
-	if (hasCompletedAt(firstRound)) expect(typeof firstRound.completed_at).toBe('number')
+		expect(get(rounds)[0].status).toBe('completed');
+		// completed_at is added by the processing as a non-typed property; use a small type-guard
+		const firstRound = get(rounds)[0];
+		function hasCompletedAt(r: unknown): r is { completed_at: number } {
+			return (
+				!!r &&
+				typeof r === 'object' &&
+				'completed_at' in r &&
+				typeof (r as Record<string, unknown>)['completed_at'] === 'number'
+			);
+		}
+		expect(hasCompletedAt(firstRound)).toBe(true);
+		if (hasCompletedAt(firstRound)) expect(typeof firstRound.completed_at).toBe('number');
 	});
 
 	it('getFilteredEvents returns a derived store filtered by criteria', async () => {
@@ -139,7 +155,7 @@ describe('roundEvents store and processing', () => {
 			type: 'round_created',
 			roundId: 'f1',
 			payload: { round: { round_id: 'f1', status: 'scheduled', participants: [] } },
-			guildId: 'g-filter',
+			guildId: 'g-filter'
 		});
 
 		vi.advanceTimersByTime(200);
@@ -163,7 +179,7 @@ describe('roundEvents store and processing', () => {
 			type: 'round_created',
 			roundId: 'will_not_process',
 			payload: { round: { round_id: 'will_not_process', status: 'scheduled', participants: [] } },
-			guildId: 'g1',
+			guildId: 'g1'
 		});
 
 		// immediately cleanup before timers run

@@ -2,44 +2,50 @@ type Task<T> = () => Promise<T>;
 
 const MAX_CONCURRENT = 2;
 let active = 0;
-const queue: Array<{ task: Task<unknown>; resolve: (v: unknown) => void; reject: (e: unknown) => void }> = [];
+const queue: Array<{
+	task: Task<unknown>;
+	resolve: (v: unknown) => void;
+	reject: (e: unknown) => void;
+}> = [];
 
 function runNext() {
-  if (active >= MAX_CONCURRENT) return;
-  const item = queue.shift();
-  if (!item) return;
-  active++;
-  const runTask = () => {
-    item.task()
-      .then((res) => {
-        active--;
-        item.resolve(res);
-        runNext();
-      })
-      .catch((err) => {
-        active--;
-        item.reject(err);
-        runNext();
-      });
-  };
+	if (active >= MAX_CONCURRENT) return;
+	const item = queue.shift();
+	if (!item) return;
+	active++;
+	const runTask = () => {
+		item
+			.task()
+			.then((res) => {
+				active--;
+				item.resolve(res);
+				runNext();
+			})
+			.catch((err) => {
+				active--;
+				item.reject(err);
+				runNext();
+			});
+	};
 
-  const ric = (cb: () => void) => {
-    // requestIdleCallback is optional in some envs; guard safely
-    const r = (globalThis as unknown as { requestIdleCallback?: (cb: () => void) => void }).requestIdleCallback;
-    if (typeof r === 'function') {
-      r(cb);
-    } else {
-      requestAnimationFrame(cb);
-    }
-  };
+	const ric = (cb: () => void) => {
+		// requestIdleCallback is optional in some envs; guard safely
+		const r = (globalThis as unknown as { requestIdleCallback?: (cb: () => void) => void })
+			.requestIdleCallback;
+		if (typeof r === 'function') {
+			r(cb);
+		} else {
+			requestAnimationFrame(cb);
+		}
+	};
 
-  ric(() => runTask());
+	ric(() => runTask());
 }
 
 export function enqueuePreload<T>(task: Task<T>): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    queue.push({ task: task as Task<unknown>, resolve: resolve as (v: unknown) => void, reject });
-    // try to run immediately if under limit
-    runNext();
-  });
+	return new Promise<T>((resolve, reject) => {
+		queue.push({ task: task as Task<unknown>, resolve: resolve as (v: unknown) => void, reject });
+		// try to run immediately if under limit
+		runNext();
+	});
 }

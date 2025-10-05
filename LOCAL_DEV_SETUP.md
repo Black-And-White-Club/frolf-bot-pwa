@@ -97,42 +97,42 @@ Create `config.local.yaml` in `discord-frolf-bot/`:
 
 ```yaml
 # Local development configuration
-database_url: "postgres://local:local@localhost:5432/frolf_bot?sslmode=disable"
+database_url: 'postgres://local:local@localhost:5432/frolf_bot?sslmode=disable'
 
 nats:
-  url: "nats://localhost:4222"
+  url: 'nats://localhost:4222'
 
 discord:
   # Your DEV bot token (not production!)
-  token: "YOUR_DEV_BOT_TOKEN_HERE"
-  
+  token: 'YOUR_DEV_BOT_TOKEN_HERE'
+
   # Your DEV application ID
-  app_id: "YOUR_DEV_APP_ID_HERE"
-  
+  app_id: 'YOUR_DEV_APP_ID_HERE'
+
   # Your test server guild ID
-  guild_id: "YOUR_TEST_GUILD_ID_HERE"
-  
+  guild_id: 'YOUR_TEST_GUILD_ID_HERE'
+
   # These will be set via /frolf-setup command
-  signup_channel_id: ""
-  signup_message_id: ""
-  event_channel_id: ""
-  leaderboard_channel_id: ""
-  
+  signup_channel_id: ''
+  signup_message_id: ''
+  event_channel_id: ''
+  leaderboard_channel_id: ''
+
   # Role IDs (optional for local dev)
-  registered_role_id: ""
-  admin_role_id: ""
-  
-  signup_emoji: "✋"
+  registered_role_id: ''
+  admin_role_id: ''
+
+  signup_emoji: '✋'
 
 service:
-  name: "discord-frolf-bot-dev"
-  version: "local"
+  name: 'discord-frolf-bot-dev'
+  version: 'local'
 
 observability:
-  environment: "development"
-  loki_url: ""
-  metrics_address: ":8081"  # Different port to avoid conflicts
-  tempo_endpoint: ""
+  environment: 'development'
+  loki_url: ''
+  metrics_address: ':8081' # Different port to avoid conflicts
+  tempo_endpoint: ''
 ```
 
 ### 3. Backend Configuration
@@ -141,18 +141,18 @@ Create `config.local.yaml` in `frolf-bot/`:
 
 ```yaml
 postgres:
-  dsn: "postgres://local:local@localhost:5432/frolf_bot?sslmode=disable"
+  dsn: 'postgres://local:local@localhost:5432/frolf_bot?sslmode=disable'
 
 nats:
-  url: "nats://localhost:4222"
+  url: 'nats://localhost:4222'
 
 observability:
-  environment: "development"
-  loki_url: ""
-  metrics_address: ":8080"
-  tempo_endpoint: ""
+  environment: 'development'
+  loki_url: ''
+  metrics_address: ':8080'
+  tempo_endpoint: ''
   tempo_insecure: true
-  tempo_sample_rate: 1.0  # 100% sampling for local dev
+  tempo_sample_rate: 1.0 # 100% sampling for local dev
 ```
 
 ---
@@ -169,6 +169,7 @@ make dev
 ```
 
 This starts:
+
 - PostgreSQL (localhost:5432)
 - NATS (localhost:4222)
 - Backend API (localhost:8080)
@@ -192,22 +193,23 @@ services:
       POSTGRES_PASSWORD: local
       POSTGRES_DB: frolf_bot
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
   nats:
     image: nats:2.10-alpine
-    command: ["-js", "-m", "8222"]
+    command: ['-js', '-m', '8222']
     ports:
-      - "4222:4222"   # NATS client
-      - "8222:8222"   # Monitoring
+      - '4222:4222' # NATS client
+      - '8222:8222' # Monitoring
 
 volumes:
   postgres_data:
 ```
 
 Start with:
+
 ```bash
 docker-compose -f docker-compose.local.yml up -d
 ```
@@ -249,11 +251,13 @@ Access the PWA: http://localhost:5173
 ### 1. Run Setup Command in Discord
 
 In your test Discord server, run:
+
 ```
 /frolf-setup
 ```
 
 This will:
+
 - Create required channels
 - Set up roles
 - Initialize the leaderboard
@@ -286,34 +290,39 @@ Fill out the modal to create a test round.
 ✅ Discord bot online in test server  
 ✅ PWA dev server running (localhost:5173)  
 ✅ Can sign in via Discord OAuth  
-✅ WebSocket connection established  
+✅ WebSocket connection established
 
 ---
 
 ## 🐛 Troubleshooting
 
 ### PWA Won't Connect to Backend
+
 - Check `.env.local` has correct `PUBLIC_API_URL`
 - Verify backend is running: `curl http://localhost:8080/health`
 - Check browser console for CORS errors
 
 ### Discord Bot Not Responding
+
 - Verify bot token in `config.local.yaml`
 - Check bot has proper permissions in test server
 - Check bot is online (green circle in member list)
 - View logs: backend and discord bot terminals
 
 ### Database Connection Failed
+
 - Ensure PostgreSQL is running: `docker ps`
 - Check credentials match in all config files
 - Try connecting manually: `psql -h localhost -U local -d frolf_bot`
 
 ### WebSocket Not Connecting
+
 - Verify NATS is running: `curl http://localhost:8222/varz`
 - Check backend logs for WebSocket errors
 - Ensure `PUBLIC_WS_URL` in `.env.local` is correct
 
 ### OAuth Redirect Errors
+
 - Verify redirect URL in Discord app settings matches exactly
 - Must be `http://localhost:5173/auth/callback/discord`
 - Clear browser cookies and try again

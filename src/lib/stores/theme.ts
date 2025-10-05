@@ -9,7 +9,6 @@ import { hexToRgbString, setRgbAliases } from './theme.helpers';
 // re-export helpers so older imports that referenced these from `theme` continue to work
 export { hexToRgbString, setRgbAliases };
 
-
 // Expanded theme interface with full design tokens
 export interface GuildTheme {
 	// Colors
@@ -24,53 +23,53 @@ export interface GuildTheme {
 
 	// Spacing scale (in rem)
 	spacing: {
-		xs: string;  // 0.5rem
-		sm: string;  // 0.75rem
-		md: string;  // 1rem
-		lg: string;  // 1.5rem
-		xl: string;  // 2rem
+		xs: string; // 0.5rem
+		sm: string; // 0.75rem
+		md: string; // 1rem
+		lg: string; // 1.5rem
+		xl: string; // 2rem
 		xxl: string; // 3rem
 	};
 
 	// Typography scale
 	typography: {
 		fontSize: {
-			xs: string;   // 0.75rem
-			sm: string;   // 0.875rem
+			xs: string; // 0.75rem
+			sm: string; // 0.875rem
 			base: string; // 1rem
-			lg: string;   // 1.125rem
-			xl: string;   // 1.25rem
-			xxl: string;  // 1.5rem
+			lg: string; // 1.125rem
+			xl: string; // 1.25rem
+			xxl: string; // 1.5rem
 			xxxl: string; // 2rem
 		};
 		fontWeight: {
-			normal: string;  // 400
-			medium: string;  // 500
+			normal: string; // 400
+			medium: string; // 500
 			semibold: string; // 600
-			bold: string;    // 700
+			bold: string; // 700
 		};
 		lineHeight: {
-			tight: string;   // 1.25
-			normal: string;  // 1.5
+			tight: string; // 1.25
+			normal: string; // 1.5
 			relaxed: string; // 1.75
 		};
 	};
 
 	// Border radius scale
 	borderRadius: {
-		sm: string;  // 0.25rem
-		md: string;  // 0.375rem
-		lg: string;  // 0.5rem
-		xl: string;  // 0.75rem
+		sm: string; // 0.25rem
+		md: string; // 0.375rem
+		lg: string; // 0.5rem
+		xl: string; // 0.75rem
 		full: string; // 9999px
 	};
 
 	// Shadows
 	shadow: {
-		sm: string;   // small shadow
-		md: string;   // medium shadow
-		lg: string;   // large shadow
-		xl: string;   // extra large shadow
+		sm: string; // small shadow
+		md: string; // medium shadow
+		lg: string; // large shadow
+		xl: string; // extra large shadow
 	};
 }
 
@@ -82,8 +81,8 @@ export const defaultTheme: GuildTheme = {
 	background: '#F5FFFA', // Mint Cream (neutral balance)
 	surface: '#ffffff', // pure white
 	text: '#1A1A1A', // Deep Charcoal (foundation)
-	textSecondary: '#6b7280', // medium gray
-	border: '#e5e7eb', // light gray
+	textSecondary: '#64748b', // medium gray
+	border: '#e2e8f0', // light gray
 
 	// Design tokens
 	spacing: {
@@ -92,7 +91,7 @@ export const defaultTheme: GuildTheme = {
 		md: '1rem',
 		lg: '1.5rem',
 		xl: '2rem',
-		xxl: '3rem',
+		xxl: '3rem'
 	},
 	typography: {
 		fontSize: {
@@ -102,33 +101,33 @@ export const defaultTheme: GuildTheme = {
 			lg: '1.125rem',
 			xl: '1.25rem',
 			xxl: '1.5rem',
-			xxxl: '2rem',
+			xxxl: '2rem'
 		},
 		fontWeight: {
 			normal: '400',
 			medium: '500',
 			semibold: '600',
-			bold: '700',
+			bold: '700'
 		},
 		lineHeight: {
 			tight: '1.25',
 			normal: '1.5',
-			relaxed: '1.75',
-		},
+			relaxed: '1.75'
+		}
 	},
 	borderRadius: {
 		sm: '0.25rem',
 		md: '0.375rem',
 		lg: '0.5rem',
 		xl: '0.75rem',
-		full: '9999px',
+		full: '9999px'
 	},
 	shadow: {
 		sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
 		md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
 		lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-		xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-	},
+		xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
+	}
 };
 
 // Alternative themes for different guilds
@@ -151,7 +150,7 @@ export const guildThemes: Record<string, GuildTheme> = {
 			md: '1rem',
 			lg: '1.5rem',
 			xl: '2rem',
-			xxl: '3rem',
+			xxl: '3rem'
 		},
 		typography: {
 			fontSize: {
@@ -161,33 +160,33 @@ export const guildThemes: Record<string, GuildTheme> = {
 				lg: '1.125rem',
 				xl: '1.25rem',
 				xxl: '1.5rem',
-				xxxl: '2rem',
+				xxxl: '2rem'
 			},
 			fontWeight: {
 				normal: '400',
 				medium: '500',
 				semibold: '600',
-				bold: '700',
+				bold: '700'
 			},
 			lineHeight: {
 				tight: '1.25',
 				normal: '1.5',
-				relaxed: '1.75',
-			},
+				relaxed: '1.75'
+			}
 		},
 		borderRadius: {
 			sm: '0.25rem',
 			md: '0.375rem',
 			lg: '0.5rem',
 			xl: '0.75rem',
-			full: '9999px',
+			full: '9999px'
 		},
 		shadow: {
 			sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
 			md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
 			lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-			xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-		},
+			xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
+		}
 	},
 
 	// Ocean theme
@@ -208,7 +207,7 @@ export const guildThemes: Record<string, GuildTheme> = {
 			md: '1rem',
 			lg: '1.5rem',
 			xl: '2rem',
-			xxl: '3rem',
+			xxl: '3rem'
 		},
 		typography: {
 			fontSize: {
@@ -218,33 +217,33 @@ export const guildThemes: Record<string, GuildTheme> = {
 				lg: '1.125rem',
 				xl: '1.25rem',
 				xxl: '1.5rem',
-				xxxl: '2rem',
+				xxxl: '2rem'
 			},
 			fontWeight: {
 				normal: '400',
 				medium: '500',
 				semibold: '600',
-				bold: '700',
+				bold: '700'
 			},
 			lineHeight: {
 				tight: '1.25',
 				normal: '1.5',
-				relaxed: '1.75',
-			},
+				relaxed: '1.75'
+			}
 		},
 		borderRadius: {
 			sm: '0.25rem',
 			md: '0.375rem',
 			lg: '0.5rem',
 			xl: '0.75rem',
-			full: '9999px',
+			full: '9999px'
 		},
 		shadow: {
 			sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
 			md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
 			lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-			xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-		},
+			xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
+		}
 	},
 
 	// Sunset theme
@@ -265,7 +264,7 @@ export const guildThemes: Record<string, GuildTheme> = {
 			md: '1rem',
 			lg: '1.5rem',
 			xl: '2rem',
-			xxl: '3rem',
+			xxl: '3rem'
 		},
 		typography: {
 			fontSize: {
@@ -275,33 +274,33 @@ export const guildThemes: Record<string, GuildTheme> = {
 				lg: '1.125rem',
 				xl: '1.25rem',
 				xxl: '1.5rem',
-				xxxl: '2rem',
+				xxxl: '2rem'
 			},
 			fontWeight: {
 				normal: '400',
 				medium: '500',
 				semibold: '600',
-				bold: '700',
+				bold: '700'
 			},
 			lineHeight: {
 				tight: '1.25',
 				normal: '1.5',
-				relaxed: '1.75',
-			},
+				relaxed: '1.75'
+			}
 		},
 		borderRadius: {
 			sm: '0.25rem',
 			md: '0.375rem',
 			lg: '0.5rem',
 			xl: '0.75rem',
-			full: '9999px',
+			full: '9999px'
 		},
 		shadow: {
 			sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
 			md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
 			lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-			xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-		},
+			xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
+		}
 	},
 
 	// Purple theme
@@ -322,7 +321,7 @@ export const guildThemes: Record<string, GuildTheme> = {
 			md: '1rem',
 			lg: '1.5rem',
 			xl: '2rem',
-			xxl: '3rem',
+			xxl: '3rem'
 		},
 		typography: {
 			fontSize: {
@@ -332,34 +331,34 @@ export const guildThemes: Record<string, GuildTheme> = {
 				lg: '1.125rem',
 				xl: '1.25rem',
 				xxl: '1.5rem',
-				xxxl: '2rem',
+				xxxl: '2rem'
 			},
 			fontWeight: {
 				normal: '400',
 				medium: '500',
 				semibold: '600',
-				bold: '700',
+				bold: '700'
 			},
 			lineHeight: {
 				tight: '1.25',
 				normal: '1.5',
-				relaxed: '1.75',
-			},
+				relaxed: '1.75'
+			}
 		},
 		borderRadius: {
 			sm: '0.25rem',
 			md: '0.375rem',
 			lg: '0.5rem',
 			xl: '0.75rem',
-			full: '9999px',
+			full: '9999px'
 		},
 		shadow: {
 			sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
 			md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
 			lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-			xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-		},
-	},
+			xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
+		}
+	}
 };
 
 // Current theme store
@@ -447,7 +446,7 @@ export function applyTheme(theme: GuildTheme, dark = false) {
 	root.setAttribute('data-guild-theme', theme.primary || 'default');
 
 	// RGB aliases for rgba() usage
-	setRgbAliases(theme);
+	setRgbAliases(theme, dark);
 
 	// Fallback: explicitly set core variables for dark mode so visuals update even if class-based rules fail
 	if (dark) {
@@ -456,12 +455,27 @@ export function applyTheme(theme: GuildTheme, dark = false) {
 		root.style.setProperty('--guild-surface', '#1A1A1A'); // card surface
 		root.style.setProperty('--guild-surface-elevated', '#242424'); // elevated surface
 		// Text: Mint Cream as text in dark mode with opacities (90%, 65%, 40%) via rgba
-		root.style.setProperty('--guild-text', `rgba(${root.style.getPropertyValue('--guild-mint-rgb') || '245,255,250'}, 0.9)`);
-		root.style.setProperty('--guild-text-secondary', `rgba(${root.style.getPropertyValue('--guild-mint-rgb') || '245,255,250'}, 0.65)`);
-		root.style.setProperty('--guild-text-disabled', `rgba(${root.style.getPropertyValue('--guild-mint-rgb') || '245,255,250'}, 0.4)`);
+		root.style.setProperty(
+			'--guild-text',
+			`rgba(${root.style.getPropertyValue('--guild-mint-rgb') || '245,255,250'}, 0.9)`
+		);
+		root.style.setProperty(
+			'--guild-text-secondary',
+			`rgba(${root.style.getPropertyValue('--guild-mint-rgb') || '245,255,250'}, 0.65)`
+		);
+		root.style.setProperty(
+			'--guild-text-disabled',
+			`rgba(${root.style.getPropertyValue('--guild-mint-rgb') || '245,255,250'}, 0.4)`
+		);
 		// Borders/dividers: mint at 10% by default; skobeloff 20% available as an alias
-		root.style.setProperty('--guild-border', `rgba(${root.style.getPropertyValue('--guild-mint-rgb') || '245,255,250'}, 0.10)`);
-		root.style.setProperty('--guild-primary-20', `rgba(${root.style.getPropertyValue('--guild-primary-rgb') || '0,116,116'}, 0.2)`);
+		root.style.setProperty(
+			'--guild-border',
+			`rgba(${root.style.getPropertyValue('--guild-mint-rgb') || '245,255,250'}, 0.10)`
+		);
+		root.style.setProperty(
+			'--guild-primary-20',
+			`rgba(${root.style.getPropertyValue('--guild-primary-rgb') || '0,116,116'}, 0.2)`
+		);
 	} else {
 		root.style.setProperty('--guild-background', theme.background);
 		root.style.setProperty('--guild-surface', theme.surface);
@@ -475,17 +489,21 @@ export function applyTheme(theme: GuildTheme, dark = false) {
 		// Use sensible fallbacks based on the current theme tokens / rgb aliases.
 		root.style.setProperty('--guild-surface-elevated', theme.surface);
 		// text-disabled: use text rgb alias if available
-		root.style.setProperty('--guild-text-disabled', `rgba(${root.style.getPropertyValue('--guild-text-rgb') || hexToRgbString(theme.text)}, 0.4)`);
+		root.style.setProperty(
+			'--guild-text-disabled',
+			`rgba(${root.style.getPropertyValue('--guild-text-rgb') || hexToRgbString(theme.text)}, 0.4)`
+		);
 		// primary-20 alias (used for subtle backgrounds)
-		root.style.setProperty('--guild-primary-20', `rgba(${root.style.getPropertyValue('--guild-primary-rgb') || hexToRgbString(theme.primary)}, 0.2)`);
+		root.style.setProperty(
+			'--guild-primary-20',
+			`rgba(${root.style.getPropertyValue('--guild-primary-rgb') || hexToRgbString(theme.primary)}, 0.2)`
+		);
 	}
 
 	// (debug logging removed in production)
 }
 
 // setRgbAliases and hexToRgbString are implemented in theme.helpers for testability
-
-
 
 // Persist minimal theme (colors + metadata) to localStorage
 function persistTheme(theme: GuildTheme) {
@@ -499,7 +517,7 @@ function persistTheme(theme: GuildTheme) {
 			surface: theme.surface,
 			text: theme.text,
 			textSecondary: theme.textSecondary,
-			border: theme.border,
+			border: theme.border
 		};
 		window.localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(payload));
 	} catch {
@@ -535,7 +553,11 @@ function loadPersisted() {
 			// persist to new key
 			window.localStorage.setItem(PREFERS_DARK_KEY, isDark ? '1' : '0');
 			// remove legacy key
-			try { window.localStorage.removeItem('darkMode'); } catch { void 0; }
+			try {
+				window.localStorage.removeItem('darkMode');
+			} catch {
+				void 0;
+			}
 		} else {
 			const persistedDark = window.localStorage.getItem(PREFERS_DARK_KEY);
 			if (persistedDark !== null) {
@@ -555,7 +577,7 @@ function loadPersisted() {
 		try {
 			const parsed = JSON.parse(raw);
 			// merge into default token set to ensure all tokens exist
-			currentTheme.update(cur => ({ ...cur, ...parsed }));
+			currentTheme.update((cur) => ({ ...cur, ...parsed }));
 		} catch {
 			void 0;
 		}
@@ -570,10 +592,10 @@ function loadPersisted() {
 
 	// Apply currently-set theme
 	let latest: GuildTheme;
-	const unsub = currentTheme.subscribe(t => (latest = t));
+	const unsub = currentTheme.subscribe((t) => (latest = t));
 	unsub();
 	let dark = false;
-	const unsub2 = prefersDark.subscribe(d => (dark = d));
+	const unsub2 = prefersDark.subscribe((d) => (dark = d));
 	unsub2();
 	applyTheme(latest!, dark);
 }
@@ -589,16 +611,16 @@ export function initTheme() {
 	loadPersisted();
 
 	// react to store changes: apply to document & persist
-	currentTheme.subscribe(theme => {
+	currentTheme.subscribe((theme) => {
 		// apply immediately using current dark flag
 		let dark = false;
-		const unsub = prefersDark.subscribe(d => (dark = d));
+		const unsub = prefersDark.subscribe((d) => (dark = d));
 		unsub();
 		applyTheme(theme, dark);
 		persistTheme(theme);
 	});
 
-	prefersDark.subscribe(v => {
+	prefersDark.subscribe((v) => {
 		persistPrefersDark(!!v);
 		// keep DOM class in sync
 		if (v) document.documentElement.classList.add('dark');
@@ -628,7 +650,9 @@ export function initTheme() {
 			mql.addEventListener('change', handler);
 		} else {
 			// older browsers implement addListener on MediaQueryList
-			const mqlCompat = mql as MediaQueryList & { addListener?: (cb: (e: MediaQueryListEvent) => void) => void };
+			const mqlCompat = mql as MediaQueryList & {
+				addListener?: (cb: (e: MediaQueryListEvent) => void) => void;
+			};
 			if (typeof mqlCompat.addListener === 'function') {
 				mqlCompat.addListener(handler);
 			}
@@ -649,7 +673,8 @@ export function setGuildTheme(guildId: string) {
 	// You could map guild IDs to specific themes here
 	// For now, we'll use a simple hash to pick a theme
 	const themeKeys = Object.keys(guildThemes);
-	const themeIndex = guildId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % themeKeys.length;
+	const themeIndex =
+		guildId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % themeKeys.length;
 	const selectedTheme = guildThemes[themeKeys[themeIndex]] || defaultTheme;
 
 	currentTheme.set(selectedTheme);
@@ -666,9 +691,9 @@ export function setGuildTheme(guildId: string) {
 
 // Function to set custom theme
 export function setCustomTheme(theme: Partial<GuildTheme>) {
-	currentTheme.update(current => ({
+	currentTheme.update((current) => ({
 		...current,
-		...theme,
+		...theme
 	}));
 }
 
@@ -710,24 +735,39 @@ export function validateTheme(theme: GuildTheme): { isValid: boolean; errors: st
 	// Validate primary button contrast on surface
 	const primaryContrast = getContrastRatio(theme.primary, theme.surface);
 	if (primaryContrast < 3) {
-		errors.push(`Primary color (${theme.primary}) has insufficient contrast (${primaryContrast.toFixed(2)}) on surface (${theme.surface}). Minimum: 3:1`);
+		errors.push(
+			`Primary color (${theme.primary}) has insufficient contrast (${primaryContrast.toFixed(2)}) on surface (${theme.surface}). Minimum: 3:1`
+		);
 	}
 
 	// Validate text contrast on background
 	const textContrast = getContrastRatio(theme.text, theme.background);
 	if (textContrast < 4.5) {
-		errors.push(`Text color (${theme.text}) has insufficient contrast (${textContrast.toFixed(2)}) on background (${theme.background}). Minimum: 4.5:1`);
+		errors.push(
+			`Text color (${theme.text}) has insufficient contrast (${textContrast.toFixed(2)}) on background (${theme.background}). Minimum: 4.5:1`
+		);
 	}
 
 	// Validate secondary text contrast
 	const secondaryTextContrast = getContrastRatio(theme.textSecondary, theme.background);
 	if (secondaryTextContrast < 4.5) {
-		errors.push(`Secondary text color (${theme.textSecondary}) has insufficient contrast (${secondaryTextContrast.toFixed(2)}) on background (${theme.background}). Minimum: 4.5:1`);
+		errors.push(
+			`Secondary text color (${theme.textSecondary}) has insufficient contrast (${secondaryTextContrast.toFixed(2)}) on background (${theme.background}). Minimum: 4.5:1`
+		);
 	}
 
 	// Check for valid hex colors
 	const hexRegex = /^#[0-9A-Fa-f]{6}$/;
-	const colorFields = ['primary', 'secondary', 'accent', 'background', 'surface', 'text', 'textSecondary', 'border'] as const;
+	const colorFields = [
+		'primary',
+		'secondary',
+		'accent',
+		'background',
+		'surface',
+		'text',
+		'textSecondary',
+		'border'
+	] as const;
 
 	for (const field of colorFields) {
 		if (!hexRegex.test(theme[field])) {

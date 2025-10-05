@@ -21,7 +21,9 @@ const sampleRound: Round = {
 describe('RoundCard interactions', () => {
 	it('renders and responds to click', async () => {
 		const handler = vi.fn();
-		const { getByTestId } = render(RoundCard, { props: { round: sampleRound, onRoundClick: handler, dataTestId: 'rc-1' } });
+		const { getByTestId } = render(RoundCard, {
+			props: { round: sampleRound, onRoundClick: handler, dataTestId: 'rc-1' }
+		});
 		const el = getByTestId('rc-1');
 		await fireEvent.click(el);
 		expect(handler).toHaveBeenCalledWith({ roundId: 'r-100' });
@@ -29,7 +31,9 @@ describe('RoundCard interactions', () => {
 
 	it('responds to Enter keydown as activation', async () => {
 		const handler = vi.fn();
-		const { getByTestId } = render(RoundCard, { props: { round: sampleRound, onRoundClick: handler, dataTestId: 'rc-2' } });
+		const { getByTestId } = render(RoundCard, {
+			props: { round: sampleRound, onRoundClick: handler, dataTestId: 'rc-2' }
+		});
 		const el = getByTestId('rc-2');
 		await fireEvent.keyDown(el, { key: 'Enter' });
 		expect(handler).toHaveBeenCalledWith({ roundId: 'r-100' });

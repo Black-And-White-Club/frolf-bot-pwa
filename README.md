@@ -68,16 +68,16 @@ src/
 
 ## 🛠️ Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Build for production |
-| `npm run preview` | Preview production build |
-| `npm run check` | Run type checking |
-| `npm run lint` | Lint code |
-| `npm run format` | Format with Prettier |
-| `npm run test` | Run tests |
-| `npm run storybook` | Start Storybook |
+| Command             | Description              |
+| ------------------- | ------------------------ |
+| `npm run dev`       | Start development server |
+| `npm run build`     | Build for production     |
+| `npm run preview`   | Preview production build |
+| `npm run check`     | Run type checking        |
+| `npm run lint`      | Lint code                |
+| `npm run format`    | Format with Prettier     |
+| `npm run test`      | Run tests                |
+| `npm run storybook` | Start Storybook          |
 
 ## 🧩 Tech Stack
 
@@ -91,13 +91,13 @@ src/
 
 ## 🔐 Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `AUTH_SECRET` | Session encryption secret | ✅ |
-| `DISCORD_CLIENT_ID` | Discord OAuth client ID | ✅ |
-| `DISCORD_CLIENT_SECRET` | Discord OAuth secret | ✅ |
-| `PUBLIC_API_URL` | Backend API URL | ✅ |
-| `PUBLIC_WS_URL` | WebSocket endpoint | ✅ |
+| Variable                | Description               | Required |
+| ----------------------- | ------------------------- | -------- |
+| `AUTH_SECRET`           | Session encryption secret | ✅       |
+| `DISCORD_CLIENT_ID`     | Discord OAuth client ID   | ✅       |
+| `DISCORD_CLIENT_SECRET` | Discord OAuth secret      | ✅       |
+| `PUBLIC_API_URL`        | Backend API URL           | ✅       |
+| `PUBLIC_WS_URL`         | WebSocket endpoint        | ✅       |
 
 Generate `AUTH_SECRET`: `openssl rand -base64 32`
 
@@ -115,14 +115,17 @@ See [LOCAL_DEV_SETUP.md](./LOCAL_DEV_SETUP.md) for complete workflow.
 ## 🐛 Troubleshooting
 
 **Can't connect to backend?**
+
 - Check backend is running: `curl http://localhost:8080/health`
 - Verify `PUBLIC_API_URL` in `.env.local`
 
 **OAuth fails?**
+
 - Verify redirect URL in Discord app: `http://localhost:5173/auth/callback/discord`
 - Clear browser cookies
 
 **Types not matching backend?**
+
 - Update `src/lib/types/backend.ts` to match Go structs
 - Run `npm run check`
 
@@ -133,6 +136,7 @@ npm run build
 ```
 
 Preview the build:
+
 ```bash
 npm run preview
 ```

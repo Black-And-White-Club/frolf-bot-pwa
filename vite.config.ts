@@ -1,4 +1,5 @@
 import { paraglideVitePlugin } from '@inlang/paraglide-js';
+import { VitePWA } from 'vite-plugin-pwa';
 import devtoolsJson from 'vite-plugin-devtools-json';
 import tailwindcss from '@tailwindcss/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
@@ -9,12 +10,56 @@ export default defineConfig({
 	// Prefer browser exports so Svelte's client runtime is used (mount / onMount available)
 	resolve: { conditions: ['browser'] },
 	plugins: [
-	 		tailwindcss(),
-	 		sveltekit(),
-	 		devtoolsJson(),
-	 		paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' }),
-	 		...(process.env.ANALYZE ? [visualizer({ filename: 'dist/stats.html', template: 'treemap' })] : [])
-	 	],
+		tailwindcss(),
+		sveltekit(),
+		devtoolsJson(),
+		paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' }),
+		VitePWA({
+			strategies: 'injectManifest',
+			srcDir: 'src',
+			filename: 'service-worker.js',
+			injectManifest: {
+				swSrc: 'src/service-worker.ts'
+			},
+			includeAssets: [
+				'favicon.svg',
+				'offline.html',
+				'fonts/inter-v20-latin-regular.woff2',
+				'fonts/inter-v20-latin-500.woff2',
+				'fonts/inter-v20-latin-600.woff2',
+				'fonts/inter-v20-latin-700.woff2',
+				'fonts/space-grotesk-v22-latin-regular.woff2',
+				'fonts/space-grotesk-v22-latin-500.woff2',
+				'fonts/space-grotesk-v22-latin-600.woff2',
+				'fonts/space-grotesk-v22-latin-700.woff2'
+			],
+			workbox: {
+				maximumFileSizeToCacheInBytes: 5_000_000,
+				runtimeCaching: [
+					{
+						urlPattern: /\/fonts\/.*\.woff2$/,
+						handler: 'CacheFirst',
+						options: {
+							cacheName: 'pwa-fonts',
+							expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 },
+							cacheableResponse: { statuses: [0, 200] }
+						}
+					},
+					{
+						urlPattern: /\/api\//,
+						handler: 'NetworkFirst',
+						options: {
+							cacheName: 'api-cache',
+							expiration: { maxEntries: 50, maxAgeSeconds: 60 * 5 }
+						}
+					}
+				]
+			}
+		}),
+		...(process.env.ANALYZE
+			? [visualizer({ filename: 'dist/stats.html', template: 'treemap' })]
+			: [])
+	],
 	test: {
 		expect: { requireAssertions: false },
 		// Shared setup for any test that uses jsdom (annotated or client project).
@@ -57,7 +102,7 @@ export default defineConfig({
 					name: 'server',
 					environment: 'node',
 					include: ['src/**/*.{test,spec}.{js,ts}'],
-					exclude: ['src/lib/components/**', "src/**/*.svelte.{test,spec}.{js,ts}"]
+					exclude: ['src/lib/components/**', 'src/**/*.svelte.{test,spec}.{js,ts}']
 				}
 			}
 		],
@@ -98,9 +143,8 @@ export default defineConfig({
 					functions: 80,
 					lines: 80
 				}
-			},
+			}
 			// Coverage focuses on src/lib/**; enforce stricter thresholds in CI if needed.
 		}
 	}
 });
-

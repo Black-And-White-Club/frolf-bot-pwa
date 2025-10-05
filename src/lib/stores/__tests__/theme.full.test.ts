@@ -20,11 +20,15 @@ describe('theme integration tests', () => {
 
 		applyTheme(defaultTheme, true);
 
-		expect(document.documentElement.style.getPropertyValue('--guild-primary')).toBe(defaultTheme.primary);
+		expect(document.documentElement.style.getPropertyValue('--guild-primary')).toBe(
+			defaultTheme.primary
+		);
 		expect(document.documentElement.classList.contains('dark')).toBe(true);
 
 		// rgb alias should be set via setRgbAliases called by applyTheme
-		expect(document.documentElement.style.getPropertyValue('--guild-primary-rgb')).toBe(hexToRgbString(defaultTheme.primary));
+		expect(document.documentElement.style.getPropertyValue('--guild-primary-rgb')).toBe(
+			hexToRgbString(defaultTheme.primary)
+		);
 
 		// dark fallbacks include rgba() style text variables
 		expect(document.documentElement.style.getPropertyValue('--guild-text')).toContain('rgba(');
@@ -39,7 +43,9 @@ describe('theme integration tests', () => {
 		applyTheme(defaultTheme, false);
 
 		expect(document.documentElement.classList.contains('dark')).toBe(false);
-		expect(document.documentElement.style.getPropertyValue('--guild-background')).toBe(defaultTheme.background);
+		expect(document.documentElement.style.getPropertyValue('--guild-background')).toBe(
+			defaultTheme.background
+		);
 
 		// check text-disabled uses --guild-text-rgb or hexToRgbString fallback
 		const textDisabled = document.documentElement.style.getPropertyValue('--guild-text-disabled');
@@ -57,7 +63,7 @@ describe('theme integration tests', () => {
 			surface: '#ffffff',
 			text: '#222222',
 			textSecondary: '#333333',
-			border: '#444444',
+			border: '#444444'
 		};
 		window.localStorage.setItem('frolf:theme', JSON.stringify(persisted));
 		window.localStorage.setItem('frolf:prefers_dark', '1');
@@ -119,7 +125,7 @@ describe('theme integration tests', () => {
 		const res = validateTheme(badTheme);
 		expect(res.isValid).toBe(false);
 		expect(res.errors.length).toBeGreaterThanOrEqual(2);
-		expect(res.errors.some(e => e.includes('not a valid hex'))).toBe(true);
-		expect(res.errors.some(e => e.includes('insufficient contrast'))).toBe(true);
+		expect(res.errors.some((e) => e.includes('not a valid hex'))).toBe(true);
+		expect(res.errors.some((e) => e.includes('insufficient contrast'))).toBe(true);
 	});
 });

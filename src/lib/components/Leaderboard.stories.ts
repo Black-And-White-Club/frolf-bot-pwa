@@ -31,8 +31,6 @@ export const WithPlayers: Story = {
 
 export const SinglePlayer: Story = {
 	args: {
-		entries: [
-			{ tag_number: 7, user_id: 'solo-1' }
-		]
+		entries: [{ tag_number: 7, user_id: 'solo-1' }]
 	}
 };

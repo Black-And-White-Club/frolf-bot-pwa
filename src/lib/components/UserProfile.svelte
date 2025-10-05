@@ -36,10 +36,12 @@
 </script>
 
 <div
-	class="bg-guild-surface rounded-xl shadow-lg border border-[var(--guild-border)] p-4 hover:shadow-xl transition-all duration-300 {onClick ? 'cursor-pointer hover:scale-[1.02]' : ''}"
+	class="bg-guild-surface rounded-xl border border-[var(--guild-border)] p-4 shadow-lg transition-all duration-300 hover:shadow-xl {onClick
+		? 'cursor-pointer hover:scale-[1.02]'
+		: ''}"
 	on:click={handleClick}
 	on:keydown={handleKeydown}
-	role={onClick ? "button" : undefined}
+	role={onClick ? 'button' : undefined}
 	use:tabindex={!!onClick}
 	data-testid={testid}
 >
@@ -54,13 +56,17 @@
 				decoding="async"
 				crossorigin="anonymous"
 				style="aspect-ratio:1/1"
-				class="w-12 h-12 rounded-full"
-				srcset={isUnsplashUrl(user.avatar_url) ? unsplashSrcset(user.avatar_url, [48, 100]) : undefined}
+				class="h-12 w-12 rounded-full"
+				srcset={isUnsplashUrl(user.avatar_url)
+					? unsplashSrcset(user.avatar_url, [48, 100])
+					: undefined}
 				sizes={isUnsplashUrl(user.avatar_url) ? unsplashSizes(48) : undefined}
 			/>
 		{:else}
-			<div class="w-12 h-12 rounded-full bg-[var(--guild-border)] flex items-center justify-center">
-				<span class="text-[var(--guild-text-secondary)] font-medium">{user.username.charAt(0).toUpperCase()}</span>
+			<div class="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--guild-border)]">
+				<span class="font-medium text-[var(--guild-text-secondary)]"
+					>{user.username.charAt(0).toUpperCase()}</span
+				>
 			</div>
 		{/if}
 		<div class="flex-1">
@@ -82,7 +88,9 @@
 			{#if user.average_score !== undefined}
 				<div class="text-center">
 					<p class="text-sm font-medium text-[var(--guild-text-secondary)]">Average</p>
-					<p class="text-xl font-bold text-[var(--guild-secondary)]">{user.average_score.toFixed(1)}</p>
+					<p class="text-xl font-bold text-[var(--guild-secondary)]">
+						{user.average_score.toFixed(1)}
+					</p>
 				</div>
 			{/if}
 		</div>

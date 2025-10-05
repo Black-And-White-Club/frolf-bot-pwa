@@ -38,21 +38,29 @@ export function addToCalendar(round: Round) {
 	// Try native calendar APIs first (mobile)
 	if ('navigator' in window && 'share' in navigator) {
 		const calendarUrl = generateCalendarUrl(event);
-		navigator.share({
-			title: event.name,
-			text: event.description,
-			url: calendarUrl,
-		}).catch(() => {
-			downloadICalendarFile(event, round.round_id);
-		});
+		navigator
+			.share({
+				title: event.name,
+				text: event.description,
+				url: calendarUrl
+			})
+			.catch(() => {
+				downloadICalendarFile(event, round.round_id);
+			});
 	} else {
 		downloadICalendarFile(event, round.round_id);
 	}
 }
 
 function generateCalendarUrl(event: CalendarEvent): string {
-	const start = new Date(event.startDate + 'T' + event.startTime).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-	const end = new Date(event.endDate + 'T' + event.endTime).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+	const start =
+		new Date(event.startDate + 'T' + event.startTime)
+			.toISOString()
+			.replace(/[-:]/g, '')
+			.split('.')[0] + 'Z';
+	const end =
+		new Date(event.endDate + 'T' + event.endTime).toISOString().replace(/[-:]/g, '').split('.')[0] +
+		'Z';
 
 	return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.name)}&dates=${start}/${end}&details=${encodeURIComponent(event.description)}&location=${encodeURIComponent(event.location)}`;
 }

@@ -17,7 +17,7 @@ Use this checklist to ensure your Discord development application is configured 
 - [ ] **Bot Token**: `_____________________` (save in password manager)
 - [ ] Enable Privileged Gateway Intents:
   - [ ] Presence Intent
-  - [ ] Server Members Intent  
+  - [ ] Server Members Intent
   - [ ] Message Content Intent
 - [ ] Click "Save Changes"
 
@@ -81,33 +81,33 @@ PUBLIC_WS_URL=ws://localhost:8080/ws
 ### Discord Bot (config.local.yaml)
 
 ```yaml
-database_url: "postgres://local:local@localhost:5432/frolf_bot?sslmode=disable"
+database_url: 'postgres://local:local@localhost:5432/frolf_bot?sslmode=disable'
 
 nats:
-  url: "nats://localhost:4222"
+  url: 'nats://localhost:4222'
 
 discord:
-  token: "_____________________"
-  app_id: "_____________________"
-  guild_id: "_____________________"
-  
-  signup_channel_id: ""
-  signup_message_id: ""
-  event_channel_id: ""
-  leaderboard_channel_id: ""
-  
-  registered_role_id: ""
-  admin_role_id: ""
-  
-  signup_emoji: "✋"
+  token: '_____________________'
+  app_id: '_____________________'
+  guild_id: '_____________________'
+
+  signup_channel_id: ''
+  signup_message_id: ''
+  event_channel_id: ''
+  leaderboard_channel_id: ''
+
+  registered_role_id: ''
+  admin_role_id: ''
+
+  signup_emoji: '✋'
 
 service:
-  name: "discord-frolf-bot-dev"
-  version: "local"
+  name: 'discord-frolf-bot-dev'
+  version: 'local'
 
 observability:
-  environment: "development"
-  metrics_address: ":8081"
+  environment: 'development'
+  metrics_address: ':8081'
 ```
 
 - [ ] Created `config.local.yaml` in `discord-frolf-bot/`
@@ -117,14 +117,14 @@ observability:
 
 ```yaml
 postgres:
-  dsn: "postgres://local:local@localhost:5432/frolf_bot?sslmode=disable"
+  dsn: 'postgres://local:local@localhost:5432/frolf_bot?sslmode=disable'
 
 nats:
-  url: "nats://localhost:4222"
+  url: 'nats://localhost:4222'
 
 observability:
-  environment: "development"
-  metrics_address: ":8080"
+  environment: 'development'
+  metrics_address: ':8080'
 ```
 
 - [ ] Created `config.local.yaml` in `frolf-bot/`
@@ -199,7 +199,7 @@ observability:
 ✅ PWA loads at localhost:5173  
 ✅ Can sign in via Discord OAuth  
 ✅ No console errors in browser  
-✅ WebSocket connection established (check Network tab)  
+✅ WebSocket connection established (check Network tab)
 
 ## 🔒 Security Reminders
 
@@ -213,14 +213,14 @@ observability:
 
 Keep this information secure and accessible:
 
-| Item | Value | Location |
-|------|-------|----------|
+| Item           | Value                   | Location           |
+| -------------- | ----------------------- | ------------------ |
 | Application ID | `_____________________` | Discord Developers |
-| Bot Token | `_____________________` | config.local.yaml |
-| Client ID | `_____________________` | .env.local |
-| Client Secret | `_____________________` | .env.local |
-| Test Guild ID | `_____________________` | config.local.yaml |
-| AUTH_SECRET | `_____________________` | .env.local |
+| Bot Token      | `_____________________` | config.local.yaml  |
+| Client ID      | `_____________________` | .env.local         |
+| Client Secret  | `_____________________` | .env.local         |
+| Test Guild ID  | `_____________________` | config.local.yaml  |
+| AUTH_SECRET    | `_____________________` | .env.local         |
 
 ## 🆘 Need Help?
 

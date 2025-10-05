@@ -67,53 +67,55 @@
 </script>
 
 {#if onRoundClick}
-  <button
-	type="button"
-	class={`bg-guild-surface rounded-xl shadow-lg hover:shadow-xl border border-[var(--guild-border)] ${compact ? 'p-4' : 'p-6'} transition-all duration-300 hover:scale-[1.02]`}
-	on:click={handleClick}
-	on:keydown={handleKeydown}
-	aria-label={`Round ${round.title ?? round.round_id}`}
-	data-testid={dataTestId}
-  >
-	<RoundHeader {round} {showStatus} />
-			{#if RoundDetailsComp}
+	<button
+		type="button"
+		class={`bg-guild-surface rounded-xl border border-[var(--guild-border)] shadow-lg hover:shadow-xl ${compact ? 'p-4' : 'p-6'} transition-all duration-300 hover:scale-[1.02]`}
+		on:click={handleClick}
+		on:keydown={handleKeydown}
+		aria-label={`Round ${round.title ?? round.round_id}`}
+		data-testid={dataTestId}
+	>
+		<RoundHeader {round} {showStatus} />
+		{#if RoundDetailsComp}
 			<svelte:component this={RoundDetailsComp} {round} {compact} />
-			{:else}
-				{#if !_preloadStarted}
-					<!-- super-light skeleton to keep DOM small until card nears viewport -->
-					<div class="h-4 bg-[var(--guild-surface-elevated)] rounded w-1/2 my-1" aria-hidden="true"></div>
-				{:else}
-					<!-- lightweight fallback for details -->
-					<div class="text-sm text-[var(--guild-text-secondary)] mt-1">Details …</div>
-				{/if}
-		{/if}
-			{#if ParticipantDisplay}
-			<svelte:component this={ParticipantDisplay} {round} {compact} />
+		{:else if !_preloadStarted}
+			<!-- super-light skeleton to keep DOM small until card nears viewport -->
+			<div
+				class="my-1 h-4 w-1/2 rounded bg-[var(--guild-surface-elevated)]"
+				aria-hidden="true"
+			></div>
 		{:else}
-				{#if !_preloadStarted}
-					<!-- very small placeholder to avoid large DOM churn from many cards -->
-					<div class="h-6 w-24 bg-[var(--guild-surface-elevated)] rounded my-2" aria-hidden="true"></div>
-				{:else}
-					<div class="text-sm text-[var(--guild-text-secondary)] mt-2">Loading participants…</div>
-				{/if}
+			<!-- lightweight fallback for details -->
+			<div class="mt-1 text-sm text-[var(--guild-text-secondary)]">Details …</div>
 		{/if}
-  </button>
+		{#if ParticipantDisplay}
+			<svelte:component this={ParticipantDisplay} {round} {compact} />
+		{:else if !_preloadStarted}
+			<!-- very small placeholder to avoid large DOM churn from many cards -->
+			<div
+				class="my-2 h-6 w-24 rounded bg-[var(--guild-surface-elevated)]"
+				aria-hidden="true"
+			></div>
+		{:else}
+			<div class="mt-2 text-sm text-[var(--guild-text-secondary)]">Loading participants…</div>
+		{/if}
+	</button>
 {:else}
-  <div
-	class={`bg-guild-surface rounded-xl shadow-lg hover:shadow-xl border border-[var(--guild-border)] ${compact ? 'p-4' : 'p-6'} transition-all duration-300 hover:scale-[1.02]`}
-	aria-label={`Round ${round.title ?? round.round_id}`}
-	data-testid={dataTestId}
-  >
-	<RoundHeader {round} {showStatus} />
+	<div
+		class={`bg-guild-surface rounded-xl border border-[var(--guild-border)] shadow-lg hover:shadow-xl ${compact ? 'p-4' : 'p-6'} transition-all duration-300 hover:scale-[1.02]`}
+		aria-label={`Round ${round.title ?? round.round_id}`}
+		data-testid={dataTestId}
+	>
+		<RoundHeader {round} {showStatus} />
 		{#if RoundDetailsComp}
 			<svelte:component this={RoundDetailsComp} {round} {compact} />
 		{:else}
-			<div class="text-sm text-[var(--guild-text-secondary)] mt-1">Details …</div>
+			<div class="mt-1 text-sm text-[var(--guild-text-secondary)]">Details …</div>
 		{/if}
-	{#if ParticipantDisplay}
-		<svelte:component this={ParticipantDisplay} {round} {compact} />
-	{:else}
-		<div class="text-sm text-[var(--guild-text-secondary)] mt-2">Loading participants…</div>
-	{/if}
-  </div>
+		{#if ParticipantDisplay}
+			<svelte:component this={ParticipantDisplay} {round} {compact} />
+		{:else}
+			<div class="mt-2 text-sm text-[var(--guild-text-secondary)]">Loading participants…</div>
+		{/if}
+	</div>
 {/if}

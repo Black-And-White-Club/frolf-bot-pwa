@@ -1,6 +1,7 @@
 # 🚀 Quick Start - PWA Development
 
 ## Prerequisites
+
 - Node.js 18+
 - Discord developer account
 - Local backend infrastructure running
@@ -8,14 +9,17 @@
 ## First Time Setup
 
 ### 1. Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 2. Create Discord Dev Application
+
 Follow the guide in `LOCAL_DEV_SETUP.md` to create a separate Discord application for development.
 
 ### 3. Configure Environment
+
 ```bash
 # Copy the example file
 cp .env.example .env.local
@@ -27,6 +31,7 @@ cp .env.example .env.local
 ```
 
 ### 4. Start Development Server
+
 ```bash
 npm run dev
 ```
@@ -75,7 +80,6 @@ src/
    ```bash
    npm run storybook
    ```
-   
 2. **Add to page** (src/routes/+page.svelte)
 
 3. **Test with real data** (connect to backend)
@@ -85,6 +89,7 @@ src/
 By default, the PWA uses mock data from `src/lib/services/mockData.ts`.
 
 To connect to real backend:
+
 1. Ensure backend is running (http://localhost:8080)
 2. Implement WebSocket service in `src/lib/services/websocket.ts`
 3. Replace mock data with WebSocket subscription
@@ -102,6 +107,7 @@ To connect to real backend:
 ## Common Tasks
 
 ### Add a New Component
+
 ```bash
 # Create component
 touch src/lib/components/NewComponent.svelte
@@ -114,6 +120,7 @@ touch src/lib/components/NewComponent.stories.ts
 ```
 
 ### Add a New Route
+
 ```bash
 # Create page
 mkdir -p src/routes/new-page
@@ -124,6 +131,7 @@ touch src/routes/new-page/+page.server.ts
 ```
 
 ### Update TypeScript Types
+
 ```bash
 # Edit src/lib/types/backend.ts to match Go structs
 # Run type check
@@ -132,32 +140,36 @@ npm run check
 
 ## Environment Variables
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `AUTH_SECRET` | Secret for session encryption | Generate with `openssl rand -base64 32` |
-| `DISCORD_CLIENT_ID` | Discord OAuth client ID | From dev.discord.com |
-| `DISCORD_CLIENT_SECRET` | Discord OAuth secret | From dev.discord.com |
-| `PUBLIC_API_URL` | Backend API base URL | `http://localhost:8080` |
-| `PUBLIC_WS_URL` | WebSocket endpoint | `ws://localhost:8080/ws` |
+| Variable                | Description                   | Example                                 |
+| ----------------------- | ----------------------------- | --------------------------------------- |
+| `AUTH_SECRET`           | Secret for session encryption | Generate with `openssl rand -base64 32` |
+| `DISCORD_CLIENT_ID`     | Discord OAuth client ID       | From dev.discord.com                    |
+| `DISCORD_CLIENT_SECRET` | Discord OAuth secret          | From dev.discord.com                    |
+| `PUBLIC_API_URL`        | Backend API base URL          | `http://localhost:8080`                 |
+| `PUBLIC_WS_URL`         | WebSocket endpoint            | `ws://localhost:8080/ws`                |
 
 **Security:** Never commit `.env.local` - it's in `.gitignore`
 
 ## Troubleshooting
 
 ### "Cannot connect to backend"
+
 - Check backend is running: `curl http://localhost:8080/health`
 - Verify `PUBLIC_API_URL` in `.env.local`
 
 ### OAuth redirect fails
+
 - Check redirect URL in Discord app matches exactly
 - Must be `http://localhost:5173/auth/callback/discord`
 - Try clearing cookies
 
 ### Hot reload not working
+
 - Restart dev server: `npm run dev`
 - Check for TypeScript errors: `npm run check`
 
 ### Storybook won't start
+
 - Delete cache: `rm -rf node_modules/.cache`
 - Reinstall: `npm install`
 
@@ -168,7 +180,7 @@ npm run check
 ✅ **Use mock data initially** - Don't depend on backend  
 ✅ **Type your events** - Avoid runtime surprises  
 ✅ **Test with real Discord** - Use dev application  
-✅ **Check component props** - Use proper TypeScript types  
+✅ **Check component props** - Use proper TypeScript types
 
 ## Next Steps
 

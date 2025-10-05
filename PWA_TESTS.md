@@ -29,8 +29,8 @@ npx playwright test --project=chromium
 ```
 
 Notes
+
 - Adjust the `BASE` URL in `tests/e2e/offline.spec.ts` if your dev server runs on a different host/port.
 - The sample test expects an element with `data-testid="offline-page"` to exist in the offline UI; change the selector to match your app.
 
-
-*** End of file
+\*\*\* End of file

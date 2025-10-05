@@ -5,18 +5,22 @@ import ThemeProvider from '../ThemeProvider.svelte';
 import * as themeStore from '$lib/stores/theme';
 
 describe('ThemeProvider', () => {
-  it('calls initTheme and applyTheme on mount', () => {
-    const initSpy = vi.spyOn(themeStore, 'initTheme').mockImplementation(() => { /* no-op */ });
-    const applySpy = vi.spyOn(themeStore, 'applyTheme').mockImplementation(() => { /* no-op */ });
+	it('calls initTheme and applyTheme on mount', () => {
+		const initSpy = vi.spyOn(themeStore, 'initTheme').mockImplementation(() => {
+			/* no-op */
+		});
+		const applySpy = vi.spyOn(themeStore, 'applyTheme').mockImplementation(() => {
+			/* no-op */
+		});
 
-    const { getByTestId } = render(ThemeProvider, { props: { testid: 'tp-1' } });
-    const el = getByTestId('tp-1');
-    expect(el).toBeTruthy();
+		const { getByTestId } = render(ThemeProvider, { props: { testid: 'tp-1' } });
+		const el = getByTestId('tp-1');
+		expect(el).toBeTruthy();
 
-    expect(initSpy).toHaveBeenCalled();
-    expect(applySpy).toHaveBeenCalled();
+		expect(initSpy).toHaveBeenCalled();
+		expect(applySpy).toHaveBeenCalled();
 
-    initSpy.mockRestore();
-    applySpy.mockRestore();
-  });
+		initSpy.mockRestore();
+		applySpy.mockRestore();
+	});
 });

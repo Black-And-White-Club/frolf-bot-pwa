@@ -20,19 +20,18 @@ export const UnderPar: Story = {
 		playerName: 'John Doe',
 		score: 2,
 		par: 3,
-		holeNumber: 1
-		, testid: 'scorecard-1-underpar'
+		holeNumber: 1,
+		testid: 'scorecard-1-underpar'
 	}
 };
-
 
 export const OverPar: Story = {
 	args: {
 		playerName: 'Jane Smith',
 		score: 5,
 		par: 3,
-		holeNumber: 2
-		, testid: 'scorecard-2-overpar'
+		holeNumber: 2,
+		testid: 'scorecard-2-overpar'
 	}
 };
 
@@ -41,8 +40,8 @@ export const EvenPar: Story = {
 		playerName: 'Bob Johnson',
 		score: 3,
 		par: 3,
-		holeNumber: 3
-		, testid: 'scorecard-3-evenpar'
+		holeNumber: 3,
+		testid: 'scorecard-3-evenpar'
 	}
 };
 
@@ -51,8 +50,8 @@ export const Birdie: Story = {
 		playerName: 'Alice Green',
 		score: 2,
 		par: 3,
-		holeNumber: 4
-		, testid: 'scorecard-4-birdie'
+		holeNumber: 4,
+		testid: 'scorecard-4-birdie'
 	}
 };
 
@@ -61,8 +60,8 @@ export const Eagle: Story = {
 		playerName: 'Charlie Blue',
 		score: 1,
 		par: 3,
-		holeNumber: 5
-		, testid: 'scorecard-5-eagle'
+		holeNumber: 5,
+		testid: 'scorecard-5-eagle'
 	}
 };
 
@@ -71,8 +70,8 @@ export const Bogey: Story = {
 		playerName: 'Diana Red',
 		score: 4,
 		par: 3,
-		holeNumber: 6
-		, testid: 'scorecard-6-bogey'
+		holeNumber: 6,
+		testid: 'scorecard-6-bogey'
 	}
 };
 
@@ -81,8 +80,8 @@ export const DoubleBogey: Story = {
 		playerName: 'Eve Yellow',
 		score: 5,
 		par: 3,
-		holeNumber: 7
-		, testid: 'scorecard-7-doublebogey'
+		holeNumber: 7,
+		testid: 'scorecard-7-doublebogey'
 	}
 };
 
@@ -91,8 +90,7 @@ export const HoleInOne: Story = {
 		playerName: 'Frank Purple',
 		score: 1,
 		par: 4,
-		holeNumber: 8
-		, testid: 'scorecard-8-holeinone'
+		holeNumber: 8,
+		testid: 'scorecard-8-holeinone'
 	}
 };
-

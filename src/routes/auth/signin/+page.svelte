@@ -6,8 +6,11 @@
 	<title>Sign In - Frolf Bot</title>
 </svelte:head>
 
-<div class="min-h-screen flex items-center justify-center bg-[var(--guild-background)]" data-testid="page-signin">
-	<div class="max-w-md w-full space-y-8">
+<div
+	class="flex min-h-screen items-center justify-center bg-[var(--guild-background)]"
+	data-testid="page-signin"
+>
+	<div class="w-full max-w-md space-y-8">
 		<div>
 			<h2 class="mt-6 text-center text-3xl font-extrabold text-[var(--guild-text)]">
 				Sign in to your account
@@ -16,7 +19,7 @@
 		<div class="mt-8 space-y-6">
 			<button
 				on:click={() => signIn('discord')}
-				class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-guild-surface bg-[var(--guild-primary)] hover:bg-[var(--guild-primary)]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--guild-primary)]"
+				class="group text-guild-surface relative flex w-full justify-center rounded-md border border-transparent bg-[var(--guild-primary)] px-4 py-2 text-sm font-medium hover:bg-[var(--guild-primary)]/90 focus:ring-2 focus:ring-[var(--guild-primary)] focus:ring-offset-2 focus:outline-none"
 				data-testid="btn-signin-discord"
 			>
 				Sign in with Discord

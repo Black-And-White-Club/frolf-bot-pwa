@@ -2,19 +2,19 @@ import type { Meta, StoryObj } from '@storybook/svelte';
 import Button from './Button.svelte';
 
 const meta: Meta = {
-  title: 'Example/Button',
-  component: Button,
-  tags: ['autodocs'],
-  argTypes: {
-    backgroundColor: { control: 'color' },
-    size: {
-      control: { type: 'select' },
-      options: ['small', 'medium', 'large'],
-    },
-  },
-  args: {
-    onclick: () => {},
-  },
+	title: 'Example/Button',
+	component: Button,
+	tags: ['autodocs'],
+	argTypes: {
+		backgroundColor: { control: 'color' },
+		size: {
+			control: { type: 'select' },
+			options: ['small', 'medium', 'large']
+		}
+	},
+	args: {
+		onclick: () => {}
+	}
 };
 
 export default meta;

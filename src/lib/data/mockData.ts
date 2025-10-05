@@ -1,4 +1,5 @@
-import type { User, DashboardData, Round, LeaderboardEntry, UserStats } from '$lib/types/backend';
+import type { User, DashboardData, LeaderboardEntry, UserStats } from '$lib/types/backend';
+import { mockRounds } from '$lib/mocks/mockRounds';
 
 // Mock users
 export const mockUsers: User[] = [
@@ -6,7 +7,8 @@ export const mockUsers: User[] = [
 		user_id: '123456789012345678',
 		username: 'Sebastian',
 		discriminator: '1234',
-	avatar_url: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=100&h=100&fit=crop&crop=face&auto=format&q=60',
+		avatar_url:
+			'https://images.unsplash.com/photo-1552053831-71594a27632d?w=100&h=100&fit=crop&crop=face&auto=format&q=60',
 		guild_id: 'mock_guild_123',
 		role: 'User',
 		tag_number: 1,
@@ -43,105 +45,7 @@ export const mockUsers: User[] = [
 	}
 ];
 
-// Mock rounds
-const mockRounds: Round[] = [
-	{
-		round_id: 'round_001',
-		guild_id: 'mock_guild_123',
-		title: 'Weekly Disc Golf Tournament',
-		description: 'Join us for our weekly tournament at the local course!',
-		location: 'Riverside Park',
-		start_time: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
-		status: 'scheduled',
-		participants: [
-			{
-				user_id: '123456789012345678',
-				username: 'Sebastian',
-				response: 'yes',
-				tag_number: 1
-			},
-			{
-				user_id: '234567890123456789',
-				username: 'Bob',
-				response: 'yes',
-				tag_number: 2
-			}
-		],
-		created_by: '123456789012345678',
-		created_at: new Date().toISOString(),
-		updated_at: new Date().toISOString()
-	},
-	{
-		round_id: 'round_002',
-		guild_id: 'mock_guild_123',
-		title: 'Casual Round',
-		description: 'Just a casual round with friends',
-		location: 'Downtown Course',
-		start_time: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-		status: 'active',
-		participants: [
-			{
-				user_id: '123456789012345678',
-				username: 'Sebastian',
-				response: 'yes',
-				tag_number: 1,
-				score: 15
-			},
-			{
-				user_id: '234567890123456789',
-				username: 'Bob',
-				response: 'yes',
-				tag_number: 2,
-				score: 18
-			},
-			{
-				user_id: '345678901234567890',
-				username: 'Charlie',
-				response: 'yes',
-				tag_number: 3,
-				score: 20
-			}
-		],
-		created_by: '234567890123456789',
-		created_at: new Date(Date.now() - 7200000).toISOString(),
-		updated_at: new Date().toISOString()
-	},
-	{
-		round_id: 'round_003',
-		guild_id: 'mock_guild_123',
-		title: 'Last Week\'s Tournament',
-		description: 'Great tournament last week!',
-		location: 'Mountain View Course',
-		start_time: new Date(Date.now() - 604800000).toISOString(), // 1 week ago
-		status: 'completed',
-		participants: [
-			{
-				user_id: '123456789012345678',
-				username: 'Alice',
-				response: 'yes',
-				tag_number: 1,
-				score: -3
-			},
-			{
-				user_id: '234567890123456789',
-				username: 'Bob',
-				response: 'yes',
-				tag_number: 2,
-				score: -1
-			},
-			{
-				user_id: '345678901234567890',
-				username: 'Charlie',
-				response: 'yes',
-				tag_number: 3,
-				score: 2
-			}
-		],
-		created_by: '123456789012345678',
-		created_at: new Date(Date.now() - 691200000).toISOString(),
-		updated_at: new Date(Date.now() - 604800000).toISOString()
-	}
-];
+// Mock rounds - using imported mock data
 
 // Mock leaderboard
 const mockLeaderboard: LeaderboardEntry[] = [
@@ -154,7 +58,7 @@ const mockLeaderboard: LeaderboardEntry[] = [
 export const mockAPI = {
 	async getDashboard(): Promise<DashboardData> {
 		// Simulate API delay
-		await new Promise(resolve => setTimeout(resolve, 500));
+		await new Promise((resolve) => setTimeout(resolve, 500));
 
 		const currentUser = mockUsers[0];
 		const userStats: UserStats = {
