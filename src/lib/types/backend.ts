@@ -52,6 +52,10 @@ export interface Round {
 	location?: string;
 	start_time?: string; // ISO 8601
 	status: RoundStatus;
+	// optional course par (total) for displaying golf-style scores in UI
+	par_total?: number;
+	// legacy or alternate name
+	par?: number;
 	participants: Participant[];
 	event_message_id?: string;
 	channel_id?: string;

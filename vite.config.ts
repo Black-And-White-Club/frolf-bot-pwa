@@ -117,6 +117,11 @@ export default defineConfig({
 				'src/.svelte-kit/**',
 				'src/routes/**',
 				'src/stories/**',
+				// Exclude small test-only Svelte stubs so they don't skew coverage
+				'src/lib/**/stubs/**',
+				// Also explicitly ignore any stubs under components or __tests__
+				'src/lib/components/**/stubs/**',
+				'src/lib/**/__tests__/stubs/**',
 				// Story files and demo/mock data skew coverage; exclude them
 				'src/lib/**/*.stories.*',
 				'src/lib/data/**',
@@ -124,6 +129,15 @@ export default defineConfig({
 				'src/lib/server/**',
 				'src/lib/services/**',
 				'src/lib/types/**',
+				// Exclude test files, specs, and type declarations from coverage
+				'**/*.test.*',
+				'**/*.spec.*',
+				'**/*.stories.*',
+				'src/stories/**',
+				'**/*.d.ts',
+				'src/lib/index.ts',
+				'src/lib/**/__tests__/**',
+				'src/lib/**/tests/**',
 				// Also exclude compiled/output folders that appear in v8 reports
 				'lib/**',
 				'lib/**/*.stories.*',

@@ -5,11 +5,24 @@ import prettier from 'eslint-config-prettier';
 import { fileURLToPath } from 'node:url';
 import { includeIgnoreFile } from '@eslint/compat';
 import js from '@eslint/js';
-import svelte from 'eslint-plugin-svelte';
 import { defineConfig } from 'eslint/config';
 import globals from 'globals';
 import ts from 'typescript-eslint';
 import svelteConfig from './svelte.config.js';
+
+// Dynamically import eslint-plugin-svelte if it's available. When running
+// the complexity scan in environments where the plugin isn't installed
+// (CI or tools container), ESLint will error trying to statically import
+// it. Using top-level await lets us gracefully fall back to an empty
+// placeholder so the config can still be loaded.
+let svelte;
+try {
+	const mod = await import('eslint-plugin-svelte');
+	svelte = mod.default || mod;
+} catch {
+	// plugin not installed; provide a minimal shape so later spreads are safe
+	svelte = { configs: { recommended: [], prettier: [] } };
+}
 
 const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 

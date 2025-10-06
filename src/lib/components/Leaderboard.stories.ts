@@ -5,7 +5,8 @@ const meta: Meta<Leaderboard> = {
 	title: 'Components/Leaderboard',
 	component: Leaderboard,
 	argTypes: {
-		entries: { control: 'object' }
+		entries: { control: 'object' },
+		variant: { control: { type: 'select' }, options: ['refined', 'minimal'] }
 	}
 };
 

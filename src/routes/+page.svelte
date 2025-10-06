@@ -114,7 +114,10 @@
 {:else if dashboardData}
 	<ThemeProvider>
 		<div class="min-h-screen bg-[var(--guild-background)]" data-testid="page-dashboard">
-			<main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+			<main
+				class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8"
+				style="--round-outer-padding: 1.5rem; --round-inner-max-width: 720px; --round-inner-min-width: 520px; --round-header-controls: 8rem;"
+			>
 				<!-- Quick Stats -->
 				<div class="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
 					<div
@@ -264,52 +267,9 @@
 
 				<!-- Main Content Grid -->
 				<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-					<!-- Left Column: Active Rounds -->
-					<div class="space-y-6 lg:col-span-2">
-						<!-- Active Rounds Section -->
-						{#if activeRounds.length > 0}
-							<section
-								class="bg-guild-surface rounded-xl border border-[var(--guild-border)] p-6 shadow-lg transition-all duration-300 hover:shadow-xl"
-								style="border-color: var(--guild-border);"
-							>
-								<div class="mb-4 flex items-center justify-between">
-									<h2 class="text-xl font-semibold" style="color: var(--guild-text);">
-										Active Rounds
-									</h2>
-									<div class="flex items-center space-x-2">
-										<span
-											class="text-guild-surface rounded-full px-2 py-1 text-xs font-medium"
-											style="background-color: {getStatusBgColor(
-												'var(--guild-primary)'
-											)}; border: 1px solid var(--guild-primary);"
-										>
-											{activeRounds.length} active
-										</span>
-										<span
-											class="text-guild-surface rounded-full px-2 py-1 text-xs font-medium"
-											style="background-color: {getStatusBgColor(
-												'var(--guild-secondary)'
-											)}; border: 1px solid var(--guild-secondary);"
-										>
-											{activeRounds.reduce((total, round) => total + round.participants.length, 0)} playing
-										</span>
-									</div>
-								</div>
-								<div class="space-y-4">
-									{#each activeRounds as round}
-										<RoundCard
-											{round}
-											onRoundClick={handleRoundClick}
-											showStatus={true}
-											compact={false}
-											dataTestId={`round-card-${round.round_id}`}
-										/>
-									{/each}
-								</div>
-							</section>
-						{/if}
-
-						<!-- Scheduled Rounds Section -->
+					<!-- Main Content: Scheduled, Active, Recent -->
+					<div class="order-2 space-y-6 lg:order-2 lg:col-span-2">
+						<!-- Scheduled Rounds Section (moved above Active) -->
 						{#if scheduledRounds.length > 0}
 							<section
 								class="bg-guild-surface rounded-xl border border-[var(--guild-border)] p-6 shadow-lg transition-all duration-300 hover:shadow-xl"
@@ -321,7 +281,7 @@
 									</h2>
 									<div class="flex items-center space-x-2">
 										<span
-											class="text-guild-surface rounded-full px-2 py-1 text-xs font-medium"
+											class="text-guild-surface flex-shrink-0 rounded-full px-2 py-1 text-xs font-medium whitespace-nowrap"
 											style="background-color: {getStatusBgColor(
 												'var(--guild-secondary)'
 											)}; border: 1px solid var(--guild-secondary);"
@@ -329,7 +289,7 @@
 											{scheduledRounds.length} upcoming
 										</span>
 										<span
-											class="text-guild-surface rounded-full px-2 py-1 text-xs font-medium"
+											class="text-guild-surface flex-shrink-0 rounded-full px-2 py-1 text-xs font-medium whitespace-nowrap"
 											style="background-color: {getStatusBgColor(
 												'var(--guild-accent)'
 											)}; border: 1px solid var(--guild-accent);"
@@ -345,9 +305,71 @@
 									{#each scheduledRounds as round}
 										<RoundCard
 											{round}
+											title={round.title}
+											description={round.description}
+											location={round.location}
+											start_time={round.start_time}
+											participants={round.participants}
+											status={round.status}
+											par_total={(round as any).par_total ?? (round as any).par}
 											onRoundClick={handleRoundClick}
 											showStatus={true}
-											compact={true}
+											compact={false}
+											showDescription={!(
+												round.title && round.title.toLowerCase().includes('weekend championship')
+											)}
+											showLocation={true}
+											dataTestId={`round-card-${round.round_id}`}
+										/>
+									{/each}
+								</div>
+							</section>
+						{/if}
+
+						<!-- Active Rounds Section -->
+						{#if activeRounds.length > 0}
+							<section
+								class="bg-guild-surface rounded-xl border border-[var(--guild-border)] p-6 shadow-lg transition-all duration-300 hover:shadow-xl"
+								style="border-color: var(--guild-border);"
+							>
+								<div class="mb-4 flex items-center justify-between">
+									<h2 class="text-xl font-semibold" style="color: var(--guild-text);">
+										Active Rounds
+									</h2>
+									<div class="flex items-center space-x-2">
+										<span
+											class="text-guild-surface flex-shrink-0 rounded-full px-2 py-1 text-xs font-medium whitespace-nowrap"
+											style="background-color: {getStatusBgColor(
+												'var(--guild-primary)'
+											)}; border: 1px solid var(--guild-primary);"
+										>
+											{activeRounds.length} active
+										</span>
+										<span
+											class="text-guild-surface flex-shrink-0 rounded-full px-2 py-1 text-xs font-medium whitespace-nowrap"
+											style="background-color: {getStatusBgColor(
+												'var(--guild-secondary)'
+											)}; border: 1px solid var(--guild-secondary);"
+										>
+											{activeRounds.reduce((total, round) => total + round.participants.length, 0)} playing
+										</span>
+									</div>
+								</div>
+								<div class="space-y-4">
+									{#each activeRounds as round}
+										<RoundCard
+											{round}
+											title={round.title}
+											description={round.description}
+											location={round.location}
+											start_time={round.start_time}
+											participants={round.participants}
+											status={round.status}
+											par_total={(round as any).par_total ?? (round as any).par}
+											onRoundClick={handleRoundClick}
+											showStatus={true}
+											compact={false}
+											showDescription={true}
 											dataTestId={`round-card-${round.round_id}`}
 										/>
 									{/each}
@@ -395,9 +417,16 @@
 									{#each completedRounds.slice(0, 3) as round}
 										<RoundCard
 											{round}
+											title={round.title}
+											location={round.location}
+											start_time={round.start_time}
+											participants={round.participants}
+											status={round.status}
+											par_total={(round as any).par_total ?? (round as any).par}
 											onRoundClick={handleRoundClick}
 											showStatus={true}
-											compact={true}
+											compact={false}
+											showDescription={false}
 											dataTestId={`round-card-${round.round_id}`}
 										/>
 									{/each}
@@ -406,8 +435,8 @@
 						{/if}
 					</div>
 
-					<!-- Right Column: Leaderboard & Profile -->
-					<div class="space-y-6">
+					<!-- Right Column: Leaderboard (appear first on mobile) -->
+					<div class="order-1 space-y-6 lg:order-2">
 						<!-- Leaderboard Section -->
 						<section
 							class="bg-guild-surface rounded-xl border border-[var(--guild-border)] p-6 shadow-lg transition-all duration-300 hover:shadow-xl"
@@ -415,7 +444,7 @@
 						>
 							<div class="mb-4 flex items-center justify-between">
 								<h2 class="text-xl font-semibold" style="color: var(--guild-text);">Leaderboard</h2>
-								<Button variant="secondary" size="sm" testid="btn-view-all">View All</Button>
+								<!-- View All handled inside Leaderboard component based on count -->
 							</div>
 							{#if Leaderboard}
 								<Leaderboard
@@ -424,37 +453,43 @@
 									showRank={true}
 									compact={true}
 									testid="leaderboard-main"
+									showViewAll={true}
+									minViewAllCount={5}
+									onViewAll={() => {
+										// TODO: navigate to full leaderboard page
+									}}
 								/>
 							{:else}
 								<div class="text-sm text-[var(--guild-text-secondary)]">Loading leaderboard…</div>
 							{/if}
 						</section>
 
-						<!-- User Profile Section -->
-						{#if currentUser}
-							<section
-								class="bg-guild-surface rounded-xl border border-[var(--guild-border)] p-6 shadow-lg transition-all duration-300 hover:shadow-xl"
-								style="border-color: var(--guild-border);"
-							>
-								<div class="mb-4 flex items-center justify-between">
-									<h2 class="text-xl font-semibold" style="color: var(--guild-text);">
-										Your Stats
-									</h2>
-									<Button
-										variant="secondary"
-										size="sm"
-										onClick={handleProfileClick}
-										testid="btn-view-profile">View Profile</Button
-									>
-								</div>
-								{#if UserProfile}
-									<UserProfile user={currentUser} showStats={true} testid="userprofile-current" />
-								{:else}
-									<div class="text-sm text-[var(--guild-text-secondary)]">Loading profile…</div>
-								{/if}
-							</section>
-						{/if}
+						<!-- (Profile intentionally omitted from mobile right column; rendered after main content on small screens) -->
 					</div>
+				</div>
+				<!-- Mobile-only Profile (appears after rounds, so it's last on mobile) -->
+				<div class="mt-6 lg:hidden">
+					{#if currentUser}
+						<section
+							class="bg-guild-surface rounded-xl border border-[var(--guild-border)] p-6 shadow-lg transition-all duration-300 hover:shadow-xl"
+							style="border-color: var(--guild-border);"
+						>
+							<div class="mb-4 flex items-center justify-between">
+								<h2 class="text-xl font-semibold" style="color: var(--guild-text);">Your Stats</h2>
+								<Button
+									variant="secondary"
+									size="sm"
+									onClick={handleProfileClick}
+									testid="btn-view-profile">View Profile</Button
+								>
+							</div>
+							{#if UserProfile}
+								<UserProfile user={currentUser} showStats={true} testid="userprofile-current" />
+							{:else}
+								<div class="text-sm text-[var(--guild-text-secondary)]">Loading profile…</div>
+							{/if}
+						</section>
+					{/if}
 				</div>
 			</main>
 		</div>

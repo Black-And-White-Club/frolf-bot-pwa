@@ -1,11 +1,11 @@
 /* @vitest-environment jsdom */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { render } from '@testing-library/svelte';
 import { test, expect } from 'vitest';
 import RoundDetails from '../RoundDetails.svelte';
 import type { RoundStatus } from '$lib/types/backend';
 
-const baseRound: any = {
+const baseRound = {
 	round_id: 'r1',
 	guild_id: 'g1',
 	title: 'Test Round',

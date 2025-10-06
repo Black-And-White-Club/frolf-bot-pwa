@@ -56,15 +56,13 @@
 </script>
 
 <span
-	class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-md {getStatusAnimation(
-		status
-	)}"
+	class="inline-flex items-center gap-1 truncate rounded-full px-2 py-1 text-xs font-semibold whitespace-nowrap shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-md"
 	style="background-color: {getStatusBgColor(status)}; border: 1px solid {getStatusColor(
 		status
 	)}; color: {getStatusColor(status)};"
 	data-testid={testid}
 >
-	<span class="icon text-sm" aria-hidden="true">
+	<span class="icon flex-shrink-0 text-sm" aria-hidden="true">
 		{#if status === 'active'}
 			<Icon name="target" size={16} />
 		{:else if status === 'completed'}
@@ -77,5 +75,5 @@
 			<Icon name="info" size={16} />
 		{/if}
 	</span>
-	<span>{displayText}</span>
+	<span class="truncate">{displayText}</span>
 </span>

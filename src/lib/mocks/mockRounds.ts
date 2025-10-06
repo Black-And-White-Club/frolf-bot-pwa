@@ -9,10 +9,12 @@ export const mockRounds: Round[] = [
 		round_id: 'round-1',
 		guild_id: 'guild-123',
 		title: 'Morning Disc Golf Session',
-		description: 'Casual morning round at the local course. Bring your own discs!',
+		description:
+			'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam.',
 		location: 'Riverside Park Disc Golf Course',
 		start_time: '2025-10-05T09:00:00Z',
 		status: 'scheduled',
+		par_total: 54,
 		participants: [
 			{
 				user_id: 'user-1',
@@ -45,19 +47,21 @@ export const mockRounds: Round[] = [
 	{
 		round_id: 'round-2',
 		guild_id: 'guild-123',
-		title: 'Evening Tournament',
-		description: 'Competitive evening tournament with prizes!',
+		title: 'Evening Classic',
+		description:
+			'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 		location: 'Downtown Disc Park',
 		start_time: '2025-10-04T18:30:00Z',
 		status: 'active',
+		par_total: 54,
 		participants: [
 			{
 				user_id: 'user-1',
 				username: 'Alice',
 				avatar_url: 'https://cdn.discordapp.com/avatars/123456789/avatar1.png',
 				response: 'yes',
-				tag_number: 42,
-				score: 45
+				tag_number: 42
+				// no score yet for Alice (still playing)
 			},
 			{
 				user_id: 'user-2',
@@ -65,7 +69,7 @@ export const mockRounds: Round[] = [
 				avatar_url: 'https://cdn.discordapp.com/avatars/123456789/avatar2.png',
 				response: 'yes',
 				tag_number: 17,
-				score: 52
+				score: 57 // +3 vs par_total 54
 			},
 			{
 				user_id: 'user-4',
@@ -73,7 +77,7 @@ export const mockRounds: Round[] = [
 				avatar_url: 'https://cdn.discordapp.com/avatars/123456789/avatar4.png',
 				response: 'late',
 				tag_number: 23,
-				score: 48,
+				score: 52, // -2 vs par_total 54
 				joined_late: true
 			},
 			{
@@ -82,7 +86,7 @@ export const mockRounds: Round[] = [
 				avatar_url: 'https://cdn.discordapp.com/avatars/123456789/avatar5.png',
 				response: 'yes',
 				tag_number: 7,
-				score: 50
+				score: 54 // E vs par_total 54
 			}
 		],
 		event_message_id: 'msg-456',
@@ -95,10 +99,12 @@ export const mockRounds: Round[] = [
 		round_id: 'round-3',
 		guild_id: 'guild-123',
 		title: 'Weekend Championship',
-		description: 'The big one! Full championship round with awards.',
+		description:
+			'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque velit nisi, pretium ut lacinia in, elementum id enim.',
 		location: 'Mountain View Championship Course',
 		start_time: '2025-10-03T14:00:00Z',
 		status: 'completed',
+		par_total: 41,
 		participants: [
 			{
 				user_id: 'user-1',
@@ -106,7 +112,7 @@ export const mockRounds: Round[] = [
 				avatar_url: 'https://cdn.discordapp.com/avatars/123456789/avatar1.png',
 				response: 'yes',
 				tag_number: 42,
-				score: 38
+				score: 38 // -3 vs par 41
 			},
 			{
 				user_id: 'user-2',
@@ -114,7 +120,7 @@ export const mockRounds: Round[] = [
 				avatar_url: 'https://cdn.discordapp.com/avatars/123456789/avatar2.png',
 				response: 'yes',
 				tag_number: 17,
-				score: 41
+				score: 41 // E
 			},
 			{
 				user_id: 'user-6',
@@ -138,7 +144,7 @@ export const mockRounds: Round[] = [
 				avatar_url: 'https://cdn.discordapp.com/avatars/123456789/avatar8.png',
 				response: 'yes',
 				tag_number: 55,
-				score: 46
+				score: 46 // +5 vs par 41
 			}
 		],
 		event_message_id: 'msg-789',

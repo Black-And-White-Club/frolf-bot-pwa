@@ -9,14 +9,15 @@
 	export let testid: string | undefined = undefined;
 </script>
 
-<div class="mb-3 flex items-start justify-between" data-testid={testid}>
+<div class="round-header" data-testid={testid}>
 	<h3
-		class="truncate text-lg font-semibold text-[var(--guild-text)]"
+		class="min-w-0 truncate pr-1 text-lg font-semibold text-[var(--guild-text)] sm:pr-1"
 		data-testid={`round-title-${round.round_id}`}
 	>
 		{round.title}
 	</h3>
-	<div class="flex flex-shrink-0 items-center space-x-2">
+
+	<div class="round-header__controls">
 		{#if round.status === 'scheduled'}
 			<!-- Simple calendar icon button -->
 			<button
@@ -63,3 +64,34 @@
 		{/if}
 	</div>
 </div>
+
+<style>
+	.round-header {
+		display: grid;
+		/* Two-column layout so the controls column is fixed and badges align across cards. */
+		grid-template-columns: 1fr var(--round-header-controls, 8rem);
+		gap: 0.5rem;
+		align-items: center;
+	}
+
+	.round-header__controls {
+		display: flex;
+		/* Fixed-width control column so badges line up across cards even when
+       controls wrap on small screens. */
+		width: var(--round-header-controls, 8rem);
+		justify-content: flex-end;
+		justify-self: end;
+		gap: 0.5rem;
+		overflow: hidden;
+	}
+
+	/* Keep controls right-aligned on larger screens as well. */
+	@media (min-width: 640px) {
+		.round-header {
+			grid-template-columns: 1fr var(--round-header-controls, 8rem);
+		}
+		.round-header__controls {
+			justify-self: end;
+		}
+	}
+</style>

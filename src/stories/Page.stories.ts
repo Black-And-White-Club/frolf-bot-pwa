@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 // Storybook play functions use loosely-typed args; relax strict rules here.
 import type { Meta, StoryObj } from '@storybook/svelte';
 import Page from './Page.svelte';

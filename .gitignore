@@ -56,3 +56,4 @@ src/lib/types/generated
 coverage*
 dist*
 /coverage
+eslint-report.json

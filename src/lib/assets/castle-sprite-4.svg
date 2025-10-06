@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="64" viewBox="0 0 256 64" shape-rendering="crispEdges">
+  <!-- 4-frame horizontal sprite sheet (each frame 64x64) -->
+  <!-- Frame 0 -->
+  <g transform="translate(0,0)">
+    <rect width="64" height="64" fill="#0B1220" />
+    <rect x="0" y="52" width="64" height="12" fill="#122033" />
+    <rect x="6" y="30" width="10" height="22" fill="#c24f4f" stroke="#7a241c" stroke-width="0.5" />
+    <rect x="8" y="26" width="6" height="4" fill="#7a241c" />
+    <rect x="20" y="18" width="24" height="34" fill="#e86b6b" stroke="#7a241c" stroke-width="0.5" />
+    <rect x="20" y="14" width="6" height="4" fill="#7a241c" />
+    <rect x="26" y="14" width="6" height="4" fill="#7a241c" />
+    <rect x="32" y="14" width="6" height="4" fill="#7a241c" />
+    <rect x="38" y="14" width="6" height="4" fill="#7a241c" />
+    <rect x="46" y="28" width="10" height="24" fill="#c24f4f" stroke="#7a241c" stroke-width="0.5" />
+    <rect x="48" y="22" width="6" height="6" fill="#7a241c" />
+    <rect x="30" y="38" width="8" height="14" fill="#2a1f15" />
+    <rect x="56" y="6" width="2" height="26" fill="#3a2b22" />
+    <rect x="58" y="6" width="12" height="8" fill="#ffd66b" />
+    <rect x="22" y="28" width="4" height="4" fill="#7a241c" />
+    <rect x="38" y="28" width="4" height="4" fill="#7a241c" />
+  </g>
+  <!-- Frame 1: flag slightly to the right -->
+  <g transform="translate(64,0)">
+    <rect width="64" height="64" fill="#0B1220" />
+    <rect x="0" y="52" width="64" height="12" fill="#122033" />
+    <rect x="6" y="30" width="10" height="22" fill="#c24f4f" stroke="#7a241c" stroke-width="0.5" />
+    <rect x="8" y="26" width="6" height="4" fill="#7a241c" />
+    <rect x="20" y="18" width="24" height="34" fill="#e86b6b" stroke="#7a241c" stroke-width="0.5" />
+    <rect x="20" y="14" width="6" height="4" fill="#7a241c" />
+    <rect x="26" y="14" width="6" height="4" fill="#7a241c" />
+    <rect x="32" y="14" width="6" height="4" fill="#7a241c" />
+    <rect x="38" y="14" width="6" height="4" fill="#7a241c" />
+    <rect x="46" y="28" width="10" height="24" fill="#c24f4f" stroke="#7a241c" stroke-width="0.5" />
+    <rect x="48" y="22" width="6" height="6" fill="#7a241c" />
+    <rect x="30" y="38" width="8" height="14" fill="#2a1f15" />
+    <rect x="56" y="6" width="2" height="26" fill="#3a2b22" />
+    <!-- flag moved right to simulate wave -->
+    <rect x="62" y="6" width="12" height="8" fill="#ffd66b" />
+    <rect x="22" y="28" width="4" height="4" fill="#7a241c" />
+    <rect x="38" y="28" width="4" height="4" fill="#7a241c" />
+  </g>
+  <!-- Frame 2: flag slightly up -->
+  <g transform="translate(128,0)">
+    <rect width="64" height="64" fill="#0B1220" />
+    <rect x="0" y="52" width="64" height="12" fill="#122033" />
+    <rect x="6" y="30" width="10" height="22" fill="#c24f4f" stroke="#7a241c" stroke-width="0.5" />
+    <rect x="8" y="26" width="6" height="4" fill="#7a241c" />
+    <rect x="20" y="18" width="24" height="34" fill="#e86b6b" stroke="#7a241c" stroke-width="0.5" />
+    <rect x="20" y="14" width="6" height="4" fill="#7a241c" />
+    <rect x="26" y="14" width="6" height="4" fill="#7a241c" />
+    <rect x="32" y="14" width="6" height="4" fill="#7a241c" />
+    <rect x="38" y="14" width="6" height="4" fill="#7a241c" />
+    <rect x="46" y="28" width="10" height="24" fill="#c24f4f" stroke="#7a241c" stroke-width="0.5" />
+    <rect x="48" y="22" width="6" height="6" fill="#7a241c" />
+    <rect x="30" y="38" width="8" height="14" fill="#2a1f15" />
+    <rect x="56" y="6" width="2" height="26" fill="#3a2b22" />
+    <!-- flag moved up -->
+    <rect x="58" y="4" width="12" height="8" fill="#ffd66b" />
+    <rect x="22" y="28" width="4" height="4" fill="#7a241c" />
+    <rect x="38" y="28" width="4" height="4" fill="#7a241c" />
+  </g>
+  <!-- Frame 3: flag slightly left -->
+  <g transform="translate(192,0)">
+    <rect width="64" height="64" fill="#0B1220" />
+    <rect x="0" y="52" width="64" height="12" fill="#122033" />
+    <rect x="6" y="30" width="10" height="22" fill="#c24f4f" stroke="#7a241c" stroke-width="0.5" />
+    <rect x="8" y="26" width="6" height="4" fill="#7a241c" />
+    <rect x="20" y="18" width="24" height="34" fill="#e86b6b" stroke="#7a241c" stroke-width="0.5" />
+    <rect x="20" y="14" width="6" height="4" fill="#7a241c" />
+    <rect x="26" y="14" width="6" height="4" fill="#7a241c" />
+    <rect x="32" y="14" width="6" height="4" fill="#7a241c" />
+    <rect x="38" y="14" width="6" height="4" fill="#7a241c" />
+    <rect x="46" y="28" width="10" height="24" fill="#c24f4f" stroke="#7a241c" stroke-width="0.5" />
+    <rect x="48" y="22" width="6" height="6" fill="#7a241c" />
+    <rect x="30" y="38" width="8" height="14" fill="#2a1f15" />
+    <rect x="56" y="6" width="2" height="26" fill="#3a2b22" />
+    <!-- flag moved left -->
+    <rect x="54" y="6" width="12" height="8" fill="#ffd66b" />
+    <rect x="22" y="28" width="4" height="4" fill="#7a241c" />
+    <rect x="38" y="28" width="4" height="4" fill="#7a241c" />
+  </g>
+</svg>

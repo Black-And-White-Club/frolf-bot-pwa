@@ -12,7 +12,7 @@ class MockWebSocket {
 			if (this.onopen) this.onopen();
 		}, 0);
 	}
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	 
 	send(..._args: unknown[]) {
 		/* noop */
 	}
