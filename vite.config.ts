@@ -57,9 +57,30 @@ export default defineConfig({
 			}
 		}),
 		...(process.env.ANALYZE
-			? [visualizer({ filename: 'dist/stats.html', template: 'treemap' })]
+			? [
+					visualizer({
+						filename: 'dist/stats.html',
+						template: 'treemap',
+						// enable compressed size measurements so the generated stats include gzip/brotli sizes
+						gzipSize: true,
+						brotliSize: true
+					})
+				]
 			: [])
 	],
+	build: {
+		rollupOptions: {
+			output: {
+				manualChunks(id: string) {
+					if (id.includes('node_modules')) {
+						if (id.includes('svelte')) return 'vendor_svelte';
+						if (id.includes('@sveltejs') || id.includes('sveltekit')) return 'vendor_sveltekit';
+						return 'vendor';
+					}
+				}
+			}
+		}
+	},
 	test: {
 		expect: { requireAssertions: false },
 		// Shared setup for any test that uses jsdom (annotated or client project).

@@ -1,4 +1,77 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// Polyfills for Vitest jsdom environment to make idle/intersection-driven loaders testable.
+// This file is referenced by vitest via setupFiles in vite.config.ts
+
+// Polyfill requestIdleCallback if missing
+if (!(globalThis as any).requestIdleCallback) {
+	(globalThis as any).requestIdleCallback = function (cb: (deadline?: any) => void) {
+		// Call on next tick so mount completes first
+		const id = setTimeout(() => cb({ didTimeout: false, timeRemaining: () => 50 }), 0);
+		return id as unknown as number;
+	};
+}
+
+if (!(globalThis as any).cancelIdleCallback) {
+	(globalThis as any).cancelIdleCallback = function (id: number) {
+		clearTimeout(id);
+	};
+}
+
+// Simple IntersectionObserver mock: immediately reports intersection on observe()
+if (!(globalThis as any).IntersectionObserver) {
+	class MockIntersectionObserver {
+		cb: IntersectionObserverCallback;
+		options: IntersectionObserverInit | undefined;
+		constructor(cb: IntersectionObserverCallback, options?: IntersectionObserverInit) {
+			this.cb = cb;
+			this.options = options;
+		}
+		observe(target?: Element | null) {
+			// async to better mirror browser behaviour
+			setTimeout(() => {
+				try {
+					this.cb(
+						[
+							{
+								isIntersecting: true,
+								target: target as Element
+							} as IntersectionObserverEntry
+						],
+						this as unknown as IntersectionObserver
+					);
+				} catch {
+					// swallow - tests may not expect thrown errors here
+				}
+			}, 0);
+		}
+		unobserve() {
+			return;
+		}
+		disconnect() {
+			return;
+		}
+		takeRecords() {
+			return [] as IntersectionObserverEntry[];
+		}
+	}
+
+	(globalThis as any).IntersectionObserver = MockIntersectionObserver;
+}
+
+// Helpful no-op for ResizeObserver if any components use it
+if (!(globalThis as any).ResizeObserver) {
+	class MockResizeObserver {
+		cb: any;
+		constructor(cb: any) {
+			this.cb = cb;
+		}
+		observe() {}
+		unobserve() {}
+		disconnect() {}
+	}
+	(globalThis as any).ResizeObserver = MockResizeObserver;
+}
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Minimal test setup for client-like tests in jsdom
 // Polyfill/define common browser APIs that jsdom doesn't provide and that components may use.
 

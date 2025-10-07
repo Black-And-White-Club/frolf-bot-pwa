@@ -1,54 +1,49 @@
 <script lang="ts">
-	import Icon from './icons/Icon.svelte';
+	import CompletedIcon from './icons/Completed.svelte';
+	import ScheduledIcon from './icons/Scheduled.svelte';
+	import DefaultIcon from './icons/Icon.svelte';
+	import { hexToRgbString } from '$lib/stores/theme.helpers';
+	import { STATUS_COLORS } from '$lib/stores/theme';
 
-	// Reusable status badge component
-	export let status: string;
+	// ✅ Props
+	export let status: 'active' | 'completed' | 'scheduled' | 'cancelled' | string;
 	export let count: number | undefined;
 	export let showCount: boolean = true;
-	export let testid: string | undefined = undefined;
+	export let testid: string | undefined;
+	export let customColor: string | undefined = undefined; // optional override (e.g. premium status)
+	export let textColor: string | undefined = undefined; // optional override; if unset, theme tokens control label color
 
-	// color to use for icon/border/text for a given status
-	function getStatusColor(status: string) {
-		switch (status) {
-			case 'active': // Skobeloff
-				return `rgb(var(--guild-primary-rgb))`;
-			case 'completed': // Gold
-				return `rgb(var(--guild-accent-rgb))`;
-			case 'scheduled': // Amethyst
-				return `rgb(var(--guild-secondary-rgb))`;
-			case 'cancelled': // neutral
-				return `rgb(var(--guild-text-secondary-rgb, 100, 116, 139))`;
-			default:
-				return 'rgb(161, 161, 170)'; // zinc-400 fallback
-		}
+	// concrete icon mapping (static imports for better tree-shaking and SSR safety)
+	const ICON_MAP: Record<string, any> = {
+		active: DefaultIcon,
+		completed: CompletedIcon,
+		scheduled: ScheduledIcon
+	};
+
+	let IconComponent: any = null;
+	let iconName = 'info';
+
+	function getColor(status: string) {
+		const lookup = (STATUS_COLORS as Record<string, string>)[status];
+		return customColor ?? lookup ?? STATUS_COLORS.default;
 	}
 
-	function getStatusBgColor(status: string) {
-		switch (status) {
-			case 'active': // Skobeloff
-				return 'rgba(var(--guild-primary-rgb), 0.1)';
-			case 'completed': // Matte Gold
-				return 'rgba(var(--guild-accent-rgb), 0.1)';
-			case 'scheduled': // Amethyst
-				return 'rgba(var(--guild-secondary-rgb), 0.1)';
-			case 'cancelled': // Charcoal (neutral gray for cancelled)
-				return 'rgba(var(--guild-text-rgb), 0.1)';
-			default:
-				return 'rgba(26, 26, 26, 0.1)';
-		}
+	function hexToRgba(hex: string, alpha = 0.13) {
+		if (!hex) return '';
+		const rgb = hexToRgbString(hex); // returns 'r, g, b'
+		return `rgba(${rgb}, ${alpha})`;
 	}
 
-	function getStatusAnimation(status: string) {
-		switch (status) {
-			case 'active':
-				return ''; // No animation - keep subtle
-			case 'completed':
-				return ''; // Completed feels accomplished, no animation needed
-			default:
-				return '';
-		}
-	}
+	// pick concrete icon or default wrapper reactively
+	$: IconComponent = ICON_MAP[status] ?? DefaultIcon;
 
+	$: {
+		if (status === 'active') iconName = 'target';
+		else if (status === 'completed') iconName = 'check';
+		else if (status === 'scheduled') iconName = 'calendar';
+		else if (status === 'cancelled') iconName = 'close';
+		else iconName = 'info';
+	}
 	$: displayText =
 		showCount && count !== undefined
 			? `${count} ${status}`
@@ -56,24 +51,57 @@
 </script>
 
 <span
-	class="inline-flex items-center gap-1 truncate rounded-full px-2 py-1 text-xs font-semibold whitespace-nowrap shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-md"
-	style="background-color: {getStatusBgColor(status)}; border: 1px solid {getStatusColor(
-		status
-	)}; color: {getStatusColor(status)};"
 	data-testid={testid}
+	data-status={status}
+	class="status-badge inline-flex items-center gap-1 truncate rounded-full px-2 py-1 text-xs font-semibold whitespace-nowrap shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-md"
+	class:active={status === 'active'}
+	role="status"
+	aria-label={displayText}
+	style="--sb-bg: {hexToRgba(getColor(status))}; --sb-border: {getColor(
+		status
+	)}; --sb-text: {textColor ??
+		'var(--guild-text, #111)'}; background-color: var(--sb-bg); border: 1px solid var(--sb-border); color: var(--sb-text);"
 >
-	<span class="icon flex-shrink-0 text-sm" aria-hidden="true">
-		{#if status === 'active'}
-			<Icon name="target" size={16} />
-		{:else if status === 'completed'}
-			<Icon name="check" size={16} />
-		{:else if status === 'scheduled'}
-			<Icon name="calendar" size={16} />
-		{:else if status === 'cancelled'}
-			<Icon name="close" size={16} />
-		{:else}
-			<Icon name="info" size={16} />
-		{/if}
+	<span class="icon flex-shrink-0" aria-hidden="true">
+		<svelte:component this={IconComponent} size={14} aria-hidden="true" />
 	</span>
-	<span class="truncate">{displayText}</span>
+
+	<span class="label truncate">{displayText}</span>
+	<span class="sr-only">Status: {displayText}</span>
 </span>
+
+<style>
+	.status-badge {
+		background-color: var(--sb-bg);
+		border: 1px solid var(--sb-border);
+		color: var(--sb-text);
+	}
+
+	/* Icon always follows the badge border color so it remains visible in both light/dark */
+	.status-badge .icon {
+		color: var(--sb-border);
+	}
+
+	.status-badge .icon :global(svg) {
+		width: 14px;
+		height: 14px;
+	}
+
+	/* enforce inheritance for any child shape */
+	.status-badge .icon :global(svg *) {
+		fill: currentColor;
+		stroke: currentColor;
+	}
+
+	.status-badge .label {
+		color: inherit; /* label follows --sb-text */
+	}
+
+	@media (prefers-color-scheme: light) {
+		.status-badge {
+			box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06) inset;
+			color: var(--guild-text);
+		}
+		/* nothing special for active in light mode — icon inherits border color */
+	}
+</style>

@@ -3,11 +3,14 @@ export function isUnsplashUrl(u: string | undefined) {
 }
 
 // Build a safe srcset for Unsplash images that appends query params correctly
-export function unsplashSrcset(u: string, widths: number[] = [48, 100]) {
+export function unsplashSrcset(u: string, widths: number[] = [48, 100], format?: 'webp' | 'avif') {
 	const hasQuery = u.includes('?');
 	const sep = hasQuery ? '&' : '?';
-	// Ensure we include auto=format to let the CDN pick modern formats
-	return widths.map((w) => `${u}${sep}w=${w}&auto=format&fit=crop&q=60 ${w}w`).join(', ');
+	// Include auto=format to allow the CDN to negotiate formats. If a specific
+	// format is requested, set fm=<format> to force that output (used in <picture>
+	// source tags for AVIF/WebP fallbacks).
+	const fmtPart = format ? `&fm=${format}` : '&auto=format';
+	return widths.map((w) => `${u}${sep}w=${w}&fit=crop&q=60${fmtPart} ${w}w`).join(', ');
 }
 
 export function unsplashSizes(targetPx: number) {

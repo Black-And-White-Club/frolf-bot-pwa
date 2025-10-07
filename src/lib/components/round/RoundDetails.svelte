@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type { Round } from '$lib/types/backend';
+	import AddToCalendarButton from '$lib/components/round/AddToCalendarButton.svelte';
+	import IconTextRow from '$lib/components/ui/IconTextRow.svelte';
 
 	export let round: Round;
 	export let compact: boolean = false;
@@ -41,20 +43,85 @@
 </script>
 
 {#if !compact}
-	<div data-testid={testid}>
+	<div data-testid={testid} class="round-details-content">
 		{#if showDescription && localDescription()}
 			<!-- Limit description line length so it doesn't stretch the entire card on wide screens -->
 			<p
-				class="mb-1 line-clamp-2 max-w-[55ch] text-left text-sm text-[var(--guild-text-secondary)] md:max-w-[48ch]"
+				class="description line-clamp-2 max-w-[55ch] text-left text-sm text-[var(--guild-text-secondary)] md:max-w-[48ch]"
 			>
 				{localDescription()}
 			</p>
 		{/if}
 
 		{#if showLocation && localLocation()}
-			<p class="mb-1 flex items-center text-sm text-[var(--guild-text-secondary)]">
+			<p class="location-row text-sm text-[var(--guild-text-secondary)]">
+				<IconTextRow className="" testid={`round-location-${round.round_id}`}>
+					<span slot="icon">
+						<svg
+							class="flex-shrink-0"
+							style="width:var(--icon-size,1rem);height:var(--icon-size,1rem)"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+							></path>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+							></path>
+						</svg>
+					</span>
+					<span class="min-w-0">{localLocation()}</span>
+				</IconTextRow>
+			</p>
+		{/if}
+	</div>
+{/if}
+
+<!-- Mobile-only calendar button positioned bottom-right within the inner card -->
+<div class="mobile-calendar">
+	{#if showLocation && localStartTime()}
+		<div class="mobile-calendar-btn-wrapper">
+			<AddToCalendarButton
+				{round}
+				showCaption={false}
+				testid={`btn-add-calendar-mobile-${round.round_id}`}
+			/>
+		</div>
+	{/if}
+</div>
+
+{#if round.status === 'scheduled'}
+	<!-- tighten vertical spacing slightly so location and date rows sit closer -->
+	<p class="date-row scheduled text-sm text-[var(--guild-text-secondary)]" style="--icon-size:1rem">
+		<IconTextRow>
+			<!-- put the calendar action inside the row so it participates in nowrap/truncation -->
+			<AddToCalendarButton
+				{round}
+				showCaption={true}
+				showIcon={true}
+				small={true}
+				captionText="Click to add to calendar"
+				testid={`btn-add-calendar-inline-${round.round_id}`}
+			>
+				<span class="date-text">{formatLocalStart()}</span>
+			</AddToCalendarButton>
+		</IconTextRow>
+	</p>
+{:else}
+	<p class="date-row text-sm text-[var(--guild-text-secondary)]">
+		<IconTextRow>
+			<span slot="icon">
 				<svg
-					class="mr-2 h-4 w-4 flex-shrink-0"
+					class="flex-shrink-0"
+					style="width:var(--icon-size,1rem);height:var(--icon-size,1rem)"
 					fill="none"
 					stroke="currentColor"
 					viewBox="0 0 24 24"
@@ -63,29 +130,81 @@
 						stroke-linecap="round"
 						stroke-linejoin="round"
 						stroke-width="2"
-						d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-					></path>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+						d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
 					></path>
 				</svg>
-				<span class="min-w-0 flex-1 truncate">{localLocation()}</span>
-			</p>
-		{/if}
-	</div>
+			</span>
+			<span class="min-w-0">{formatLocalStart()}</span>
+		</IconTextRow>
+	</p>
 {/if}
 
-<p class="mb-1 flex items-center text-sm text-[var(--guild-text-secondary)]">
-	<svg class="mr-1 h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-		<path
-			stroke-linecap="round"
-			stroke-linejoin="round"
-			stroke-width="2"
-			d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-		></path>
-	</svg>
-	{formatLocalStart()}
-</p>
+<style>
+	.mobile-calendar {
+		position: relative;
+	}
+	.mobile-calendar-btn-wrapper {
+		display: none;
+	}
+	@media (max-width: 639px) {
+		.mobile-calendar-btn-wrapper {
+			display: inline-flex;
+			position: absolute;
+			right: 0.75rem;
+			bottom: 0.75rem;
+			background: rgba(0, 0, 0, 0.12);
+			border: 1px solid rgba(255, 255, 255, 0.04);
+			padding: 0.35rem;
+			border-radius: 0.5rem;
+			color: var(--guild-secondary);
+		}
+	}
+
+	/* IconTextRow provides the inline icon+text contract so no local CSS needed here */
+
+	/* tighter spacing so stacked rows sit closer together */
+	/* Default paragraph spacing inside the details block. Keep description a little looser. */
+	.round-details-content p {
+		margin-bottom: 0.25rem; /* reasonable default */
+	}
+
+	/* Description should have a bit more breathing room before location */
+	.round-details-content p.description {
+		margin-bottom: 0.5rem;
+	}
+
+	.date-row {
+		margin-top: 0; /* no extra top gap */
+	}
+
+	/* ensure inline rows keep icon+text on a single line and share icon sizing */
+	.round-details-content {
+		--icon-size: 1rem;
+	}
+
+	.location-row,
+	.date-row {
+		line-height: 1.15rem; /* slightly tighter vertical rhythm */
+		margin-top: 0; /* ensure no extra gap above these rows */
+	}
+
+	/* TIGHTEN: only adjust spacing between location and date rows
+	   Make them sit closer together by pulling the date up slightly */
+	.location-row {
+		margin-bottom: -0.25rem; /* pull date row up ~4px */
+	}
+
+	/* lift the date row up a hair as well so the two rows are visually tight */
+	.date-row {
+		margin-top: -0.0625rem; /* -1px */
+		margin-bottom: 0;
+	}
+
+	/* scheduled rows should use the brand secondary (amethyst) for the icon */
+	.date-row.scheduled {
+		--icon-color: var(--guild-secondary);
+	}
+
+	/* Only the scheduled inline calendar should use the amethyst accent for the icon */
+	/* (was .date-row .icon-row) */
+</style>

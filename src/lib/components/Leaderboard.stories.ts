@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/svelte';
 import Leaderboard from './Leaderboard.svelte';
 
-const meta: Meta<Leaderboard> = {
+const meta: Meta<typeof Leaderboard> = {
 	title: 'Components/Leaderboard',
 	component: Leaderboard,
 	argTypes: {
@@ -11,7 +11,7 @@ const meta: Meta<Leaderboard> = {
 };
 
 export default meta;
-type Story = StoryObj<Leaderboard>;
+type Story = StoryObj<typeof Leaderboard>;
 
 export const Empty: Story = {
 	args: {

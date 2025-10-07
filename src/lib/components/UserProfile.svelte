@@ -47,21 +47,43 @@
 >
 	<div class="flex items-center space-x-4">
 		{#if user.avatar_url}
-			<img
-				src={user.avatar_url}
-				alt="{user.username}'s avatar"
-				width="48"
-				height="48"
-				loading="lazy"
-				decoding="async"
-				crossorigin="anonymous"
-				style="aspect-ratio:1/1"
-				class="h-12 w-12 rounded-full"
-				srcset={isUnsplashUrl(user.avatar_url)
-					? unsplashSrcset(user.avatar_url, [48, 100])
-					: undefined}
-				sizes={isUnsplashUrl(user.avatar_url) ? unsplashSizes(48) : undefined}
-			/>
+			{#if isUnsplashUrl(user.avatar_url)}
+				<picture>
+					<source
+						type="image/avif"
+						srcset={unsplashSrcset(user.avatar_url, [48, 100], 'avif')}
+						sizes={unsplashSizes(48)}
+					/>
+					<source
+						type="image/webp"
+						srcset={unsplashSrcset(user.avatar_url, [48, 100], 'webp')}
+						sizes={unsplashSizes(48)}
+					/>
+					<img
+						src={user.avatar_url}
+						alt="{user.username}'s avatar"
+						width="48"
+						height="48"
+						loading="lazy"
+						decoding="async"
+						crossorigin="anonymous"
+						style="aspect-ratio:1/1"
+						class="h-12 w-12 rounded-full"
+					/>
+				</picture>
+			{:else}
+				<img
+					src={user.avatar_url}
+					alt="{user.username}'s avatar"
+					width="48"
+					height="48"
+					loading="lazy"
+					decoding="async"
+					crossorigin="anonymous"
+					style="aspect-ratio:1/1"
+					class="h-12 w-12 rounded-full"
+				/>
+			{/if}
 		{:else}
 			<div class="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--guild-border)]">
 				<span class="font-medium text-[var(--guild-text-secondary)]"

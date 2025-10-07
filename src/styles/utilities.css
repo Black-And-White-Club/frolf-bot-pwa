@@ -1,0 +1,55 @@
+@layer utilities {
+	.theme-toggle-knob {
+		border: var(--toggle-knob-border-width) solid var(--toggle-knob-border-color);
+		transition:
+			transform var(--transition-base),
+			border-color var(--transition-base);
+	}
+
+	.card-title {
+		position: relative;
+		color: rgb(var(--color-text));
+		font-family: var(--font-display);
+	}
+	.card-title--mint-text {
+		color: rgb(var(--color-mint));
+		font-weight: 600;
+	}
+	.card-title--skobeloff {
+		color: rgb(var(--color-primary));
+	}
+	.card-title--amethyst {
+		color: rgb(var(--color-secondary));
+	}
+	.card-title--gold {
+		color: rgb(var(--color-matte-gold));
+	}
+
+	.link-like {
+		background: transparent;
+		border: none;
+		padding: 0;
+		color: rgb(var(--color-primary));
+		text-decoration: underline;
+		font-weight: 600;
+		cursor: pointer;
+		transition: color var(--transition-fast);
+	}
+
+	.pr-inner-controls {
+		padding-right: var(--inner-controls-offset);
+	}
+
+	.safe-area-inset-top {
+		padding-top: env(safe-area-inset-top, 0);
+	}
+	.safe-area-inset-bottom {
+		padding-bottom: env(safe-area-inset-bottom, 0);
+	}
+	.safe-area-inset-left {
+		padding-left: env(safe-area-inset-left, 0);
+	}
+	.safe-area-inset-right {
+		padding-right: env(safe-area-inset-right, 0);
+	}
+}

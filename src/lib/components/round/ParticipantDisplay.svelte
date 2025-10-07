@@ -1,63 +1,166 @@
 <script lang="ts">
 	import type { Round, Participant } from '$lib/types/backend';
 	import ParticipantAvatar from './ParticipantAvatar.svelte';
-
-	export let round: Round;
-	export let participants: Participant[] | undefined = undefined; // optional explicit participants list
-	export let status: string | undefined = undefined; // optional explicit status
-	export let par_total: number | undefined = undefined; // optional explicit par_total or par
-	export let compact: boolean = false;
-	export let testid: string | undefined = undefined;
-
-	let expanded = false;
-
-	function toggleExpanded() {
-		expanded = !expanded;
-	}
-
-	// helpers for responsive avatars (used only for srcset decision)
 	import { isUnsplashUrl, unsplashSrcset, unsplashSizes } from '$lib/utils/unsplash';
 
-	function formatScore(s: number | undefined) {
-		if (s === undefined || s === null) return null;
-		// Prefer explicit par_total prop, else fall back to round props
-		const parTotal = par_total ?? (round as any).par_total ?? (round as any).par;
-		if (typeof parTotal === 'number') {
-			const rel = s - parTotal;
-			if (rel === 0) return 'E';
-			return rel > 0 ? `+${rel}` : `${rel}`;
-		}
-		// Fallback: show raw strokes (no leading +) when par isn't available
-		return `${s}`;
+	// Props using Svelte 5 syntax
+	interface Props {
+		round: Round;
+		participants?: Participant[];
+		status?: string;
+		par_total?: number;
+		compact?: boolean;
+		testid?: string;
 	}
 
-	// compute participants to display; for completed rounds sort by numeric score (lower better)
-	function participantsToShow() {
-		// use explicit participants when provided, otherwise use round.participants
-		const src = participants ?? round.participants ?? [];
-		const parts = src.slice();
-		const localStatus = status ?? round.status;
+	let { round, participants, status, par_total, compact = false, testid }: Props = $props();
+
+	// State using Svelte 5 runes
+	let expanded = $state(false);
+
+	// Computed values using $derived
+	const localStatus = $derived(status ?? round.status);
+	const localParticipants = $derived(participants ?? round.participants ?? []);
+
+	const sortedParticipants = $derived.by(() => {
+		const parts = [...localParticipants];
+
 		if (localStatus === 'completed') {
 			parts.sort((a, b) => {
-				const ax = a.score;
-				const bx = b.score;
-				const aHas = ax !== undefined && ax !== null;
-				const bHas = bx !== undefined && bx !== null;
-				if (aHas && bHas) return ax - bx; // lower score first
-				if (aHas) return -1;
-				if (bHas) return 1;
+				const scoreA = a.score;
+				const scoreB = b.score;
+				const hasA = scoreA !== undefined && scoreA !== null;
+				const hasB = scoreB !== undefined && scoreB !== null;
+
+				if (hasA && hasB) return scoreA - scoreB;
+				if (hasA) return -1;
+				if (hasB) return 1;
 				return 0;
 			});
 		}
+
 		return parts;
+	});
+
+	const displayedParticipants = $derived(
+		expanded ? sortedParticipants : sortedParticipants.slice(0, 4)
+	);
+
+	const hasMoreParticipants = $derived(sortedParticipants.length > 4);
+	const remainingCount = $derived(sortedParticipants.length - 4);
+
+	const scoredCount = $derived(
+		localParticipants.filter((p) => p.score !== undefined && p.score !== null).length
+	);
+
+	// Format score relative to par
+	function formatScore(score: number | undefined): string | null {
+		if (score === undefined || score === null) return null;
+
+		const parTotal = par_total ?? (round as any).par_total ?? (round as any).par;
+
+		if (typeof parTotal === 'number') {
+			const relative = score - parTotal;
+			if (relative === 0) return 'E';
+			return relative > 0 ? `+${relative}` : `${relative}`;
+		}
+
+		return `${score}`;
+	}
+
+	// Get badge styling based on response
+	function getResponseBadgeClass(response: string | undefined): string {
+		if (!response) return '';
+
+		const baseClass =
+			'inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold transition-colors';
+
+		switch (response) {
+			case 'yes':
+				return `${baseClass} bg-guild-primary/10 text-guild-primary`;
+			case 'maybe':
+				return `${baseClass} bg-guild-accent/10 text-guild-accent`;
+			case 'no':
+				return `${baseClass} bg-guild-secondary/10 text-guild-secondary`;
+			default:
+				return baseClass;
+		}
+	}
+
+	// Get response text
+	function getResponseText(response: string | undefined): string {
+		if (!response) return '';
+		return response.charAt(0).toUpperCase() + response.slice(1);
+	}
+
+	// Toggle expanded state
+	function toggleExpanded(): void {
+		expanded = !expanded;
+	}
+
+	// Keyboard handler for expand button
+	function handleKeyDown(event: KeyboardEvent): void {
+		if (event.key === 'Enter' || event.key === ' ') {
+			event.preventDefault();
+			toggleExpanded();
+		}
 	}
 </script>
 
-{#if !compact}
+{#if compact}
+	<!-- Compact view: stacked avatars with count -->
+	<div
+		class="participant-row grid items-center gap-2 text-sm"
+		style="grid-template-columns: 1fr minmax(4rem, var(--inner-controls-width));"
+		data-testid={testid}
+	>
+		<div class="flex min-w-0 items-center gap-2">
+			<div class="flex items-center -space-x-1" role="group" aria-label="Participants">
+				{#each localParticipants.slice(0, 3) as participant}
+					<div class="ring-guild-surface rounded-full ring-2">
+						<ParticipantAvatar
+							avatar_url={participant.avatar_url}
+							username={participant.username}
+							size={24}
+							extraClasses="border-2"
+						/>
+					</div>
+				{/each}
+
+				{#if localParticipants.length > 3}
+					<div
+						class="participant-avatar border-guild-border bg-guild-secondary ring-guild-surface flex h-6 w-6 items-center justify-center rounded-full border-2 ring-2"
+						aria-label="{localParticipants.length - 3} more participants"
+					>
+						<span class="text-xs font-bold text-white">
+							+{localParticipants.length - 3}
+						</span>
+					</div>
+				{/if}
+			</div>
+
+			<span class="text-guild-text truncate font-medium">
+				{localParticipants.length}
+				{localParticipants.length === 1 ? 'player' : 'players'}
+			</span>
+		</div>
+
+		{#if scoredCount > 0}
+			<div class="text-guild-primary pr-inner-controls text-right font-medium">
+				{scoredCount} scored
+			</div>
+		{/if}
+	</div>
+{:else}
+	<!-- Full view: individual participant rows -->
 	<div class="space-y-2" data-testid={testid}>
-		{#each expanded ? participantsToShow() : participantsToShow().slice(0, 4) as participant}
-			<div class="participant-row relative flex items-center text-sm">
-				<div class="flex min-w-0 items-center space-x-2 pr-56 md:pr-20">
+		{#each displayedParticipants as participant (participant.user_id || participant.username)}
+			<div
+				class="participant-row grid items-center text-sm"
+				style="grid-template-columns: 1fr minmax(4rem, var(--inner-controls-width)); gap: 1.5rem;"
+			>
+				<!-- Left: Avatar and name -->
+				<div class="flex min-w-0 items-center gap-2">
 					<ParticipantAvatar
 						avatar_url={participant.avatar_url}
 						username={participant.username}
@@ -65,55 +168,59 @@
 						extraClasses="flex-shrink-0"
 					/>
 					<span
-						class="max-w-[10rem] min-w-0 flex-1 truncate text-left text-[var(--guild-text)] md:max-w-[14rem]"
-						>{participant.username}</span
+						class="text-guild-text max-w-[10rem] min-w-0 flex-1 truncate text-left md:max-w-[14rem]"
+						title={participant.username}
 					>
-
-					<!-- Responses moved to the right column for scheduled rounds -->
+						{participant.username}
+					</span>
 				</div>
-				<div
-					class="absolute text-right md:static md:ml-1 md:w-20"
-					style="right: 0; top: 50%; transform: translateY(-50%);"
-				>
-					{#if (status ?? round.status) === 'scheduled'}
+
+				<!-- Right: Status/Score -->
+				<div class="pr-inner-controls text-right">
+					{#if localStatus === 'scheduled'}
 						{#if participant.response}
-							<span
-								class={`rounded px-2 py-1 text-xs font-semibold ${participant.response === 'yes' ? 'bg-[var(--guild-primary)]/10 text-[var(--guild-primary)]' : participant.response === 'maybe' ? 'bg-[var(--guild-accent)]/10 text-[var(--guild-accent)]' : 'bg-[var(--guild-secondary)]/10 text-[var(--guild-secondary)]'}`}
-							>
-								{participant.response === 'yes'
-									? 'Yes'
-									: participant.response === 'maybe'
-										? 'Maybe'
-										: participant.response === 'no'
-											? 'No'
-											: ''}
+							<span class={getResponseBadgeClass(participant.response)}>
+								{getResponseText(participant.response)}
 							</span>
 						{/if}
 					{:else if formatScore(participant.score) !== null}
 						<span
-							class="rounded bg-[var(--guild-primary)]/20 px-2 py-1 text-xs font-semibold text-[var(--guild-primary)]"
-							>{formatScore(participant.score)}</span
+							class="bg-guild-primary/20 text-guild-primary inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold"
 						>
-					{:else if (status ?? round.status) === 'completed'}
+							{formatScore(participant.score)}
+						</span>
+					{:else if localStatus === 'completed'}
 						<span
-							class="rounded bg-[var(--guild-primary)]/20 px-2 py-1 text-xs font-semibold text-[var(--guild-primary)]"
-							>DNP</span
+							class="bg-guild-primary/20 text-guild-primary inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold"
 						>
+							DNP
+						</span>
 					{:else}
-						<!-- active/no score placeholder -->
+						<!-- Active round, no score yet -->
 						<span
-							class="rounded bg-[var(--guild-primary)]/20 px-2 py-1 text-xs font-semibold text-[var(--guild-primary)]"
-							aria-hidden="true">-</span
+							class="bg-guild-primary/20 text-guild-primary inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold"
+							aria-hidden="true"
 						>
+							-
+						</span>
 					{/if}
 				</div>
 			</div>
 		{/each}
-		{#if participantsToShow().length > 4}
-			<div class="text-center text-xs font-medium text-[var(--guild-text)]">
-				<button class="underline" on:click={toggleExpanded} aria-expanded={expanded}>
+
+		<!-- Expand/Collapse button -->
+		{#if hasMoreParticipants}
+			<div class="flex justify-center pt-1">
+				<button
+					class="link-like focus-visible:outline-guild-primary tap-highlight-none text-xs font-medium"
+					onclick={toggleExpanded}
+					onkeydown={handleKeyDown}
+					aria-expanded={expanded}
+					aria-controls="participant-list"
+					type="button"
+				>
 					{#if !expanded}
-						+{participantsToShow().length - 4} more players
+						+{remainingCount} more {remainingCount === 1 ? 'player' : 'players'}
 					{:else}
 						Show less
 					{/if}
@@ -121,42 +228,25 @@
 			</div>
 		{/if}
 	</div>
-{:else}
-	<div class="participant-row relative flex items-center text-sm">
-		<div class="flex min-w-0 items-center space-x-2 pr-44 md:pr-20">
-			<div class="flex items-center -space-x-1">
-				{#each (participants ?? round.participants ?? []).slice(0, 3) as participant}
-					<ParticipantAvatar
-						avatar_url={participant.avatar_url}
-						username={participant.username}
-						size={24}
-						extraClasses="border-2"
-					/>
-				{/each}
-				{#if (participants ?? round.participants ?? []).length > 3}
-					<div
-						class="participant-avatar participant-avatar--secondary flex h-6 w-6 items-center justify-center rounded-full border-2 border-[var(--guild-border)] bg-[var(--guild-secondary)]"
-					>
-						<span class="text-xs font-bold text-[var(--guild-text)]"
-							>+{(round.participants ?? []).length - 3}</span
-						>
-					</div>
-				{/if}
-			</div>
-			<span class="ml-2 truncate font-medium text-[var(--guild-text)]"
-				>{(participants ?? round.participants ?? []).length} players</span
-			>
-		</div>
-		{#if (participants ?? round.participants ?? []).some((p) => p.score !== undefined && p.score !== null)}
-			<span
-				class="absolute font-medium text-[var(--guild-primary)] md:static"
-				style="right: 0; top: 50%; transform: translateY(-50%);"
-			>
-				{(participants ?? round.participants ?? []).filter(
-					(p) => p.score !== undefined && p.score !== null
-				).length}
-				scored
-			</span>
-		{/if}
-	</div>
 {/if}
+
+<style>
+	/* Mobile: Ensure right-hand controls align properly */
+	@media (max-width: 639px) {
+		:global(.participant-row) {
+			grid-template-columns: 1fr minmax(4rem, var(--inner-controls-width)) !important;
+		}
+
+		:global(.participant-row > div:last-child) {
+			justify-self: end;
+			text-align: right;
+		}
+	}
+
+	/* Ensure smooth transitions for expand/collapse */
+	@media (prefers-reduced-motion: no-preference) {
+		.space-y-2 > * {
+			animation: slideDown 200ms ease-out;
+		}
+	}
+</style>

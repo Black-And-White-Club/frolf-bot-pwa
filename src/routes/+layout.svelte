@@ -1,35 +1,78 @@
 <script lang="ts">
-	import '../app.css';
+	import '../styles/app.css';
 	import { page } from '$app/stores';
 	import Navbar from '$lib/components/Navbar.svelte';
 	import ThemeProvider from '$lib/components/ThemeProvider.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
-	import LiveAnnouncer from '$lib/components/LiveAnnouncer.svelte';
-	import UpdateSnackbarClient from '$lib/components/UpdateSnackbar.client.svelte';
-	import { showUpdate } from '$lib/pwa/updateSnackbarHelper';
-	import { registerServiceWorker } from '$lib/pwa/registerServiceWorker';
+
+	// These are client-only, non-critical components — load them lazily to keep the
+	// initial bundle smaller. Use Svelte 5 `$state` so updates are reactive.
+	let LiveAnnouncer = $state<any>(null);
+	let UpdateSnackbarClient = $state<any>(null);
+	// Defer importing PWA helpers so they don't bloat the initial layout chunk.
+	// We'll dynamically import them after the app is idle.
 
 	let swListener: (ev: Event) => void;
 
 	onMount(async () => {
-		try {
-			const reg = await registerServiceWorker();
-			// server may return the registration; we already dispatch sw:waiting from registerServiceWorker
-		} catch {
-			// best-effort
-		}
-
-		swListener = (e: Event) => {
-			const ev = e as CustomEvent<ServiceWorkerRegistration>;
+		// Register the service worker after the browser is idle so we don't
+		// block the main thread or inflate the initial JS bundle.
+		const registerLater = async () => {
 			try {
-				if (browser) showUpdate(ev.detail);
-			} catch {
-				/* ignore */
+				const [{ registerServiceWorker }, { showUpdate }] = await Promise.all([
+					import('$lib/pwa/registerServiceWorker'),
+					import('$lib/pwa/updateSnackbarHelper')
+				]);
+
+				// call registration (best-effort)
+				try {
+					await registerServiceWorker?.();
+				} catch {
+					// swallow errors — registration is non-critical
+				}
+
+				// create listener that calls the lazily-imported showUpdate helper
+				swListener = (e: Event) => {
+					const ev = e as CustomEvent<ServiceWorkerRegistration>;
+					try {
+						if (browser) showUpdate?.(ev.detail);
+					} catch {
+						/* ignore */
+					}
+				};
+
+				if (browser && swListener)
+					window.addEventListener('sw:waiting', swListener as EventListener);
+			} catch (err) {
+				// best-effort: don't block rendering if imports fail
+				// eslint-disable-next-line no-console
+				console.warn('deferred SW registration failed', err);
 			}
 		};
-		if (browser) window.addEventListener('sw:waiting', swListener as EventListener);
+
+		if ('requestIdleCallback' in window) {
+			(window as any).requestIdleCallback(registerLater, { timeout: 2000 });
+		} else {
+			// fallback: register after brief timeout
+			setTimeout(registerLater, 2000);
+		}
+
+		// Lazy-load a11y and update UI components after hydration so they don't
+		// inflate the initial JS payload.
+		try {
+			const [live, upd] = await Promise.all([
+				import('$lib/components/LiveAnnouncer.svelte'),
+				import('$lib/components/UpdateSnackbar.client.svelte')
+			]);
+			LiveAnnouncer = live.default;
+			UpdateSnackbarClient = upd.default;
+		} catch (err) {
+			// best-effort, keep app usable without these features
+			// eslint-disable-next-line no-console
+			console.warn('deferred client components failed to load', err);
+		}
 	});
 
 	onDestroy(() => {
@@ -38,6 +81,8 @@
 	});
 
 	let { children } = $props();
+
+	import { modalOpen } from '$lib/stores/overlay';
 </script>
 
 <svelte:head>
@@ -53,13 +98,17 @@
 >
 
 <ThemeProvider>
-	<LiveAnnouncer />
-	<UpdateSnackbarClient />
+	{#if LiveAnnouncer}
+		<LiveAnnouncer />
+	{/if}
+	{#if UpdateSnackbarClient}
+		<UpdateSnackbarClient />
+	{/if}
 	{#if $page.data.session}
 		<!-- User is signed in -->
-		<div class="min-h-screen bg-[var(--guild-background)]">
+		<div class="app-container">
 			<Navbar />
-			<main class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+			<main id="main-content" aria-hidden={$modalOpen} class="app-main">
 				{@render children?.()}
 			</main>
 		</div>
@@ -71,8 +120,8 @@
 					<ThemeToggle testid="theme-toggle-guest" />
 				</div>
 				<div>
-					<h1 class="text-guild-primary text-center text-3xl font-extrabold">Frolf Bot PWA</h1>
-					<p class="text-guild-text-secondary mt-2 text-center text-sm">
+					<h1 class="text-center text-3xl font-extrabold text-guild-primary">Frolf Bot PWA</h1>
+					<p class="mt-2 text-center text-sm text-guild-text-secondary">
 						Sign in with Discord to access your disc golf games.
 					</p>
 				</div>
@@ -80,7 +129,7 @@
 					<a
 						href="/auth/signin"
 						data-testid="btn-signin"
-						class="group text-guild-surface relative flex w-full justify-center rounded-md border border-transparent bg-[var(--guild-primary)] px-4 py-2 text-sm font-medium hover:bg-[var(--guild-primary)]/90 focus:ring-2 focus:ring-[var(--guild-primary)] focus:ring-offset-2 focus:outline-none"
+						class="hover:bg-[var(--guild-primary)]/90 group relative flex w-full justify-center rounded-md border border-transparent bg-[var(--guild-primary)] px-4 py-2 text-sm font-medium text-guild-surface focus:outline-none focus:ring-2 focus:ring-[var(--guild-primary)] focus:ring-offset-2"
 					>
 						Sign In
 					</a>

@@ -39,7 +39,6 @@
 	tabindex="0"
 	data-testid={dataTestId}
 >
-	<!-- Subtle geometric pattern for modern classic personality -->
 	<div
 		class="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,var(--guild-primary)_10px,var(--guild-primary)_11px)] opacity-[0.02] transition-opacity duration-300 group-hover:opacity-[0.05]"
 	></div>

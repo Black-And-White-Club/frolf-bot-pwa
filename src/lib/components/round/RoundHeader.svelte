@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Round } from '$lib/types/backend';
-	import { addToCalendar } from '$lib/utils/calendar';
+	// calendar action moved into RoundDetails via AddToCalendarButton
 	import StatusBadge from '../StatusBadge.svelte';
 	import { announce } from '$lib/stores/announcer';
 
@@ -18,49 +18,19 @@
 	</h3>
 
 	<div class="round-header__controls">
-		{#if round.status === 'scheduled'}
-			<!-- Simple calendar icon button -->
-			<button
-				on:click|stopPropagation={() => {
-					addToCalendar(round);
-					announce('Added to calendar');
-				}}
-				on:keydown|stopPropagation={(e) => {
-					if (e.key === 'Enter' || e.key === ' ') {
-						e.preventDefault();
-						addToCalendar(round);
-						announce('Added to calendar');
-					}
-				}}
-				class="rounded-md p-1 text-[var(--guild-secondary)] transition-colors hover:bg-[var(--guild-secondary)]/10"
-				aria-label="Add round to calendar"
-				title="Add to calendar"
-				data-testid={`btn-add-calendar-${round.round_id}`}
-			>
-				<svg
-					class="h-4 w-4"
-					aria-hidden="true"
-					focusable="false"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-					></path>
-				</svg>
-			</button>
+		{#if false}
+			<!-- calendar action intentionally moved to RoundDetails -->
 		{/if}
+
 		{#if showStatus}
-			<StatusBadge
-				status={round.status}
-				count={undefined}
-				showCount={false}
-				testid={`status-${round.round_id}`}
-			/>
+			<div class="status-anchor">
+				<StatusBadge
+					status={round.status}
+					count={undefined}
+					showCount={false}
+					testid={`status-${round.round_id}`}
+				/>
+			</div>
 		{/if}
 	</div>
 </div>
@@ -68,30 +38,47 @@
 <style>
 	.round-header {
 		display: grid;
-		/* Two-column layout so the controls column is fixed and badges align across cards. */
-		grid-template-columns: 1fr var(--round-header-controls, 8rem);
+		grid-template-columns: 1fr var(--inner-controls-width, 6.25rem);
 		gap: 0.5rem;
 		align-items: center;
 	}
 
 	.round-header__controls {
 		display: flex;
-		/* Fixed-width control column so badges line up across cards even when
-       controls wrap on small screens. */
-		width: var(--round-header-controls, 8rem);
-		justify-content: flex-end;
-		justify-self: end;
+		width: var(--inner-controls-width, 6.25rem);
 		gap: 0.5rem;
-		overflow: hidden;
+		overflow: visible;
+		align-items: center;
+		padding: 0; /* we'll position badge absolutely inside this area */
+		justify-self: end; /* pin the control column to the right edge */
+		position: relative;
 	}
 
-	/* Keep controls right-aligned on larger screens as well. */
+	.round-header__controls .status-anchor {
+		position: absolute;
+		right: var(--inner-controls-offset, 2rem);
+		top: 50%;
+		transform: translateY(-50%);
+		display: flex;
+		align-items: center;
+		min-width: 4rem;
+		z-index: 2;
+	}
+
 	@media (min-width: 640px) {
 		.round-header {
-			grid-template-columns: 1fr var(--round-header-controls, 8rem);
+			grid-template-columns: 1fr var(--inner-controls-width, 6.25rem);
 		}
-		.round-header__controls {
-			justify-self: end;
+	}
+
+	/* Mobile: nudge the badge further right so inner-card badges align visually
+	   a bit more to the right than desktop for improved touch spacing */
+	@media (max-width: 639px) {
+		.round-header__controls .status-anchor {
+			right: var(
+				--inner-controls-offset-header-mobile,
+				calc(var(--inner-controls-offset, 2rem) + 1.25rem)
+			);
 		}
 	}
 </style>

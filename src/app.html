@@ -1,53 +1,110 @@
 <!doctype html>
-<html lang="%paraglide.lang%">
+<!-- Use a valid BCP47 language tag here. During builds/SSR this can be templated if you need per-guild localization. -->
+<html lang="en">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="manifest" href="/manifest.json" />
-		<!-- Preload critical fonts -->
+		<!-- Preconnects should be added only for origins used on first load.
+		     Removed preconnect to Unsplash (images.unsplash.com) because it is not
+		     requested on the initial render. Add it back on pages that actually
+		     fetch images from that origin. -->
+
+		<!--
+		  Preload your LCP image here. Replace the href with the actual LCP image path.
+		  Example:
+		  <link rel="preload" as="image" href="/images/hero-lcp.webp">
+		-->
+		<!-- <link rel="preload" as="image" href="/path/to/lcp-image.webp"> -->
+		<!-- Preload only the primary font weight to reduce initial priority downloads -->
 		<link
 			rel="preload"
-			href="/fonts/inter-v20-latin-600.woff2"
-			as="font"
-			type="font/woff2"
-			crossorigin
-		/>
-		<link
-			rel="preload"
-			href="/fonts/space-grotesk-v22-latin-regular.woff2"
+			href="/fonts/inter-v20-latin-regular.woff2"
 			as="font"
 			type="font/woff2"
 			crossorigin
 		/>
 		<meta name="theme-color" content="#007474" />
+
+		<!--
+		  Small synchronous theme initializer that runs before the app paints.
+		  It sets the `.dark` class on <html> based on a stored preference or
+		  the user's OS preference. This enables Tailwind's class-based dark
+		  mode and ensures colors are correct on first render (avoids flash).
+		-->
+		<script>
+			(function () {
+				try {
+					// Prefer the canonical persisted key used by the theme system.
+					const prefers = localStorage.getItem('frolf:prefers_dark');
+					if (prefers === '1') {
+						document.documentElement.classList.add('dark');
+					} else if (prefers === '0') {
+						document.documentElement.classList.remove('dark');
+					} else {
+						// Fallback to legacy 'theme' key for compatibility
+						const legacy = localStorage.getItem('theme');
+						if (legacy === 'dark') document.documentElement.classList.add('dark');
+						else if (legacy === 'light') document.documentElement.classList.remove('dark');
+						else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+							document.documentElement.classList.add('dark');
+					}
+				} catch (e) {
+					/* ignore (private mode may throw) */
+				}
+			})();
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
 		<script type="module">
-			if ('serviceWorker' in navigator) {
-				window.addEventListener('load', async () => {
+			// Defer service worker registration to the browser's idle period to avoid
+			// competing for main-thread time during initial render (reduces TBT/Speed Index).
+			function registerSWWhenIdle() {
+				if (!('serviceWorker' in navigator)) return;
+				const doRegister = async () => {
 					try {
 						const m = await import('/src/lib/pwa/registerServiceWorker.ts');
-						const reg = await m.registerServiceWorker();
-						console.info('Service worker registered', reg);
+						if (m && m.registerServiceWorker) {
+							await m.registerServiceWorker();
+							console.info('Service worker registered (deferred)');
+						}
 					} catch (err) {
-						console.warn('Service worker registration failed', err);
+						console.warn('Deferred service worker registration failed', err);
 					}
-				});
+				};
+				if ('requestIdleCallback' in window) {
+					// Give the browser a short idle window (timeout 200ms) to try to register
+					window.requestIdleCallback(() => doRegister(), { timeout: 200 });
+				} else {
+					// Fallback: schedule after load + small timeout
+					window.addEventListener('load', () => setTimeout(doRegister, 300));
+				}
 			}
+			registerSWWhenIdle();
 		</script>
 
 		<script>
-			// update meta theme-color to match CSS variable so install UI reflects current theme
+			// update meta theme-color to match CSS tokens so install UI reflects current theme
 			function updateMetaThemeColor() {
 				try {
 					const meta = document.querySelector('meta[name="theme-color"]');
 					if (!meta) return;
-					const val =
-						getComputedStyle(document.documentElement).getPropertyValue('--guild-primary').trim() ||
-						'#007474';
-					meta.setAttribute('content', val);
+					// We expose the primary color as an RGB token (--guild-primary-rgb).
+					// Read that and set the meta tag to an rgb(...) value so installers
+					// and OS UI reflect the current theme.
+					const rgb = getComputedStyle(document.documentElement)
+						.getPropertyValue('--guild-primary-rgb')
+						.trim();
+					if (rgb) {
+						meta.setAttribute('content', `rgb(${rgb})`);
+					} else {
+						// Fallback to sensible theme-based defaults
+						if (document.documentElement.classList.contains('dark'))
+							meta.setAttribute('content', '#0f0f0f');
+						else meta.setAttribute('content', '#007474');
+					}
 				} catch (e) {
 					// ignore
 				}

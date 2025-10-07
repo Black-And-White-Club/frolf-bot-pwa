@@ -215,6 +215,15 @@ export const guildThemes: Record<string, GuildTheme> = Object.fromEntries(
 	Object.entries(COLOR_THEMES).map(([key, colors]) => [key, createTheme(colors)])
 );
 
+// Export a small map of status colors for use by components (shared brand tokens)
+export const STATUS_COLORS: Record<string, string> = {
+	active: COLOR_THEMES.default.primary,
+	completed: COLOR_THEMES.default.accent,
+	scheduled: COLOR_THEMES.default.secondary,
+	cancelled: '#1A1A1A',
+	default: '#A1A1AA'
+};
+
 // ============================================================================
 // STORES
 // ============================================================================
@@ -299,9 +308,11 @@ function applyDarkModeVariables(root: HTMLElement) {
 		'--guild-background': '#0F0F0F',
 		'--guild-surface': '#1A1A1A',
 		'--guild-surface-elevated': '#242424',
-		'--guild-text': `rgba(${mintRgb}, 0.9)`,
-		'--guild-text-secondary': `rgba(${mintRgb}, 0.65)`,
-		'--guild-text-disabled': `rgba(${mintRgb}, 0.4)`,
+		// Use the same mint/cream used for the light-mode background for dark-mode text
+		// This ensures the pale mint tone matches the light-mode background color
+		'--guild-text': defaultTheme.background,
+		'--guild-text-secondary': `rgba(${mintRgb}, 0.66)`,
+		'--guild-text-disabled': `rgba(${mintRgb}, 0.40)`,
 		'--guild-border': `rgba(${mintRgb}, 0.10)`,
 		'--guild-primary-20': `rgba(${primaryRgb}, 0.2)`
 	};

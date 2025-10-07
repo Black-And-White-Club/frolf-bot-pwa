@@ -1,0 +1,201 @@
+@layer components {
+	/* App layout semantic classes */
+	.app-container {
+		min-height: 100vh;
+		background: var(--guild-background);
+	}
+
+	.app-main {
+		margin-left: auto;
+		margin-right: auto;
+		max-width: 80rem; /* Tailwind max-w-7xl */
+		padding-top: 1.5rem;
+		padding-bottom: 1.5rem;
+
+		/* Responsive horizontal padding */
+		padding-left: 1rem; /* px-4 default */
+		padding-right: 1rem;
+		@media (min-width: 640px) {
+			padding-left: 1.5rem; /* sm:px-6 */
+			padding-right: 1.5rem;
+		}
+		@media (min-width: 1024px) {
+			padding-left: 2rem; /* lg:px-8 */
+			padding-right: 2rem;
+		}
+
+		padding-top: calc(var(--app-header-height) + env(safe-area-inset-top));
+	}
+
+	/* Profile / card semantic classes */
+	.profile-card {
+		border-radius: var(--border-radius-lg); /* rounded-xl */
+		border-width: var(--border-width);
+		border-style: solid;
+		border-color: var(--guild-border);
+		padding: 1.5rem; /* p-6 */
+		background: var(--guild-surface);
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* shadow-sm */
+		transition: box-shadow var(--transition-base);
+
+		/* stronger hover shadow */
+		&:hover {
+			box-shadow:
+				0 4px 6px -1px rgba(0, 0, 0, 0.1),
+				0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+		}
+	}
+
+	.profile-card--mobile {
+		display: block;
+	}
+
+	@media (min-width: 1024px) {
+		.profile-card--mobile {
+			display: none;
+		}
+	}
+
+	/* Dashboard layout semantic classes */
+	.dashboard-container {
+		margin-left: auto;
+		margin-right: auto;
+		max-width: 80rem; /* max-w-7xl */
+		padding-top: 1.5rem;
+		padding-bottom: 1.5rem;
+		padding-left: 1rem; /* px-4 */
+		padding-right: 1rem;
+		@media (min-width: 640px) {
+			padding-left: 1.5rem; /* sm:px-6 */
+			padding-right: 1.5rem;
+		}
+		@media (min-width: 1024px) {
+			padding-left: 2rem; /* lg:px-8 */
+			padding-right: 2rem;
+		}
+	}
+
+	.stats-grid {
+		margin-bottom: 2rem; /* mb-8 */
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 1rem; /* gap-4 */
+		@media (min-width: 768px) {
+			grid-template-columns: repeat(4, 1fr); /* md:grid-cols-4 */
+		}
+	}
+
+	.content-grid {
+		display: grid;
+		gap: 1.5rem;
+		grid-template-columns: 1fr;
+	}
+
+	@media (min-width: 1024px) {
+		.content-grid {
+			grid-template-columns: 2fr 1fr;
+		}
+	}
+
+	.rounds-column {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem; /* gap-6 */
+	}
+
+	.sidebar {
+		order: -1; /* order-first */
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+		@media (min-width: 1024px) {
+			order: 0; /* lg:order-none */
+		}
+	}
+
+	/* Participant Row Layout */
+	.participant-row {
+		display: grid;
+		grid-template-columns: 1fr minmax(4rem, var(--inner-controls-width));
+		gap: 1.5rem;
+		align-items: center;
+	}
+
+	.participant-avatar {
+		border-width: var(--border-width-thick);
+		border-style: solid;
+		transition:
+			background-color var(--transition-fast),
+			border-color var(--transition-fast),
+			transform var(--transition-fast);
+	}
+
+	.participant-avatar:hover {
+		transform: scale(1.05);
+	}
+
+	/* Site header (fixed) - centralize header geometry and safe-area handling */
+	.site-header {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: var(--app-header-height);
+		padding-top: env(safe-area-inset-top);
+		z-index: var(--z-sticky);
+		background: var(--guild-surface);
+		border-bottom: 1px solid var(--guild-border);
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+	}
+
+	.site-header__inner {
+		height: calc(var(--app-header-height) - env(safe-area-inset-top));
+		display: flex;
+		align-items: center;
+	}
+}
+@layer components {
+	@media (max-width: 1023px) {
+		.participant-row {
+			grid-template-columns: 1fr auto;
+		}
+		.participant-row > div:last-child,
+		.participant-row .text-right {
+			text-align: right;
+			justify-self: end;
+		}
+		.round-header__controls {
+			justify-content: flex-end;
+			justify-self: end;
+		}
+		.section-header {
+			align-items: center;
+		}
+		.badges {
+			margin-left: auto;
+		}
+		.desktop-profile {
+			display: none;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.content-grid {
+			display: grid;
+			grid-template-columns: 2fr 1fr;
+			gap: 2rem;
+			align-items: start;
+		}
+		.sidebar {
+			grid-column: 2 / 3;
+			grid-row: 1 / 2;
+		}
+		.rounds-column {
+			grid-column: 1 / 2;
+			grid-row: 1 / 2;
+		}
+		.desktop-profile {
+			display: block;
+		}
+	}
+}
