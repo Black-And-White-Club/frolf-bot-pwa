@@ -10,7 +10,6 @@ beforeEach(() => {
 	// ensure fresh crypto for randomUUID
 	if (!globalThis.crypto) {
 		// lightweight stub: define minimal crypto on globalThis
-		// fakeCrypto is intentionally minimal for tests; typed as Partial<Crypto> to avoid unsafe double-casts
 		const fakeCrypto: Partial<Crypto> = {
 			randomUUID: () => '00000000-0000-4000-8000-000000000000',
 			getRandomValues: <T extends ArrayBufferView>(array: T) => array

@@ -104,7 +104,8 @@
 	}
 
 	.sidebar {
-		order: -1; /* order-first */
+		order: 1; /* place sidebar after main content on mobile (appear last)
+			This replaces previous order:-1 which made the sidebar appear first on mobile */
 		display: flex;
 		flex-direction: column;
 		gap: 1.5rem;

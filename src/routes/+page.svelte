@@ -185,28 +185,6 @@
 							controlWidth="6.25rem"
 						/>
 					{/if}
-
-					<!-- Mobile Profile -->
-					{#if currentUser}
-						{#snippet mobile_profile_header()}
-							<div class="mb-4 flex items-center justify-between">
-								<h2 class="card-title card-title--skobeloff text-xl font-semibold">Your Stats</h2>
-							</div>
-						{/snippet}
-
-						<!-- render the profile card with an explicit headerAction to avoid nested interactive elements -->
-						<UserProfileCard
-							user={currentUser!}
-							showStats={true}
-							testid="userprofilecard-current-mobile"
-							header={mobile_profile_header}
-							headerAction={{
-								label: 'View Profile',
-								onClick: handleProfileClick,
-								testid: 'btn-view-profile-mobile'
-							}}
-						/>
-					{/if}
 				</div>
 
 				<!-- Sidebar -->
@@ -248,7 +226,7 @@
 
 						<!-- desktop profile: render the profile card with headerAction -->
 						<div
-							class="hidden rounded-xl border p-6 shadow-sm transition-shadow hover:shadow-md lg:block"
+							class="rounded-xl border p-6 shadow-sm transition-shadow hover:shadow-md"
 							style="background: var(--guild-surface); border-color: var(--guild-border);"
 							data-testid="desktop-profile-card"
 						>

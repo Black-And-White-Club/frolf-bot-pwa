@@ -120,6 +120,8 @@ export default defineConfig({
 			reporter: ['text', 'html'],
 			include: ['src/lib/**'],
 			exclude: [
+				// ignore any __tests__ folders under src/lib (test helpers / fixtures)
+				'src/lib/**/__tests__/**',
 				// keep your existing detailed excludes
 				'src/lib/paraglide/**',
 				'src/.svelte-kit/**',
