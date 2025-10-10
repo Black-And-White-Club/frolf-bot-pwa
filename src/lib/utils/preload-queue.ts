@@ -29,13 +29,18 @@ function runNext() {
 	};
 
 	const ric = (cb: () => void) => {
-		// requestIdleCallback is optional in some envs; guard safely
-		const r = (globalThis as unknown as { requestIdleCallback?: (cb: () => void) => void })
-			.requestIdleCallback;
-		if (typeof r === 'function') {
-			r(cb);
+		// Prefer requestIdleCallback when available, fall back to requestAnimationFrame,
+		// and finally to setTimeout to ensure tasks run in environments without rIC/rAF
+		const g = globalThis as unknown as {
+			requestIdleCallback?: (cb: () => void) => void;
+			requestAnimationFrame?: (cb: () => void) => number;
+		};
+		if (typeof g.requestIdleCallback === 'function') {
+			g.requestIdleCallback(cb as unknown as () => void);
+		} else if (typeof g.requestAnimationFrame === 'function') {
+			g.requestAnimationFrame(() => cb());
 		} else {
-			requestAnimationFrame(cb);
+			setTimeout(cb, 0);
 		}
 	};
 

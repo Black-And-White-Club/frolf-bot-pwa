@@ -3,15 +3,14 @@
 	import ParticipantAvatar from './ParticipantAvatar.svelte';
 	import { isUnsplashUrl, unsplashSrcset, unsplashSizes } from '$lib/utils/unsplash';
 
-	// Props using Svelte 5 syntax
-	interface Props {
+	type Props = {
 		round: Round;
 		participants?: Participant[];
 		status?: string;
 		par_total?: number;
 		compact?: boolean;
 		testid?: string;
-	}
+	};
 
 	let { round, participants, status, par_total, compact = false, testid }: Props = $props();
 

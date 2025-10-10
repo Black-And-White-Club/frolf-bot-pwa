@@ -24,6 +24,16 @@ try {
 	svelte = { configs: { recommended: [], prettier: [] } };
 }
 
+// Dynamically import sonarjs plugin for complexity rules
+let sonarjs;
+try {
+	const mod = await import('eslint-plugin-sonarjs');
+	sonarjs = mod.default || mod;
+} catch {
+	// plugin not installed; skip complexity rules
+	sonarjs = null;
+}
+
 const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 
 export default defineConfig(
@@ -46,13 +56,24 @@ export default defineConfig(
 	{
 		files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
 		languageOptions: {
-			parser: ts.parser, // ✅ move here
+			parser: ts.parser,
 			parserOptions: {
-				project: true, // let it pick up tsconfig.json
+				project: true,
 				extraFileExtensions: ['.svelte'],
 				tsconfigRootDir: process.cwd(),
 				svelteConfig
 			}
+		}
+	},
+	// Complexity rules (from .eslintrc.complex.json)
+	{
+		files: ['**/*.{ts,js,svelte}'],
+		...(sonarjs && { plugins: { sonarjs } }),
+		rules: {
+			complexity: ['warn', 10],
+			'max-depth': ['warn', 4],
+			'max-statements': ['warn', 40],
+			...(sonarjs && { 'sonarjs/cognitive-complexity': ['warn', 15] })
 		}
 	}
 );

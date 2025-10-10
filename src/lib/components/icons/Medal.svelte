@@ -1,11 +1,16 @@
 <script lang="ts">
-	export let rank: number = 1;
-	export let size: number = 20; // px
+	type Props = {
+		rank?: number;
+		size?: number;
+	};
+
+	let { rank = 1, size = 20 }: Props = $props();
+
 	const gold = ['#B89B5E', '#A68A4A', '#7C6B3C']; // matte gold gradient
 	const silver = ['#C9C9C9', '#AFAFAF', '#8F8F8F'];
 	const bronze = ['#B3744A', '#9A643E', '#7C4E2E'];
-	const bg = rank === 1 ? gold : rank === 2 ? silver : bronze;
-	const id = `medal-grad-${Math.random().toString(36).slice(2, 9)}`;
+	const bg = $derived(rank === 1 ? gold : rank === 2 ? silver : bronze);
+	const id = $derived(`medal-grad-${Math.random().toString(36).slice(2, 9)}`);
 </script>
 
 <svg

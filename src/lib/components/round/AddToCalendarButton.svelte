@@ -3,15 +3,30 @@
 	import { addToCalendar } from '$lib/utils/calendar';
 	import { announce } from '$lib/stores/announcer';
 
-	export let round: Round;
-	export let showCaption: boolean = false;
-	export let showIcon: boolean = true;
-	export let small: boolean = false;
-	export let captionText: string = 'Click to add to calendar';
-	export let testid: string | undefined = undefined;
+	type Props = {
+		round: Round;
+		showCaption?: boolean;
+		showIcon?: boolean;
+		small?: boolean;
+		captionText?: string;
+		testid?: string;
+		children?: import('svelte').Snippet;
+	};
+
+	let {
+		round,
+		showCaption = false,
+		showIcon = true,
+		small = false,
+		captionText = 'Click to add to calendar',
+		testid,
+		children
+	}: Props = $props();
 
 	// unique id for the caption (used for aria-describedby)
-	$: tipId = `add-to-calendar-tip-${round?.round_id ?? Math.random().toString(36).slice(2, 8)}`;
+	const tipId = $derived(
+		`add-to-calendar-tip-${round?.round_id ?? Math.random().toString(36).slice(2, 8)}`
+	);
 
 	function formatDateForLabel(dateString: string | undefined) {
 		if (!dateString) return 'TBD';
@@ -24,7 +39,7 @@
 		});
 	}
 
-	$: formattedDate = formatDateForLabel(round?.start_time ?? undefined);
+	const formattedDate = $derived(formatDateForLabel(round?.start_time ?? undefined));
 
 	function handleAction() {
 		addToCalendar(round);
@@ -48,8 +63,8 @@
 		aria-label={`Add ${formattedDate} to calendar`}
 		data-tooltip={captionText}
 		data-small={small}
-		on:click|stopPropagation={handleAction}
-		on:keydown|stopPropagation={handleKey}
+		onclick={handleAction}
+		onkeydown={handleKey}
 	>
 		{#if showIcon}
 			<svg class="calendar-svg mr-2 h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24">
@@ -61,7 +76,7 @@
 				></path>
 			</svg>
 		{/if}
-		<span class="slot-content"><slot /></span>
+		<span class="slot-content">{@render children?.()}</span>
 	</button>
 
 	{#if showCaption}

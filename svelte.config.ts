@@ -5,15 +5,18 @@ import { sveltePreprocess } from 'svelte-preprocess';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-	preprocess: [
-		sveltePreprocess({
-			postcss: true // ✅ enable Tailwind/PostCSS
-		}),
-		vitePreprocess(),
-		mdsvex()
-	],
+	preprocess: [sveltePreprocess({}), vitePreprocess(), mdsvex()],
 	kit: {
-		adapter: adapter()
+		adapter: adapter(),
+		// Keep TS path aliases in the kit config so SvelteKit/Vite handle
+		// module resolution instead of duplicating them in tsconfig.
+		// See: https://svelte.dev/docs/kit/configuration#alias
+		alias: {
+			$lib: 'src/lib',
+			'$lib/*': 'src/lib/*',
+			$tests: 'tests',
+			'$tests/*': 'tests/*'
+		}
 	},
 	extensions: ['.svelte', '.svx']
 };

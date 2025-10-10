@@ -1,12 +1,15 @@
 <script lang="ts">
 	import type { Round } from '$lib/types/backend';
 	// calendar action moved into RoundDetails via AddToCalendarButton
-	import StatusBadge from '../StatusBadge.svelte';
-	import { announce } from '$lib/stores/announcer';
+	import StatusBadge from '$lib/components/general/StatusBadge.svelte';
 
-	export let round: Round;
-	export let showStatus: boolean = true;
-	export let testid: string | undefined = undefined;
+	type Props = {
+		round: Round;
+		showStatus?: boolean;
+		testid?: string;
+	};
+
+	let { round, showStatus = true, testid }: Props = $props();
 </script>
 
 <div class="round-header" data-testid={testid}>

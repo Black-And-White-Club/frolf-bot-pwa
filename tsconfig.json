@@ -1,11 +1,18 @@
 {
 	"extends": "./.svelte-kit/tsconfig.json",
-	"include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
+	"include": [
+		"src/**/*.d.ts",
+		"src/**/*.ts",
+		"src/**/*.js",
+		"src/**/*.svelte",
+		"tests/**/*.ts",
+		"tests/**/*.js",
+		"static/metaTheme.ts",
+		"static/registerServiceWorker.ts",
+		"static/updateSnackbarHelper.ts"
+	],
 	"exclude": [
-		"tests",
-		"tests/**",
 		"playwright.config.ts",
-		"tests/**",
 		"integration_tests",
 		"integration_tests/**",
 		"**/*.spec.ts",
@@ -17,6 +24,7 @@
 		"moduleResolution": "bundler",
 		"esModuleInterop": true,
 		"skipLibCheck": true,
-		"forceConsistentCasingInFileNames": true
+		"forceConsistentCasingInFileNames": true,
+		"allowImportingTsExtensions": true
 	}
 }

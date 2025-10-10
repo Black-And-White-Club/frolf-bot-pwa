@@ -1,7 +1,11 @@
 <script lang="ts">
-	export let name: string;
-	export let size: number = 16;
-	export let ariaLabel: string | null = null;
+	type Props = {
+		name: string;
+		size?: number;
+		ariaLabel?: string | null;
+	};
+
+	let { name, size = 16, ariaLabel = null }: Props = $props();
 </script>
 
 {#if name === 'target'}

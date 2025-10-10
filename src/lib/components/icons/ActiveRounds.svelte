@@ -1,9 +1,13 @@
 <script lang="ts">
-	export let className: string = '';
-	export let size: number | string = 20;
-	export let testid: string | undefined = undefined;
-	export let title: string | undefined = undefined;
-	export let decorative: boolean = false;
+	type Props = {
+		className?: string;
+		size?: number | string;
+		testid?: string;
+		title?: string;
+		decorative?: boolean;
+	};
+
+	let { className = '', size = 20, testid, title, decorative = false }: Props = $props();
 </script>
 
 <svg

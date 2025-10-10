@@ -1,30 +1,29 @@
 <script lang="ts">
-	export let avatar_url: string | undefined;
-	export let username: string;
-	export let size: number = 24; // px
-	export let extraClasses: string = '';
-	// If true, this image will be treated as high-priority and loaded eagerly.
-	// Default is false to avoid increasing initial render contention.
-	export let priority: boolean = false;
-
 	import { isUnsplashUrl, unsplashSrcset, unsplashSizes } from '$lib/utils/unsplash';
 
-	// derived attrs for external unsplash images
-	let _isUnsplash = false;
-	let _srcset: string | undefined;
-	let _sizes: string | undefined;
-	let _loading: 'lazy' | 'eager' = 'lazy';
+	type Props = {
+		avatar_url?: string;
+		username: string;
+		size?: number;
+		extraClasses?: string;
+		priority?: boolean;
+	};
 
-	$: _isUnsplash = isUnsplashUrl(avatar_url);
-	$: _srcset = _isUnsplash && avatar_url ? unsplashSrcset(avatar_url, [size, size * 2]) : undefined;
-	$: _sizes = _isUnsplash ? unsplashSizes(size) : undefined;
+	let { avatar_url, username, size = 24, extraClasses = '', priority = false }: Props = $props();
+
+	// derived attrs for external unsplash images
+	const _isUnsplash = $derived(isUnsplashUrl(avatar_url));
+	const _srcset = $derived(
+		_isUnsplash && avatar_url ? unsplashSrcset(avatar_url, [size, size * 2]) : undefined
+	);
+	const _sizes = $derived(_isUnsplash ? unsplashSizes(size) : undefined);
 	// Keep avatars lazy by default to avoid many images competing for network during
 	// initial render. Consumers can opt into eager loading by setting `priority`.
-	$: _loading = priority ? 'eager' : 'lazy';
+	const _loading = $derived(priority ? 'eager' : 'lazy');
 
 	// Local state to track load/error so we can show the fallback initial
-	let loaded = false;
-	let errored = false;
+	let loaded = $state(false);
+	let errored = $state(false);
 
 	function handleLoad() {
 		loaded = true;
@@ -60,8 +59,8 @@
 					height={size}
 					loading={_loading}
 					decoding="async"
-					on:load={handleLoad}
-					on:error={handleError}
+					onload={handleLoad}
+					onerror={handleError}
 					class="h-full w-full rounded-full object-cover"
 					style="image-rendering: pixelated; image-rendering: -moz-crisp-edges; aspect-ratio:1/1;"
 					crossorigin="anonymous"
@@ -75,8 +74,8 @@
 				height={size}
 				loading={_loading}
 				decoding="async"
-				on:load={handleLoad}
-				on:error={handleError}
+				onload={handleLoad}
+				onerror={handleError}
 				class="h-full w-full rounded-full object-cover"
 				style="image-rendering: pixelated; image-rendering: -moz-crisp-edges; aspect-ratio:1/1;"
 			/>

@@ -18,7 +18,7 @@
 		</div>
 		<div class="mt-8 space-y-6">
 			<button
-				on:click={() => signIn('discord')}
+				onclick={() => signIn('discord')}
 				class="group text-guild-surface relative flex w-full justify-center rounded-md border border-transparent bg-[var(--guild-primary)] px-4 py-2 text-sm font-medium hover:bg-[var(--guild-primary)]/90 focus:ring-2 focus:ring-[var(--guild-primary)] focus:ring-offset-2 focus:outline-none"
 				data-testid="btn-signin-discord"
 			>

@@ -21,7 +21,7 @@ A modern progressive web app for disc golf (frolf) round management, scoring, an
 ### Installation
 
 ```bash
-npm install
+bun install
 ```
 
 ### Development
@@ -31,7 +31,7 @@ npm install
 docker-compose -f docker-compose.dev.yml up -d
 
 # Start dev server
-npm run dev
+bun run dev
 ```
 
 Visit http://localhost:5173
@@ -50,7 +50,7 @@ See [LOCAL_DEV_SETUP.md](./LOCAL_DEV_SETUP.md) for detailed configuration instru
 
 - **[QUICK_START.md](./QUICK_START.md)** - Get started in 5 minutes
 - **[LOCAL_DEV_SETUP.md](./LOCAL_DEV_SETUP.md)** - Complete development environment setup
-- **[Component Library](http://localhost:6006)** - Run `npm run storybook`
+- **[Component Library](http://localhost:6006)** - Run `bun run storybook`
 
 ## 🏗️ Project Structure
 
@@ -70,14 +70,14 @@ src/
 
 | Command             | Description              |
 | ------------------- | ------------------------ |
-| `npm run dev`       | Start development server |
-| `npm run build`     | Build for production     |
-| `npm run preview`   | Preview production build |
-| `npm run check`     | Run type checking        |
-| `npm run lint`      | Lint code                |
-| `npm run format`    | Format with Prettier     |
-| `npm run test`      | Run tests                |
-| `npm run storybook` | Start Storybook          |
+| `bun run dev`       | Start development server |
+| `bun run build`     | Build for production     |
+| `bun run preview`   | Preview production build |
+| `bun run check`     | Run type checking        |
+| `bun run lint`      | Lint code                |
+| `bun run format`    | Format with Prettier     |
+| `bun run test`      | Run tests                |
+| `bun run storybook` | Start Storybook          |
 
 ## 🧩 Tech Stack
 
@@ -105,7 +105,7 @@ Generate `AUTH_SECRET`: `openssl rand -base64 32`
 
 1. **Start infrastructure** (PostgreSQL, NATS)
 2. **Start backend** (Go API server)
-3. **Start PWA** (`npm run dev`)
+3. **Start PWA** (`bun run dev`)
 4. Make changes → See live reload
 5. Build components in Storybook
 6. Test with Discord dev application
@@ -127,25 +127,25 @@ See [LOCAL_DEV_SETUP.md](./LOCAL_DEV_SETUP.md) for complete workflow.
 **Types not matching backend?**
 
 - Update `src/lib/types/backend.ts` to match Go structs
-- Run `npm run check`
+- Run `bun run check`
 
 ## 📦 Building for Production
 
 ```bash
-npm run build
+bun run build
 ```
 
 Preview the build:
 
 ```bash
-npm run preview
+bun run preview
 ```
 
 ## 🤝 Contributing
 
 1. Create a feature branch
 2. Make your changes
-3. Run `npm run check` and `npm run test`
+3. Run `bun run check` and `bun run test`
 4. Submit a pull request
 
 ## 📄 License

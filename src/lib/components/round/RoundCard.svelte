@@ -1,51 +1,68 @@
 <script lang="ts">
 	import type { Round } from '$lib/types/backend';
-	import { onMount } from 'svelte';
+	import { cn } from '$lib/utils';
 	import RoundHeader from './RoundHeader.svelte';
-	import { preloadParticipantDisplay } from './participant-loader';
-	import { preloadRoundDetails } from './round-details-loader';
-	import { observeOnce } from '$lib/utils/viewport';
+	import RoundDetails from './RoundDetails.svelte';
+	import ParticipantDisplay from './ParticipantDisplay.svelte';
+	import ChevronCollapse from '../general/ChevronCollapse.svelte';
 
 	type ClickHandler = (payload: { roundId: string }) => void;
 
-	export let round: Round;
-	export let onRoundClick: ClickHandler | undefined = undefined;
-	export let showStatus: boolean = true;
-	export let compact: boolean = false;
-	export let dataTestId: string | undefined = undefined;
-	export let showDescription: boolean = true;
-	export let showLocation: boolean = true;
+	type Props = {
+		round: Round;
+		onRoundClick?: ClickHandler;
+		showStatus?: boolean;
+		compact?: boolean;
+		dataTestId?: string;
+		showDescription?: boolean;
+		showLocation?: boolean;
+		title?: string;
+		description?: string;
+		location?: string;
+		start_time?: string;
+		participants?: any[];
+		status?: string;
+		par_total?: number;
+		collapsed?: boolean;
+		onToggle?: (collapsed: boolean) => void;
+		chevronTestid?: string;
+		class?: string;
+		[key: string]: any;
+	};
 
-	// Optional explicit fields parents may pass to control what the card displays
-	export let title: string | undefined = undefined;
-	export let description: string | undefined = undefined;
-	export let location: string | undefined = undefined;
-	export let start_time: string | undefined = undefined;
-	export let participants: any[] | undefined = undefined;
-	export let status: string | undefined = undefined;
-	export let par_total: number | undefined = undefined;
+	let {
+		round,
+		onRoundClick,
+		showStatus = true,
+		compact = false,
+		dataTestId,
+		showDescription = true,
+		showLocation = true,
+		title,
+		description,
+		location,
+		start_time,
+		participants,
+		status,
+		par_total,
+		collapsed = false,
+		onToggle,
+		chevronTestid,
+		class: incomingClass,
+		...restProps
+	}: Props = $props();
 
-	// Local explicit fields we can forward to child components to avoid coupling
-	// children to a full round object when it's not desired
-	const localTitle = title ?? round?.title;
-	const localDescription = description ?? round?.description;
-	const localLocation = location ?? round?.location;
-	const localStartTime = start_time ?? round?.start_time;
-	const localParticipants = participants ?? round?.participants;
-	const localStatus = status ?? round?.status;
-	const localParTotal = par_total ?? (round as any)?.par_total ?? (round as any)?.par;
+	const localTitle = $derived(title ?? round?.title);
+	const localDescription = $derived(description ?? round?.description);
+	const localLocation = $derived(location ?? round?.location);
+	const localStartTime = $derived(start_time ?? round?.start_time);
+	const localParticipants = $derived(participants ?? round?.participants);
+	const localStatus = $derived(status ?? round?.status);
+	const localParTotal = $derived(par_total ?? (round as any)?.par_total ?? (round as any)?.par);
 
-	// Will hold the lazily-loaded components on the client
-	let ParticipantDisplay: any = null;
-	let RoundDetailsComp: any = null;
-	let _preloaded = false;
-	let _preloadStarted = false;
-	// separate refs for the two branches (button vs div). We pick whichever
-	// is rendered during onMount to avoid binding the same variable twice.
-	let rootBtn: HTMLElement | null = null;
-	let rootDiv: HTMLElement | null = null;
-	// reference to the inner wrapper so we can measure it in dev
-	let innerEl: HTMLElement | null = null;
+	const chevronTestId = $derived(
+		chevronTestid ?? (dataTestId ? `${dataTestId}-chevron` : undefined)
+	);
 
 	function handleClick() {
 		if (onRoundClick) {
@@ -62,132 +79,106 @@
 		}
 	}
 
-	async function doPreload() {
-		if (_preloaded) return;
-		_preloadStarted = true;
-		_preloaded = true;
-		try {
-			const [detailsMod, participantsMod] = await Promise.all([
-				preloadRoundDetails(),
-				preloadParticipantDisplay()
-			]);
-			const anyDetails: any = detailsMod;
-			const anyParticipants: any = participantsMod;
-			RoundDetailsComp = anyDetails?.default ?? anyDetails;
-			ParticipantDisplay = anyParticipants?.default ?? anyParticipants;
-		} catch {
-			// best-effort; leave null to show fallback
-		}
+	function toggle() {
+		onToggle?.(!collapsed);
 	}
-
-	onMount(() => {
-		const el = rootBtn ?? rootDiv;
-		if (!el) return;
-
-		// Use the shared observer utility to avoid creating one IO per card.
-		const unobserve = observeOnce(el, () => {
-			void doPreload();
-		});
-		return () => unobserve();
-	});
 </script>
 
 {#if onRoundClick}
 	<button
 		type="button"
-		bind:this={rootBtn}
-		class={`bg-guild-surface w-full overflow-hidden rounded-xl border border-[var(--guild-border)] shadow-lg transition-all duration-300 hover:scale-[1.01] hover:shadow-xl`}
-		style={`padding: var(--round-outer-padding, ${compact ? '1rem' : '1.5rem'}); min-height: ${compact ? '110px' : '140px'};`}
-		on:click={handleClick}
-		on:keydown={handleKeydown}
-		aria-label={`Round ${round.title ?? round.round_id}`}
+		class={cn(
+			'bg-guild-surface w-full overflow-hidden rounded-xl border border-[var(--guild-border)] shadow-lg transition-all duration-300 hover:scale-[1.01] hover:shadow-xl',
+			incomingClass
+		)}
+		style="padding: var(--round-outer-padding, {compact ? '1rem' : '1.5rem'}); min-height: {compact
+			? '110px'
+			: '140px'};"
+		onclick={handleClick}
+		onkeydown={handleKeydown}
+		aria-label="Round {round.title ?? round.round_id}"
 		data-testid={dataTestId}
+		{...restProps}
 	>
-		<div class="round-card-inner" bind:this={innerEl}>
-			<RoundHeader {round} {showStatus} />
-			{#if RoundDetailsComp}
-				<svelte:component
-					this={RoundDetailsComp}
-					{round}
-					{compact}
-					{showDescription}
-					{showLocation}
-					title={localTitle}
-					description={localDescription}
-					location={localLocation}
-					start_time={localStartTime}
+		<div class="round-card-inner">
+			<div class="round-card-header">
+				<RoundHeader {round} {showStatus} />
+				<ChevronCollapse
+					{collapsed}
+					disabled={false}
+					ariaControls="round-body-{round.round_id}"
+					ariaLabel={collapsed ? 'Expand round details' : 'Collapse round details'}
+					testid={chevronTestId}
+					onclick={toggle}
 				/>
-			{:else}
-				<!-- lightweight fallback for details -->
-				<div
-					class="mt-1 text-sm text-[var(--guild-text-secondary)]"
-					data-testid={dataTestId ? `${dataTestId}-details-fallback` : undefined}
-				>
-					Details …
-				</div>
-			{/if}
-
-			{#if ParticipantDisplay}
-				<svelte:component
-					this={ParticipantDisplay}
-					{round}
-					{compact}
-					participants={localParticipants}
-					status={localStatus}
-					par_total={localParTotal}
-				/>
-			{:else if !_preloadStarted}
-				<!-- very small placeholder to avoid large DOM churn from many cards -->
-				<div
-					class="my-2 h-6 w-24 rounded bg-[var(--guild-surface-elevated)]"
-					aria-hidden="true"
-				></div>
-			{:else}
-				<div
-					class="mt-2 text-sm text-[var(--guild-text-secondary)]"
-					data-testid={dataTestId ? `${dataTestId}-participants-fallback` : undefined}
-				>
-					Loading participants…
+			</div>
+			{#if !collapsed}
+				<div id="round-body-{round.round_id}" class="round-card-body">
+					<RoundDetails
+						{round}
+						{compact}
+						{showDescription}
+						{showLocation}
+						description={localDescription}
+						location={localLocation}
+						start_time={localStartTime}
+					/>
+					<ParticipantDisplay
+						{round}
+						{compact}
+						participants={localParticipants}
+						status={localStatus}
+						par_total={localParTotal}
+					/>
 				</div>
 			{/if}
 		</div>
 	</button>
 {:else}
+	<!-- Same structure for div branch -->
 	<div
-		class={`bg-guild-surface w-full overflow-hidden rounded-xl border border-[var(--guild-border)] shadow-lg transition-all duration-300 hover:scale-[1.01] hover:shadow-xl`}
-		style={`padding: var(--round-outer-padding, ${compact ? '1rem' : '1.5rem'}); min-height: ${compact ? '110px' : '140px'};`}
-		aria-label={`Round ${round.title ?? round.round_id}`}
-		bind:this={rootDiv}
+		class={cn(
+			'bg-guild-surface w-full overflow-hidden rounded-xl border border-[var(--guild-border)] shadow-lg transition-all duration-300 hover:scale-[1.01] hover:shadow-xl',
+			incomingClass
+		)}
+		style="padding: var(--round-outer-padding, {compact ? '1rem' : '1.5rem'}); min-height: {compact
+			? '110px'
+			: '140px'};"
+		aria-label="Round {round.title ?? round.round_id}"
 		data-testid={dataTestId}
+		{...restProps}
 	>
 		<div class="round-card-inner">
-			<RoundHeader {round} {showStatus} />
-			{#if RoundDetailsComp}
-				<svelte:component
-					this={RoundDetailsComp}
-					{round}
-					{compact}
-					{showDescription}
-					{showLocation}
-					title={localTitle}
-					description={localDescription}
-					location={localLocation}
-					start_time={localStartTime}
+			<div class="round-card-header">
+				<RoundHeader {round} {showStatus} />
+				<ChevronCollapse
+					{collapsed}
+					disabled={false}
+					ariaControls="round-body-{round.round_id}"
+					ariaLabel={collapsed ? 'Expand round details' : 'Collapse round details'}
+					testid={chevronTestId}
+					onclick={toggle}
 				/>
-			{:else}
-				<div class="mt-1 text-sm text-[var(--guild-text-secondary)]">Details …</div>
-			{/if}
-			{#if ParticipantDisplay}
-				<svelte:component
-					this={ParticipantDisplay}
-					{round}
-					{compact}
-					participants={localParticipants}
-					status={localStatus}
-					par_total={localParTotal}
-				/>
-			{:else}
-				<div class="mt-2 text-sm text-[var(--guild-text-secondary)]">Loading participants…</div>
+			</div>
+			{#if !collapsed}
+				<div id="round-body-{round.round_id}" class="round-card-body">
+					<RoundDetails
+						{round}
+						{compact}
+						{showDescription}
+						{showLocation}
+						description={localDescription}
+						location={localLocation}
+						start_time={localStartTime}
+					/>
+					<ParticipantDisplay
+						{round}
+						{compact}
+						participants={localParticipants}
+						status={localStatus}
+						par_total={localParTotal}
+					/>
+				</div>
 			{/if}
 		</div>
 	</div>
@@ -244,5 +235,16 @@
 	/* Ensure the inner wrapper can position children absolutely when needed */
 	.round-card-inner {
 		position: relative;
+	}
+
+	.round-card-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+	}
+
+	.round-card-body {
+		margin-top: 0.75rem;
 	}
 </style>

@@ -1,18 +1,29 @@
 <script lang="ts">
 	import type { Round } from '$lib/types/backend';
 	import AddToCalendarButton from '$lib/components/round/AddToCalendarButton.svelte';
-	import IconTextRow from '$lib/components/ui/IconTextRow.svelte';
+	import IconTextRow from '$lib/components/general/IconTextRow.svelte';
 
-	export let round: Round;
-	export let compact: boolean = false;
-	export let testid: string | undefined = undefined;
-	export let showDescription: boolean = true;
-	export let showLocation: boolean = true;
+	type Props = {
+		round: Round;
+		compact?: boolean;
+		testid?: string;
+		showDescription?: boolean;
+		showLocation?: boolean;
+		description?: string;
+		location?: string;
+		start_time?: string;
+	};
 
-	// Accept explicit fields when callers prefer to control what the component renders
-	export let description: string | undefined = undefined;
-	export let location: string | undefined = undefined;
-	export let start_time: string | undefined = undefined;
+	let {
+		round,
+		compact = false,
+		testid,
+		showDescription = true,
+		showLocation = true,
+		description,
+		location,
+		start_time
+	}: Props = $props();
 
 	function formatDate(dateString: string) {
 		return new Date(dateString).toLocaleDateString('en-US', {
@@ -56,7 +67,7 @@
 		{#if showLocation && localLocation()}
 			<p class="location-row text-sm text-[var(--guild-text-secondary)]">
 				<IconTextRow className="" testid={`round-location-${round.round_id}`}>
-					<span slot="icon">
+					{#snippet icon()}
 						<svg
 							class="flex-shrink-0"
 							style="width:var(--icon-size,1rem);height:var(--icon-size,1rem)"
@@ -77,8 +88,10 @@
 								d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
 							></path>
 						</svg>
-					</span>
-					<span class="min-w-0">{localLocation()}</span>
+					{/snippet}
+					{#snippet children()}
+						<span class="min-w-0">{localLocation()}</span>
+					{/snippet}
 				</IconTextRow>
 			</p>
 		{/if}
@@ -118,7 +131,7 @@
 {:else}
 	<p class="date-row text-sm text-[var(--guild-text-secondary)]">
 		<IconTextRow>
-			<span slot="icon">
+			{#snippet icon()}
 				<svg
 					class="flex-shrink-0"
 					style="width:var(--icon-size,1rem);height:var(--icon-size,1rem)"
@@ -133,8 +146,10 @@
 						d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
 					></path>
 				</svg>
-			</span>
-			<span class="min-w-0">{formatLocalStart()}</span>
+			{/snippet}
+			{#snippet children()}
+				<span class="min-w-0">{formatLocalStart()}</span>
+			{/snippet}
 		</IconTextRow>
 	</p>
 {/if}

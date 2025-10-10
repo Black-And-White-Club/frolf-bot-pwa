@@ -1,9 +1,9 @@
 <script lang="ts">
 	import '../styles/app.css';
-	import { page } from '$app/stores';
-	import Navbar from '$lib/components/Navbar.svelte';
-	import ThemeProvider from '$lib/components/ThemeProvider.svelte';
-	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+	import { page } from '$app/state';
+	import Navbar from '$lib/components/general/Navbar.svelte';
+	import ThemeProvider from '$lib/components/general/ThemeProvider.svelte';
+	import ThemeToggle from '$lib/components/general/ThemeToggle.svelte';
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
 
@@ -63,8 +63,8 @@
 		// inflate the initial JS payload.
 		try {
 			const [live, upd] = await Promise.all([
-				import('$lib/components/LiveAnnouncer.svelte'),
-				import('$lib/components/UpdateSnackbar.client.svelte')
+				import('$lib/components/general/LiveAnnouncer.svelte'),
+				import('$lib/components/general/UpdateSnackbar.client.svelte')
 			]);
 			LiveAnnouncer = live.default;
 			UpdateSnackbarClient = upd.default;
@@ -104,7 +104,7 @@
 	{#if UpdateSnackbarClient}
 		<UpdateSnackbarClient />
 	{/if}
-	{#if $page.data.session}
+	{#if page.data.session}
 		<!-- User is signed in -->
 		<div class="app-container">
 			<Navbar />
@@ -120,8 +120,8 @@
 					<ThemeToggle testid="theme-toggle-guest" />
 				</div>
 				<div>
-					<h1 class="text-center text-3xl font-extrabold text-guild-primary">Frolf Bot PWA</h1>
-					<p class="mt-2 text-center text-sm text-guild-text-secondary">
+					<h1 class="text-guild-primary text-center text-3xl font-extrabold">Frolf Bot PWA</h1>
+					<p class="text-guild-text-secondary mt-2 text-center text-sm">
 						Sign in with Discord to access your disc golf games.
 					</p>
 				</div>
@@ -129,7 +129,7 @@
 					<a
 						href="/auth/signin"
 						data-testid="btn-signin"
-						class="hover:bg-[var(--guild-primary)]/90 group relative flex w-full justify-center rounded-md border border-transparent bg-[var(--guild-primary)] px-4 py-2 text-sm font-medium text-guild-surface focus:outline-none focus:ring-2 focus:ring-[var(--guild-primary)] focus:ring-offset-2"
+						class="group text-guild-surface relative flex w-full justify-center rounded-md border border-transparent bg-[var(--guild-primary)] px-4 py-2 text-sm font-medium hover:bg-[var(--guild-primary)]/90 focus:ring-2 focus:ring-[var(--guild-primary)] focus:ring-offset-2 focus:outline-none"
 					>
 						Sign In
 					</a>

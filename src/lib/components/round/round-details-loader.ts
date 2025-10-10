@@ -1,23 +1,31 @@
-// Shared module-level cached dynamic import for RoundDetails
-let detailsPromise: Promise<unknown> | null = null;
+// Lightweight shim for round details loader. Provides preloadRoundDetails()
+// and a __TEST_HOOKS API for tests that still expect to inject imports.
 
-// Test hook used by unit tests to inject a fake dynamic import
-export const __TEST_HOOKS: { injectedImport?: () => Promise<unknown>; clearCache?: () => void } =
-	{};
+import RoundDetails from './RoundDetails.svelte';
 
-// expose a small test helper so unit tests can reset the module-level cache between tests
+type ImportResult = { default: any } | null;
+
+let cachedPromise: Promise<ImportResult> | null = null;
+
+export const __TEST_HOOKS: {
+	injectedImport?: (() => Promise<ImportResult>) | undefined;
+	clearCache?: () => void;
+} = {};
+
+export function preloadRoundDetails(): Promise<ImportResult> {
+	if (cachedPromise) return cachedPromise;
+
+	if (typeof __TEST_HOOKS.injectedImport === 'function') {
+		cachedPromise = __TEST_HOOKS.injectedImport();
+		return cachedPromise;
+	}
+
+	cachedPromise = Promise.resolve({ default: RoundDetails });
+	return cachedPromise;
+}
+
 __TEST_HOOKS.clearCache = () => {
-	detailsPromise = null;
+	cachedPromise = null;
 };
 
-export function preloadRoundDetails(): Promise<unknown> {
-	if (!detailsPromise) {
-		detailsPromise = import('$lib/utils/preload-queue').then((m) =>
-			m.enqueuePreload(() => {
-				const importer = __TEST_HOOKS.injectedImport ?? (() => import('./RoundDetails.svelte'));
-				return importer();
-			})
-		);
-	}
-	return detailsPromise;
-}
+export default {};

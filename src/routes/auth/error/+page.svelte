@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 </script>
 
 <svelte:head>
@@ -16,7 +16,7 @@
 				Authentication Error
 			</h2>
 			<p class="mt-2 text-center text-sm text-[var(--guild-text-secondary)]">
-				{$page.url.searchParams.get('error') || 'An error occurred during authentication.'}
+				{page.url.searchParams.get('error') || 'An error occurred during authentication.'}
 			</p>
 		</div>
 		<div class="mt-8">

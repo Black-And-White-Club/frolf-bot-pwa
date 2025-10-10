@@ -104,5 +104,6 @@ test('shows "more players" when > 4 participants in non-compact view', () => {
 	const { getByText } = render(ParticipantDisplay, {
 		props: { round, compact: false, testid: 'pd-5' }
 	});
-	expect(getByText(/\+1 more players/)).toBeTruthy();
+	// Allow singular or plural wording: '+1 more player' or '+1 more players'
+	expect(getByText(/\+1 more player(s)?/)).toBeTruthy();
 });

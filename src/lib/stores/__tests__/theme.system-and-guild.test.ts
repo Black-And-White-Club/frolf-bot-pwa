@@ -44,6 +44,8 @@ describe('theme system and guild behavior', () => {
 		const mod = await import('../theme');
 		const { initTheme, prefersDark } = mod;
 
+		// ensure any stale preference is removed for deterministic test runs
+		window.localStorage.removeItem('frolf:prefers_dark');
 		expect(window.localStorage.getItem('frolf:prefers_dark')).toBeNull();
 
 		initTheme();

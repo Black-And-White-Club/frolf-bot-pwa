@@ -1,24 +1,36 @@
-// Shared module-level cached dynamic import for ParticipantDisplay
-let participantPromise: Promise<unknown> | null = null;
+// Lightweight shim for participant loader. Previously this returned a dynamic
+// import; runtime now imports the component statically but tests and older
+// code may still import this module. Keep a minimal API compatible with
+// earlier tests: preloadParticipantDisplay() and __TEST_HOOKS with
+// injectedImport and clearCache.
 
-// Test hook used by unit tests to inject a fake dynamic import
-export const __TEST_HOOKS: { injectedImport?: () => Promise<unknown>; clearCache?: () => void } =
-	{};
+import ParticipantDisplay from './ParticipantDisplay.svelte';
 
-// expose a small test helper so unit tests can reset the module-level cache between tests
+type ImportResult = { default: any } | null;
+
+let cachedPromise: Promise<ImportResult> | null = null;
+
+export const __TEST_HOOKS: {
+	injectedImport?: (() => Promise<ImportResult>) | undefined;
+	clearCache?: () => void;
+} = {};
+
+export function preloadParticipantDisplay(): Promise<ImportResult> {
+	if (cachedPromise) return cachedPromise;
+
+	if (typeof __TEST_HOOKS.injectedImport === 'function') {
+		cachedPromise = __TEST_HOOKS.injectedImport();
+		return cachedPromise;
+	}
+
+	// Default: return the statically imported component so callers get a
+	// truthy module-like object with `default`.
+	cachedPromise = Promise.resolve({ default: ParticipantDisplay });
+	return cachedPromise;
+}
+
 __TEST_HOOKS.clearCache = () => {
-	participantPromise = null;
+	cachedPromise = null;
 };
 
-export function preloadParticipantDisplay(): Promise<unknown> {
-	if (!participantPromise) {
-		participantPromise = import('$lib/utils/preload-queue').then((m) =>
-			m.enqueuePreload(() => {
-				const importer =
-					__TEST_HOOKS.injectedImport ?? (() => import('./ParticipantDisplay.svelte'));
-				return importer();
-			})
-		);
-	}
-	return participantPromise;
-}
+export default {};

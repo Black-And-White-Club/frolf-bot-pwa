@@ -1,8 +1,6 @@
 <script lang="ts">
-	import type { Round } from '$lib/types/backend';
-
-	export const round: Round | undefined = undefined;
-	export const compact: boolean = false;
+	export let round: any;
+	export let testid: string | undefined;
 </script>
 
-<div data-testid="details-stub">Details Stub</div>
+<div data-testid={testid ?? 'details-stub'} class="details-stub">{round?.title ?? 'Details'}</div>

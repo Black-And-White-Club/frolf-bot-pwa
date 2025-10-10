@@ -104,6 +104,20 @@ export interface User {
 	average_score?: number;
 }
 
+// Lightweight session representation used in frontend tests/fixtures.
+// The backend doesn't necessarily provide this shape, but tests and the
+// frontend expect a small session object containing a user and token.
+export interface Session {
+	// session user: require minimal id/name compatible with frontend auth store
+	user: (Partial<User> & { user_id?: string; username?: string }) & {
+		// required for the frontend AuthStore shape
+		id: string;
+		name: string;
+	};
+	token: string;
+	[key: string]: any;
+}
+
 // ============ Score Types ============
 
 export interface ScoreEntry {

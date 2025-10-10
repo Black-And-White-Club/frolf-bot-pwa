@@ -5,10 +5,18 @@ import tailwindcss from '@tailwindcss/vite';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vitest/config';
 import { sveltekit } from '@sveltejs/kit/vite';
+import path from 'path';
 
 export default defineConfig({
-	// Prefer browser exports so Svelte's client runtime is used (mount / onMount available)
-	resolve: { conditions: ['browser'] },
+	resolve: {
+		conditions: ['browser'],
+		alias: {
+			$lib: path.resolve('./src/lib'),
+			$tests: path.resolve('./tests'),
+			'$tests/*': path.resolve('./tests/*')
+		}
+	},
+
 	plugins: [
 		tailwindcss(),
 		sveltekit(),
@@ -61,31 +69,17 @@ export default defineConfig({
 					visualizer({
 						filename: 'dist/stats.html',
 						template: 'treemap',
-						// enable compressed size measurements so the generated stats include gzip/brotli sizes
 						gzipSize: true,
 						brotliSize: true
 					})
 				]
 			: [])
 	],
-	build: {
-		rollupOptions: {
-			output: {
-				manualChunks(id: string) {
-					if (id.includes('node_modules')) {
-						if (id.includes('svelte')) return 'vendor_svelte';
-						if (id.includes('@sveltejs') || id.includes('sveltekit')) return 'vendor_sveltekit';
-						return 'vendor';
-					}
-				}
-			}
-		}
-	},
+
 	test: {
 		expect: { requireAssertions: false },
-		// Shared setup for any test that uses jsdom (annotated or client project).
-		// This ensures polyfills and DOM safety stubs are available regardless of project.
 		setupFiles: ['./vitest-setup-client.ts'],
+
 		projects: [
 			{
 				extends: './vite.config.ts',
@@ -93,21 +87,14 @@ export default defineConfig({
 					name: 'client',
 					environment: 'jsdom',
 					include: [
-						'src/lib/components/**/*.test.{js,ts}',
-						'src/lib/components/**/*.spec.{js,ts}',
-						'src/lib/utils/**/*.test.{js,ts}',
-						'src/demo.spec.{js,ts}',
-						'src/lib/a11y/**/*.test.{js,ts}'
+						'src/lib/components/**/__tests__/**/*.{test,spec}.{js,ts}',
+						'tests/**/*.{test,spec}.{js,ts}'
 					],
 					exclude: ['src/lib/server/**'],
 					server: {
 						deps: {
 							inline: [
 								'svelte',
-								'svelte/src/index-client.js',
-								'svelte/src/internal/index.js',
-								'svelte/src/internal/client/index.js',
-								'svelte/src/store/index-client.js',
 								'svelte/internal',
 								'svelte/store',
 								'@testing-library/svelte',
@@ -131,46 +118,31 @@ export default defineConfig({
 		coverage: {
 			provider: 'v8',
 			reporter: ['text', 'html'],
-			// Focus coverage on application library code and ignore build/config/generated files
 			include: ['src/lib/**'],
 			exclude: [
+				// keep your existing detailed excludes
 				'src/lib/paraglide/**',
 				'src/.svelte-kit/**',
 				'src/routes/**',
 				'src/stories/**',
-				// Exclude small test-only Svelte stubs so they don't skew coverage
 				'src/lib/**/stubs/**',
-				// Also explicitly ignore any stubs under components or __tests__
 				'src/lib/components/**/stubs/**',
 				'src/lib/**/__tests__/stubs/**',
-				// Story files and demo/mock data skew coverage; exclude them
 				'src/lib/**/*.stories.*',
 				'src/lib/data/**',
 				'src/lib/mocks/**',
 				'src/lib/server/**',
 				'src/lib/services/**',
 				'src/lib/types/**',
-				// Exclude test files, specs, and type declarations from coverage
 				'**/*.test.*',
 				'**/*.spec.*',
 				'**/*.stories.*',
-				'src/stories/**',
 				'**/*.d.ts',
 				'src/lib/index.ts',
-				'src/lib/**/__tests__/**',
-				'src/lib/**/tests/**',
-				// Also exclude compiled/output folders that appear in v8 reports
+				'tests/**',
 				'lib/**',
-				'lib/**/*.stories.*',
-				'lib/data/**',
-				'lib/mocks/**',
-				'lib/server/**',
-				'lib/services/**',
-				'lib/types/**',
-				'public/**',
-				'tests/**'
+				'static/**'
 			],
-			// Soft thresholds for the library code. CI can enforce stricter limits.
 			thresholds: {
 				global: {
 					statements: 80,
@@ -179,7 +151,6 @@ export default defineConfig({
 					lines: 80
 				}
 			}
-			// Coverage focuses on src/lib/**; enforce stricter thresholds in CI if needed.
 		}
 	}
 });

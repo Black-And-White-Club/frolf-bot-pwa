@@ -5,14 +5,12 @@
 	import { setGuildTheme } from '$lib/stores/theme';
 
 	// Static imports for critical path
-	import Button from '$lib/components/Button.svelte';
-	import StatCard from '$lib/components/StatCard.svelte';
-	import RoundsSection from '$lib/components/RoundSection.svelte';
-
-	// Lazy loader components
-	import LeaderboardLoader from '$lib/components/LeaderboardLoader.svelte';
-	import UserProfileLoader from '$lib/components/UserProfileLoader.svelte';
-	import CollapsibleCard from '$lib/components/CollapsibleCard.svelte';
+	import Button from '$lib/components/general/Button.svelte';
+	import StatCard from '$lib/components/general/StatCard.svelte';
+	import RoundsSection from '$lib/components/round/RoundSection.svelte';
+	import Leaderboard from '$lib/components/leaderboard/Leaderboard.svelte';
+	import UserProfileCard from '$lib/components/user/UserProfileCard.svelte';
+	import RoundCard from '$lib/components/round/RoundCard.svelte';
 
 	// State management - use $state.raw for complex objects to avoid deep reactivity overhead
 	let dashboardData = $state.raw<DashboardData | null>(null);
@@ -193,31 +191,20 @@
 						{#snippet mobile_profile_header()}
 							<div class="mb-4 flex items-center justify-between">
 								<h2 class="card-title card-title--skobeloff text-xl font-semibold">Your Stats</h2>
-								<Button
-									variant="secondary"
-									size="sm"
-									onclick={handleProfileClick}
-									testid="btn-view-profile-mobile"
-									class="link-like"
-								>
-									View Profile
-								</Button>
 							</div>
 						{/snippet}
 
-						{#snippet mobile_profile_children()}
-							<UserProfileLoader
-								user={currentUser!}
-								showStats={true}
-								testid="userprofile-current-mobile"
-							/>
-						{/snippet}
-
-						<CollapsibleCard
-							class="profile-card profile-card--mobile lg:hidden"
-							testid="mobile-profile-card"
+						<!-- render the profile card with an explicit headerAction to avoid nested interactive elements -->
+						<UserProfileCard
+							user={currentUser!}
+							showStats={true}
+							testid="userprofilecard-current-mobile"
 							header={mobile_profile_header}
-							children={mobile_profile_children}
+							headerAction={{
+								label: 'View Profile',
+								onClick: handleProfileClick,
+								testid: 'btn-view-profile-mobile'
+							}}
 						/>
 					{/if}
 				</div>
@@ -231,7 +218,7 @@
 					{/snippet}
 
 					{#snippet leaderboard_children()}
-						<LeaderboardLoader
+						<Leaderboard
 							entries={dashboardData?.leaderboard_preview ?? []}
 							limit={10}
 							showRank={true}
@@ -242,45 +229,41 @@
 						/>
 					{/snippet}
 
-					<CollapsibleCard
+					<!-- Render leaderboard header and children directly to keep Leaderboard strictly typed -->
+					<div
 						class="rounded-xl border p-6 shadow-sm transition-shadow hover:shadow-md"
 						style="background: var(--guild-surface); border-color: var(--guild-border);"
-						testid="leaderboard-card"
-						header={leaderboard_header}
-						children={leaderboard_children}
-					/>
+						data-testid="leaderboard-card"
+					>
+						{@render leaderboard_header()}
+						{@render leaderboard_children()}
+					</div>
 
 					{#if currentUser}
 						{#snippet desktop_profile_header()}
 							<div class="mb-4 flex items-center justify-between">
 								<h2 class="card-title card-title--skobeloff text-xl font-semibold">Your Stats</h2>
-								<Button
-									variant="secondary"
-									size="sm"
-									onclick={handleProfileClick}
-									testid="btn-view-profile"
-									class="link-like"
-								>
-									View Profile
-								</Button>
 							</div>
 						{/snippet}
 
-						{#snippet desktop_profile_children()}
-							<UserProfileLoader
-								user={currentUser!}
-								showStats={true}
-								testid="userprofile-current"
-							/>
-						{/snippet}
-
-						<CollapsibleCard
+						<!-- desktop profile: render the profile card with headerAction -->
+						<div
 							class="hidden rounded-xl border p-6 shadow-sm transition-shadow hover:shadow-md lg:block"
 							style="background: var(--guild-surface); border-color: var(--guild-border);"
-							testid="desktop-profile-card"
-							header={desktop_profile_header}
-							children={desktop_profile_children}
-						/>
+							data-testid="desktop-profile-card"
+						>
+							<UserProfileCard
+								user={currentUser!}
+								showStats={true}
+								testid="userprofilecard-current"
+								header={desktop_profile_header}
+								headerAction={{
+									label: 'View Profile',
+									onClick: handleProfileClick,
+									testid: 'btn-view-profile'
+								}}
+							/>
+						</div>
 					{/if}
 				</aside>
 			</div>
