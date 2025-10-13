@@ -7,9 +7,10 @@ const meta: Meta<typeof RoundCard> = {
 	component: RoundCard,
 	tags: ['autodocs'],
 	argTypes: {
-		onRoundClick: { action: 'roundClick' },
 		showStatus: { control: 'boolean' },
-		compact: { control: 'boolean' }
+		compact: { control: 'boolean' },
+		showDescription: { control: 'boolean' },
+		showLocation: { control: 'boolean' }
 	}
 };
 

@@ -63,11 +63,12 @@
 		aria-label={`Add ${formattedDate} to calendar`}
 		data-tooltip={captionText}
 		data-small={small}
+		data-iconless={!showIcon ? 'true' : undefined}
 		onclick={handleAction}
 		onkeydown={handleKey}
 	>
 		{#if showIcon}
-			<svg class="calendar-svg mr-2 h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24">
+			<svg class="calendar-svg h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24">
 				<path
 					stroke-linecap="round"
 					stroke-linejoin="round"
@@ -120,6 +121,13 @@
 		vertical-align: middle;
 	}
 
+	/* when small and iconless we want absolutely minimal padding so the text aligns with
+	   other inline IconTextRow rows (no extra click-box offset) */
+	.add-to-calendar-btn[data-small='true'][data-iconless='true'] {
+		padding-left: 0;
+		padding-right: 0.0625rem; /* keep a tiny buffer for touch */
+	}
+
 	/* when button is small and used with icon only, ensure the icon remains visible and not clipped */
 	.add-to-calendar-btn[data-small='true'] > svg {
 		width: var(--icon-size);
@@ -164,6 +172,36 @@
 		vertical-align: middle;
 	}
 
+	/* When this component is used inside an IconTextRow (as an icon slot),
+	   make the button visually behave like the raw svg so the text lines up
+	   exactly with other IconTextRow instances. Keep the selector specific
+	   to avoid affecting other uses. */
+	:global(.icon-text-row) .add-to-calendar {
+		display: inline-flex;
+		align-items: center;
+	}
+
+	:global(.icon-text-row) .add-to-calendar .add-to-calendar-btn {
+		padding: 0;
+		margin: 0;
+		width: var(--icon-size);
+		height: var(--icon-size);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	:global(.icon-text-row) .add-to-calendar .add-to-calendar-btn > svg {
+		width: var(--icon-size);
+		height: var(--icon-size);
+		display: block;
+	}
+
+	/* inside IconTextRow the row gap handles spacing, so remove svg margin here */
+	:global(.icon-text-row) .add-to-calendar .add-to-calendar-btn > svg {
+		margin-right: 0;
+	}
+
 	/* size SVG from local variable so icons across rows match; stroke inherits currentColor unless overridden */
 	.add-to-calendar-btn > svg {
 		width: var(--icon-size);
@@ -173,7 +211,7 @@
 
 	/* calendar-specific svg class keeps consistent spacing when used icon-only */
 	.calendar-svg {
-		margin-right: 0.5rem;
+		margin-right: 0.375rem; /* match IconTextRow gap */
 		flex-shrink: 0;
 	}
 
@@ -193,6 +231,22 @@
 			white-space: nowrap;
 			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 			z-index: 30;
+		}
+	}
+
+	/* Expand hit target for small icon-only buttons on touch devices without changing layout */
+	@media (hover: none) and (pointer: coarse), (max-width: 639px) {
+		.add-to-calendar-btn[data-small='true']::after {
+			content: '';
+			position: absolute;
+			left: -8px;
+			right: -8px;
+			top: -8px;
+			bottom: -8px;
+			/* no visual effect; clicks on the pseudo-element count for the button */
+		}
+		.add-to-calendar-btn[data-small='true'] {
+			position: relative; /* needed for ::after expansion */
 		}
 	}
 

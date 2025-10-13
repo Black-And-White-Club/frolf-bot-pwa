@@ -20,7 +20,9 @@ test('renders user info and responds to click', async () => {
 		props: { user, onClick, testid: 'user-card' }
 	});
 	getByText('TestUser');
-	getByText('Rounds played: 5');
+	// When onClick is provided the component renders as a button and shows
+	// "Rounds: {n}". Match that exact text here.
+	getByText('Rounds: 5');
 	await fireEvent.click(getByTestId('user-card'));
 	expect(onClick).toHaveBeenCalled();
 });

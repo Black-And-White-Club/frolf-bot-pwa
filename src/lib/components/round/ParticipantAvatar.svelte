@@ -11,17 +11,10 @@
 
 	let { avatar_url, username, size = 24, extraClasses = '', priority = false }: Props = $props();
 
-	// derived attrs for external unsplash images
-	const _isUnsplash = $derived(isUnsplashUrl(avatar_url));
-	const _srcset = $derived(
-		_isUnsplash && avatar_url ? unsplashSrcset(avatar_url, [size, size * 2]) : undefined
-	);
-	const _sizes = $derived(_isUnsplash ? unsplashSizes(size) : undefined);
-	// Keep avatars lazy by default to avoid many images competing for network during
-	// initial render. Consumers can opt into eager loading by setting `priority`.
-	const _loading = $derived(priority ? 'eager' : 'lazy');
+	const isUnsplash = $derived(isUnsplashUrl(avatar_url));
+	const sizes = $derived(isUnsplash ? unsplashSizes(size) : undefined);
+	const loading = $derived(priority ? 'eager' : 'lazy');
 
-	// Local state to track load/error so we can show the fallback initial
 	let loaded = $state(false);
 	let errored = $state(false);
 
@@ -32,37 +25,34 @@
 	function handleError() {
 		errored = true;
 	}
+
+	const initial = $derived(username ? username.charAt(0).toUpperCase() : '?');
 </script>
 
-<div
-	class={`relative inline-flex items-center justify-center overflow-hidden rounded-full ${extraClasses}`}
-	style={`width:${size}px;height:${size}px;min-width:${size}px;min-height:${size}px;`}
->
+<div class="avatar-container {extraClasses}" style="--size: {size}px;">
 	{#if avatar_url && !errored}
-		<!-- Use picture to serve AVIF/WebP for Unsplash images, fallback to original for others -->
-		{#if _isUnsplash}
+		{#if isUnsplash}
 			<picture>
 				<source
 					type="image/avif"
 					srcset={unsplashSrcset(avatar_url, [size, size * 2], 'avif')}
-					sizes={_sizes}
+					{sizes}
 				/>
 				<source
 					type="image/webp"
 					srcset={unsplashSrcset(avatar_url, [size, size * 2], 'webp')}
-					sizes={_sizes}
+					{sizes}
 				/>
 				<img
 					src={avatar_url}
 					alt={username}
 					width={size}
 					height={size}
-					loading={_loading}
+					{loading}
 					decoding="async"
 					onload={handleLoad}
 					onerror={handleError}
-					class="h-full w-full rounded-full object-cover"
-					style="image-rendering: pixelated; image-rendering: -moz-crisp-edges; aspect-ratio:1/1;"
+					class="avatar-img"
 					crossorigin="anonymous"
 				/>
 			</picture>
@@ -72,29 +62,72 @@
 				alt={username}
 				width={size}
 				height={size}
-				loading={_loading}
+				{loading}
 				decoding="async"
 				onload={handleLoad}
 				onerror={handleError}
-				class="h-full w-full rounded-full object-cover"
-				style="image-rendering: pixelated; image-rendering: -moz-crisp-edges; aspect-ratio:1/1;"
+				class="avatar-img"
 			/>
 		{/if}
-		<!-- fallback initial shown until image loads -->
-		<div
-			class="bg-guild-surface-elevated absolute inset-0 flex items-center justify-center rounded-full text-xs font-bold text-[var(--guild-text)]"
-			aria-hidden={!loaded}
-			style:display={loaded ? 'none' : 'flex'}
-		>
-			{username ? username.charAt(0).toUpperCase() : '?'}
-		</div>
+
+		{#if !loaded}
+			<div class="avatar-fallback">
+				{initial}
+			</div>
+		{/if}
 	{:else}
-		<!-- Neutral initials-only placeholder (no color blocks) -->
-		<div
-			class="bg-guild-surface-elevated flex h-full w-full items-center justify-center rounded-full border border-[var(--guild-border)] text-xs font-bold text-[var(--guild-text)]"
-			aria-hidden="true"
-		>
-			{username ? username.charAt(0).toUpperCase() : '?'}
+		<div class="avatar-placeholder">
+			{initial}
 		</div>
 	{/if}
 </div>
+
+<style>
+	.avatar-container {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+		border-radius: 9999px;
+		width: var(--size);
+		height: var(--size);
+		min-width: var(--size);
+		min-height: var(--size);
+	}
+
+	.avatar-img {
+		width: 100%;
+		height: 100%;
+		border-radius: 9999px;
+		object-fit: cover;
+		aspect-ratio: 1 / 1;
+	}
+
+	.avatar-fallback {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 9999px;
+		background: var(--guild-surface-elevated);
+		color: var(--guild-text);
+		font-size: 0.75rem;
+		font-weight: 700;
+	}
+
+	.avatar-placeholder {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 100%;
+		border-radius: 9999px;
+		border: 1px solid var(--guild-border);
+		background: var(--guild-surface-elevated);
+		color: var(--guild-text);
+		font-size: 0.75rem;
+		font-weight: 700;
+	}
+</style>

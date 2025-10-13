@@ -98,34 +98,27 @@
 	</div>
 {/if}
 
-<!-- Mobile-only calendar button positioned bottom-right within the inner card -->
-<div class="mobile-calendar">
-	{#if showLocation && localStartTime()}
-		<div class="mobile-calendar-btn-wrapper">
-			<AddToCalendarButton
-				{round}
-				showCaption={false}
-				testid={`btn-add-calendar-mobile-${round.round_id}`}
-			/>
-		</div>
-	{/if}
-</div>
+<!-- mobile floating calendar removed: the inline scheduled row contains the icon-only control -->
 
 {#if round.status === 'scheduled'}
 	<!-- tighten vertical spacing slightly so location and date rows sit closer -->
 	<p class="date-row scheduled text-sm text-[var(--guild-text-secondary)]" style="--icon-size:1rem">
 		<IconTextRow>
-			<!-- put the calendar action inside the row so it participates in nowrap/truncation -->
-			<AddToCalendarButton
-				{round}
-				showCaption={true}
-				showIcon={true}
-				small={true}
-				captionText="Click to add to calendar"
-				testid={`btn-add-calendar-inline-${round.round_id}`}
-			>
+			{#snippet icon()}
+				<!-- icon-only button: icon is the interactive control -->
+				<AddToCalendarButton
+					{round}
+					showCaption={true}
+					showIcon={true}
+					small={true}
+					captionText="Click to add to calendar"
+					testid={`btn-add-calendar-inline-${round.round_id}`}
+				/>
+			{/snippet}
+
+			{#snippet children()}
 				<span class="date-text">{formatLocalStart()}</span>
-			</AddToCalendarButton>
+			{/snippet}
 		</IconTextRow>
 	</p>
 {:else}
@@ -155,26 +148,6 @@
 {/if}
 
 <style>
-	.mobile-calendar {
-		position: relative;
-	}
-	.mobile-calendar-btn-wrapper {
-		display: none;
-	}
-	@media (max-width: 639px) {
-		.mobile-calendar-btn-wrapper {
-			display: inline-flex;
-			position: absolute;
-			right: 0.75rem;
-			bottom: 0.75rem;
-			background: rgba(0, 0, 0, 0.12);
-			border: 1px solid rgba(255, 255, 255, 0.04);
-			padding: 0.35rem;
-			border-radius: 0.5rem;
-			color: var(--guild-secondary);
-		}
-	}
-
 	/* IconTextRow provides the inline icon+text contract so no local CSS needed here */
 
 	/* tighter spacing so stacked rows sit closer together */
@@ -206,13 +179,12 @@
 	/* TIGHTEN: only adjust spacing between location and date rows
 	   Make them sit closer together by pulling the date up slightly */
 	.location-row {
-		margin-bottom: -0.25rem; /* pull date row up ~4px */
+		margin-bottom: 0.25rem; /* pull date row up ~4px */
 	}
 
 	/* lift the date row up a hair as well so the two rows are visually tight */
 	.date-row {
-		margin-top: -0.0625rem; /* -1px */
-		margin-bottom: 0;
+		margin-bottom: 0.5rem;
 	}
 
 	/* scheduled rows should use the brand secondary (amethyst) for the icon */

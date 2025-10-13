@@ -21,8 +21,6 @@
 		players: TotalPlayers
 	};
 
-	let IconComponent = $derived(iconMap[icon]);
-
 	const colorMap = {
 		primary: 'var(--guild-primary)',
 		secondary: 'var(--guild-secondary)',
@@ -34,6 +32,8 @@
 		secondary: 'rgba(var(--guild-secondary-rgb, 139, 123, 184), 0.1)',
 		accent: 'rgba(var(--guild-accent-rgb, 203, 165, 53), 0.1)'
 	};
+
+	let IconComponent = $derived(iconMap[icon]);
 </script>
 
 <div class="stat-card" data-testid={testid}>
@@ -41,15 +41,16 @@
 		<p class="stat-label">{label}</p>
 		<p class="stat-value">{value}</p>
 	</div>
-	<div class="stat-icon" style="background-color: {bgColorMap[color]};">
-		{#if IconComponent}
-			<div class="icon" style="color: {colorMap[color]};">
-				<IconComponent />
-			</div>
-		{:else}
-			<div class="icon-fallback" style="color: {colorMap[color]};"></div>
-		{/if}
-	</div>
+
+	{#if IconComponent}
+		<IconComponent
+			withBg={true}
+			bgColor={bgColorMap[color]}
+			fgColor={colorMap[color]}
+			boxSize="3rem"
+			size="60%"
+		/>
+	{/if}
 </div>
 
 <style>
@@ -60,55 +61,34 @@
 		background: var(--guild-surface);
 		border: 1px solid var(--guild-border);
 		border-radius: 0.75rem;
-		padding: 1rem;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+		padding: 0.55rem;
+		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 	}
 
 	.stat-content {
-		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
 	}
 
 	.stat-label {
-		font-size: 0.875rem;
-		font-weight: 500;
+		font-size: 1rem;
+		font-weight: 700;
 		color: var(--guild-text-secondary);
-		margin: 0;
+		line-height: 1.25;
 	}
 
 	.stat-value {
-		font-size: 1.5rem;
+		display: flex;
+		justify-content: center;
+		font-size: 2rem;
 		font-weight: 700;
 		color: var(--guild-text);
-		margin: 0.25rem 0 0;
 	}
 
-	.stat-icon {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 2.5rem;
-		height: 2.5rem;
-		border-radius: 0.5rem;
-		flex-shrink: 0;
-		.icon {
-			width: 1.25rem;
-			height: 1.25rem;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
+	@media (max-width: 640px) {
+		.stat-card {
+			padding: 1rem;
 		}
-
-		.icon > :global(svg) {
-			width: 100%;
-			height: 100%;
-		}
-
-		.icon-fallback {
-			width: 1.25rem;
-			height: 1.25rem;
-			border-radius: 50%;
-			background: currentColor;
-		}
-		background: currentColor;
 	}
 </style>

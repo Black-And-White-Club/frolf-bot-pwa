@@ -27,8 +27,7 @@ test('renders header and badges and round loaders', () => {
 		props: {
 			title: 'Upcoming',
 			rounds: [minimalRound] as unknown as import('$lib/types/backend').Round[],
-			badges: [{ label: 'My Badge', color: 'secondary' }],
-			onRoundClick: (() => {}) as unknown as (payload: { roundId: string }) => void
+			badges: [{ label: 'My Badge', color: 'secondary' }]
 		}
 	});
 

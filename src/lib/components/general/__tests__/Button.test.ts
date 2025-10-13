@@ -5,7 +5,7 @@ import Button from '../Button.svelte';
 
 describe('Button component', () => {
 	it('renders button element with testid', () => {
-		const { getByTestId } = render(Button, { props: { dataTestId: 'btn-1' } });
+		const { getByTestId } = render(Button, { props: { testid: 'btn-1' } });
 		const el = getByTestId('btn-1');
 		expect(el).toBeTruthy();
 	});
@@ -15,7 +15,7 @@ describe('Button component', () => {
 		const handler = (e: MouseEvent) => {
 			spy(e);
 		};
-		const { getByTestId } = render(Button, { props: { onClick: handler, dataTestId: 'btn-2' } });
+		const { getByTestId } = render(Button, { props: { onclick: handler, testid: 'btn-2' } });
 		const el = getByTestId('btn-2');
 		await fireEvent.click(el);
 		expect(spy).toHaveBeenCalled();
@@ -27,7 +27,7 @@ describe('Button component', () => {
 			spy(e);
 		};
 		const { getByTestId } = render(Button, {
-			props: { onClick: handler, disabled: true, dataTestId: 'btn-3' }
+			props: { onclick: handler, disabled: true, testid: 'btn-3' }
 		});
 		const el = getByTestId('btn-3');
 		await fireEvent.click(el);

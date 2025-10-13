@@ -15,14 +15,6 @@
 		/* Responsive horizontal padding */
 		padding-left: 1rem; /* px-4 default */
 		padding-right: 1rem;
-		@media (min-width: 640px) {
-			padding-left: 1.5rem; /* sm:px-6 */
-			padding-right: 1.5rem;
-		}
-		@media (min-width: 1024px) {
-			padding-left: 2rem; /* lg:px-8 */
-			padding-right: 2rem;
-		}
 
 		padding-top: calc(var(--app-header-height) + env(safe-area-inset-top));
 	}
@@ -65,24 +57,13 @@
 		padding-bottom: 1.5rem;
 		padding-left: 1rem; /* px-4 */
 		padding-right: 1rem;
-		@media (min-width: 640px) {
-			padding-left: 1.5rem; /* sm:px-6 */
-			padding-right: 1.5rem;
-		}
-		@media (min-width: 1024px) {
-			padding-left: 2rem; /* lg:px-8 */
-			padding-right: 2rem;
-		}
 	}
 
 	.stats-grid {
-		margin-bottom: 2rem; /* mb-8 */
+		margin-bottom: 0rem; /* mb-8 */
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
 		gap: 1rem; /* gap-4 */
-		@media (min-width: 768px) {
-			grid-template-columns: repeat(4, 1fr); /* md:grid-cols-4 */
-		}
 	}
 
 	.content-grid {
@@ -104,14 +85,51 @@
 	}
 
 	.sidebar {
-		order: 1; /* place sidebar after main content on mobile (appear last)
-			This replaces previous order:-1 which made the sidebar appear first on mobile */
 		display: flex;
 		flex-direction: column;
 		gap: 1.5rem;
-		@media (min-width: 1024px) {
-			order: 0; /* lg:order-none */
-		}
+	}
+
+	.sidebar-card {
+		background: var(--guild-surface);
+		border: 1px solid var(--guild-border);
+		border-radius: 0.75rem;
+		padding: 1.5rem;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	}
+
+	.profile-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 1rem;
+		gap: 1rem;
+	}
+
+	.section-title {
+		font-size: 1.125rem;
+		font-weight: 600;
+		color: var(--guild-text);
+		margin: 0;
+	}
+
+	.sidebar-card:hover {
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	}
+
+	.card-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 1rem;
+		gap: 1rem;
+	}
+
+	.card-title {
+		font-size: 1.125rem;
+		font-weight: 600;
+		color: var(--guild-text);
+		margin: 0;
 	}
 
 	/* Participant Row Layout */
@@ -198,5 +216,34 @@
 		.desktop-profile {
 			display: block;
 		}
+	}
+}
+
+/* Flattened responsive rules previously nested inside selectors */
+@media (min-width: 640px) {
+	.app-main {
+		padding-left: 1.5rem;
+		padding-right: 1.5rem;
+	}
+	.dashboard-container {
+		padding-left: 1.5rem;
+		padding-right: 1.5rem;
+	}
+}
+
+@media (min-width: 1024px) {
+	.app-main {
+		padding-left: 2rem;
+		padding-right: 2rem;
+	}
+	.dashboard-container {
+		padding-left: 2rem;
+		padding-right: 2rem;
+	}
+}
+
+@media (min-width: 768px) {
+	.stats-grid {
+		grid-template-columns: repeat(4, 1fr);
 	}
 }

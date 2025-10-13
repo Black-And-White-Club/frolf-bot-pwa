@@ -16,96 +16,118 @@
 
 	let { status, count, showCount = true, testid, customColor, textColor }: Props = $props();
 
-	// concrete icon mapping (static imports for better tree-shaking and SSR safety)
 	const ICON_MAP: Record<string, any> = {
 		active: DefaultIcon,
 		completed: CompletedIcon,
 		scheduled: ScheduledIcon
 	};
 
-	let iconName = $state('info');
-
 	const IconComponent = $derived(ICON_MAP[status] ?? DefaultIcon);
 
-	const displayText = $derived(() => {
-		if (showCount && count !== undefined) {
-			return `${count} ${status}`;
-		}
-		return status.charAt(0).toUpperCase() + status.slice(1);
-	});
+	const displayText = $derived(
+		showCount && count !== undefined
+			? `${count} ${status}`
+			: status.charAt(0).toUpperCase() + status.slice(1)
+	);
 
-	$effect(() => {
-		if (status === 'active') iconName = 'target';
-		else if (status === 'completed') iconName = 'check';
-		else if (status === 'scheduled') iconName = 'calendar';
-		else if (status === 'cancelled') iconName = 'close';
-		else iconName = 'info';
-	});
+	const baseColor = $derived(customColor ?? STATUS_COLORS[status] ?? STATUS_COLORS.default);
 
-	function getColor(status: string) {
-		const lookup = (STATUS_COLORS as Record<string, string>)[status];
-		return customColor ?? lookup ?? STATUS_COLORS.default;
-	}
+	// Pill background: always translucent
+	const bgColor = $derived(`rgba(${hexToRgbString(baseColor)}, 0.13)`);
 
-	function hexToRgba(hex: string, alpha = 0.13) {
-		if (!hex) return '';
-		const rgb = hexToRgbString(hex); // returns 'r, g, b'
-		return `rgba(${rgb}, ${alpha})`;
-	}
+	// Text color: dark by default (or custom)
+	const finalTextColor = $derived(textColor ?? 'var(--guild-text, #111)');
+
+	// Icon color: always solid base color (filled)
+	const iconColor = $derived(baseColor);
 </script>
 
 <span
 	data-testid={testid}
 	data-status={status}
-	class="status-badge inline-flex items-center gap-1 truncate rounded-full px-2 py-1 text-xs font-semibold whitespace-nowrap shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-md"
-	class:active={status === 'active'}
+	class="status-badge"
 	role="status"
-	aria-label={displayText()}
-	style="--sb-bg: {hexToRgba(getColor(status))}; --sb-border: {getColor(
-		status
-	)}; --sb-text: {textColor ??
-		'var(--guild-text, #111)'}; background-color: var(--sb-bg); border: 1px solid var(--sb-border); color: var(--sb-text);"
+	aria-label={displayText}
+	style="background: {bgColor}; border: 1px solid {baseColor}; color: {finalTextColor};"
 >
-	<span class="icon flex-shrink-0" aria-hidden="true">
-		<IconComponent size={14} aria-hidden="true" />
+	<span class="icon" aria-hidden="true" style="color: {iconColor};">
+		<!-- disable the surrounding StatIcon background box so all icons match size -->
+		<IconComponent size={14} withBg={false} boxSize={'1rem'} />
 	</span>
 
-	<span class="label truncate">{displayText()}</span>
-	<span class="sr-only">Status: {displayText()}</span>
+	<span class="label">{displayText}</span>
 </span>
 
 <style>
 	.status-badge {
-		background-color: var(--sb-bg);
-		border: 1px solid var(--sb-border);
-		color: var(--sb-text);
+		display: inline-flex;
+		align-items: center;
+		gap: 0.05rem;
+		padding: 0.25rem 0.45rem;
+		border-radius: 9999px;
+		font-size: 0.75rem;
+		font-weight: 700;
+		white-space: nowrap;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+		transition: all 200ms;
 	}
 
-	/* Icon always follows the badge border color so it remains visible in both light/dark */
-	.status-badge .icon {
-		color: var(--sb-border);
+	.status-badge:hover {
+		transform: scale(1.02);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 	}
 
-	.status-badge .icon :global(svg) {
+	.icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+	}
+
+	.icon :global(svg) {
 		width: 14px;
 		height: 14px;
 	}
 
-	/* enforce inheritance for any child shape */
-	.status-badge .icon :global(svg *) {
-		fill: currentColor;
-		stroke: currentColor;
+	/* Ensure icon renders as a filled glyph inside the pill (solid color) */
+	.icon :global(svg *) {
+		fill: currentColor !important;
+		stroke: none !important;
 	}
 
-	.status-badge .label {
-		color: inherit; /* label follows --sb-text */
+	.label {
+		line-height: 1;
 	}
 
 	@media (prefers-color-scheme: light) {
 		.status-badge {
 			box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06) inset;
-			color: var(--guild-text);
 		}
-		/* nothing special for active in light mode — icon inherits border color */
+	}
+
+	/* Mobile-only visual-only offset: translate the badge on mobile so it
+			 appears further right without affecting layout (prevents cutting off
+			 nearby text). Tweak --status-badge-mobile-translate as needed. */
+	@media (max-width: 640px) {
+		.status-badge {
+			--status-badge-mobile-translate: 2rem;
+			transform: translateX(var(--status-badge-mobile-translate));
+		}
+
+		.status-badge:hover {
+			transform: translateX(var(--status-badge-mobile-translate)) scale(1.02);
+		}
+	}
+
+	@media (max-width: 420px) {
+		.status-badge {
+			/* slightly larger nudge for very small viewports */
+			--status-badge-mobile-translate: 1.25rem;
+			transform: translateX(var(--status-badge-mobile-translate));
+		}
+
+		.status-badge:hover {
+			transform: translateX(var(--status-badge-mobile-translate)) scale(1.02);
+		}
 	}
 </style>

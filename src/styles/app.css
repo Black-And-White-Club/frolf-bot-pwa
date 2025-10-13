@@ -5,7 +5,3 @@
 @import './components.css';
 @import './utilities.css';
 @import './animations.css';
-
-/* Root app stylesheet - imports split style modules.
-   See src/styles/ for tokens, fonts, base, components, utilities, animations
-*/

@@ -16,7 +16,9 @@ describe('StatCard', () => {
 
 		// wait for dynamic import to resolve and an icon svg to be present
 		await waitFor(() => {
-			const icon = container.querySelector('.icon > svg');
+			// The stat icon is rendered inside the StatIcon wrapper (.tp-wrapper)
+			// and the SVG is a direct child. Query that instead of `.icon > svg`.
+			const icon = container.querySelector('.tp-wrapper svg');
 			expect(icon).toBeTruthy();
 		});
 	});

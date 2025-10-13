@@ -20,10 +20,15 @@ const makeRound = (overrides: Record<string, unknown> = {}) => ({
 
 test('renders title and status when scheduled', async () => {
 	const round = makeRound();
-	const { getByTestId } = render(RoundHeader, {
+	const { getByTestId, getByText } = render(RoundHeader, {
 		props: { round: round as unknown as Round, showStatus: true, testid: 'header-1' }
 	});
-	expect(getByTestId('round-title-r1')).toBeTruthy();
+
+	// component root is testid 'header-1'
+	expect(getByTestId('header-1')).toBeTruthy();
+	// title should render as text
+	expect(getByText('Test Round')).toBeTruthy();
+	// status badge should exist with its own testid
 	expect(getByTestId('status-r1')).toBeTruthy();
 	// Calendar action lives in RoundDetails (inline button) for scheduled rounds
 });
