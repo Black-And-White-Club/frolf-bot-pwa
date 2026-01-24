@@ -57,3 +57,9 @@ coverage*
 dist*
 /coverage
 eslint-report.json
+TECHNICAL_STRATEGY.md
+PROGRESS.md
+CLAUDE.md
+brand-guide.md
+asyncapi.yaml
+tasks/

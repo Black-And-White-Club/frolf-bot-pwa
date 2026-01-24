@@ -110,7 +110,7 @@ export default defineConfig({
 					name: 'server',
 					environment: 'node',
 					include: ['src/**/*.{test,spec}.{js,ts}'],
-					exclude: ['src/lib/components/**', 'src/**/*.svelte.{test,spec}.{js,ts}']
+					exclude: ['src/lib/components/**', 'src/**/*.svelte.{test,spec}.{js,ts}', 'src/lib/stores/_deprecated/**']
 				}
 			}
 		],

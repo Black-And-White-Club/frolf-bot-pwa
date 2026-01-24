@@ -6,6 +6,7 @@
 	import ThemeToggle from '$lib/components/general/ThemeToggle.svelte';
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
+	import { appInit } from '$lib/stores/init.svelte';
 
 	// These are client-only, non-critical components — load them lazily to keep the
 	// initial bundle smaller. Use Svelte 5 `$state` so updates are reactive.
@@ -80,6 +81,14 @@
 			window.removeEventListener('sw:waiting', swListener as EventListener);
 	});
 
+	onMount(() => {
+		appInit.initialize();
+
+		return () => {
+			appInit.teardown();
+		};
+	});
+
 	let { children } = $props();
 
 	import { modalOpen } from '$lib/stores/overlay';
@@ -104,7 +113,28 @@
 	{#if UpdateSnackbarClient}
 		<UpdateSnackbarClient />
 	{/if}
-	{#if page.data.session}
+	{#if appInit.isLoading}
+		<div class="flex items-center justify-center min-h-screen bg-[#081212]">
+			<div class="text-center">
+				<div class="animate-spin w-8 h-8 border-2 border-[#007474] border-t-transparent rounded-full mx-auto mb-4"></div>
+				<p class="text-white/60">Connecting...</p>
+			</div>
+		</div>
+	{:else if appInit.error}
+		<div class="flex items-center justify-center min-h-screen bg-[#081212]">
+			<div class="text-center max-w-md p-6">
+				<div class="text-red-400 text-xl mb-2">Connection Error</div>
+				<p class="text-white/60 mb-4">{appInit.error}</p>
+				<button
+					class="px-4 py-2 bg-[#007474] text-white rounded hover:bg-[#008B8B] transition"
+					onclick={() => appInit.initialize()}
+				>
+					Retry
+				</button>
+			</div>
+		</div>
+	{:else}
+		{#if page.data.session}
 		<!-- User is signed in -->
 		<div class="app-container">
 			<Navbar />
@@ -113,28 +143,29 @@
 			</main>
 		</div>
 	{:else}
-		<!-- User is not signed in -->
-		<div class="flex min-h-screen items-center justify-center bg-[var(--guild-background)]">
-			<div class="w-full max-w-md space-y-8">
-				<div class="flex justify-end">
-					<ThemeToggle testid="theme-toggle-guest" />
-				</div>
-				<div>
-					<h1 class="text-guild-primary text-center text-3xl font-extrabold">Frolf Bot PWA</h1>
-					<p class="text-guild-text-secondary mt-2 text-center text-sm">
-						Sign in with Discord to access your disc golf games.
-					</p>
-				</div>
-				<div>
-					<a
-						href="/auth/signin"
-						data-testid="btn-signin"
-						class="group text-guild-surface relative flex w-full justify-center rounded-md border border-transparent bg-[var(--guild-primary)] px-4 py-2 text-sm font-medium hover:bg-[var(--guild-primary)]/90 focus:ring-2 focus:ring-[var(--guild-primary)] focus:ring-offset-2 focus:outline-none"
-					>
-						Sign In
-					</a>
+			<!-- User is not signed in -->
+			<div class="flex min-h-screen items-center justify-center bg-[var(--guild-background)]">
+				<div class="w-full max-w-md space-y-8">
+					<div class="flex justify-end">
+						<ThemeToggle testid="theme-toggle-guest" />
+					</div>
+					<div>
+						<h1 class="text-guild-primary text-center text-3xl font-extrabold">Frolf Bot PWA</h1>
+						<p class="text-guild-text-secondary mt-2 text-center text-sm">
+							Sign in with Discord to access your disc golf games.
+						</p>
+					</div>
+					<div>
+						<a
+							href="/auth/signin"
+							data-testid="btn-signin"
+							class="group text-guild-surface relative flex w-full justify-center rounded-md border border-transparent bg-[var(--guild-primary)] px-4 py-2 text-sm font-medium hover:bg-[var(--guild-primary)]/90 focus:ring-2 focus:ring-[var(--guild-primary)] focus:ring-offset-2 focus:outline-none"
+						>
+							Sign In
+						</a>
+					</div>
 				</div>
 			</div>
-		</div>
+		{/if}
 	{/if}
 </ThemeProvider>

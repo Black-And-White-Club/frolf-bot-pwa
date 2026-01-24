@@ -36,6 +36,7 @@
 		"jsdom": "^21.1.2",
 		"lighthouse": "^12.8.2",
 		"mdsvex": "^0.12.6",
+		"mock-socket": "^9.3.1",
 		"playwright": "^1.56.0",
 		"prettier": "^3.6.2",
 		"prettier-plugin-svelte": "^3.4.0",
@@ -89,8 +90,15 @@
 	"type": "module",
 	"dependencies": {
 		"@auth/sveltekit": "^1.10.0",
+		"@opentelemetry/api": "^1.9.0",
+		"@opentelemetry/core": "^2.5.0",
+		"@opentelemetry/exporter-trace-otlp-http": "^0.211.0",
+		"@opentelemetry/resources": "^2.5.0",
+		"@opentelemetry/sdk-trace-web": "^2.5.0",
+		"@opentelemetry/semantic-conventions": "^1.39.0",
 		"add-to-calendar-button": "^2.12.6",
 		"clsx": "^2.1.1",
+		"nats.ws": "^1.30.3",
 		"tailwind-merge": "^3.3.1"
 	}
 }
