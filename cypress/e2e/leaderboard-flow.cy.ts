@@ -20,10 +20,10 @@ describe('Leaderboard Flow', () => {
 			}
 		});
 
-		cy.get('[data-testid="leaderboard-entry"]')
-			.should('have.length', 3);
+		cy.get('[data-testid="leaderboard-entry"]').should('have.length', 3);
 
-		cy.get('[data-testid="leaderboard-entry"]').first()
+		cy.get('[data-testid="leaderboard-entry"]')
+			.first()
 			.should('contain', 'Player One')
 			.and('contain', '#1');
 	});
@@ -51,7 +51,8 @@ describe('Leaderboard Flow', () => {
 		});
 
 		// User-2 should now be first
-		cy.get('[data-testid="leaderboard-entry"]').first()
+		cy.get('[data-testid="leaderboard-entry"]')
+			.first()
 			.should('have.attr', 'data-user-id', 'user-2');
 	});
 
@@ -77,11 +78,9 @@ describe('Leaderboard Flow', () => {
 		});
 
 		// Verify swap happened
-		cy.get('[data-testid="leaderboard-entry"][data-user-id="user-1"]')
-			.should('contain', '#5');
+		cy.get('[data-testid="leaderboard-entry"][data-user-id="user-1"]').should('contain', '#5');
 
-		cy.get('[data-testid="leaderboard-entry"][data-user-id="user-2"]')
-			.should('contain', '#1');
+		cy.get('[data-testid="leaderboard-entry"][data-user-id="user-2"]').should('contain', '#1');
 	});
 
 	it('shows movement indicator after tag change', () => {
@@ -92,9 +91,7 @@ describe('Leaderboard Flow', () => {
 				guild_id: 'guild-123',
 				version: 1,
 				last_updated: '2026-01-23T12:00:00Z',
-				entries: [
-					{ user_id: 'user-1', tag_number: 5 }
-				]
+				entries: [{ user_id: 'user-1', tag_number: 5 }]
 			}
 		});
 
@@ -105,7 +102,6 @@ describe('Leaderboard Flow', () => {
 			new_tag: 2
 		});
 
-		cy.get('[data-testid="movement-indicator"]')
-			.should('have.class', 'movement-up');
+		cy.get('[data-testid="movement-indicator"]').should('have.class', 'movement-up');
 	});
 });

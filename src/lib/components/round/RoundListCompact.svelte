@@ -36,6 +36,6 @@
 		<RoundListCard {round} />
 	{/each}
 	{#if rounds.length > limit}
-		<p class="text-xs text-slate-500 text-center pt-2">+{rounds.length - limit} more</p>
+		<p class="pt-2 text-center text-xs text-slate-500">+{rounds.length - limit} more</p>
 	{/if}
 </div>

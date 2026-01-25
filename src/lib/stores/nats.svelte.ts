@@ -17,10 +17,7 @@ interface NatsMessage<T = unknown> {
 	headers?: Map<string, string[]>;
 }
 
-interface SubscriptionHandle {
-	subject: string;
-	unsubscribe: () => void;
-}
+// SubscriptionHandle removed — not used
 
 // ============ NatsService Class ============
 
@@ -36,6 +33,11 @@ class NatsService {
 	isReconnecting = $derived(this.status === 'reconnecting');
 
 	// Private
+
+	// using a built-in Map deliberately for subscription management; disable the
+	// rule that prefers SvelteMap here because this class is not a Svelte component
+	// and we want an ordinary Map for its API.
+
 	private subscriptions: Map<string, Subscription> = new Map();
 	private codec = StringCodec();
 
@@ -131,14 +133,15 @@ class NatsService {
 				const traceparent = msg.headers?.get('traceparent')?.[0];
 
 				// Create span for message processing
-				const span = createChildSpan(
-					`nats.receive.${subject}`,
-					traceparent,
-					{ 'messaging.system': 'nats', 'messaging.destination': subject }
-				);
+				const span = createChildSpan(`nats.receive.${subject}`, traceparent, {
+					'messaging.system': 'nats',
+					'messaging.destination': subject
+				});
 
 				try {
 					const data = JSON.parse(this.codec.decode(msg.data)) as T;
+					// local headers map for downstream handlers
+					// eslint-disable-next-line svelte/prefer-svelte-reactivity
 					const headers = new Map<string, string[]>();
 
 					if (msg.headers) {

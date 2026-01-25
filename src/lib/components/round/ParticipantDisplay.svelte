@@ -74,7 +74,7 @@
 	<div class="participant-row compact" data-testid={testid}>
 		<div class="flex min-w-0 items-center gap-2">
 			<div class="flex items-center -space-x-1" role="group" aria-label="Participants">
-				{#each localParticipants.slice(0, 3) as participant}
+				{#each localParticipants.slice(0, 3) as participant (participant.user_id || participant.username)}
 					<div class="ring-guild-surface rounded-full ring-2">
 						<ParticipantAvatar
 							avatar_url={participant.avatar_url}

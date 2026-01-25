@@ -57,9 +57,7 @@ describe('Dashboard', () => {
 			cy.visitWithToken();
 
 			cy.publishNatsEvent('leaderboard.updated.v1', {
-				entries: [
-					{ userId: '1', displayName: 'Test Player', tag: 1, points: 1000, movement: 0 }
-				]
+				entries: [{ userId: '1', displayName: 'Test Player', tag: 1, points: 1000, movement: 0 }]
 			});
 
 			cy.get('[data-testid="leaderboard-row"]').should('contain', 'Test Player');

@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import ThemeToggle from './ThemeToggle.svelte';
 	import HamburgerMenu from './HamburgerMenu.svelte';
-	import { modalOpen, setModalOpen } from '$lib/stores/overlay';
+	import { setModalOpen } from '$lib/stores/overlay';
 
 	let showHamburger = $state(false);
 
@@ -34,14 +34,23 @@
 				</h1>
 
 				<!-- Desktop Navigation Links -->
-				<nav class="hidden md:flex gap-4">
-					<a href="/" class="text-[var(--guild-text-secondary)] hover:text-[var(--guild-text)] transition-colors">
+				<nav class="hidden gap-4 md:flex">
+					<a
+						href="/"
+						class="text-[var(--guild-text-secondary)] transition-colors hover:text-[var(--guild-text)]"
+					>
 						Home
 					</a>
-					<a href="/rounds" class="text-[var(--guild-text-secondary)] hover:text-[var(--guild-text)] transition-colors">
+					<a
+						href="/rounds"
+						class="text-[var(--guild-text-secondary)] transition-colors hover:text-[var(--guild-text)]"
+					>
 						Rounds
 					</a>
-					<a href="/leaderboard" class="text-[var(--guild-text-secondary)] hover:text-[var(--guild-text)] transition-colors">
+					<a
+						href="/leaderboard"
+						class="text-[var(--guild-text-secondary)] transition-colors hover:text-[var(--guild-text)]"
+					>
 						Leaderboard
 					</a>
 				</nav>

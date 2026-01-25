@@ -41,6 +41,9 @@
 		class: incomingClass
 	}: Props = $props();
 
+	// title prop may be provided by callers; reference to avoid unused-var lint
+	void title;
+
 	const localDescription = $derived(description ?? round?.description);
 	const localLocation = $derived(location ?? round?.location);
 	const localStartTime = $derived(start_time ?? round?.start_time);

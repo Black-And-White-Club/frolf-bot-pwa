@@ -64,11 +64,7 @@ class DataLoader {
 			const response = await nats.request<
 				{ guild_id: string },
 				{ leaderboard: LeaderboardSnapshot }
-			>(
-				`leaderboard.snapshot.request.v1.${guildId}`,
-				{ guild_id: guildId },
-				{ timeout: 5000 }
-			);
+			>(`leaderboard.snapshot.request.v1.${guildId}`, { guild_id: guildId }, { timeout: 5000 });
 
 			if (response?.leaderboard) {
 				leaderboardService.setSnapshot(response.leaderboard);

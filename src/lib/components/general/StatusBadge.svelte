@@ -52,7 +52,7 @@
 >
 	<span class="icon" aria-hidden="true" style="color: {iconColor};">
 		<!-- disable the surrounding StatIcon background box so all icons match size -->
-		<IconComponent size={14} withBg={false} boxSize={'1rem'} />
+		<IconComponent size={14} withBg={false} boxSize="1rem" />
 	</span>
 
 	<span class="label">{displayText}</span>

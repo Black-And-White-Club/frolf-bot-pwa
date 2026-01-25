@@ -1,3 +1,4 @@
+<!-- eslint-disable svelte/no-useless-children-snippet -->
 <script lang="ts">
 	import type { Round } from '$lib/types/backend';
 	import AddToCalendarButton from '$lib/components/round/AddToCalendarButton.svelte';
@@ -89,9 +90,7 @@
 							></path>
 						</svg>
 					{/snippet}
-					{#snippet children()}
-						<span class="min-w-0">{localLocation()}</span>
-					{/snippet}
+					<span class="min-w-0">{localLocation()}</span>
 				</IconTextRow>
 			</p>
 		{/if}
@@ -116,9 +115,7 @@
 				/>
 			{/snippet}
 
-			{#snippet children()}
-				<span class="date-text">{formatLocalStart()}</span>
-			{/snippet}
+			<span class="date-text">{formatLocalStart()}</span>
 		</IconTextRow>
 	</p>
 {:else}
@@ -140,9 +137,7 @@
 					></path>
 				</svg>
 			{/snippet}
-			{#snippet children()}
-				<span class="min-w-0">{formatLocalStart()}</span>
-			{/snippet}
+			<span class="min-w-0">{formatLocalStart()}</span>
 		</IconTextRow>
 	</p>
 {/if}

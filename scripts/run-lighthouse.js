@@ -44,6 +44,7 @@ function waitForUrl(url, timeout = TIMEOUT, interval = 500) {
 	});
 }
 
+// eslint-disable-next-line complexity, sonarjs/cognitive-complexity
 async function main() {
 	const usingBun = !!process.env.BUN_VERSION;
 	const buildCmd = usingBun ? 'bun' : process.platform === 'win32' ? 'npm.cmd' : 'npm';

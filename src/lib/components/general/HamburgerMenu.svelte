@@ -162,13 +162,25 @@
 
 		<!-- Navigation Links -->
 		<nav class="mb-6 flex flex-col gap-2">
-			<a href="/" class="block px-4 py-2 rounded-md text-[var(--guild-text)] hover:bg-[var(--guild-surface-elevated)] transition-colors" onclick={closeHamburger}>
+			<a
+				href="/"
+				class="block rounded-md px-4 py-2 text-[var(--guild-text)] transition-colors hover:bg-[var(--guild-surface-elevated)]"
+				onclick={closeHamburger}
+			>
 				Home
 			</a>
-			<a href="/rounds" class="block px-4 py-2 rounded-md text-[var(--guild-text)] hover:bg-[var(--guild-surface-elevated)] transition-colors" onclick={closeHamburger}>
+			<a
+				href="/rounds"
+				class="block rounded-md px-4 py-2 text-[var(--guild-text)] transition-colors hover:bg-[var(--guild-surface-elevated)]"
+				onclick={closeHamburger}
+			>
 				Rounds
 			</a>
-			<a href="/leaderboard" class="block px-4 py-2 rounded-md text-[var(--guild-text)] hover:bg-[var(--guild-surface-elevated)] transition-colors" onclick={closeHamburger}>
+			<a
+				href="/leaderboard"
+				class="block rounded-md px-4 py-2 text-[var(--guild-text)] transition-colors hover:bg-[var(--guild-surface-elevated)]"
+				onclick={closeHamburger}
+			>
 				Leaderboard
 			</a>
 		</nav>

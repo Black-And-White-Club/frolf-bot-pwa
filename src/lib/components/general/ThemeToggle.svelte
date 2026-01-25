@@ -72,7 +72,7 @@
 		try {
 			const ct = get(currentTheme);
 			applyTheme(ct, next);
-		} catch (err) {
+		} catch {
 			/* ignore */
 		}
 	}

@@ -248,10 +248,12 @@ export const mockAPI = {
 	},
 
 	async getLeaderboard(_guildId: GuildID = 'mock_guild_123'): Promise<LeaderboardData> {
+		void _guildId;
 		return simulateAPICall(getMockLeaderboard());
 	},
 
 	async getRounds(_guildId: GuildID = 'mock_guild_123'): Promise<Round[]> {
+		void _guildId;
 		return simulateAPICall(mockRounds);
 	},
 

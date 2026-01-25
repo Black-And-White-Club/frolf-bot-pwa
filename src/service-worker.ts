@@ -15,7 +15,7 @@ sw.addEventListener('install', (event) => {
 			try {
 				// Workbox will replace `self.__WB_MANIFEST` at build time with the precache manifest.
 				// Keep the literal `self.__WB_MANIFEST` so injectManifest can find the placeholder.
-				 
+
 				const precacheList = (self as any).__WB_MANIFEST ?? [];
 				const urls = precacheList
 					.map((m: { url: string }) => m.url)

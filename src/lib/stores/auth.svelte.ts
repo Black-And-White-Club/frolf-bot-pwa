@@ -33,6 +33,8 @@ class AuthService {
 	extractTokenFromUrl(): string | null {
 		if (typeof window === 'undefined') return null;
 
+		// URLSearchParams mutability is okay here; keep simple extraction
+		// eslint-disable-next-line svelte/prefer-svelte-reactivity
 		const params = new URLSearchParams(window.location.search);
 		const token = params.get('t');
 
@@ -70,7 +72,7 @@ class AuthService {
 			}
 
 			return claims;
-		} catch (e) {
+		} catch {
 			return null;
 		}
 	}

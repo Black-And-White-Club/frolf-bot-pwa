@@ -36,7 +36,7 @@
 			<div class="empty">No guilds found.</div>
 		{:else}
 			<ul class="guild-list">
-				{#each guilds as g}
+				{#each guilds as g (g.id)}
 					<li class="guild-item">
 						<div class="guild-info">
 							<strong>{g.name}</strong>

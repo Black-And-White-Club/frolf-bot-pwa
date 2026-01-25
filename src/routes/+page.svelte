@@ -12,4 +12,3 @@
 </svelte:head>
 
 <Dashboard {mode} />
-

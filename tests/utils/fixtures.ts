@@ -1,5 +1,5 @@
 // Minimal fixtures used by tests. Keep these lightweight and only provide fields tests rely on.
-import type { Round, User, Session } from '$lib/types/backend';
+import type { Round, Session } from '$lib/types/backend';
 
 export function makeRound(overrides: Partial<Round> = {}): Round {
 	const now = new Date().toISOString();

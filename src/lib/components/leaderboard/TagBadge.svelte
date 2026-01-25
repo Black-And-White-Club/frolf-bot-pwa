@@ -8,11 +8,7 @@
 	}: { tag: LeaderboardEntry; rank: number; size?: 'sm' | 'md' | 'lg' } = $props();
 
 	let sizeClasses = $derived(
-		size === 'lg'
-			? 'w-20 h-20 text-2xl'
-			: size === 'md'
-				? 'w-14 h-14 text-lg'
-				: 'w-10 h-10 text-sm'
+		size === 'lg' ? 'w-20 h-20 text-2xl' : size === 'md' ? 'w-14 h-14 text-lg' : 'w-10 h-10 text-sm'
 	);
 
 	let rankColor = $derived(
@@ -28,9 +24,9 @@
 
 <div class="flex flex-col items-center gap-2">
 	<div
-		class={`${sizeClasses} ${rankColor} rounded-full flex items-center justify-center font-bold text-black`}
+		class={`${sizeClasses} ${rankColor} flex items-center justify-center rounded-full font-bold text-black`}
 	>
 		{tag.tagNumber}
 	</div>
-	<span class="text-sm font-medium text-center">{tag.displayName ?? `User ${tag.userId}`}</span>
+	<span class="text-center text-sm font-medium">{tag.displayName ?? `User ${tag.userId}`}</span>
 </div>

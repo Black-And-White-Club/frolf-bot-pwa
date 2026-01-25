@@ -12,9 +12,10 @@ class MockWebSocket {
 			if (this.onopen) this.onopen();
 		}, 0);
 	}
-	 
+
 	send(..._args: unknown[]) {
-		/* noop */
+		// reference args to avoid unused var lint warning in tests
+		void _args;
 	}
 	close() {
 		if (this.onclose) this.onclose();

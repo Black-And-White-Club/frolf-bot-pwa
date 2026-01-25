@@ -25,9 +25,7 @@ class AppInitializer {
 	isLoading = $derived(this.status === 'initializing');
 
 	async initialize(): Promise<void> {
-		if (!browser || this.status === 'initializing' || this.status === 'ready') {
-			return;
-		}
+		if (!browser || this.status === 'initializing' || this.status === 'ready') return;
 
 		this.status = 'initializing';
 		this.error = null;
@@ -36,47 +34,24 @@ class AppInitializer {
 			// Step 1: Initialize tracing
 			initTracing();
 
-			// Check for mock mode via URL param or env
-			const urlParams = new URLSearchParams(window.location.search);
-			const useMock =
-				urlParams.get('mock') === 'true' || import.meta.env.VITE_USE_MOCK === 'true';
-
-			if (useMock) {
-				console.log('[AppInit] Starting in mock mode');
-				mockDataProvider.start();
-				this.mode = 'mock';
-				this.status = 'ready';
+			// Handle mock mode early
+			if (this.isMockMode()) {
+				this.startMockMode();
 				return;
 			}
 
-			// Step 2: Initialize auth (extracts token, validates)
-			auth.initialize();
-
-			// Step 2.5: Load guild info if authenticated
-			if (auth.isAuthenticated) {
-				await guildService.loadGuildInfo();
-			}
-
-			// Step 3: Check if authenticated
-			if (!auth.isAuthenticated || !auth.token) {
-				// Not authenticated - that's OK, just mark ready
-				// UI will show login prompt
+			// Perform authentication and optional guild load
+			const authenticated = await this.authenticateAndLoadGuild();
+			if (!authenticated) {
+				// Not authenticated: mark ready but disconnected
 				console.log('[AppInit] No token found, staying disconnected');
 				this.mode = 'disconnected';
 				this.status = 'ready';
 				return;
 			}
 
-			// Step 4: Connect to NATS
-			await nats.connect(auth.token);
-
-			// Step 5: Start subscriptions for user's guild
-			if (auth.user?.guildId) {
-				subscriptionManager.start(auth.user.guildId);
-
-				// Step 6: Load initial data snapshots
-				await dataLoader.loadInitialData();
-			}
+			// Connect to NATS and load initial data/subscriptions
+			await this.connectAndLoad();
 
 			this.mode = 'live';
 			this.status = 'ready';
@@ -85,6 +60,49 @@ class AppInitializer {
 			this.mode = 'disconnected';
 			this.error = err instanceof Error ? err.message : 'Initialization failed';
 			console.error('[AppInit] Failed:', err);
+		}
+	}
+
+	private isMockMode(): boolean {
+		try {
+			const urlParams = new URLSearchParams(window.location.search);
+			return urlParams.get('mock') === 'true' || import.meta.env.VITE_USE_MOCK === 'true';
+		} catch {
+			return false;
+		}
+	}
+
+	private startMockMode(): void {
+		console.log('[AppInit] Starting in mock mode');
+		mockDataProvider.start();
+		this.mode = 'mock';
+		this.status = 'ready';
+	}
+
+	private async authenticateAndLoadGuild(): Promise<boolean> {
+		// Initialize auth (extracts token, validates)
+		auth.initialize();
+
+		if (auth.isAuthenticated) {
+			try {
+				await guildService.loadGuildInfo();
+			} catch (e) {
+				// non-fatal: continue even if guild load fails
+				console.warn('[AppInit] Failed to load guild info:', e);
+			}
+		}
+
+		return Boolean(auth.isAuthenticated && auth.token);
+	}
+
+	private async connectAndLoad(): Promise<void> {
+		// Connect to NATS
+		await nats.connect(auth.token as string);
+
+		// Start subscriptions and load initial data if we have a guild
+		if (auth.user?.guildId) {
+			subscriptionManager.start(auth.user.guildId);
+			await dataLoader.loadInitialData();
 		}
 	}
 

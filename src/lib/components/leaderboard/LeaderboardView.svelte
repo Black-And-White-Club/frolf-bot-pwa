@@ -3,7 +3,9 @@
 	import LeaderboardRow from './LeaderboardRow.svelte';
 	import TagBadge from './TagBadge.svelte';
 
-	let { guildId }: { guildId: string } = $props();
+	let { guildId }: { guildId?: string } = $props();
+	// keep prop available for callers; reference to satisfy linter when unused
+	void guildId;
 
 	let sortedEntries = $derived(leaderboardService.sortedEntries);
 	let topThree = $derived(leaderboardService.sortedEntries.slice(0, 3));
@@ -30,18 +32,18 @@
 	<!-- Top 3 Highlight -->
 	{#if topThree.length > 0}
 		<div
-			class="bg-forest-800/30 border border-sage-600/20 rounded-lg p-6 flex justify-center gap-8"
+			class="bg-forest-800/30 border-sage-600/20 flex justify-center gap-8 rounded-lg border p-6"
 		>
-			{#each topThree as entry, index}
+			{#each topThree as entry, index (index)}
 				<TagBadge tag={entry} rank={index + 1} size="lg" />
 			{/each}
 		</div>
 	{/if}
 
 	<!-- Full Rankings Table -->
-	<div class="bg-forest-800/30 border border-sage-600/20 rounded-lg p-4">
+	<div class="bg-forest-800/30 border-sage-600/20 rounded-lg border p-4">
 		<div class="space-y-2">
-			{#each sortedEntries as entry, index}
+			{#each sortedEntries as entry, index (index)}
 				<LeaderboardRow {entry} rank={index + 1} />
 			{/each}
 		</div>

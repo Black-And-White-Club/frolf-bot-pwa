@@ -75,7 +75,9 @@
 		// restore focus if possible
 		try {
 			if (prevActive && (prevActive as HTMLElement).focus) (prevActive as HTMLElement).focus();
-		} catch {}
+		} catch {
+			/* ignore */
+		}
 	}
 </script>
 

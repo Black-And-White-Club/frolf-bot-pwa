@@ -50,7 +50,7 @@
 					window.addEventListener('sw:waiting', swListener as EventListener);
 			} catch (err) {
 				// best-effort: don't block rendering if imports fail
-				// eslint-disable-next-line no-console
+
 				console.warn('deferred SW registration failed', err);
 			}
 		};
@@ -73,7 +73,7 @@
 			UpdateSnackbarClient = upd.default;
 		} catch (err) {
 			// best-effort, keep app usable without these features
-			// eslint-disable-next-line no-console
+
 			console.warn('deferred client components failed to load', err);
 		}
 	});
@@ -117,27 +117,28 @@
 		<UpdateSnackbarClient />
 	{/if}
 	{#if appInit.isLoading}
-		<div class="flex items-center justify-center min-h-screen bg-[#081212]">
+		<div class="flex min-h-screen items-center justify-center bg-[#081212]">
 			<div class="text-center">
-				<div class="animate-spin w-8 h-8 border-2 border-[#007474] border-t-transparent rounded-full mx-auto mb-4"></div>
+				<div
+					class="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-[#007474] border-t-transparent"
+				></div>
 				<p class="text-white/60">Connecting...</p>
 			</div>
 		</div>
 	{:else if appInit.error}
-		<div class="flex items-center justify-center min-h-screen bg-[#081212]">
-			<div class="text-center max-w-md p-6">
-				<div class="text-red-400 text-xl mb-2">Connection Error</div>
-				<p class="text-white/60 mb-4">{appInit.error}</p>
+		<div class="flex min-h-screen items-center justify-center bg-[#081212]">
+			<div class="max-w-md p-6 text-center">
+				<div class="mb-2 text-xl text-red-400">Connection Error</div>
+				<p class="mb-4 text-white/60">{appInit.error}</p>
 				<button
-					class="px-4 py-2 bg-[#007474] text-white rounded hover:bg-[#008B8B] transition"
+					class="rounded bg-[#007474] px-4 py-2 text-white transition hover:bg-[#008B8B]"
 					onclick={() => appInit.initialize()}
 				>
 					Retry
 				</button>
 			</div>
 		</div>
-	{:else}
-		{#if page.data.session}
+	{:else if page.data.session}
 		<!-- User is signed in -->
 		<div class="app-container">
 			<Navbar />
@@ -146,30 +147,29 @@
 			</main>
 		</div>
 	{:else}
-			<!-- User is not signed in -->
-			<div class="flex min-h-screen items-center justify-center bg-[var(--guild-background)]">
-				<div class="w-full max-w-md space-y-8">
-					<div class="flex justify-end">
-						<ThemeToggle testid="theme-toggle-guest" />
-					</div>
-					<div>
-						<h1 class="text-guild-primary text-center text-3xl font-extrabold">Frolf Bot PWA</h1>
-						<p class="text-guild-text-secondary mt-2 text-center text-sm">
-							Sign in with Discord to access your disc golf games.
-						</p>
-					</div>
-					<div>
-						<a
-							href="/auth/signin"
-							data-testid="btn-signin"
-							class="group text-guild-surface relative flex w-full justify-center rounded-md border border-transparent bg-[var(--guild-primary)] px-4 py-2 text-sm font-medium hover:bg-[var(--guild-primary)]/90 focus:ring-2 focus:ring-[var(--guild-primary)] focus:ring-offset-2 focus:outline-none"
-						>
-							Sign In
-						</a>
-					</div>
+		<!-- User is not signed in -->
+		<div class="flex min-h-screen items-center justify-center bg-[var(--guild-background)]">
+			<div class="w-full max-w-md space-y-8">
+				<div class="flex justify-end">
+					<ThemeToggle testid="theme-toggle-guest" />
+				</div>
+				<div>
+					<h1 class="text-guild-primary text-center text-3xl font-extrabold">Frolf Bot PWA</h1>
+					<p class="text-guild-text-secondary mt-2 text-center text-sm">
+						Sign in with Discord to access your disc golf games.
+					</p>
+				</div>
+				<div>
+					<a
+						href="/auth/signin"
+						data-testid="btn-signin"
+						class="group text-guild-surface relative flex w-full justify-center rounded-md border border-transparent bg-[var(--guild-primary)] px-4 py-2 text-sm font-medium hover:bg-[var(--guild-primary)]/90 focus:ring-2 focus:ring-[var(--guild-primary)] focus:ring-offset-2 focus:outline-none"
+					>
+						Sign In
+					</a>
 				</div>
 			</div>
-		{/if}
+		</div>
 	{/if}
 	<InstallPrompt />
 </ThemeProvider>

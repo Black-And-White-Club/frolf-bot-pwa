@@ -5,5 +5,7 @@ export function resetModuleAndDom() {
 	// naive reset for svelte store tests: clear document body and reload modules if necessary.
 	try {
 		if (typeof document !== 'undefined') document.body.innerHTML = '';
-	} catch {}
+	} catch {
+		// ignore errors during DOM cleanup in test environment
+	}
 }

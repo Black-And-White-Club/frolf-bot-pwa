@@ -42,7 +42,7 @@
 			<h2 class="section-title">{title}</h2>
 			{#if badges.length > 0}
 				<div class="badges">
-					{#each badges as badge}
+					{#each badges as badge (badge.label)}
 						<span
 							class="badge"
 							style="background-color: {bgColorMap[badge.color]}; border: 1px solid {colorMap[
@@ -68,14 +68,14 @@
 
 	{#if !collapsed}
 		<div class="rounds-list" id="rounds-list-{title}">
-			{#each rounds as round}
+			{#each rounds as round, i (round.round_id ?? i)}
 				<RoundCard
 					{round}
 					showStatus={true}
 					compact={false}
 					{showDescription}
 					showLocation={true}
-					dataTestId={`round-card-${round.round_id}`}
+					dataTestId={`round-card-${round.round_id ?? i}`}
 				/>
 			{/each}
 		</div>

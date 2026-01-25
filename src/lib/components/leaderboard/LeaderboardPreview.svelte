@@ -28,12 +28,12 @@
 <div class="leaderboard-preview">
 	{#if state.snapshot}
 		<div class="tags">
-			{#each state.snapshot.topTags as t}
+			{#each state.snapshot.topTags as t (t.tag)}
 				<span class="tag">{t.tag} ({t.count})</span>
 			{/each}
 		</div>
 		<ul class="players">
-			{#each state.snapshot.topPlayers as p}
+			{#each state.snapshot.topPlayers as p (p.name)}
 				<li class="player">{p.name} — {p.score}</li>
 			{/each}
 		</ul>

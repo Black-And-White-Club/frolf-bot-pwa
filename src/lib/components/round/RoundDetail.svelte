@@ -62,9 +62,7 @@
 		return { current, total: totalHoles };
 	});
 
-	let showScoreGrid = $derived(
-		round?.state === 'started' || round?.state === 'finalized'
-	);
+	let showScoreGrid = $derived(round?.state === 'started' || round?.state === 'finalized');
 
 	let roundPar = $derived(() => {
 		if (!round?.parValues) return (round?.holes ?? 18) * 3;

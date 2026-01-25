@@ -47,8 +47,7 @@ describe('Round Flow', () => {
 			round_id: 'round-1'
 		});
 
-		cy.get('[data-testid="round-card"]')
-			.should('have.attr', 'data-state', 'started');
+		cy.get('[data-testid="round-card"]').should('have.attr', 'data-state', 'started');
 	});
 
 	it('adds participant when joined event received', () => {
@@ -77,8 +76,7 @@ describe('Round Flow', () => {
 			}
 		});
 
-		cy.get('[data-testid="participant-count"]')
-			.should('contain', '1');
+		cy.get('[data-testid="participant-count"]').should('contain', '1');
 	});
 
 	it('updates score when score event received', () => {
@@ -93,12 +91,14 @@ describe('Round Flow', () => {
 			state: 'started',
 			created_by: 'user-1',
 			event_message_id: 'msg-1',
-			participants: [{
-				user_id: 'user-2',
-				response: 'accepted',
-				score: null,
-				tag_number: 5
-			}]
+			participants: [
+				{
+					user_id: 'user-2',
+					response: 'accepted',
+					score: null,
+					tag_number: 5
+				}
+			]
 		});
 
 		// Score update
@@ -108,8 +108,7 @@ describe('Round Flow', () => {
 			score: -3
 		});
 
-		cy.get('[data-testid="participant-score"]')
-			.should('contain', '-3');
+		cy.get('[data-testid="participant-score"]').should('contain', '-3');
 	});
 
 	it('removes round when deleted event received', () => {

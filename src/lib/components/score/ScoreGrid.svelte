@@ -59,7 +59,7 @@
 			<thead>
 				<tr>
 					<th class="player-column sticky-column">Player</th>
-					{#each holes as hole}
+					{#each holes as hole (hole)}
 						<th class="hole-column" class:current-hole={hole === currentHole}>
 							{hole}
 						</th>
@@ -82,7 +82,7 @@
 								</span>
 							</div>
 						</td>
-						{#each holes as hole, idx}
+						{#each holes as hole, idx (hole)}
 							<td
 								class="score-cell {getScoreColor(participant.scores?.[idx], parValues[idx])}"
 								class:current-hole={hole === currentHole}
@@ -103,7 +103,7 @@
 					<td class="player-cell sticky-column">
 						<span class="par-label">Par</span>
 					</td>
-					{#each parValues as par, idx}
+					{#each parValues as par, idx (idx)}
 						<td class="score-cell" class:current-hole={holes[idx] === currentHole}>
 							{par}
 						</td>
@@ -262,16 +262,6 @@
 		color: var(--guild-text-muted, #9ca3af);
 		font-size: 0.875rem;
 		font-weight: 600;
-	}
-
-	.position-first .position-text,
-	.position-second .position-text,
-	.position-third .position-text {
-		font-size: 1.25rem;
-	}
-
-	.position-default .position-text {
-		font-family: 'Space Grotesk', monospace;
 	}
 
 	@media (max-width: 640px) {

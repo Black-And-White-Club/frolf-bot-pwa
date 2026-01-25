@@ -50,6 +50,7 @@
 	);
 
 	let displayName = $derived(participant.username || participant.userId);
+	// keep response available on participant object; no local alias required
 </script>
 
 <div class="participant-row">
@@ -58,11 +59,7 @@
 	</div>
 
 	<div class="participant-info">
-		<ParticipantAvatar
-			avatar_url={participant.avatar_url}
-			username={displayName}
-			size={40}
-		/>
+		<ParticipantAvatar avatar_url={participant.avatar_url} username={displayName} size={40} />
 		<div class="participant-details">
 			<span class="participant-name">{displayName}</span>
 			{#if participant.tagNumber}

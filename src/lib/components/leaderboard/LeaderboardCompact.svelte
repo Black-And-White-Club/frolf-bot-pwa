@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { LeaderboardEntry } from '$lib/stores/leaderboard.svelte';
-	import TagBadge from './TagBadge.svelte';
+	// TagBadge intentionally unused in this compact list; remove the import to avoid lint noise.
 
 	let { entries, limit = 10 }: { entries: LeaderboardEntry[]; limit?: number } = $props();
 

@@ -13,7 +13,7 @@
 		<h3>How to access:</h3>
 		<ol>
 			<li>Open Discord</li>
-			<li>Go to your league's server</li>
+			<li>Go to your club's server</li>
 			<li>Type <code>/dashboard</code></li>
 			<li>Click the link sent to you</li>
 		</ol>

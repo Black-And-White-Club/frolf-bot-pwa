@@ -16,16 +16,14 @@
 	let movement = $derived(leaderboardService.getMovementIndicator(entry));
 </script>
 
-<div
-	class="flex items-center gap-4 p-3 hover:bg-forest-800/50 rounded-lg transition-colors"
->
+<div class="hover:bg-forest-800/50 flex items-center gap-4 rounded-lg p-3 transition-colors">
 	<!-- Tag Number Badge -->
-	<div class={`w-10 h-10 rounded-full flex items-center justify-center ${tagStyle}`}>
+	<div class={`flex h-10 w-10 items-center justify-center rounded-full ${tagStyle}`}>
 		{entry.tagNumber}
 	</div>
 
 	<!-- Player Info -->
-	<div class="flex-1 flex items-center gap-3">
+	<div class="flex flex-1 items-center gap-3">
 		<span class="font-medium">{entry.displayName ?? `User ${entry.userId}`}</span>
 	</div>
 

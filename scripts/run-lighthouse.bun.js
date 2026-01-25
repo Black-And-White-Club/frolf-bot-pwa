@@ -27,6 +27,7 @@ async function waitForUrl(url, timeout = TIMEOUT, interval = 500) {
 	throw new Error('Timeout waiting for ' + url);
 }
 
+// eslint-disable-next-line complexity, sonarjs/cognitive-complexity
 async function run(cmd, args, opts = {}) {
 	console.log(`> ${cmd} ${args.join(' ')}`);
 	const p = Bun.spawn({
@@ -69,6 +70,7 @@ async function run(cmd, args, opts = {}) {
 	}
 }
 
+// eslint-disable-next-line complexity
 async function main() {
 	console.log('1) Building (this may take a moment)...');
 	try {

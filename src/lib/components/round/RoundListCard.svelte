@@ -44,20 +44,13 @@
 		}).format(new Date(round.startTime))
 	);
 
-	let confirmedParticipants = $derived(
-		round.participants.filter((p) => p.response === 'accepted')
-	);
+	let confirmedParticipants = $derived(round.participants.filter((p) => p.response === 'accepted'));
 
 	let visibleParticipants = $derived(confirmedParticipants.slice(0, 5));
 	let overflowCount = $derived(Math.max(0, confirmedParticipants.length - 5));
 </script>
 
-<button
-	class="round-card"
-	onclick={onclick}
-	type="button"
-	aria-label="View round: {round.title}"
->
+<button class="round-card" {onclick} type="button" aria-label="View round: {round.title}">
 	<div class="card-header">
 		<div class="status-indicator">
 			<div class="status-dot {statusColor}"></div>
