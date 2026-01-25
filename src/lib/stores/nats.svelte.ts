@@ -5,6 +5,7 @@
 
 import { connect, type NatsConnection, type Subscription, StringCodec } from 'nats.ws';
 import { getTracer, injectTraceContext, createChildSpan } from '$lib/otel/tracing';
+import { config, log } from '$lib/config';
 
 // ============ Types ============
 
@@ -37,8 +38,6 @@ class NatsService {
 	// Private
 	private subscriptions: Map<string, Subscription> = new Map();
 	private codec = StringCodec();
-	private maxReconnectAttempts = 10;
-	private reconnectDelayMs = 1000;
 
 	/**
 	 * Connect to NATS server with JWT token
@@ -58,16 +57,17 @@ class NatsService {
 
 		try {
 			this.connection = await connect({
-				servers: import.meta.env.VITE_NATS_URL || 'wss://nats.frolf-bot.com:443',
+				servers: config.nats.url,
 				pass: token,
 				name: 'frolf-pwa',
 				reconnect: true,
-				maxReconnectAttempts: this.maxReconnectAttempts,
-				reconnectTimeWait: this.reconnectDelayMs
+				maxReconnectAttempts: config.nats.reconnectAttempts,
+				reconnectTimeWait: config.nats.reconnectDelayMs
 			});
 
 			this.status = 'connected';
 			this.reconnectAttempts = 0;
+			log('Connected to NATS:', config.nats.url);
 			span.end();
 
 			// Monitor connection status

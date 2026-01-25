@@ -1,11 +1,11 @@
-interface LeaderboardEntry {
+export interface LeaderboardEntry {
 	userId: string;
 	tagNumber: number;
 	displayName?: string;
 	previousTagNumber?: number; // for movement indicator
 }
 
-interface LeaderboardSnapshot {
+export interface LeaderboardSnapshot {
 	id: string;
 	guildId: string;
 	version: number;

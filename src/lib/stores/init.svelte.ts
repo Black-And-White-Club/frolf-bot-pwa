@@ -1,24 +1,29 @@
 /**
  * App Initializer
  * Orchestrates startup sequence: OTel -> Auth -> NATS -> Subscriptions
+ * Supports mock mode for development without live NATS connection
  */
 
+import { browser } from '$app/environment';
 import { auth } from './auth.svelte';
 import { nats } from './nats.svelte';
 import { subscriptionManager } from './subscriptions.svelte';
 import { initTracing } from '$lib/otel/tracing';
+import { mockDataProvider } from '$lib/mocks/mockDataProvider.svelte';
 
 type InitStatus = 'idle' | 'initializing' | 'ready' | 'error';
+type InitMode = 'live' | 'mock' | 'disconnected';
 
 class AppInitializer {
 	status = $state<InitStatus>('idle');
+	mode = $state<InitMode>('disconnected');
 	error = $state<string | null>(null);
 
 	isReady = $derived(this.status === 'ready');
 	isLoading = $derived(this.status === 'initializing');
 
 	async initialize(): Promise<void> {
-		if (this.status === 'initializing' || this.status === 'ready') {
+		if (!browser || this.status === 'initializing' || this.status === 'ready') {
 			return;
 		}
 
@@ -29,6 +34,19 @@ class AppInitializer {
 			// Step 1: Initialize tracing
 			initTracing();
 
+			// Check for mock mode via URL param or env
+			const urlParams = new URLSearchParams(window.location.search);
+			const useMock =
+				urlParams.get('mock') === 'true' || import.meta.env.VITE_USE_MOCK === 'true';
+
+			if (useMock) {
+				console.log('[AppInit] Starting in mock mode');
+				mockDataProvider.start();
+				this.mode = 'mock';
+				this.status = 'ready';
+				return;
+			}
+
 			// Step 2: Initialize auth (extracts token, validates)
 			auth.initialize();
 
@@ -36,6 +54,8 @@ class AppInitializer {
 			if (!auth.isAuthenticated || !auth.token) {
 				// Not authenticated - that's OK, just mark ready
 				// UI will show login prompt
+				console.log('[AppInit] No token found, staying disconnected');
+				this.mode = 'disconnected';
 				this.status = 'ready';
 				return;
 			}
@@ -48,25 +68,32 @@ class AppInitializer {
 				subscriptionManager.start(auth.user.guildId);
 			}
 
+			this.mode = 'live';
 			this.status = 'ready';
 		} catch (err) {
 			this.status = 'error';
+			this.mode = 'disconnected';
 			this.error = err instanceof Error ? err.message : 'Initialization failed';
 			console.error('[AppInit] Failed:', err);
 		}
 	}
 
 	async teardown(): Promise<void> {
-		// Stop subscriptions
-		subscriptionManager.stop();
+		if (this.mode === 'mock') {
+			mockDataProvider.stop();
+		} else if (this.mode === 'live') {
+			// Stop subscriptions
+			subscriptionManager.stop();
 
-		// Disconnect NATS
-		nats.destroy();
+			// Disconnect NATS
+			nats.destroy();
 
-		// Clear auth
-		auth.signOut();
+			// Clear auth
+			auth.signOut();
+		}
 
 		this.status = 'idle';
+		this.mode = 'disconnected';
 		this.error = null;
 	}
 }

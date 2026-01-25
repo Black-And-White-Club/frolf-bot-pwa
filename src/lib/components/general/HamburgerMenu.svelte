@@ -160,6 +160,19 @@
 			</h2>
 		</div>
 
+		<!-- Navigation Links -->
+		<nav class="mb-6 flex flex-col gap-2">
+			<a href="/" class="block px-4 py-2 rounded-md text-[var(--guild-text)] hover:bg-[var(--guild-surface-elevated)] transition-colors" onclick={closeHamburger}>
+				Home
+			</a>
+			<a href="/rounds" class="block px-4 py-2 rounded-md text-[var(--guild-text)] hover:bg-[var(--guild-surface-elevated)] transition-colors" onclick={closeHamburger}>
+				Rounds
+			</a>
+			<a href="/leaderboard" class="block px-4 py-2 rounded-md text-[var(--guild-text)] hover:bg-[var(--guild-surface-elevated)] transition-colors" onclick={closeHamburger}>
+				Leaderboard
+			</a>
+		</nav>
+
 		<!-- Theme toggle -->
 		<div class="mb-6">
 			<label class="mb-2 block text-sm font-medium text-[var(--guild-text-secondary)]">

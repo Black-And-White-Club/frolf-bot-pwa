@@ -1,0 +1,36 @@
+<script lang="ts">
+	import type { LeaderboardEntry } from '$lib/stores/leaderboard.svelte';
+
+	let {
+		tag,
+		rank,
+		size = 'md'
+	}: { tag: LeaderboardEntry; rank: number; size?: 'sm' | 'md' | 'lg' } = $props();
+
+	let sizeClasses = $derived(
+		size === 'lg'
+			? 'w-20 h-20 text-2xl'
+			: size === 'md'
+				? 'w-14 h-14 text-lg'
+				: 'w-10 h-10 text-sm'
+	);
+
+	let rankColor = $derived(
+		rank === 1
+			? 'bg-gradient-to-br from-amber-400 to-amber-600 shadow-lg shadow-amber-500/30'
+			: rank === 2
+				? 'bg-gradient-to-br from-slate-300 to-slate-500 shadow-lg shadow-slate-400/30'
+				: rank === 3
+					? 'bg-gradient-to-br from-amber-600 to-amber-800 shadow-lg shadow-amber-700/30'
+					: 'bg-slate-700'
+	);
+</script>
+
+<div class="flex flex-col items-center gap-2">
+	<div
+		class={`${sizeClasses} ${rankColor} rounded-full flex items-center justify-center font-bold text-black`}
+	>
+		{tag.tagNumber}
+	</div>
+	<span class="text-sm font-medium text-center">{tag.displayName ?? `User ${tag.userId}`}</span>
+</div>

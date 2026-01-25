@@ -28,10 +28,23 @@
 <nav class="site-header">
 	<div class="site-header__inner mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 		<div class="flex w-full items-center justify-between">
-			<div class="flex items-center">
+			<div class="flex items-center gap-8">
 				<h1 class="text-guild-primary card-title card-title--skobeloff text-xl font-bold">
 					Frolf Bot
 				</h1>
+
+				<!-- Desktop Navigation Links -->
+				<nav class="hidden md:flex gap-4">
+					<a href="/" class="text-[var(--guild-text-secondary)] hover:text-[var(--guild-text)] transition-colors">
+						Home
+					</a>
+					<a href="/rounds" class="text-[var(--guild-text-secondary)] hover:text-[var(--guild-text)] transition-colors">
+						Rounds
+					</a>
+					<a href="/leaderboard" class="text-[var(--guild-text-secondary)] hover:text-[var(--guild-text)] transition-colors">
+						Leaderboard
+					</a>
+				</nav>
 			</div>
 
 			{#if page.data.session}
