@@ -129,6 +129,15 @@ class RoundService {
 	handleScoreUpdated(payload: { roundId: string; userId: string; score: number }): void {
 		this.updateParticipant(payload.roundId, payload.userId, { score: payload.score });
 	}
+
+	// Data loading methods
+	setLoading(loading: boolean): void {
+		this.isLoading = loading;
+	}
+
+	setRounds(rounds: Round[]): void {
+		this.rounds = rounds;
+	}
 }
 
 export const roundService = new RoundService();

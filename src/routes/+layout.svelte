@@ -4,6 +4,8 @@
 	import Navbar from '$lib/components/general/Navbar.svelte';
 	import ThemeProvider from '$lib/components/general/ThemeProvider.svelte';
 	import ThemeToggle from '$lib/components/general/ThemeToggle.svelte';
+	import InstallPrompt from '$lib/components/pwa/InstallPrompt.svelte';
+	import OfflineIndicator from '$lib/components/pwa/OfflineIndicator.svelte';
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
 	import { appInit } from '$lib/stores/init.svelte';
@@ -107,6 +109,7 @@
 >
 
 <ThemeProvider>
+	<OfflineIndicator />
 	{#if LiveAnnouncer}
 		<LiveAnnouncer />
 	{/if}
@@ -168,4 +171,5 @@
 			</div>
 		{/if}
 	{/if}
+	<InstallPrompt />
 </ThemeProvider>

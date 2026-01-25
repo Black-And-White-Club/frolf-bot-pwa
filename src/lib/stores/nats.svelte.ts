@@ -229,6 +229,41 @@ class NatsService {
 	}
 
 	/**
+	 * Send a request and wait for reply (request/reply pattern)
+	 */
+	async request<TReq, TRes>(
+		subject: string,
+		data: TReq,
+		options: { timeout?: number } = {}
+	): Promise<TRes | null> {
+		if (!this.connection) {
+			throw new Error('Not connected to NATS');
+		}
+
+		const timeout = options.timeout ?? 5000;
+		const payload = this.codec.encode(JSON.stringify(data));
+
+		const tracer = getTracer();
+		const span = tracer.startSpan(`nats.request.${subject}`, {
+			attributes: {
+				'messaging.system': 'nats',
+				'messaging.destination': subject
+			}
+		});
+
+		try {
+			const msg = await this.connection.request(subject, payload, { timeout });
+			const response = JSON.parse(this.codec.decode(msg.data)) as TRes;
+			span.end();
+			return response;
+		} catch (e) {
+			span.recordException(e as Error);
+			span.end();
+			throw e;
+		}
+	}
+
+	/**
 	 * Cleanup all resources
 	 */
 	destroy(): void {

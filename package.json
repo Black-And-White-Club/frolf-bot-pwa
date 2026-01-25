@@ -60,6 +60,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
+		"dev:token": "./scripts/dev-with-token.sh",
 		"build": "vite build",
 		"build:analyze": "ANALYZE=1 vite build --mode production && echo \"Visualizer generated at dist/stats.html\"",
 		"analyze:parse": "bun run node ./scripts/parse-stats.js || node ./scripts/parse-stats.js",
@@ -85,6 +86,7 @@
 		"coverage:server": "vitest --project server --run --coverage",
 		"test:browser": "vitest \"src/routes/**/*.spec.{ts,js}\"",
 		"test": "npm run test:unit -- --run",
+		"test:e2e:integration": "CYPRESS_USE_MOCK=false cypress run",
 		"storybook": "storybook dev -p 6006",
 		"build-storybook": "storybook build"
 	},

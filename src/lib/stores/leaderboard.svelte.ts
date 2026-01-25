@@ -104,6 +104,11 @@ class LeaderboardService {
 		if (entry.tagNumber > entry.previousTagNumber) return 'down';
 		return 'same';
 	}
+
+	// Data loading methods
+	setLoading(loading: boolean): void {
+		this.isLoading = loading;
+	}
 }
 
 export const leaderboardService = new LeaderboardService();

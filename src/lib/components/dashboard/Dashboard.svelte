@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { roundService } from '$lib/stores/round.svelte';
 	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
+	import { auth } from '$lib/stores/auth.svelte';
+	import { appInit } from '$lib/stores/init.svelte';
 	import RoundListCompact from '$lib/components/round/RoundListCompact.svelte';
 	import LeaderboardCompact from '$lib/components/leaderboard/LeaderboardCompact.svelte';
 	import LiveIndicator from '$lib/components/general/LiveIndicator.svelte';
 	import ConnectionStatus from '$lib/components/general/ConnectionStatus.svelte';
 	import LoadingSkeleton from '$lib/components/general/LoadingSkeleton.svelte';
 	import EmptyState from '$lib/components/general/EmptyState.svelte';
+	import UnauthenticatedView from '$lib/components/general/UnauthenticatedView.svelte';
 
 	let { mode = 'default' }: { mode?: 'default' | 'tv' | 'compact' } = $props();
 
@@ -15,44 +18,48 @@
 	);
 </script>
 
-<div class="dashboard" class:tv-mode={mode === 'tv'} class:compact-mode={mode === 'compact'}>
-	<header class="dashboard-header">
-		<div class="flex items-center gap-2">
-			<h1 class="text-xl font-bold text-slate-100">Frolf Bot</h1>
-			<LiveIndicator active={activeRounds.length > 0} />
+{#if !auth.isAuthenticated && appInit.mode !== 'mock'}
+	<UnauthenticatedView />
+{:else}
+	<div class="dashboard" class:tv-mode={mode === 'tv'} class:compact-mode={mode === 'compact'}>
+		<header class="dashboard-header">
+			<div class="flex items-center gap-2">
+				<h1 class="text-xl font-bold text-slate-100">Frolf Bot</h1>
+				<LiveIndicator active={activeRounds.length > 0} />
+			</div>
+			<ConnectionStatus />
+		</header>
+
+		<div class="dashboard-grid">
+			<!-- Rounds Panel -->
+			<section class="panel rounds-panel">
+				<h2 class="panel-title">Rounds</h2>
+				{#if roundService.isLoading}
+					<LoadingSkeleton variant="card" count={3} />
+				{:else if roundService.rounds.length === 0}
+					<EmptyState icon="🥏" title="No rounds" message="Waiting for round events" />
+				{:else}
+					<RoundListCompact rounds={roundService.rounds} />
+				{/if}
+			</section>
+
+			<!-- Leaderboard Panel -->
+			<section class="panel leaderboard-panel">
+				<h2 class="panel-title">Leaderboard</h2>
+				{#if leaderboardService.isLoading}
+					<LoadingSkeleton variant="row" count={10} />
+				{:else if leaderboardService.entries.length === 0}
+					<EmptyState icon="🏆" title="No rankings" message="Waiting for leaderboard data" />
+				{:else}
+					<LeaderboardCompact
+						entries={leaderboardService.entries}
+						limit={mode === 'tv' ? 20 : 10}
+					/>
+				{/if}
+			</section>
 		</div>
-		<ConnectionStatus />
-	</header>
-
-	<div class="dashboard-grid">
-		<!-- Rounds Panel -->
-		<section class="panel rounds-panel">
-			<h2 class="panel-title">Rounds</h2>
-			{#if roundService.isLoading}
-				<LoadingSkeleton variant="card" count={3} />
-			{:else if roundService.rounds.length === 0}
-				<EmptyState icon="🥏" title="No rounds" message="Waiting for round events" />
-			{:else}
-				<RoundListCompact rounds={roundService.rounds} />
-			{/if}
-		</section>
-
-		<!-- Leaderboard Panel -->
-		<section class="panel leaderboard-panel">
-			<h2 class="panel-title">Leaderboard</h2>
-			{#if leaderboardService.isLoading}
-				<LoadingSkeleton variant="row" count={10} />
-			{:else if leaderboardService.entries.length === 0}
-				<EmptyState icon="🏆" title="No rankings" message="Waiting for leaderboard data" />
-			{:else}
-				<LeaderboardCompact
-					entries={leaderboardService.entries}
-					limit={mode === 'tv' ? 20 : 10}
-				/>
-			{/if}
-		</section>
 	</div>
-</div>
+{/if}
 
 <style>
 	.dashboard {

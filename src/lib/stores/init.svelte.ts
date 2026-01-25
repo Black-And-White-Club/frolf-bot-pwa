@@ -8,8 +8,10 @@ import { browser } from '$app/environment';
 import { auth } from './auth.svelte';
 import { nats } from './nats.svelte';
 import { subscriptionManager } from './subscriptions.svelte';
+import { dataLoader } from './dataLoader.svelte';
 import { initTracing } from '$lib/otel/tracing';
 import { mockDataProvider } from '$lib/mocks/mockDataProvider.svelte';
+import { guildService } from './guild.svelte';
 
 type InitStatus = 'idle' | 'initializing' | 'ready' | 'error';
 type InitMode = 'live' | 'mock' | 'disconnected';
@@ -50,6 +52,11 @@ class AppInitializer {
 			// Step 2: Initialize auth (extracts token, validates)
 			auth.initialize();
 
+			// Step 2.5: Load guild info if authenticated
+			if (auth.isAuthenticated) {
+				await guildService.loadGuildInfo();
+			}
+
 			// Step 3: Check if authenticated
 			if (!auth.isAuthenticated || !auth.token) {
 				// Not authenticated - that's OK, just mark ready
@@ -66,6 +73,9 @@ class AppInitializer {
 			// Step 5: Start subscriptions for user's guild
 			if (auth.user?.guildId) {
 				subscriptionManager.start(auth.user.guildId);
+
+				// Step 6: Load initial data snapshots
+				await dataLoader.loadInitialData();
 			}
 
 			this.mode = 'live';
@@ -90,6 +100,9 @@ class AppInitializer {
 
 			// Clear auth
 			auth.signOut();
+
+			// Clear guild info
+			guildService.clear();
 		}
 
 		this.status = 'idle';
