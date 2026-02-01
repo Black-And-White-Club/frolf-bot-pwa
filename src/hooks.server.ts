@@ -12,10 +12,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 		"default-src 'self'",
 		"script-src 'self' 'unsafe-inline'",
 		"style-src 'self' 'unsafe-inline'",
-		"img-src 'self' data: https://images.unsplash.com https://*.githubusercontent.com",
+		"img-src 'self' data: https://images.unsplash.com https://*.githubusercontent.com https://cdn.discordapp.com",
 		"font-src 'self' data:",
 		"manifest-src 'self'",
-		"connect-src 'self' https://api.github.com ws:",
+		"connect-src 'self' https://api.github.com ws: http://localhost:4318",
 		"frame-ancestors 'none'",
 		"base-uri 'self'",
 		"object-src 'none'"

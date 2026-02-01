@@ -1,32 +1,42 @@
 <script lang="ts">
-	import type { LeaderboardEntry } from '$lib/stores/leaderboard.svelte';
-	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
-	import MovementIndicator from './MovementIndicator.svelte';
+    import type { LeaderboardEntry } from '$lib/stores/leaderboard.svelte';
+    import { leaderboardService } from '$lib/stores/leaderboard.svelte';
+    import { userProfiles } from '$lib/stores/userProfiles.svelte';
+    import ParticipantAvatar from '$lib/components/round/ParticipantAvatar.svelte';
+    import MovementIndicator from './MovementIndicator.svelte';
 
-	let { entry, rank }: { entry: LeaderboardEntry; rank: number } = $props();
+    let { entry, rank }: { entry: LeaderboardEntry; rank: number } = $props();
 
-	let tagStyle = $derived(
-		rank <= 3
-			? 'bg-amber-500 text-black font-bold'
-			: rank <= 10
-				? 'bg-sage-600 text-white'
-				: 'bg-slate-700 text-slate-200'
-	);
+    let tagStyle = $derived(
+        rank <= 3
+            ? 'bg-amber-500 text-black font-bold'
+            : rank <= 10
+                ? 'bg-sage-600 text-white'
+                : 'bg-slate-700 text-slate-200'
+    );
 
-	let movement = $derived(leaderboardService.getMovementIndicator(entry));
+    let movement = $derived(leaderboardService.getMovementIndicator(entry));
+    let displayName = $derived(userProfiles.getDisplayName(entry.userId));
 </script>
 
 <div class="hover:bg-forest-800/50 flex items-center gap-4 rounded-lg p-3 transition-colors">
-	<!-- Tag Number Badge -->
-	<div class={`flex h-10 w-10 items-center justify-center rounded-full ${tagStyle}`}>
-		{entry.tagNumber}
-	</div>
+    <!-- Tag Number Badge -->
+    <div class={`flex h-10 w-10 items-center justify-center rounded-full ${tagStyle}`}>
+        {entry.tagNumber}
+    </div>
 
-	<!-- Player Info -->
-	<div class="flex flex-1 items-center gap-3">
-		<span class="font-medium">{entry.displayName ?? `User ${entry.userId}`}</span>
-	</div>
+    <!-- Avatar -->
+    <ParticipantAvatar 
+        userId={entry.userId} 
+        username={displayName} 
+        size={32} 
+    />
 
-	<!-- Movement Indicator -->
-	<MovementIndicator {entry} {movement} />
+    <!-- Player Info -->
+    <div class="flex flex-1 items-center gap-3">
+        <span class="font-medium">{displayName}</span>
+    </div>
+
+    <!-- Movement Indicator -->
+    <MovementIndicator {entry} {movement} />
 </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 	import ParticipantAvatar from './ParticipantAvatar.svelte';
 
 	type Round = {
@@ -26,13 +27,7 @@
 
 	let { round, onclick }: Props = $props();
 
-	let statusColor = $derived(
-		round.state === 'started'
-			? 'bg-green-500'
-			: round.state === 'scheduled'
-				? 'bg-amber-500'
-				: 'bg-slate-500'
-	);
+
 
 	let formattedDate = $derived(
 		new Intl.DateTimeFormat('en-US', {
@@ -40,7 +35,8 @@
 			month: 'short',
 			day: 'numeric',
 			hour: 'numeric',
-			minute: '2-digit'
+			minute: '2-digit',
+			timeZoneName: 'short'
 		}).format(new Date(round.startTime))
 	);
 
@@ -52,9 +48,6 @@
 
 <button class="round-card" {onclick} type="button" aria-label="View round: {round.title}">
 	<div class="card-header">
-		<div class="status-indicator">
-			<div class="status-dot {statusColor}"></div>
-		</div>
 		<h3 class="round-title">{round.title}</h3>
 	</div>
 
@@ -78,11 +71,40 @@
 		</p>
 	</div>
 
-	{#if visibleParticipants.length > 0}
+	{#if round.state === 'finalized' && confirmedParticipants.length > 0}
+		<!-- Scorecard Preview for Finalized Rounds -->
+		{@const sortedScores = confirmedParticipants
+			.filter((p) => typeof p.score === 'number')
+			.sort((a, b) => (a.score ?? 0) - (b.score ?? 0))
+			.slice(0, 3)}
+		{#if sortedScores.length > 0}
+			<div class="mt-2 pl-6">
+				<div
+					class="flex items-center gap-4 rounded-md border border-[var(--guild-border)] bg-[var(--guild-surface-elevated)] p-2 text-sm"
+				>
+					{#each sortedScores as p, i (p.userId)}
+						<div class="flex items-center gap-2">
+							<span class="font-mono text-xs font-bold text-slate-400">#{i + 1}</span>
+							<ParticipantAvatar
+								userId={p.userId}
+								username={userProfiles.getDisplayName(p.userId)}
+								size={20}
+							/>
+							<span class="font-bold text-[var(--primary)]">{p.score}</span>
+						</div>
+					{/each}
+				</div>
+			</div>
+		{/if}
+	{:else if visibleParticipants.length > 0}
 		<div class="participant-avatars">
 			{#each visibleParticipants as participant (participant.userId)}
 				<div class="avatar-wrapper">
-					<ParticipantAvatar username={participant.userId} size={32} />
+					<ParticipantAvatar
+						userId={participant.userId}
+						username={userProfiles.getDisplayName(participant.userId)}
+						size={32}
+					/>
 				</div>
 			{/each}
 			{#if overflowCount > 0}

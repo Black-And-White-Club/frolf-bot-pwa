@@ -1,28 +1,7 @@
-import { WebTracerProvider, BatchSpanProcessor } from '@opentelemetry/sdk-trace-web';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { resourceFromAttributes } from '@opentelemetry/resources';
-import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
-import { trace, context, type Tracer, type Context } from '@opentelemetry/api';
-import { W3CTraceContextPropagator } from '@opentelemetry/core';
+import { trace, context, type Tracer, type Context, type TextMapPropagator } from '@opentelemetry/api';
 
-const resource = resourceFromAttributes({
-	[ATTR_SERVICE_NAME]: 'frolf-pwa',
-	[ATTR_SERVICE_VERSION]: '0.4.0',
-	'deployment.environment': import.meta.env.MODE
-});
-
-const exporter = new OTLPTraceExporter({
-	url: import.meta.env.VITE_OTEL_ENDPOINT || 'http://localhost:4318/v1/traces'
-});
-
-const provider = new WebTracerProvider({
-	resource,
-	spanProcessors: [new BatchSpanProcessor(exporter)]
-});
-
-provider.register();
-
-const propagator = new W3CTraceContextPropagator();
+let propagator: TextMapPropagator | null = null;
+let initialized = false;
 
 // Get tracer instance
 export function getTracer(name: string = 'frolf-pwa'): Tracer {
@@ -71,6 +50,8 @@ export async function withAsyncSpan<T>(
 
 // Extract traceparent from headers
 export function extractTraceContext(headers: Record<string, string>): Context {
+	if (!propagator) return context.active();
+	
 	return propagator.extract(context.active(), headers, {
 		get: (carrier, key) => carrier[key],
 		keys: (carrier) => Object.keys(carrier)
@@ -79,6 +60,8 @@ export function extractTraceContext(headers: Record<string, string>): Context {
 
 // Inject traceparent into headers
 export function injectTraceContext(headers: Record<string, string>): void {
+	if (!propagator) return;
+
 	propagator.inject(context.active(), headers, {
 		set: (carrier, key, value) => {
 			carrier[key] = value;
@@ -102,18 +85,61 @@ export function createChildSpan(
 	return tracer.startSpan(name, { attributes });
 }
 
-let initialized = false;
-
-export function initTracing(): void {
+export async function initTracing(): Promise<void> {
 	if (initialized) return;
 
-	// Provider is registered on module load
-	// This function exists for explicit initialization if needed
-	initialized = true;
+	try {
+		// Dynamic imports to reduce initial bundle size
+		const [
+			{ WebTracerProvider, BatchSpanProcessor },
+			{ OTLPTraceExporter },
+			{ resourceFromAttributes },
+			{ W3CTraceContextPropagator }
+		] = await Promise.all([
+			import('@opentelemetry/sdk-trace-web'),
+			import('@opentelemetry/exporter-trace-otlp-http'),
+			import('@opentelemetry/resources'),
+			import('@opentelemetry/core')
+		]);
 
-	console.log('[OTel] Tracing initialized', {
-		service: 'frolf-pwa',
-		endpoint: import.meta.env.VITE_OTEL_ENDPOINT,
-		mode: import.meta.env.MODE
-	});
+		const endpoint = import.meta.env.VITE_OTEL_ENDPOINT;
+		
+		// Strictly require an endpoint to be configured to enable tracing.
+		// This prevents "connection refused" errors in any environment (dev or prod)
+		// where a collector is not explicitly available.
+		if (!endpoint) {
+			// console.debug('[OTel] Tracing disabled: VITE_OTEL_ENDPOINT is not set');
+			return;
+		}
+
+		const resource = resourceFromAttributes({
+			'service.name': 'frolf-pwa',
+			'service.version': '0.4.0',
+			'deployment.environment': import.meta.env.MODE
+		});
+
+		const exporter = new OTLPTraceExporter({
+			url: import.meta.env.VITE_OTEL_ENDPOINT || 'http://localhost:4318/v1/traces'
+		});
+
+		const provider = new WebTracerProvider({
+			resource,
+			spanProcessors: [new BatchSpanProcessor(exporter)]
+		});
+
+		provider.register();
+
+		// Initialize propagator
+		propagator = new W3CTraceContextPropagator();
+
+		initialized = true;
+
+		console.log('[OTel] Tracing initialized', {
+			service: 'frolf-pwa',
+			endpoint: import.meta.env.VITE_OTEL_ENDPOINT,
+			mode: import.meta.env.MODE
+		});
+	} catch (err) {
+		console.error('[OTel] Failed to initialize tracing:', err);
+	}
 }

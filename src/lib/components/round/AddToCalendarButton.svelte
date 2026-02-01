@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { Round } from '$lib/types/backend';
-	import { addToCalendar } from '$lib/utils/calendar';
 	import { announce } from '$lib/stores/announcer';
+	// CSS is loaded dynamically on click to avoid render blocking
+	// import 'add-to-calendar-button/assets/css/atcb.css';
 
 	type Props = {
 		round: Round;
@@ -41,15 +42,40 @@
 
 	const formattedDate = $derived(formatDateForLabel(round?.start_time ?? undefined));
 
-	function handleAction() {
-		addToCalendar(round);
-		announce('Added to calendar');
+	async function handleAction(e: Event) {
+		e.preventDefault();
+		e.stopPropagation();
+		
+		const startDate = round.start_time ? new Date(round.start_time) : new Date(round.created_at);
+		const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000); // 2 hours later
+
+		// Helper to format date as YYYY-MM-DD
+		const toDateStr = (d: Date) => d.toISOString().split('T')[0];
+		// Helper to format time as HH:mm
+		const toTimeStr = (d: Date) => d.toTimeString().slice(0, 5);
+
+		const { atcb_action } = await import('add-to-calendar-button');
+		await import('add-to-calendar-button/assets/css/atcb.css');
+
+		atcb_action({
+			name: `Disc Golf Round: ${round.title}`,
+			description: round.description || `Round at ${round.location || 'TBD'}`,
+			startDate: toDateStr(startDate),
+			startTime: toTimeStr(startDate),
+			endDate: toDateStr(endDate),
+			endTime: toTimeStr(endDate),
+			location: round.location || 'TBD',
+			options: ['Apple', 'Google', 'iCal', 'Microsoft365', 'Outlook.com', 'Yahoo'],
+			timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+		});
+
+		announce('Opened calendar options');
 	}
 
 	function handleKey(e: KeyboardEvent) {
 		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
-			handleAction();
+			handleAction(e);
 		}
 	}
 </script>

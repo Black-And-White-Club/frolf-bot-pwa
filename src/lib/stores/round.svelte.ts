@@ -5,17 +5,46 @@
 
 // ============ Types ============
 
-type RoundState = 'scheduled' | 'started' | 'finalized' | 'cancelled';
-type ParticipantResponse = 'accepted' | 'declined' | 'tentative';
+// ============ Types ============
+export type RoundState = 'scheduled' | 'started' | 'finalized' | 'cancelled';
+export type ParticipantResponse = 'accepted' | 'declined' | 'tentative';
 
-interface Participant {
+export interface Participant {
 	userId: string;
 	response: ParticipantResponse;
 	score: number | null;
 	tagNumber: number | null;
 }
 
-interface Round {
+// Raw API format (snake_case - matches Go backend)
+export interface ParticipantRaw {
+	user_id: string;
+	response: ParticipantResponse;
+	score: number | null;
+	tag_number: number | null;
+	team_id?: string;
+	raw_name?: string;
+}
+
+// Raw API response format (snake_case - matches Go backend)
+export interface RoundRaw {
+	id: string;
+	guild_id: string;
+	title: string;
+	location: string;
+	description: string;
+	start_time: string | null; // ISO timestamp, can be null
+	state: RoundState;
+	created_by: string;
+	event_message_id: string;
+	participants: ParticipantRaw[];
+	par_values?: number[];
+	holes?: number;
+	current_hole?: number;
+}
+
+// Internal frontend format (camelCase)
+export interface Round {
 	id: string;
 	guildId: string;
 	title: string;
@@ -26,11 +55,60 @@ interface Round {
 	createdBy: string;
 	eventMessageId: string;
 	participants: Participant[];
+	parValues?: number[];
+	holes?: number;
+	currentHole?: number;
+}
+
+// Map backend string enums (ACCEPT, DECLINE, etc) to frontend state
+function mapResponse(response: string): ParticipantResponse {
+	const r = (response || '').toUpperCase();
+	if (r === 'ACCEPT' || r === 'ACCEPTED') return 'accepted';
+	if (r === 'DECLINE' || r === 'DECLINED') return 'declined';
+	return 'tentative';
+}
+
+// Transform participant from snake_case to camelCase
+function transformParticipant(raw: ParticipantRaw): Participant {
+	return {
+		userId: raw.user_id,
+		response: mapResponse(raw.response),
+		score: raw.score,
+		tagNumber: raw.tag_number
+	};
+}
+
+// Map backend state (UPCOMING, IN_PROGRESS, etc) to frontend state
+function mapRoundState(state: string): RoundState {
+	const s = (state || '').toUpperCase();
+	if (s === 'UPCOMING' || s === 'SCHEDULED') return 'scheduled';
+	if (s === 'IN_PROGRESS' || s === 'STARTED') return 'started';
+	if (s === 'FINALIZED') return 'finalized';
+	return 'cancelled'; // Default fallback
+}
+
+// Transform raw API response to internal format
+function transformRound(raw: RoundRaw): Round {
+	return {
+		id: raw.id,
+		guildId: raw.guild_id,
+		title: raw.title || '',
+		location: raw.location || '',
+		description: raw.description || '',
+		startTime: raw.start_time || new Date().toISOString(), // Fallback to now if null
+		state: mapRoundState(raw.state),
+		createdBy: raw.created_by,
+		eventMessageId: raw.event_message_id || '',
+		participants: (raw.participants || []).map(transformParticipant),
+		parValues: raw.par_values,
+		holes: raw.holes,
+		currentHole: raw.current_hole
+	};
 }
 
 // ============ RoundService Class ============
 
-class RoundService {
+export class RoundService {
 	// State
 	rounds = $state<Round[]>([]);
 	selectedRoundId = $state<string | null>(null);
@@ -135,6 +213,16 @@ class RoundService {
 		this.isLoading = loading;
 	}
 
+	/**
+	 * Set rounds from raw API response (snake_case format)
+	 */
+	setRoundsFromApi(rawRounds: RoundRaw[]): void {
+		this.rounds = rawRounds.map(transformRound);
+	}
+
+	/**
+	 * Set rounds directly (already in camelCase format)
+	 */
 	setRounds(rounds: Round[]): void {
 		this.rounds = rounds;
 	}

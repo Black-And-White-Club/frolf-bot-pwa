@@ -32,7 +32,7 @@ class AppInitializer {
 
 		try {
 			// Step 1: Initialize tracing
-			initTracing();
+			await initTracing();
 
 			// Handle mock mode early
 			if (this.isMockMode()) {

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { LeaderboardEntry } from '$lib/stores/leaderboard.svelte';
+	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 
 	let {
 		tag,
@@ -28,5 +29,5 @@
 	>
 		{tag.tagNumber}
 	</div>
-	<span class="text-center text-sm font-medium">{tag.displayName ?? `User ${tag.userId}`}</span>
+	<span class="text-center text-sm font-medium">{userProfiles.getDisplayName(tag.userId)}</span>
 </div>

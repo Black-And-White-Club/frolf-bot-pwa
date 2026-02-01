@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 	import ParticipantAvatar from '../round/ParticipantAvatar.svelte';
 
 	type Participant = {
@@ -73,12 +74,13 @@
 						<td class="player-cell sticky-column">
 							<div class="player-info">
 								<ParticipantAvatar
+									userId={participant.userId}
 									avatar_url={participant.avatar_url}
-									username={participant.username || participant.userId}
+									username={userProfiles.getDisplayName(participant.userId)}
 									size={24}
 								/>
 								<span class="player-name">
-									{participant.username || participant.userId}
+									{userProfiles.getDisplayName(participant.userId)}
 								</span>
 							</div>
 						</td>

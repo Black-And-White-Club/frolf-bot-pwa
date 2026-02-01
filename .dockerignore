@@ -1,0 +1,60 @@
+# =============================================================================
+# Docker Build Ignore File
+# =============================================================================
+# Files and directories to exclude from Docker build context
+
+# Dependencies (installed in container)
+node_modules
+
+# Build output (built in container)
+build
+dist
+.svelte-kit
+
+# Development files
+.env
+.env.local
+.env.*.local
+*.log
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE/Editor
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# Testing
+coverage
+.nyc_output
+cypress/videos
+cypress/screenshots
+*.test.ts
+*.spec.ts
+__tests__
+tests
+
+# Documentation
+*.md
+!README.md
+docs
+
+# Storybook
+.storybook
+*.stories.ts
+*.stories.svelte
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+
+# Misc
+*.tgz
+*.tar.gz
+tmp

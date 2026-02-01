@@ -1,3 +1,5 @@
+import type { UserProfileRaw } from './userProfiles.svelte';
+
 export interface LeaderboardEntry {
 	userId: string;
 	tagNumber: number;
@@ -11,6 +13,37 @@ export interface LeaderboardSnapshot {
 	version: number;
 	lastUpdated: string;
 	entries: LeaderboardEntry[];
+}
+
+// Raw API response format (snake_case - matches Go backend)
+export interface LeaderboardEntryRaw {
+	user_id: string;
+	tag_number: number;
+}
+
+// The backend sends LeaderboardData which is just an array of entries
+// (not the full Leaderboard struct)
+export interface LeaderboardResponseRaw {
+	guild_id: string;
+	leaderboard: LeaderboardEntryRaw[]; // LeaderboardData is just []LeaderboardEntry
+	profiles?: Record<string, UserProfileRaw>;
+}
+
+// Transform raw API response to internal format
+function transformLeaderboardEntries(
+	entries: LeaderboardEntryRaw[],
+	guildId: string
+): LeaderboardSnapshot {
+	return {
+		id: guildId, // Use guildId as ID since backend doesn't send one
+		guildId: guildId,
+		version: 1,
+		lastUpdated: new Date().toISOString(), // Backend doesn't provide this, use current time
+		entries: (entries || []).map((entry) => ({
+			userId: entry.user_id,
+			tagNumber: entry.tag_number
+		}))
+	};
 }
 
 type PatchOperation =
@@ -108,6 +141,16 @@ class LeaderboardService {
 	// Data loading methods
 	setLoading(loading: boolean): void {
 		this.isLoading = loading;
+	}
+
+	/**
+	 * Set snapshot from raw API response (snake_case format)
+	 * @param entries Array of LeaderboardEntryRaw from API
+	 * @param guildId The guild ID
+	 */
+	setSnapshotFromApi(entries: LeaderboardEntryRaw[], guildId: string): void {
+		this.snapshot = transformLeaderboardEntries(entries, guildId);
+		this.version = this.snapshot.version;
 	}
 }
 

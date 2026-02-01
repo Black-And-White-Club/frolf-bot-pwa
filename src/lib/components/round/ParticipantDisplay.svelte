@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Round, Participant } from '$lib/types/backend';
 	import ParticipantAvatar from './ParticipantAvatar.svelte';
+	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 
 	type Props = {
 		round: Round;
@@ -77,8 +78,9 @@
 				{#each localParticipants.slice(0, 3) as participant (participant.user_id || participant.username)}
 					<div class="ring-guild-surface rounded-full ring-2">
 						<ParticipantAvatar
+							userId={participant.user_id}
 							avatar_url={participant.avatar_url}
-							username={participant.username}
+							username={userProfiles.getDisplayName(participant.user_id)}
 							size={24}
 							extraClasses="border-2"
 						/>
@@ -110,13 +112,14 @@
 			<div class="participant-row">
 				<div class="participant-info">
 					<ParticipantAvatar
+						userId={participant.user_id}
 						avatar_url={participant.avatar_url}
-						username={participant.username}
+						username={userProfiles.getDisplayName(participant.user_id)}
 						size={24}
 						extraClasses="flex-shrink-0"
 					/>
-					<span class="participant-name" title={participant.username}>
-						{participant.username}
+					<span class="participant-name" title={userProfiles.getDisplayName(participant.user_id)}>
+						{userProfiles.getDisplayName(participant.user_id)}
 					</span>
 				</div>
 

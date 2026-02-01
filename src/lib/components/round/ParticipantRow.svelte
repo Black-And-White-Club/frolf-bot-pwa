@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 	import ParticipantAvatar from './ParticipantAvatar.svelte';
 
 	type Participant = {
@@ -49,7 +50,7 @@
 		position === 1 ? '🥇' : position === 2 ? '🥈' : position === 3 ? '🥉' : `${position}`
 	);
 
-	let displayName = $derived(participant.username || participant.userId);
+	let displayName = $derived(userProfiles.getDisplayName(participant.userId));
 	// keep response available on participant object; no local alias required
 </script>
 
@@ -59,7 +60,7 @@
 	</div>
 
 	<div class="participant-info">
-		<ParticipantAvatar avatar_url={participant.avatar_url} username={displayName} size={40} />
+		<ParticipantAvatar userId={participant.userId} avatar_url={participant.avatar_url} username={displayName} size={40} />
 		<div class="participant-details">
 			<span class="participant-name">{displayName}</span>
 			{#if participant.tagNumber}

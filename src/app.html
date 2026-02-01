@@ -5,6 +5,7 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="manifest" href="/manifest.json" />
+		<link rel="icon" href="/favicon.png" />
 		<!-- Preconnects should be added only for origins used on first load.
 		     Removed preconnect to Unsplash (images.unsplash.com) because it is not
 		     requested on the initial render. Add it back on pages that actually
@@ -26,6 +27,7 @@
 		/>
 		<meta name="theme-color" content="#007474" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 		<link rel="apple-touch-icon" href="/icons/icon-192.png" />
 
@@ -61,32 +63,6 @@
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">%sveltekit.body%</div>
-		<script type="module">
-			// Defer service worker registration to the browser's idle period to avoid
-			// competing for main-thread time during initial render (reduces TBT/Speed Index).
-			function registerSWWhenIdle() {
-				if (!('serviceWorker' in navigator)) return;
-				const doRegister = async () => {
-					try {
-						const m = await import('/src/lib/pwa/registerServiceWorker.ts');
-						if (m && m.registerServiceWorker) {
-							await m.registerServiceWorker();
-							console.info('Service worker registered (deferred)');
-						}
-					} catch (err) {
-						console.warn('Deferred service worker registration failed', err);
-					}
-				};
-				if ('requestIdleCallback' in window) {
-					// Give the browser a short idle window (timeout 200ms) to try to register
-					window.requestIdleCallback(() => doRegister(), { timeout: 200 });
-				} else {
-					// Fallback: schedule after load + small timeout
-					window.addEventListener('load', () => setTimeout(doRegister, 300));
-				}
-			}
-			registerSWWhenIdle();
-		</script>
 
 		<script>
 			// update meta theme-color to match CSS tokens so install UI reflects current theme

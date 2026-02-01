@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 	import type { LeaderboardEntry } from '$lib/stores/leaderboard.svelte';
 	// TagBadge intentionally unused in this compact list; remove the import to avoid lint noise.
 
@@ -11,7 +12,7 @@
 	{#each topEntries as entry, i (entry.userId)}
 		<div class="entry" class:top-3={i < 3}>
 			<div class="tag-number">{entry.tagNumber}</div>
-			<span class="name">{entry.displayName ?? `User ${entry.userId}`}</span>
+			<span class="name">{userProfiles.getDisplayName(entry.userId)}</span>
 		</div>
 	{/each}
 </div>

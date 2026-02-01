@@ -7,6 +7,6 @@ export { subscriptionManager } from './subscriptions.svelte';
 export { appInit } from './init.svelte';
 
 // Svelte 4 stores (P1/P2 migration)
-export { theme } from './theme';
+export { currentTheme as theme } from './theme';
 export { announcer } from './announcer';
-export { overlay } from './overlay';
+export { modalOpen as overlay } from './overlay';

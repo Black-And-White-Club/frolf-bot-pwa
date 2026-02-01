@@ -13,8 +13,15 @@ export default defineConfig({
 		alias: {
 			$lib: path.resolve('./src/lib'),
 			$tests: path.resolve('./tests'),
-			'$tests/*': path.resolve('./tests/*')
+			'$tests/*': path.resolve('./tests/*'),
+			'@opentelemetry/semantic-conventions': path.resolve(
+				'./src/lib/stubs/semantic-conventions.ts'
+			)
 		}
+	},
+
+	build: {
+		target: 'esnext'
 	},
 
 	plugins: [

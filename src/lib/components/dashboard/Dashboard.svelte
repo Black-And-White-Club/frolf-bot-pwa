@@ -13,8 +13,14 @@
 
 	let { mode = 'default' }: { mode?: 'default' | 'tv' | 'compact' } = $props();
 
+	// Remove activeTab
+	
 	const activeRounds = $derived(
 		roundService.rounds.filter((r) => r.state === 'started' || r.state === 'scheduled')
+	);
+
+	const finalizedRounds = $derived(
+		roundService.rounds.filter((r) => r.state === 'finalized' || r.state === 'cancelled')
 	);
 </script>
 
@@ -25,21 +31,33 @@
 		<header class="dashboard-header">
 			<div class="flex items-center gap-2">
 				<h1 class="text-xl font-bold text-slate-100">Frolf Bot</h1>
-				<LiveIndicator active={activeRounds.length > 0} />
 			</div>
 			<ConnectionStatus />
 		</header>
 
 		<div class="dashboard-grid">
 			<!-- Rounds Panel -->
-			<section class="panel rounds-panel">
-				<h2 class="panel-title">Rounds</h2>
-				{#if roundService.isLoading}
-					<LoadingSkeleton variant="card" count={3} />
-				{:else if roundService.rounds.length === 0}
-					<EmptyState icon="🥏" title="No rounds" message="Waiting for round events" />
-				{:else}
-					<RoundListCompact rounds={roundService.rounds} />
+			<section class="panel rounds-panel space-y-6">
+				<!-- Active Section -->
+				<div>
+					<h2 class="panel-title sticky top-0 z-10 bg-[var(--guild-surface,#081212)] pb-2">Active & Upcoming</h2>
+					{#if roundService.isLoading}
+						<LoadingSkeleton variant="card" count={2} />
+					{:else if activeRounds.length === 0}
+						<div class="py-4 text-center">
+							<EmptyState icon="🥏" title="No active rounds" message="Scheduled games appear here" />
+						</div>
+					{:else}
+						<RoundListCompact rounds={activeRounds} />
+					{/if}
+				</div>
+
+				<!-- History Section -->
+				{#if !roundService.isLoading && finalizedRounds.length > 0}
+					<div class="border-t border-[var(--guild-border)] pt-4">
+						<h2 class="panel-title sticky top-0 z-10 bg-[var(--guild-surface,#081212)] pb-2">Recent History</h2>
+						<RoundListCompact rounds={finalizedRounds} limit={5} />
+					</div>
 				{/if}
 			</section>
 

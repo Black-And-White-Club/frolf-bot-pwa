@@ -3,7 +3,7 @@
  * Central connection manager for Direct-to-NATS architecture
  */
 
-import { connect, type NatsConnection, type Subscription, StringCodec } from 'nats.ws';
+import type { NatsConnection, Subscription, Codec } from 'nats.ws'; // Types only
 import { getTracer, injectTraceContext, createChildSpan } from '$lib/otel/tracing';
 import { config, log } from '$lib/config';
 
@@ -16,8 +16,6 @@ interface NatsMessage<T = unknown> {
 	data: T;
 	headers?: Map<string, string[]>;
 }
-
-// SubscriptionHandle removed — not used
 
 // ============ NatsService Class ============
 
@@ -33,13 +31,9 @@ class NatsService {
 	isReconnecting = $derived(this.status === 'reconnecting');
 
 	// Private
-
-	// using a built-in Map deliberately for subscription management; disable the
-	// rule that prefers SvelteMap here because this class is not a Svelte component
-	// and we want an ordinary Map for its API.
-
 	private subscriptions: Map<string, Subscription> = new Map();
-	private codec = StringCodec();
+	private codec: Codec<string> | null = null;
+	private natsLib: typeof import('nats.ws') | null = null;
 
 	/**
 	 * Connect to NATS server with JWT token
@@ -47,6 +41,12 @@ class NatsService {
 	async connect(token: string): Promise<void> {
 		if (this.status === 'connecting' || this.status === 'connected') {
 			return;
+		}
+
+		// Dynamic import to save bundle size
+		if (!this.natsLib) {
+			this.natsLib = await import('nats.ws');
+			this.codec = this.natsLib.StringCodec();
 		}
 
 		const tracer = getTracer();
@@ -58,7 +58,7 @@ class NatsService {
 		this.lastError = null;
 
 		try {
-			this.connection = await connect({
+			this.connection = await this.natsLib.connect({
 				servers: config.nats.url,
 				pass: token,
 				name: 'frolf-pwa',
@@ -115,7 +115,7 @@ class NatsService {
 	 * Returns unsubscribe function for $effect cleanup
 	 */
 	subscribe<T>(subject: string, handler: (msg: NatsMessage<T>) => void): () => void {
-		if (!this.connection) {
+		if (!this.connection || !this.codec) {
 			console.warn('Cannot subscribe: not connected');
 			return () => {};
 		}
@@ -139,7 +139,7 @@ class NatsService {
 				});
 
 				try {
-					const data = JSON.parse(this.codec.decode(msg.data)) as T;
+					const data = JSON.parse(this.codec!.decode(msg.data)) as T;
 					// local headers map for downstream handlers
 					// eslint-disable-next-line svelte/prefer-svelte-reactivity
 					const headers = new Map<string, string[]>();
@@ -188,8 +188,8 @@ class NatsService {
 	/**
 	 * Publish a message to a NATS subject
 	 */
-	publish<T>(subject: string, data: T, headers?: Record<string, string>): void {
-		if (!this.connection) {
+	publish<T>(subject: string, data: T, customHeaders?: Record<string, string>): void {
+		if (!this.connection || !this.natsLib || !this.codec) {
 			console.warn('Cannot publish: not connected');
 			return;
 		}
@@ -204,7 +204,7 @@ class NatsService {
 
 		try {
 			const payload = this.codec.encode(JSON.stringify(data));
-			const natsHeaders = this.connection.headers();
+			const natsHeaders = this.natsLib.headers();
 
 			// Inject traceparent
 			const traceHeaders: Record<string, string> = {};
@@ -216,8 +216,8 @@ class NatsService {
 			}
 
 			// Add custom headers
-			if (headers) {
-				for (const [key, value] of Object.entries(headers)) {
+			if (customHeaders) {
+				for (const [key, value] of Object.entries(customHeaders)) {
 					natsHeaders.append(key, value);
 				}
 			}
@@ -233,13 +233,15 @@ class NatsService {
 
 	/**
 	 * Send a request and wait for reply (request/reply pattern)
+	 * Uses a custom implementation that works with JetStream consumers
+	 * by including the reply_to subject in the message headers.
 	 */
 	async request<TReq, TRes>(
 		subject: string,
 		data: TReq,
 		options: { timeout?: number } = {}
 	): Promise<TRes | null> {
-		if (!this.connection) {
+		if (!this.connection || !this.natsLib || !this.codec) {
 			throw new Error('Not connected to NATS');
 		}
 
@@ -254,11 +256,36 @@ class NatsService {
 			}
 		});
 
+		// Create a unique inbox for this request
+		const inbox = this.natsLib.createInbox();
+
 		try {
-			const msg = await this.connection.request(subject, payload, { timeout });
-			const response = JSON.parse(this.codec.decode(msg.data)) as TRes;
-			span.end();
-			return response;
+			// Subscribe to the inbox for the response
+			const sub = this.connection.subscribe(inbox, { max: 1, timeout });
+
+			// Create headers with reply_to for JetStream compatibility
+			const natsHeaders = this.natsLib.headers();
+			natsHeaders.append('reply_to', inbox);
+
+			// Inject trace context
+			const traceHeaders: Record<string, string> = {};
+			injectTraceContext(traceHeaders);
+			for (const [key, value] of Object.entries(traceHeaders)) {
+				natsHeaders.append(key, value);
+			}
+
+			// Publish the request with the reply_to header
+			this.connection.publish(subject, payload, { headers: natsHeaders });
+
+			// Wait for the response
+			for await (const msg of sub) {
+				const response = JSON.parse(this.codec.decode(msg.data)) as TRes;
+				span.end();
+				return response;
+			}
+
+			// If we get here, subscription timed out or no message received
+			throw new Error(`Request to ${subject} timed out`);
 		} catch (e) {
 			span.recordException(e as Error);
 			span.end();

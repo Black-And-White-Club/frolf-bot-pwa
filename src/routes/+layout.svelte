@@ -84,9 +84,24 @@
 	});
 
 	onMount(() => {
-		appInit.initialize();
+		// Defer heavy initialization (NATS, OTel) until the main thread is idle
+		// This significantly improves Total Blocking Time (TBT) and LCP
+		const initWork = () => {
+			appInit.initialize();
+		};
+
+		let idleHandle: number;
+		let timeoutHandle: any; // using any for runtimes where NodeJS might be involved in types
+
+		if ('requestIdleCallback' in window) {
+			idleHandle = (window as any).requestIdleCallback(initWork, { timeout: 3000 });
+		} else {
+			timeoutHandle = setTimeout(initWork, 100);
+		}
 
 		return () => {
+			if (idleHandle) (window as any).cancelIdleCallback(idleHandle);
+			if (timeoutHandle) clearTimeout(timeoutHandle);
 			appInit.teardown();
 		};
 	});
@@ -101,6 +116,8 @@
 	<!-- Preconnect to common image CDN to reduce LCP latency (reported by Lighthouse) -->
 	<link rel="dns-prefetch" href="https://images.unsplash.com" />
 	<link rel="preconnect" href="https://images.unsplash.com" crossorigin="anonymous" />
+	<link rel="preconnect" href="https://cdn.discordapp.com" crossorigin="anonymous" />
+	<link rel="preconnect" href="https://nats.frolf-bot.com" crossorigin="anonymous" />
 </svelte:head>
 
 <!-- Skip link for keyboard/mobile users -->

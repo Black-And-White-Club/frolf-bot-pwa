@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { isUnsplashUrl, unsplashSrcset, unsplashSizes } from '$lib/utils/unsplash';
+	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 
 	type Props = {
+		userId?: string;
 		avatar_url?: string;
 		username: string;
 		size?: number;
@@ -9,9 +11,29 @@
 		priority?: boolean;
 	};
 
-	let { avatar_url, username, size = 24, extraClasses = '', priority = false }: Props = $props();
+	let { userId, avatar_url, username, size = 24, extraClasses = '', priority = false }: Props = $props();
 
-	const isUnsplash = $derived(isUnsplashUrl(avatar_url));
+	function optimizeDiscordAvatar(url: string | undefined, targetSize: number) {
+		if (!url) return undefined;
+		// Only optimize Discord CDN URLs that don't already have query params
+		if (url.includes('cdn.discordapp.com') && !url.includes('?')) {
+			// multi-resolution support: request 2x size for high-DPI
+			const size2x = targetSize * 2;
+			const supported = [16, 32, 64, 128, 256, 512, 1024];
+			const best = supported.find((s) => s >= size2x) || 1024;
+			return `${url}?size=${best}`;
+		}
+		return url;
+	}
+
+	let profileAvatar = $derived(userId ? userProfiles.getAvatarUrl(userId) : undefined);
+	let rawAvatarUrl = $derived(avatar_url || profileAvatar);
+	let finalAvatarUrl = $derived(optimizeDiscordAvatar(rawAvatarUrl, size));
+
+    let profileDisplayName = $derived(userId ? userProfiles.getDisplayName(userId) : undefined);
+    let finalUsername = $derived(profileDisplayName || username);
+
+	const isUnsplash = $derived(isUnsplashUrl(finalAvatarUrl));
 	const sizes = $derived(isUnsplash ? unsplashSizes(size) : undefined);
 	const loading = $derived(priority ? 'eager' : 'lazy');
 
@@ -26,26 +48,26 @@
 		errored = true;
 	}
 
-	const initial = $derived(username ? username.charAt(0).toUpperCase() : '?');
+	const initial = $derived(finalUsername ? finalUsername.charAt(0).toUpperCase() : '?');
 </script>
 
-<div class="avatar-container {extraClasses}" style="--size: {size}px;">
-	{#if avatar_url && !errored}
+<div class="avatar-container {extraClasses}" style="--size: {size}px;" title={finalUsername}>
+	{#if finalAvatarUrl && !errored}
 		{#if isUnsplash}
 			<picture>
 				<source
 					type="image/avif"
-					srcset={unsplashSrcset(avatar_url, [size, size * 2], 'avif')}
+					srcset={unsplashSrcset(finalAvatarUrl, [size, size * 2], 'avif')}
 					{sizes}
 				/>
 				<source
 					type="image/webp"
-					srcset={unsplashSrcset(avatar_url, [size, size * 2], 'webp')}
+					srcset={unsplashSrcset(finalAvatarUrl, [size, size * 2], 'webp')}
 					{sizes}
 				/>
 				<img
-					src={avatar_url}
-					alt={username}
+					src={finalAvatarUrl}
+					alt={finalUsername}
 					width={size}
 					height={size}
 					{loading}
@@ -58,8 +80,8 @@
 			</picture>
 		{:else}
 			<img
-				src={avatar_url}
-				alt={username}
+				src={finalAvatarUrl}
+				alt={finalUsername}
 				width={size}
 				height={size}
 				{loading}
@@ -67,6 +89,7 @@
 				onload={handleLoad}
 				onerror={handleError}
 				class="avatar-img"
+				referrerpolicy="no-referrer"
 			/>
 		{/if}
 

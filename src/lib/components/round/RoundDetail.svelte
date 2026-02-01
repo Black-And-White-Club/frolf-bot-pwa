@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { roundService } from '$lib/stores/round.svelte';
+	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 	import ParticipantRow from './ParticipantRow.svelte';
-	import ScoreGrid from '../score/ScoreGrid.svelte';
+
 
 	type Props = {
 		roundId: string;
@@ -66,7 +67,7 @@
 
 	let roundPar = $derived(() => {
 		if (!round?.parValues) return (round?.holes ?? 18) * 3;
-		return round.parValues.reduce((acc, p) => acc + p, 0);
+		return round.parValues.reduce((acc: number, p: number) => acc + p, 0);
 	});
 </script>
 
@@ -125,7 +126,7 @@
 					<div class="stat-item">
 						<span class="stat-label">Leader</span>
 						<span class="stat-value">
-							{leader()?.username || leader()?.userId}
+							{leader() ? userProfiles.getDisplayName(leader()!.userId) : ''}
 							<span class="leader-score">
 								{(() => {
 									const diff = (leader()?.score ?? 0) - roundPar();
@@ -166,7 +167,9 @@
 		{#if showScoreGrid}
 			<section class="score-section">
 				<h2 class="section-title">Scorecard</h2>
-				<ScoreGrid {round} />
+				{#await import('../score/ScoreGrid.svelte') then { default: ScoreGrid }}
+					<ScoreGrid {round} />
+				{/await}
 			</section>
 		{/if}
 	</div>
