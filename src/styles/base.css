@@ -1,0 +1,47 @@
+@layer base {
+	*,
+	*::before,
+	*::after {
+		border-color: rgb(var(--color-border));
+	}
+
+	html {
+		-webkit-tap-highlight-color: transparent;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		text-rendering: optimizeLegibility;
+	}
+
+	html,
+	body {
+		height: 100%;
+		font-family: var(--font-primary);
+		background-color: rgb(var(--color-background));
+		color: rgb(var(--color-text));
+		transition:
+			background-color var(--transition-base),
+			color var(--transition-base);
+	}
+
+	:focus-visible {
+		outline: 3px solid rgba(var(--color-primary), 0.4);
+		outline-offset: 2px;
+		border-radius: var(--border-radius-sm);
+	}
+
+	:focus:not(:focus-visible) {
+		outline: none;
+	}
+
+	button,
+	a {
+		touch-action: manipulation;
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		html {
+			scroll-behavior: smooth;
+		}
+	}
+}

@@ -1,0 +1,46 @@
+<script lang="ts">
+	type Props = {
+		className?: string;
+		width?: number | string;
+		height?: number | string;
+		testid?: string;
+		title?: string;
+		decorative?: boolean;
+	};
+
+	let {
+		className = '',
+		width = 32,
+		height = 32,
+		testid,
+		title,
+		decorative = false
+	}: Props = $props();
+</script>
+
+<svg
+	{width}
+	{height}
+	viewBox="0 0 32 32"
+	xmlns="http://www.w3.org/2000/svg"
+	class={className}
+	role={decorative ? undefined : 'img'}
+	aria-hidden={decorative ? 'true' : undefined}
+	aria-label={decorative ? undefined : title}
+	data-testid={testid}
+>
+	{#if title}
+		<title>{title}</title>
+	{/if}
+	<path
+		class="icon--accent"
+		d="M31.3313 8.44657C30.9633 7.08998 29.8791 6.02172 28.5022 5.65916C26.0067 5.00026 16 5.00026 16 5.00026C16 5.00026 5.99333 5.00026 3.4978 5.65916C2.12102 6.02172 1.03665 7.08998 0.668678 8.44657C0 10.9053 0 16.0353 0 16.0353C0 16.0353 0 21.1652 0.668678 23.6242C1.03665 24.9806 2.12102 26.0489 3.4978 26.4116C5.99333 27.0703 16 27.0703 16 27.0703C16 27.0703 26.0067 27.0703 28.5022 26.4116C29.8791 26.0489 30.9633 24.9806 31.3313 23.6242C32 21.1652 32 16.0353 32 16.0353C32 16.0353 32 10.9053 31.3313 8.44657Z"
+	/>
+	<path fill="currentColor" d="M12.7266 20.6934L21.0902 16.036L12.7266 11.3781V20.6934Z" />
+
+	<style>
+		.icon--accent {
+			fill: var(--guild-accent);
+		}
+	</style>
+</svg>

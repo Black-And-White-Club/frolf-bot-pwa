@@ -1,0 +1,79 @@
+@layer base {
+	:root {
+		/* Typography Scale */
+		--font-primary: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+		--font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+
+		/* Brand tokens (single source of truth) */
+		--guild-primary-rgb: 0 116 116; /* #007474 */
+		--guild-primary: #007474;
+
+		--guild-secondary-rgb: 139 123 184; /* #8B7BB8 */
+		--guild-secondary: #8b7bb8;
+
+		--guild-accent-rgb: 184 155 94; /* #B89B5E */
+		--guild-accent: #b89b5e;
+		--guild-gold-gradient: linear-gradient(135deg, #b89b5e 0%, #a68a4a 50%, #7c6b3c 100%);
+
+		--guild-text-rgb: 26 26 26;
+		--guild-text: #1a1a1a;
+		--guild-text-secondary: rgb(71 85 105);
+		--guild-border: rgb(226 232 240);
+		--guild-background: rgb(245 255 250);
+		--guild-surface: rgb(255 255 255);
+
+		/* Semantic */
+		--guild-error-bg: rgb(254 242 242);
+		--guild-error-text: rgb(153 27 27);
+		--guild-error-border: rgb(254 202 202);
+
+		/* Utility fallbacks */
+		--color-primary: var(--guild-primary-rgb);
+		--color-secondary: var(--guild-secondary-rgb);
+		--color-accent: var(--guild-accent-rgb);
+
+		/* Spacing & Layout */
+		--inner-controls-width: 12rem;
+		--inner-controls-offset: max(2rem, env(safe-area-inset-right, 0px));
+		--inner-controls-offset-mobile: calc(var(--inner-controls-offset) + 1.25rem);
+
+		/* Borders & Effects */
+		--border-radius-sm: 0.375rem;
+		--border-radius-md: 0.5rem;
+		--border-radius-lg: 0.75rem;
+		--border-width: 1px;
+		--border-width-thick: 2px;
+
+		/* Transitions */
+		--transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+		--transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+		/* Z-index Scale */
+		--z-base: 0;
+		--z-dropdown: 1000;
+		--z-sticky: 1020;
+
+		/* Component-specific */
+		--toggle-knob-border-color: rgba(0, 0, 0, 0.6);
+		--toggle-knob-border-width: 2px;
+
+		/* App layout tokens */
+		--app-header-height: 4rem;
+
+		--color-text: var(--guild-text-rgb);
+		--color-text-secondary: 71 85 105;
+
+		color-scheme: light;
+	}
+
+	:root.dark {
+		--guild-background: rgb(15 15 15);
+		--guild-surface: rgb(26 26 26);
+		--guild-surface-elevated: rgb(32 32 32);
+		--guild-text-rgb: 245 255 250;
+		--guild-text-secondary: rgb(203 213 225);
+		--guild-border: rgb(51 65 85);
+		--toggle-knob-border-color: rgba(245, 255, 250, 0.3);
+		color-scheme: dark;
+	}
+}
