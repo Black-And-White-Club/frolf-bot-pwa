@@ -9,6 +9,8 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
 	import { appInit } from '$lib/stores/init.svelte';
+	import { auth } from '$lib/stores/auth.svelte';
+	import { guildService } from '$lib/stores/guild.svelte';
 
 	// These are client-only, non-critical components — load them lazily to keep the
 	// initial bundle smaller. Use Svelte 5 `$state` so updates are reactive.
@@ -155,7 +157,7 @@
 				</button>
 			</div>
 		</div>
-	{:else if page.data.session}
+	{:else if page.data.session || auth.isAuthenticated}
 		<!-- User is signed in -->
 		<div class="app-container">
 			<Navbar />
@@ -171,7 +173,9 @@
 					<ThemeToggle testid="theme-toggle-guest" />
 				</div>
 				<div>
-					<h1 class="text-guild-primary text-center text-3xl font-extrabold">Frolf Bot PWA</h1>
+					<h1 class="text-guild-primary text-center text-3xl font-extrabold">
+						{guildService.info?.name ?? 'Frolf Bot PWA'}
+					</h1>
 					<p class="text-guild-text-secondary mt-2 text-center text-sm">
 						Sign in with Discord to access your disc golf games.
 					</p>

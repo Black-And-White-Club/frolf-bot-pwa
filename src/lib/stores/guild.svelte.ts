@@ -10,18 +10,18 @@ class GuildService {
 	info = $state<GuildInfo | null>(null);
 	loading = $state(false);
 
-	// Derived from auth
-	guildId = $derived(auth.user?.guildId ?? null);
+	// Preferred ID for current session (Club UUID or legacy Guild ID)
+	id = $derived(auth.user?.activeClubUuid ?? auth.user?.guildId ?? null);
 
 	/**
 	 * Fetch guild info from cache or API
 	 * Called after auth is initialized
 	 */
 	async loadGuildInfo(): Promise<void> {
-		if (!this.guildId) return;
+		if (!this.id) return;
 
 		// Check localStorage cache first
-		const cached = this.getCachedGuild(this.guildId);
+		const cached = this.getCachedGuild(this.id);
 		if (cached) {
 			this.info = cached;
 			return;
@@ -34,7 +34,7 @@ class GuildService {
 			// const data = await response.json();
 
 			this.info = {
-				id: this.guildId,
+				id: this.id,
 				name: 'Disc Golf League', // Placeholder until API fetch
 				icon: undefined
 			};

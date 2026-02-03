@@ -9,17 +9,16 @@ import { leaderboardService } from './leaderboard.svelte';
 
 class SubscriptionManager {
 	private unsubscribers: (() => void)[] = [];
-	private guildId: string | null = null;
-
+	private id: string | null = null;
 	/**
-	 * Start all subscriptions for a guild
+	 * Start all subscriptions for a club/guild
 	 */
-	start(guildId: string): void {
+	start(id: string): void {
 		this.stop();
 
-		this.guildId = guildId;
-		this.subscribeRoundEvents(guildId);
-		this.subscribeLeaderboardEvents(guildId);
+		this.id = id;
+		this.subscribeRoundEvents(id);
+		this.subscribeLeaderboardEvents(id);
 	}
 
 	/**
@@ -28,7 +27,7 @@ class SubscriptionManager {
 	stop(): void {
 		this.unsubscribers.forEach((unsub) => unsub());
 		this.unsubscribers = [];
-		this.guildId = null;
+		this.id = null;
 	}
 
 	/**

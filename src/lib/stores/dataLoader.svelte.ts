@@ -19,8 +19,8 @@ class DataLoader {
 	 * Request initial data snapshots after NATS connection established
 	 */
 	async loadInitialData(): Promise<void> {
-		const guildId = auth.user?.guildId;
-		if (!guildId || !nats.isConnected) {
+		const id = auth.user?.activeClubUuid || auth.user?.guildId;
+		if (!id || !nats.isConnected) {
 			log('DataLoader: Cannot load - no guild or not connected');
 			return;
 		}
@@ -29,7 +29,7 @@ class DataLoader {
 		this.error = null;
 
 		try {
-			await Promise.all([this.loadRounds(guildId), this.loadLeaderboard(guildId)]);
+			await Promise.all([this.loadRounds(id), this.loadLeaderboard(id)]);
 			log('DataLoader: Initial data loaded successfully');
 		} catch (e) {
 			this.error = e instanceof Error ? e.message : 'Failed to load data';
@@ -95,6 +95,13 @@ class DataLoader {
 	reset(): void {
 		this.loading = false;
 		this.error = null;
+	}
+
+	clearData(): void {
+		this.reset();
+		roundService.clear();
+		leaderboardService.clear();
+		userProfiles.clear();
 	}
 }
 

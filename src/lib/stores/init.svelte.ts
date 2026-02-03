@@ -99,9 +99,10 @@ class AppInitializer {
 		// Connect to NATS
 		await nats.connect(auth.token as string);
 
-		// Start subscriptions and load initial data if we have a guild
-		if (auth.user?.guildId) {
-			subscriptionManager.start(auth.user.guildId);
+		// Start subscriptions and load initial data using the preferred identity (Club UUID)
+		const subscriptionId = auth.user?.activeClubUuid || auth.user?.guildId;
+		if (subscriptionId) {
+			subscriptionManager.start(subscriptionId);
 			await dataLoader.loadInitialData();
 		}
 	}

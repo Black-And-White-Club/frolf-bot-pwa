@@ -1,15 +1,26 @@
 // src/lib/stores/auth.svelte.ts
 
-interface AuthUser {
-	id: string;
-	guildId: string;
+interface ClubRole {
+	club_uuid: string;
 	role: 'viewer' | 'player' | 'editor' | 'admin';
 }
 
+interface AuthUser {
+	id: string; // Discord ID (legacy)
+	uuid: string; // Internal User UUID
+	activeClubUuid: string; // Internal Club UUID
+	guildId: string; // Discord Guild ID (legacy)
+	role: 'viewer' | 'player' | 'editor' | 'admin';
+	clubs: ClubRole[];
+}
+
 interface TokenClaims {
-	sub: string; // user:{discord_id}
-	guild: string; // guild ID
-	role: string; // permission level
+	sub: string; // Discord ID
+	user_uuid: string;
+	active_club_uuid: string;
+	clubs: ClubRole[];
+	guild: string; // Legacy Guild ID
+	role: string; // Legacy Role
 	exp: number; // expiry timestamp
 	iat: number; // issued at
 }
@@ -113,17 +124,57 @@ class AuthService {
 		sessionStorage.setItem('auth_token', token);
 		this.token = token;
 
-		// Extract user ID from sub (format: "user:{discord_id}")
+		// Extract user ID from sub
+		// Note: Backend currently sends raw Discord ID in sub
 		const userId = claims.sub.replace('user:', '');
 
 		this.user = {
 			id: userId,
+			uuid: claims.user_uuid,
+			activeClubUuid: claims.active_club_uuid,
 			guildId: claims.guild,
-			role: claims.role as AuthUser['role']
+			role: (claims.role || 'viewer') as AuthUser['role'],
+			clubs: claims.clubs || []
 		};
+
 
 		this.status = 'authenticated';
 		this.error = null;
+	}
+
+	/**
+	 * Switch the active club for the current session
+	 * Updates the store and triggers data reload via subscription manager
+	 */
+	async switchClub(clubUuid: string): Promise<void> {
+		if (!this.user) return;
+
+		// Verify membership
+		const membership = this.user.clubs.find(c => c.club_uuid === clubUuid);
+		if (!membership) {
+			console.warn(`User is not a member of club ${clubUuid}`);
+			return;
+		}
+
+		// Update local state
+		this.user.activeClubUuid = clubUuid;
+		this.user.role = membership.role; // Update active role context
+
+		// Reload app data
+		// We import subscriptionManager dynamically or assume it reacts to auth changes?
+		// Actually, in init.svelte.ts we start subscriptions based on auth.user.activeClubUuid.
+		// So we should restart subscriptions here.
+		// Using dynamic import to avoid circular dependency since init imports auth.
+		
+		const { subscriptionManager } = await import('./subscriptions.svelte');
+		const { dataLoader } = await import('./dataLoader.svelte');
+		const { guildService } = await import('./guild.svelte');
+		
+		subscriptionManager.start(clubUuid);
+		// clear old club specific data
+		dataLoader.clearData(); 
+		await guildService.loadGuildInfo(); // Will use new ID from auth.user.activeClubUuid
+		await dataLoader.loadInitialData();
 	}
 
 	/**
