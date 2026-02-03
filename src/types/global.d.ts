@@ -2,10 +2,6 @@
 // local runtime modules and dev/test-only packages used in the PWA.
 // Add or tighten types here as you replace shims with real typings.
 
-declare module '$lib/paraglide/runtime' {
-	export function deLocalizeUrl(url: string | URL): URL;
-}
-
 declare module 'drizzle-orm' {
 	// minimal shape used by server code; replace with real types as needed
 	export function eq<T = unknown>(a: T, b: T): boolean;
