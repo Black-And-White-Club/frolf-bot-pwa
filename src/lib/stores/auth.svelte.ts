@@ -119,6 +119,17 @@ export class AuthService {
 		// 2. Try silent refresh (works if we have a valid cookie)
 		await this.refreshSession();
 
+		// 3. Restore preferred club if possible
+		if (this.status === 'authenticated' && this.user) {
+			const preferredClub = localStorage.getItem('frolf_preferred_club');
+			if (preferredClub && preferredClub !== this.user.activeClubUuid) {
+				const hasMembership = this.user.clubs.some((c) => c.club_uuid === preferredClub);
+				if (hasMembership) {
+					await this.switchClub(preferredClub);
+				}
+			}
+		}
+
 		if (this.status !== 'authenticated') {
 			this.status = 'idle';
 		}
@@ -151,8 +162,12 @@ export class AuthService {
 		try {
 			const res = await fetch('/api/auth/ticket');
 			if (!res.ok) {
-				if (this.status === 'authenticated') {
-					this.signOut();
+				if (res.status === 401 || res.status === 403) {
+					if (this.status === 'authenticated') {
+						this.signOut();
+					}
+				} else {
+					this.error = 'Session refresh failed';
 				}
 				return null;
 			}
@@ -214,6 +229,7 @@ export class AuthService {
 		// Update local state
 		this.user.activeClubUuid = clubUuid;
 		this.user.role = membership.role; // Update active role context
+		localStorage.setItem('frolf_preferred_club', clubUuid);
 
 		// Reload app data
 		// We import subscriptionManager dynamically or assume it reacts to auth changes?

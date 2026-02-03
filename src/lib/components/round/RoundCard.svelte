@@ -30,7 +30,8 @@
 		dataTestId,
 		showDescription = true,
 		showLocation = true,
-		title,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		title: _unusedTitle,
 		description,
 		location,
 		start_time,
@@ -40,9 +41,6 @@
 		collapsed = false,
 		class: incomingClass
 	}: Props = $props();
-
-	// title prop may be provided by callers; reference to avoid unused-var lint
-	void title;
 
 	const localDescription = $derived(description ?? round?.description);
 	const localLocation = $derived(location ?? round?.location);

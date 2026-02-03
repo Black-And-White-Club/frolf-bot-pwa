@@ -3,9 +3,8 @@
 	import LeaderboardRow from './LeaderboardRow.svelte';
 	import TagBadge from './TagBadge.svelte';
 
-	let { guildId }: { guildId?: string } = $props();
-	// keep prop available for callers; reference to satisfy linter when unused
-	void guildId;
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	let { guildId: _unusedGuildId }: { guildId?: string } = $props();
 
 	let sortedEntries = $derived(leaderboardService.sortedEntries);
 	let topThree = $derived(leaderboardService.sortedEntries.slice(0, 3));

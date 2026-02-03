@@ -1,4 +1,4 @@
-import { paraglideVitePlugin } from '@inlang/paraglide-js';
+import { paraglide } from '@inlang/paraglide-vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import devtoolsJson from 'vite-plugin-devtools-json';
 import tailwindcss from '@tailwindcss/vite';
@@ -28,7 +28,7 @@ export default defineConfig({
 		tailwindcss(),
 		sveltekit(),
 		devtoolsJson(),
-		paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' }),
+		paraglide({ project: './project.inlang', outdir: './src/lib/paraglide' }),
 		VitePWA({
 			strategies: 'injectManifest',
 			srcDir: 'src',
