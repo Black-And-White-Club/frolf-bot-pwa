@@ -55,7 +55,7 @@
 		const toTimeStr = (d: Date) => d.toTimeString().slice(0, 5);
 
 		const { atcb_action } = await import('add-to-calendar-button');
-		await import('add-to-calendar-button/assets/css/atcb.css');
+		await import('$lib/assets/atcb.css');
 
 		atcb_action({
 			name: `Disc Golf Round: ${round.title}`,

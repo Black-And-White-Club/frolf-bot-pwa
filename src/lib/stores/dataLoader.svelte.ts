@@ -7,8 +7,8 @@ import { log } from '$lib/config';
 
 // Update response type for rounds
 interface RoundListResponseRaw {
-    rounds: RoundRaw[];
-    profiles?: Record<string, UserProfileRaw>;
+	rounds: RoundRaw[];
+	profiles?: Record<string, UserProfileRaw>;
 }
 
 class DataLoader {
@@ -45,9 +45,13 @@ class DataLoader {
 		try {
 			// Request rounds snapshot via NATS request/reply
 			// Backend returns snake_case format
-			const response = await nats.request<{ guild_id: string }, RoundListResponseRaw>(
+			// We send both guild_id (legacy) and club_uuid (new) to be safe
+			const response = await nats.request<
+				{ guild_id: string; club_uuid: string },
+				RoundListResponseRaw
+			>(
 				`round.list.request.v1.${guildId}`,
-				{ guild_id: guildId },
+				{ guild_id: guildId, club_uuid: guildId },
 				{ timeout: 5000 }
 			);
 
@@ -73,9 +77,13 @@ class DataLoader {
 			// Request leaderboard snapshot via NATS request/reply
 			// Backend returns snake_case format
 			const response = await nats.request<
-				{ guild_id: string },
+				{ guild_id: string; club_uuid: string },
 				LeaderboardResponseRaw
-			>(`leaderboard.snapshot.request.v1.${guildId}`, { guild_id: guildId }, { timeout: 5000 });
+			>(
+				`leaderboard.snapshot.request.v1.${guildId}`,
+				{ guild_id: guildId, club_uuid: guildId },
+				{ timeout: 5000 }
+			);
 
 			if (response?.leaderboard) {
 				leaderboardService.setSnapshotFromApi(response.leaderboard, guildId);

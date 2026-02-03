@@ -70,14 +70,23 @@ class UserProfileService {
 
     /**
      * Get avatar URL with fallback to Discord default
+     * @param size Optional size (power of 2: 16, 32, 64, 128, 256, 512)
      */
-    getAvatarUrl(userId: string): string {
+    getAvatarUrl(userId: string, size?: number): string {
         const profile = this.profiles[userId];
-        if (profile?.avatarUrl) {
-            return profile.avatarUrl;
+        let url = profile?.avatarUrl;
+        
+        if (!url) {
+            return this.getDefaultAvatarUrl(userId);
         }
-        // Generate default Discord avatar
-        return this.getDefaultAvatarUrl(userId);
+
+        // If it's a Discord URL, we can append size
+        if (size && url.includes('cdn.discordapp.com')) {
+            const separator = url.includes('?') ? '&' : '?';
+            return `${url}${separator}size=${size}`;
+        }
+        
+        return url;
     }
 
     private getDefaultAvatarUrl(userId: string): string {

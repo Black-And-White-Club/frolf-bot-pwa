@@ -105,7 +105,7 @@
 					<div class="hidden items-center space-x-4 md:flex">
 						<ThemeToggle testid="theme-toggle-navbar" />
 						<span class="text-sm text-[var(--guild-text-secondary)]">
-							Welcome, {page.data.session?.user?.name ?? auth.user?.id ?? 'Guest'}!
+							Welcome, {auth.displayName}!
 						</span>
 						{#if auth.isAuthenticated}
 							<button

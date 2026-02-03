@@ -81,7 +81,7 @@ class AppInitializer {
 
 	private async authenticateAndLoadGuild(): Promise<boolean> {
 		// Initialize auth (extracts token, validates)
-		auth.initialize();
+		await auth.initialize();
 
 		if (auth.isAuthenticated) {
 			try {
