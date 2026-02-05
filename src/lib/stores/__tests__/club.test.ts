@@ -6,8 +6,10 @@ vi.mock('$lib/config', () => ({
 	config: {
 		api: {
 			url: 'https://api.test'
-		}
-	}
+		},
+		debug: false
+	},
+	log: vi.fn()
 }));
 
 // Mock auth dependency

@@ -19,7 +19,7 @@ sw.addEventListener('install', (event) => {
 				const precacheList = (self as any).__WB_MANIFEST ?? [];
 				const urls = precacheList
 					.map((m: { url: string }) => m.url)
-					.concat([OFFLINE_URL, '/favicon.svg']);
+					.concat([OFFLINE_URL, '/favicon.png']);
 				await cache.addAll(urls);
 			} catch {
 				// best-effort

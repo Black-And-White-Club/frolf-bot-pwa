@@ -1,16 +1,18 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { serverConfig } from '$lib/server/config';
 
-export const GET: RequestHandler = async ({ url, fetch, request }) => {
-	const token = url.searchParams.get('t');
+export const POST: RequestHandler = async ({ fetch, request }) => {
 	const { backendUrl } = serverConfig;
-	
+
 	try {
-		const res = await fetch(`${backendUrl}/api/auth/callback?t=${token}`, {
-			method: 'GET',
+		const body = await request.text();
+		const res = await fetch(`${backendUrl}/api/auth/login`, {
+			method: 'POST',
 			headers: {
+				'content-type': request.headers.get('content-type') || 'application/json',
 				cookie: request.headers.get('cookie') || ''
-			}
+			},
+			body
 		});
 
 		if (!res.ok) {
@@ -18,7 +20,6 @@ export const GET: RequestHandler = async ({ url, fetch, request }) => {
 			return json({ error }, { status: res.status });
 		}
 
-		// Forward the Set-Cookie header from the backend
 		const setCookie = res.headers.get('set-cookie');
 		const data = await res.json();
 
@@ -29,7 +30,7 @@ export const GET: RequestHandler = async ({ url, fetch, request }) => {
 
 		return json(data, { headers });
 	} catch (e) {
-		console.error('Callback proxy error:', e);
+		console.error('Login proxy error:', e);
 		return json({ error: 'Internal Server Error' }, { status: 500 });
 	}
 };

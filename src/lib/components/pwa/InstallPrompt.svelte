@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { log } from '$lib/config';
 
 	let deferredPrompt: BeforeInstallPromptEvent | null = $state(null);
 	let showPrompt = $state(false);
@@ -13,7 +14,7 @@
 		if (!browser) return;
 
 		const handler = (e: Event) => {
-			console.log('[PWA] beforeinstallprompt event fired');
+			log('[PWA] beforeinstallprompt event fired');
 			e.preventDefault();
 			deferredPrompt = e as BeforeInstallPromptEvent;
 			showPrompt = true;

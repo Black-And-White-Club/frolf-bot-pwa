@@ -17,7 +17,7 @@ const {
 	mockLeaderboardService,
 	mockAuth,
 	mockAppInit,
-	mockGuildService,
+	mockClubService,
 	mockUserProfiles
 } = vi.hoisted(() => {
 	return {
@@ -35,7 +35,7 @@ const {
 		mockAppInit: {
 			mode: 'default'
 		},
-		mockGuildService: {
+		mockClubService: {
 			info: { name: 'Test Guild' }
 		},
 		mockUserProfiles: {
@@ -65,8 +65,8 @@ vi.mock('$lib/stores/init.svelte', () => ({
 	appInit: mockAppInit
 }));
 
-vi.mock('$lib/stores/guild.svelte', () => ({
-	guildService: mockGuildService
+vi.mock('$lib/stores/club.svelte', () => ({
+	clubService: mockClubService
 }));
 
 describe('Dashboard', () => {
@@ -78,7 +78,7 @@ describe('Dashboard', () => {
 		mockLeaderboardService.isLoading = false;
 		mockAuth.isAuthenticated = false;
 		mockAppInit.mode = 'default';
-		mockGuildService.info = { name: 'Test Guild' };
+		mockClubService.info = { name: 'Test Guild' };
 	});
 
 	it('shows UnauthenticatedView when not authenticated', () => {

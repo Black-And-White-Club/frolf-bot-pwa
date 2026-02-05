@@ -176,7 +176,6 @@ export class AuthService {
 
 			const { ticket } = await res.json();
 			const claims = this.parseJWT(ticket);
-			console.log('[Auth] Raw Claims:', claims);
 
 			this.token = ticket;
 			this.user = {
@@ -234,12 +233,7 @@ export class AuthService {
 		this.user.role = membership.role; // Update active role context
 		localStorage.setItem('frolf_preferred_club', clubUuid);
 
-		// Reload app data
-		// We import subscriptionManager dynamically or assume it reacts to auth changes?
-		// Actually, in init.svelte.ts we start subscriptions based on auth.user.activeClubUuid.
-		// So we should restart subscriptions here.
-		// Using dynamic import to avoid circular dependency since init imports auth.
-
+		// Reload app data — dynamic imports avoid circular dependency (init imports auth)
 		const { subscriptionManager } = await import('./subscriptions.svelte');
 		const { dataLoader } = await import('./dataLoader.svelte');
 		const { clubService } = await import('./club.svelte');

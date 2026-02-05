@@ -19,7 +19,7 @@ export const config = {
 	mock: {
 		enabled: env.PUBLIC_USE_MOCK === 'true'
 	},
-	debug: env.PUBLIC_DEBUG === 'true' || true // Enable debug by default for now to help the user
+	debug: env.PUBLIC_DEBUG === 'true'
 } as const;
 
 export function log(...args: unknown[]): void {

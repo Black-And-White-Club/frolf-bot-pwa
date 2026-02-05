@@ -8,7 +8,7 @@
 		try {
 			// This would trigger a NATS request via the backend to send a magic link
 			// For now, we'll just mock the success state or redirect to the backend generator
-			const res = await fetch(`${auth.token ? '' : ''}/api/auth/login`, {
+			const res = await fetch('/api/auth/login', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ email })

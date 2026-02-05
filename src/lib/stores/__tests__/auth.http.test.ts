@@ -10,8 +10,8 @@ vi.mock('../dataLoader.svelte', () => ({
 	dataLoader: { clearData: vi.fn(), loadInitialData: vi.fn() }
 }));
 
-vi.mock('../guild.svelte', () => ({
-	guildService: { loadGuildInfo: vi.fn() }
+vi.mock('../club.svelte', () => ({
+	clubService: { loadClubInfo: vi.fn() }
 }));
 
 describe('AuthService HTTP methods (auth.svelte.ts)', () => {

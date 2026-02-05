@@ -125,7 +125,7 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href="/favicon.svg" />
+	<link rel="icon" href="/favicon.png" type="image/png" />
 	<!-- Preconnect to common image CDN to reduce LCP latency (reported by Lighthouse) -->
 	<link rel="dns-prefetch" href="https://images.unsplash.com" />
 	<link rel="preconnect" href="https://images.unsplash.com" crossorigin="anonymous" />

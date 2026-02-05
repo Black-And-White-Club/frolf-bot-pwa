@@ -42,10 +42,8 @@ export {};
 // for information about these interfaces
 declare global {
 	namespace App {
-		interface Locals {
-			auth: import('@auth/sveltekit').Session | null;
-		}
-	} // interface Error {}
+		// interface Error {}
+		// interface Locals {}
 	// interface Locals {}
 } // interface PageData {}
 // interface PageState {}

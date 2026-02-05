@@ -16,9 +16,9 @@ vi.mock('$lib/stores/dataLoader.svelte', () => ({
 	}
 }));
 
-vi.mock('$lib/stores/guild.svelte', () => ({
-	guildService: {
-		loadGuildInfo: vi.fn()
+vi.mock('$lib/stores/club.svelte', () => ({
+	clubService: {
+		loadClubInfo: vi.fn()
 	}
 }));
 
@@ -177,11 +177,11 @@ describe('AuthService (auth.svelte.ts)', () => {
 			// Verify side effects
 			const { subscriptionManager } = await import('../subscriptions.svelte');
 			const { dataLoader } = await import('../dataLoader.svelte');
-			const { guildService } = await import('../guild.svelte');
+			const { clubService } = await import('../club.svelte');
 
 			expect(subscriptionManager.start).toHaveBeenCalledWith('club-2');
 			expect(dataLoader.clearData).toHaveBeenCalled();
-			expect(guildService.loadGuildInfo).toHaveBeenCalled();
+			expect(clubService.loadClubInfo).toHaveBeenCalled();
 			expect(dataLoader.loadInitialData).toHaveBeenCalled();
 		});
 

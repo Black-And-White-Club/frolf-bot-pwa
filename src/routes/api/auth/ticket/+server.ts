@@ -4,8 +4,6 @@ import { serverConfig } from '$lib/server/config';
 export const GET: RequestHandler = async ({ fetch, request }) => {
 	const { backendUrl } = serverConfig;
 	
-	console.log(`[Proxy] Ticket: backendUrl=${backendUrl}`);
-
 	try {
 		const res = await fetch(`${backendUrl}/api/auth/ticket`, {
 			method: 'GET',

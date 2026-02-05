@@ -22,7 +22,20 @@ ENV VITE_API_URL=${VITE_API_URL} \
 
 RUN bun run build
 
-FROM nginx:alpine
-COPY --from=builder /app/build /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# --- Runtime ---
+FROM oven/bun:1-alpine
+WORKDIR /app
+
+RUN addgroup -S app && adduser -S app -G app
+
+COPY --from=builder /app/build build/
+COPY --from=builder /app/package.json .
+COPY --from=builder /app/node_modules node_modules/
+
+USER app
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s \
+    CMD wget -qO- http://localhost:3000/api/ping || exit 1
+
+CMD ["bun", "build/index.js"]

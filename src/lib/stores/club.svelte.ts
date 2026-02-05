@@ -1,4 +1,5 @@
 import { auth } from './auth.svelte';
+import { log } from '$lib/config';
 
 
 interface ClubInfo {
@@ -20,26 +21,26 @@ class ClubService {
 	 */
 	async loadClubInfo(): Promise<void> {
 		if (!this.id) {
-			console.log('[ClubService] No ID available to load');
+			log('[ClubService] No ID available to load');
 			return;
 		}
 
 		// In development, clear cache to ensure fresh data
 		// But don't clear in tests, so we can verify caching logic
 		if (import.meta.env.DEV && !import.meta.env.TEST && typeof window !== 'undefined') {
-			console.log('[ClubService] DEV mode: Clearing club cache');
+			log('[ClubService] DEV mode: Clearing club cache');
 			localStorage.removeItem(`club:${this.id}`);
 		}
 
 		// Check localStorage cache first
 		const cached = this.getCachedClub(this.id);
 		if (cached) {
-			console.log('[ClubService] Loading from cache:', cached);
+			log('[ClubService] Loading from cache:', cached);
 			this.info = cached;
 			// Background refresh via NATS
 			this.fetchFromNats(this.id).then((fresh) => {
 				if (fresh) {
-					console.log('[ClubService] Background refresh success:', fresh);
+					log('[ClubService] Background refresh success:', fresh);
 					this.info = fresh;
 					this.cacheClub(fresh);
 				}
@@ -47,15 +48,15 @@ class ClubService {
 			return;
 		}
 
-		console.log('[ClubService] Fetching fresh data for:', this.id);
+		log('[ClubService] Fetching fresh data for:', this.id);
 		this.loading = true;
 		try {
 			// NATS First Strategy (as requested)
-			console.log('[ClubService] Requesting info via NATS...');
+			log('[ClubService] Requesting info via NATS...');
 			const info = await this.fetchFromNats(this.id);
 			
 			if (info) {
-				console.log('[ClubService] NATS fetch success:', info);
+				log('[ClubService] NATS fetch success:', info);
 				this.info = info;
 				this.cacheClub(info);
 			} else {

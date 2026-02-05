@@ -31,20 +31,6 @@
 		return auth.user.id;
 	});
 
-	$effect(() => {
-		if (auth.user) {
-			const profile = userProfiles.getProfile(auth.user.uuid) ?? userProfiles.getProfile(auth.user.id);
-			console.log('[Navbar] Name Resolution:', {
-				uuid: auth.user.uuid,
-				id: auth.user.id,
-				profile,
-				udiscName: profile?.udiscUsername,
-				authDisplayName: auth.displayName,
-				finalDisplayName: displayName
-			});
-		}
-	});
-
 	function toggleHamburger() {
 		showHamburger = !showHamburger;
 		try {

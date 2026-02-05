@@ -85,10 +85,6 @@ class AppInitializer {
 		// Initialize auth (extracts token, validates)
 		await auth.initialize();
 
-		// We delay guild loading until after NATS connect if possible,
-		// or we can try here but it will fail over to NATS later if we move it.
-		// Actually, let's just return true if auth is good.
-		
 		return Boolean(auth.isAuthenticated && auth.token);
 	}
 
