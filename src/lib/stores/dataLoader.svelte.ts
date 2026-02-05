@@ -7,8 +7,8 @@ import { log } from '$lib/config';
 
 // Update response type for rounds
 interface RoundListResponseRaw {
-    rounds: RoundRaw[];
-    profiles?: Record<string, UserProfileRaw>;
+	rounds: RoundRaw[];
+	profiles?: Record<string, UserProfileRaw>;
 }
 
 class DataLoader {
@@ -19,9 +19,18 @@ class DataLoader {
 	 * Request initial data snapshots after NATS connection established
 	 */
 	async loadInitialData(): Promise<void> {
-		const guildId = auth.user?.guildId;
-		if (!guildId || !nats.isConnected) {
-			log('DataLoader: Cannot load - no guild or not connected');
+		const user = auth.user;
+		if (!user || !nats.isConnected) {
+			log('DataLoader: Cannot load - no user or not connected');
+			return;
+		}
+
+		const clubUuid = user.activeClubUuid;
+		const guildId = user.guildId;
+		const preferredId = clubUuid || guildId;
+
+		if (!preferredId) {
+			log('DataLoader: Cannot load - no club or guild ID');
 			return;
 		}
 
@@ -29,7 +38,10 @@ class DataLoader {
 		this.error = null;
 
 		try {
-			await Promise.all([this.loadRounds(guildId), this.loadLeaderboard(guildId)]);
+			await Promise.all([
+				this.loadRounds(preferredId, clubUuid, guildId),
+				this.loadLeaderboard(preferredId, clubUuid, guildId)
+			]);
 			log('DataLoader: Initial data loaded successfully');
 		} catch (e) {
 			this.error = e instanceof Error ? e.message : 'Failed to load data';
@@ -39,15 +51,19 @@ class DataLoader {
 		}
 	}
 
-	private async loadRounds(guildId: string): Promise<void> {
+	private async loadRounds(subjectId: string, clubUuid: string, guildId: string): Promise<void> {
 		roundService.setLoading(true);
 
 		try {
 			// Request rounds snapshot via NATS request/reply
 			// Backend returns snake_case format
-			const response = await nats.request<{ guild_id: string }, RoundListResponseRaw>(
-				`round.list.request.v1.${guildId}`,
-				{ guild_id: guildId },
+			// We send both guild_id (legacy) and club_uuid (new) separately
+			const response = await nats.request<
+				{ guild_id: string; club_uuid: string },
+				RoundListResponseRaw
+			>(
+				`round.list.request.v1.${subjectId}`,
+				{ guild_id: guildId, club_uuid: clubUuid },
 				{ timeout: 5000 }
 			);
 
@@ -66,19 +82,23 @@ class DataLoader {
 		}
 	}
 
-	private async loadLeaderboard(guildId: string): Promise<void> {
+	private async loadLeaderboard(subjectId: string, clubUuid: string, guildId: string): Promise<void> {
 		leaderboardService.setLoading(true);
 
 		try {
 			// Request leaderboard snapshot via NATS request/reply
 			// Backend returns snake_case format
 			const response = await nats.request<
-				{ guild_id: string },
+				{ guild_id: string; club_uuid: string },
 				LeaderboardResponseRaw
-			>(`leaderboard.snapshot.request.v1.${guildId}`, { guild_id: guildId }, { timeout: 5000 });
+			>(
+				`leaderboard.snapshot.request.v1.${subjectId}`,
+				{ guild_id: guildId, club_uuid: clubUuid },
+				{ timeout: 5000 }
+			);
 
 			if (response?.leaderboard) {
-				leaderboardService.setSnapshotFromApi(response.leaderboard, guildId);
+				leaderboardService.setSnapshotFromApi(response.leaderboard, subjectId);
 			}
 			// Store profiles if included
 			if (response?.profiles) {
@@ -95,6 +115,13 @@ class DataLoader {
 	reset(): void {
 		this.loading = false;
 		this.error = null;
+	}
+
+	clearData(): void {
+		this.reset();
+		roundService.clear();
+		leaderboardService.clear();
+		userProfiles.clear();
 	}
 }
 

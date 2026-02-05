@@ -3,6 +3,7 @@
 	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
 	import { auth } from '$lib/stores/auth.svelte';
 	import { appInit } from '$lib/stores/init.svelte';
+	import { clubService } from '$lib/stores/club.svelte';
 	import RoundListCompact from '$lib/components/round/RoundListCompact.svelte';
 	import LeaderboardCompact from '$lib/components/leaderboard/LeaderboardCompact.svelte';
 	import LiveIndicator from '$lib/components/general/LiveIndicator.svelte';
@@ -13,8 +14,6 @@
 
 	let { mode = 'default' }: { mode?: 'default' | 'tv' | 'compact' } = $props();
 
-	// Remove activeTab
-	
 	const activeRounds = $derived(
 		roundService.rounds.filter((r) => r.state === 'started' || r.state === 'scheduled')
 	);
@@ -30,7 +29,9 @@
 	<div class="dashboard" class:tv-mode={mode === 'tv'} class:compact-mode={mode === 'compact'}>
 		<header class="dashboard-header">
 			<div class="flex items-center gap-2">
-				<h1 class="text-xl font-bold text-slate-100">Frolf Bot</h1>
+				<h1 class="text-xl font-bold text-slate-100">
+					{clubService.info?.name ?? 'Frolf Bot'}
+				</h1>
 			</div>
 			<ConnectionStatus />
 		</header>

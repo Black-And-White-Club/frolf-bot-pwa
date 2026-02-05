@@ -7,9 +7,10 @@
 		transport: Transport;
 	};
 
-	let { transport }: Props = $props();
+	const props = $props<Props>();
 
-	const store = createLeaderboardPreviewStore(transport);
+	// Store is created once with initial transport - transport changes are not supported
+	const store = createLeaderboardPreviewStore(props.transport);
 	let state: { snapshot: any; lastVersion: number } = $state({ snapshot: null, lastVersion: 0 });
 
 	const unsubscribe = store.subscribe((s) => {

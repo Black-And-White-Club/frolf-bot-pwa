@@ -3,16 +3,6 @@ import type { SvelteComponentTyped } from 'svelte';
 // Project-level ambient declarations to help svelte-check find types for
 // local runtime modules and dev-only packages used in tests.
 
-declare module '$lib/paraglide/runtime' {
-	export function deLocalizeUrl(url: string | URL): URL;
-}
-
-// Also provide the declaration here to ensure TypeScript finds the module
-declare module '$lib/paraglide/runtime' {
-	/** Low-level de-localization function returning an absolute URL */
-	export function deLocalizeUrl(url: string | URL): URL;
-}
-
 declare module 'drizzle-orm' {
 	export function eq(a: unknown, b: unknown): unknown;
 }
@@ -52,10 +42,8 @@ export {};
 // for information about these interfaces
 declare global {
 	namespace App {
-		interface Locals {
-			auth: import('@auth/sveltekit').Session | null;
-		}
-	} // interface Error {}
+		// interface Error {}
+		// interface Locals {}
 	// interface Locals {}
 } // interface PageData {}
 // interface PageState {}

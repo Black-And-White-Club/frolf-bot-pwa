@@ -147,29 +147,6 @@
 		gap: 0.75rem;
 	}
 
-	.status-indicator {
-		padding-top: 0.25rem;
-	}
-
-	.status-dot {
-		width: 8px;
-		height: 8px;
-		border-radius: 50%;
-	}
-
-	.status-dot.bg-green-500 {
-		background-color: #10b981;
-		box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
-	}
-
-	.status-dot.bg-amber-500 {
-		background-color: #f59e0b;
-	}
-
-	.status-dot.bg-slate-500 {
-		background-color: #64748b;
-	}
-
 	.round-title {
 		flex: 1;
 		margin: 0;

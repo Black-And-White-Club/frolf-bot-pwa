@@ -1,4 +1,4 @@
-import { paraglideVitePlugin } from '@inlang/paraglide-js';
+import { paraglide } from '@inlang/paraglide-vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import devtoolsJson from 'vite-plugin-devtools-json';
 import tailwindcss from '@tailwindcss/vite';
@@ -24,11 +24,20 @@ export default defineConfig({
 		target: 'esnext'
 	},
 
+	server: {
+		proxy: {
+			// Proxy backend requests to local Go server to avoid CORS
+			'/api': 'http://localhost:3001',
+			'/clubs': 'http://localhost:3001',
+			'/guilds': 'http://localhost:3001'
+		}
+	},
+
 	plugins: [
 		tailwindcss(),
 		sveltekit(),
 		devtoolsJson(),
-		paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' }),
+		paraglide({ project: './project.inlang', outdir: './src/lib/paraglide' }),
 		VitePWA({
 			strategies: 'injectManifest',
 			srcDir: 'src',

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Dashboard from '$lib/components/dashboard/Dashboard.svelte';
+	import { clubService } from '$lib/stores/club.svelte';
 	import { page } from '$app/stores';
 
 	const mode = $derived(
@@ -8,7 +9,7 @@
 </script>
 
 <svelte:head>
-	<title>Frolf Bot</title>
+	<title>{clubService.info?.name ?? 'Frolf Bot'}</title>
 </svelte:head>
 
 <Dashboard {mode} />

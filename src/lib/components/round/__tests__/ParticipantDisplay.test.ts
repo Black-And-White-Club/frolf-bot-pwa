@@ -1,8 +1,13 @@
 /* @vitest-environment jsdom */
 import { render } from '@testing-library/svelte';
-import { test, expect } from 'vitest';
+import { test, expect, beforeEach } from 'vitest';
 import ParticipantDisplay from '../ParticipantDisplay.svelte';
 import type { Round } from '$lib/types/backend';
+import { userProfiles } from '$lib/stores/userProfiles.svelte';
+
+beforeEach(() => {
+	userProfiles.setProfilesFromApi({});
+});
 
 const makeRound = (overrides?: Partial<Round>): Round =>
 	({
@@ -31,6 +36,12 @@ test('shows avatars when avatar_url present and score displayed when present', (
 			{ user_id: 'u2', username: 'bob', avatar_url: undefined, response: 'yes' }
 		],
 		status: 'active'
+	});
+	
+	// Populate user profiles store
+	userProfiles.setProfilesFromApi({
+		'u1': { user_id: 'u1', display_name: 'alice', avatar_url: 'https://example.com/a.png' },
+		'u2': { user_id: 'u2', display_name: 'bob', avatar_url: '' }
 	});
 
 	const { getByAltText, getByText } = render(ParticipantDisplay, {

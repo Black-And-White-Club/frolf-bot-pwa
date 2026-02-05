@@ -16,6 +16,18 @@ interface CalendarEvent {
 	timeZone: string;
 }
 
+/**
+ * Escapes a string for safe inclusion in an iCalendar field.
+ * Prevents CRLF injection and conforms to RFC 5545 TEXT escaping.
+ */
+function sanitizeIcsField(value: string): string {
+	return value
+		.replace(/\\/g, '\\\\')
+		.replace(/\r?\n/g, '\\n')
+		.replace(/,/g, '\\,')
+		.replace(/;/g, '\\;');
+}
+
 export function createCalendarEvent(round: Round): CalendarEvent {
 	const startDate = round.start_time ? new Date(round.start_time) : new Date(round.created_at);
 	const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000); // 2 hours later
@@ -69,9 +81,9 @@ function downloadICalendarFile(event: CalendarEvent, roundId: string) {
 	const icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
 BEGIN:VEVENT
-SUMMARY:${event.name}
-DESCRIPTION:${event.description}
-LOCATION:${event.location}
+SUMMARY:${sanitizeIcsField(event.name)}
+DESCRIPTION:${sanitizeIcsField(event.description)}
+LOCATION:${sanitizeIcsField(event.location)}
 DTSTART:${new Date(event.startDate + 'T' + event.startTime).toISOString().replace(/[-:]/g, '').split('.')[0]}Z
 DTEND:${new Date(event.endDate + 'T' + event.endTime).toISOString().replace(/[-:]/g, '').split('.')[0]}Z
 END:VEVENT

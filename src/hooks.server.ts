@@ -15,7 +15,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		"img-src 'self' data: https://images.unsplash.com https://*.githubusercontent.com https://cdn.discordapp.com",
 		"font-src 'self' data:",
 		"manifest-src 'self'",
-		"connect-src 'self' https://api.github.com ws: http://localhost:4318",
+		"connect-src 'self' https://api.github.com ws:",
 		"frame-ancestors 'none'",
 		"base-uri 'self'",
 		"object-src 'none'"

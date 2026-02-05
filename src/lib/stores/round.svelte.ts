@@ -208,6 +208,12 @@ export class RoundService {
 		this.updateParticipant(payload.roundId, payload.userId, { score: payload.score });
 	}
 
+	clear(): void {
+		this.rounds = [];
+		this.selectedRoundId = null;
+		this.lastError = null;
+	}
+
 	// Data loading methods
 	setLoading(loading: boolean): void {
 		this.isLoading = loading;

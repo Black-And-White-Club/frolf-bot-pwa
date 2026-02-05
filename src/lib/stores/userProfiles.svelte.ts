@@ -9,6 +9,7 @@ export interface UserProfileRaw {
     display_name: string;
     avatar_url: string;
     udisc_username?: string;
+    udisc_name?: string;
 }
 
 // Internal format
@@ -17,6 +18,7 @@ export interface UserProfile {
     displayName: string;
     avatarUrl: string;
     udiscUsername?: string;
+    udiscName?: string;
 }
 
 function transformProfile(raw: UserProfileRaw): UserProfile {
@@ -24,7 +26,8 @@ function transformProfile(raw: UserProfileRaw): UserProfile {
         userId: raw.user_id,
         displayName: raw.display_name,
         avatarUrl: raw.avatar_url,
-        udiscUsername: raw.udisc_username
+        udiscUsername: raw.udisc_username,
+        udiscName: raw.udisc_name
     };
 }
 
@@ -70,14 +73,23 @@ class UserProfileService {
 
     /**
      * Get avatar URL with fallback to Discord default
+     * @param size Optional size (power of 2: 16, 32, 64, 128, 256, 512)
      */
-    getAvatarUrl(userId: string): string {
+    getAvatarUrl(userId: string, size?: number): string {
         const profile = this.profiles[userId];
-        if (profile?.avatarUrl) {
-            return profile.avatarUrl;
+        let url = profile?.avatarUrl;
+        
+        if (!url) {
+            return this.getDefaultAvatarUrl(userId);
         }
-        // Generate default Discord avatar
-        return this.getDefaultAvatarUrl(userId);
+
+        // If it's a Discord URL, we can append size
+        if (size && url.includes('cdn.discordapp.com')) {
+            const separator = url.includes('?') ? '&' : '?';
+            return `${url}${separator}size=${size}`;
+        }
+        
+        return url;
     }
 
     private getDefaultAvatarUrl(userId: string): string {
