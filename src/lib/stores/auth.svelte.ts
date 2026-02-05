@@ -119,8 +119,10 @@ export class AuthService {
 		// 2. Try silent refresh (works if we have a valid cookie)
 		await this.refreshSession();
 
+
 		// 3. Restore preferred club if possible
-		if (this.status === 'authenticated' && this.user) {
+		// TS incorrectly narrows status to 'validating' here despite async calls
+		if ((this.status as string) === 'authenticated' && this.user) {
 			const preferredClub = localStorage.getItem('frolf_preferred_club');
 			if (preferredClub && preferredClub !== this.user.activeClubUuid) {
 				const hasMembership = this.user.clubs.some((c) => c.club_uuid === preferredClub);
@@ -130,7 +132,7 @@ export class AuthService {
 			}
 		}
 
-		if (this.status !== 'authenticated') {
+		if ((this.status as string) !== 'authenticated') {
 			this.status = 'idle';
 		}
 	}
@@ -174,6 +176,7 @@ export class AuthService {
 
 			const { ticket } = await res.json();
 			const claims = this.parseJWT(ticket);
+			console.log('[Auth] Raw Claims:', claims);
 
 			this.token = ticket;
 			this.user = {
@@ -239,12 +242,12 @@ export class AuthService {
 
 		const { subscriptionManager } = await import('./subscriptions.svelte');
 		const { dataLoader } = await import('./dataLoader.svelte');
-		const { guildService } = await import('./guild.svelte');
+		const { clubService } = await import('./club.svelte');
 
 		subscriptionManager.start(clubUuid);
 		// clear old club specific data
 		dataLoader.clearData();
-		await guildService.loadGuildInfo(); // Will use new ID from auth.user.activeClubUuid
+		await clubService.loadClubInfo(); // Will use new ID from auth.user.activeClubUuid
 		await dataLoader.loadInitialData();
 	}
 

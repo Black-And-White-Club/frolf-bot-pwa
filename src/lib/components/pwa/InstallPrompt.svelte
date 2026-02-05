@@ -13,6 +13,7 @@
 		if (!browser) return;
 
 		const handler = (e: Event) => {
+			console.log('[PWA] beforeinstallprompt event fired');
 			e.preventDefault();
 			deferredPrompt = e as BeforeInstallPromptEvent;
 			showPrompt = true;

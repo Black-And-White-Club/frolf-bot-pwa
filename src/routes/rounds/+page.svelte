@@ -2,7 +2,7 @@
 	import RoundList from '$lib/components/round/RoundList.svelte';
 	import { auth } from '$lib/stores/auth.svelte';
 
-	import { guildService } from '$lib/stores/guild.svelte';
+	import { clubService } from '$lib/stores/club.svelte';
 
 	let isAuthenticated = $derived(auth.isAuthenticated);
 
@@ -12,7 +12,7 @@
 </script>
 
 <svelte:head>
-	<title>Rounds | {guildService.info?.name ?? 'Frolf Bot'}</title>
+	<title>Rounds | {clubService.info?.name ?? 'Frolf Bot'}</title>
 </svelte:head>
 
 <main class="container mx-auto px-4 py-6">

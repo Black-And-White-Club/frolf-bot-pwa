@@ -10,7 +10,7 @@
 	import { browser } from '$app/environment';
 	import { appInit } from '$lib/stores/init.svelte';
 	import { auth } from '$lib/stores/auth.svelte';
-	import { guildService } from '$lib/stores/guild.svelte';
+	import { clubService } from '$lib/stores/club.svelte';
 
 	// These are client-only, non-critical components — load them lazily to keep the
 	// initial bundle smaller. Use Svelte 5 `$state` so updates are reactive.
@@ -22,6 +22,17 @@
 	let swListener: (ev: Event) => void;
 
 	onMount(async () => {
+		console.log('%c Frolf App v1.1 - Dev Cache Clear Active ', 'background: #222; color: #bada55');
+
+		// In development, force unregister any existing service workers to prevent stale caching
+		if (import.meta.env.DEV && 'serviceWorker' in navigator) {
+			const registrations = await navigator.serviceWorker.getRegistrations();
+			for (const registration of registrations) {
+				console.log('[Dev] Unregistering service worker:', registration);
+				await registration.unregister();
+			}
+		}
+
 		// Register the service worker after the browser is idle so we don't
 		// block the main thread or inflate the initial JS bundle.
 		const registerLater = async () => {
@@ -157,7 +168,7 @@
 				</button>
 			</div>
 		</div>
-	{:else if page.data.session || auth.isAuthenticated}
+	{:else if auth.isAuthenticated}
 		<!-- User is signed in -->
 		<div class="app-container">
 			<Navbar />
@@ -174,7 +185,7 @@
 				</div>
 				<div>
 					<h1 class="text-guild-primary text-center text-3xl font-extrabold">
-						{guildService.info?.name ?? 'Frolf Bot PWA'}
+						{'Frolf Bot'}
 					</h1>
 					<p class="text-guild-text-secondary mt-2 text-center text-sm">
 						Sign in with Discord to access your disc golf games.

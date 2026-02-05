@@ -9,6 +9,7 @@ export interface UserProfileRaw {
     display_name: string;
     avatar_url: string;
     udisc_username?: string;
+    udisc_name?: string;
 }
 
 // Internal format
@@ -17,6 +18,7 @@ export interface UserProfile {
     displayName: string;
     avatarUrl: string;
     udiscUsername?: string;
+    udiscName?: string;
 }
 
 function transformProfile(raw: UserProfileRaw): UserProfile {
@@ -24,7 +26,8 @@ function transformProfile(raw: UserProfileRaw): UserProfile {
         userId: raw.user_id,
         displayName: raw.display_name,
         avatarUrl: raw.avatar_url,
-        udiscUsername: raw.udisc_username
+        udiscUsername: raw.udisc_username,
+        udiscName: raw.udisc_name
     };
 }
 

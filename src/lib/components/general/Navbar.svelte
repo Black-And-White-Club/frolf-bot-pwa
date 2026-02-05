@@ -4,9 +4,46 @@
 	import HamburgerMenu from './HamburgerMenu.svelte';
 	import { setModalOpen } from '$lib/stores/overlay';
 	import { auth } from '$lib/stores/auth.svelte';
-	import { guildService } from '$lib/stores/guild.svelte';
+	import { clubService } from '$lib/stores/club.svelte';
+	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 
 	let showHamburger = $state(false);
+
+	const displayName = $derived.by(() => {
+		if (!auth.user) return 'Guest';
+		const profile = userProfiles.getProfile(auth.user.uuid) ?? userProfiles.getProfile(auth.user.id);
+
+		// 1. Per-club nickname from JWT (Discord server nickname)
+		if (auth.displayName && auth.displayName !== auth.user.id) {
+			return auth.displayName;
+		}
+
+		// 2. UDisc Name (name shown on casual rounds)
+		if (profile?.udiscName) return profile.udiscName;
+
+		// 3. UDisc Username (@handle)
+		if (profile?.udiscUsername) return profile.udiscUsername;
+
+		// 4. Global display name from profile (Discord username)
+		if (profile?.displayName) return profile.displayName;
+
+		// 5. Final fallback to Discord ID
+		return auth.user.id;
+	});
+
+	$effect(() => {
+		if (auth.user) {
+			const profile = userProfiles.getProfile(auth.user.uuid) ?? userProfiles.getProfile(auth.user.id);
+			console.log('[Navbar] Name Resolution:', {
+				uuid: auth.user.uuid,
+				id: auth.user.id,
+				profile,
+				udiscName: profile?.udiscUsername,
+				authDisplayName: auth.displayName,
+				finalDisplayName: displayName
+			});
+		}
+	});
 
 	function toggleHamburger() {
 		showHamburger = !showHamburger;
@@ -32,7 +69,7 @@
 		<div class="flex w-full items-center justify-between">
 			<div class="flex items-center gap-8">
 				<h1 class="text-guild-primary card-title card-title--skobeloff text-xl font-bold">
-					{guildService.info?.name ?? 'Frolf Bot'}
+					{'Frolf Bot'}
 				</h1>
 
 				<!-- Desktop Navigation Links -->
@@ -105,7 +142,7 @@
 					<div class="hidden items-center space-x-4 md:flex">
 						<ThemeToggle testid="theme-toggle-navbar" />
 						<span class="text-sm text-[var(--guild-text-secondary)]">
-							Welcome, {auth.displayName}!
+							Welcome, {displayName}!
 						</span>
 						{#if auth.isAuthenticated}
 							<button

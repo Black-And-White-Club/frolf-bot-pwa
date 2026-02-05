@@ -10,8 +10,8 @@ import { nats } from './nats.svelte';
 import { subscriptionManager } from './subscriptions.svelte';
 import { dataLoader } from './dataLoader.svelte';
 import { initTracing } from '$lib/otel/tracing';
-import { mockDataProvider } from '$lib/mocks/mockDataProvider.svelte';
-import { guildService } from './guild.svelte';
+// import { mockDataProvider } from '$lib/mocks/mockDataProvider.svelte';
+import { clubService } from './club.svelte';
 
 type InitStatus = 'idle' | 'initializing' | 'ready' | 'error';
 type InitMode = 'live' | 'mock' | 'disconnected';
@@ -36,7 +36,7 @@ class AppInitializer {
 
 			// Handle mock mode early
 			if (this.isMockMode()) {
-				this.startMockMode();
+				await this.startMockMode();
 				return;
 			}
 
@@ -72,7 +72,9 @@ class AppInitializer {
 		}
 	}
 
-	private startMockMode(): void {
+	private async startMockMode(): Promise<void> {
+		// step 1: dynamic import to avoid bundling mocks in production
+		const { mockDataProvider } = await import('$lib/mocks/mockDataProvider.svelte');
 		console.log('[AppInit] Starting in mock mode');
 		mockDataProvider.start();
 		this.mode = 'mock';
@@ -83,21 +85,24 @@ class AppInitializer {
 		// Initialize auth (extracts token, validates)
 		await auth.initialize();
 
-		if (auth.isAuthenticated) {
-			try {
-				await guildService.loadGuildInfo();
-			} catch (e) {
-				// non-fatal: continue even if guild load fails
-				console.warn('[AppInit] Failed to load guild info:', e);
-			}
-		}
-
+		// We delay guild loading until after NATS connect if possible,
+		// or we can try here but it will fail over to NATS later if we move it.
+		// Actually, let's just return true if auth is good.
+		
 		return Boolean(auth.isAuthenticated && auth.token);
 	}
 
 	private async connectAndLoad(): Promise<void> {
 		// Connect to NATS
 		await nats.connect(auth.token as string);
+
+		// Now that NATS is connected, we can try loading club info.
+		// This allows the NATS fallback to work if HTTP fails (CSP blocks, etc).
+		try {
+			await clubService.loadClubInfo();
+		} catch (e) {
+			console.warn('[AppInit] Failed to load club info:', e);
+		}
 
 		// Start subscriptions and load initial data using the preferred identity (Club UUID)
 		const subscriptionId = auth.user?.activeClubUuid || auth.user?.guildId;
@@ -109,6 +114,7 @@ class AppInitializer {
 
 	async teardown(): Promise<void> {
 		if (this.mode === 'mock') {
+			const { mockDataProvider } = await import('$lib/mocks/mockDataProvider.svelte');
 			mockDataProvider.stop();
 		} else if (this.mode === 'live') {
 			// Stop subscriptions
@@ -120,8 +126,8 @@ class AppInitializer {
 			// Clear auth
 			auth.signOut();
 
-			// Clear guild info
-			guildService.clear();
+			// Clear club info
+			clubService.clear();
 		}
 
 		this.status = 'idle';

@@ -56,10 +56,12 @@ class NatsService {
 
 		this.status = 'connecting';
 		this.lastError = null;
+		log('Connecting to NATS with token length:', token?.length);
 
 		try {
 			this.connection = await this.natsLib.connect({
 				servers: config.nats.url,
+				user: 'frolf-pwa-user', // Dummy user required for NATS to include the password in Auth Callout
 				pass: token,
 				name: 'frolf-pwa',
 				reconnect: true,

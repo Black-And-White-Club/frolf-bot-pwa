@@ -3,7 +3,7 @@
 	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
 	import { auth } from '$lib/stores/auth.svelte';
 	import { appInit } from '$lib/stores/init.svelte';
-	import { guildService } from '$lib/stores/guild.svelte';
+	import { clubService } from '$lib/stores/club.svelte';
 	import RoundListCompact from '$lib/components/round/RoundListCompact.svelte';
 	import LeaderboardCompact from '$lib/components/leaderboard/LeaderboardCompact.svelte';
 	import LiveIndicator from '$lib/components/general/LiveIndicator.svelte';
@@ -30,7 +30,7 @@
 		<header class="dashboard-header">
 			<div class="flex items-center gap-2">
 				<h1 class="text-xl font-bold text-slate-100">
-					{guildService.info?.name ?? 'Frolf Bot'}
+					{clubService.info?.name ?? 'Frolf Bot'}
 				</h1>
 			</div>
 			<ConnectionStatus />

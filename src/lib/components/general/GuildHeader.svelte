@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { guildService } from '$lib/stores/guild.svelte';
+	import { clubService } from '$lib/stores/club.svelte';
 	import { auth } from '$lib/stores/auth.svelte';
 
-	const guildName = $derived(guildService.info?.name ?? 'Frolf Bot');
-	const guildIcon = $derived(guildService.info?.icon);
+	const guildName = $derived(clubService.info?.name ?? 'Frolf Bot');
+	const guildIcon = $derived(clubService.info?.icon);
 </script>
 
 <div class="guild-header">

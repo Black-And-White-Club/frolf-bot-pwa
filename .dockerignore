@@ -58,3 +58,5 @@ docs
 *.tgz
 *.tar.gz
 tmp
+
+.vite
