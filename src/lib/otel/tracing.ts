@@ -134,11 +134,7 @@ export async function initTracing(): Promise<void> {
 
 		initialized = true;
 
-		console.log('[OTel] Tracing initialized', {
-			service: 'frolf-pwa',
-			endpoint: import.meta.env.VITE_OTEL_ENDPOINT,
-			mode: import.meta.env.MODE
-		});
+		// Tracing ready
 	} catch (err) {
 		console.error('[OTel] Failed to initialize tracing:', err);
 	}

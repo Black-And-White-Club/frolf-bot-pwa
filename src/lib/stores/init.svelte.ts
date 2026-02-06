@@ -44,7 +44,7 @@ class AppInitializer {
 			const authenticated = await this.authenticateAndLoadGuild();
 			if (!authenticated) {
 				// Not authenticated: mark ready but disconnected
-				console.log('[AppInit] No token found, staying disconnected');
+				// Not authenticated — stay in disconnected mode
 				this.mode = 'disconnected';
 				this.status = 'ready';
 				return;
