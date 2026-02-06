@@ -75,7 +75,7 @@ class ClubService {
 			const { nats } = await import('./nats.svelte');
 			if (!nats.isConnected) return null;
 
-			console.log(`[ClubService] Requesting club info via NATS: club.info.request.v1.${id}`);
+			// Request club info via NATS
 			const response = await nats.request<any, any>(
 				`club.info.request.v1.${id}`,
 				{ club_uuid: id },

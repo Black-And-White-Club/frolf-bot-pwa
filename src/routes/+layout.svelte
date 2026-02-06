@@ -22,8 +22,6 @@
 	let swListener: (ev: Event) => void;
 
 	onMount(async () => {
-		console.log('%c Frolf App v1.1 - Dev Cache Clear Active ', 'background: #222; color: #bada55');
-
 		// In development, force unregister any existing service workers to prevent stale caching
 		if (import.meta.env.DEV && 'serviceWorker' in navigator) {
 			const registrations = await navigator.serviceWorker.getRegistrations();
