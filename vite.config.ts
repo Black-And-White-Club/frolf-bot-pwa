@@ -27,9 +27,9 @@ export default defineConfig({
 	server: {
 		proxy: {
 			// Proxy backend requests to local Go server to avoid CORS
-			'/api': 'http://localhost:3001',
-			'/clubs': 'http://localhost:3001',
-			'/guilds': 'http://localhost:3001'
+			'/api': 'http://localhost:8080',
+			'/clubs': 'http://localhost:8080',
+			'/guilds': 'http://localhost:8080'
 		}
 	},
 

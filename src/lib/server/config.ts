@@ -11,5 +11,5 @@ export const serverConfig = {
 	 * In production/K8s, this might be an internal service name like 'http://backend:3001'.
 	 * Locally, it defaults to the same as the public API URL or localhost:3001.
 	 */
-	backendUrl: privateEnv.PRIVATE_API_URL || publicConfig.api.url || 'http://localhost:3001'
+	backendUrl: privateEnv.PRIVATE_API_URL || publicConfig.api.url || 'http://localhost:8080'
 } as const;
