@@ -20,6 +20,7 @@ ENV VITE_API_URL=${VITE_API_URL} \
     VITE_USE_MOCK=${VITE_USE_MOCK} \
     VITE_DEBUG=${VITE_DEBUG}
 
+RUN bun run prepare
 RUN bun run build
 
 # --- Runtime ---
