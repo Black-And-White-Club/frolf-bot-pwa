@@ -11,6 +11,12 @@ export type RoundID = string; // UUID
 export type TagNumber = number; // 1-200
 export type Score = number;
 
+export interface GuildInfo {
+	id: string;
+	name: string;
+	icon?: string;
+}
+
 export type UserRoleEnum = '' | 'User' | 'Editor' | 'Admin';
 
 export type ServiceUpdateSource = 'round' | 'manual' | 'system';

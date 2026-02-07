@@ -1,11 +1,12 @@
 import { auth } from './auth.svelte';
 import { config } from '$lib/config';
+import type { GuildInfo } from '$lib/types/backend';
 
-interface GuildInfo {
-	id: string;
-	name: string;
-	icon?: string;
+interface CachedGuildInfo extends GuildInfo {
+	lastUpdated: number;
 }
+
+const CACHE_TTL = 1000 * 60 * 60 * 24; // 24 hours
 
 class GuildService {
 	info = $state<GuildInfo | null>(null);
@@ -34,16 +35,22 @@ class GuildService {
 		// Check localStorage cache first
 		const cached = this.getCachedGuild(this.id);
 		if (cached) {
-			console.log('[GuildService] Loading from cache:', cached);
-			this.info = cached;
+			this.info = { id: cached.id, name: cached.name, icon: cached.icon };
+			
+			// If cache is fresh, don't even background refresh
+			const now = Date.now();
+			if (now - cached.lastUpdated < CACHE_TTL) {
+				console.log('[GuildService] Cache is fresh, skipping refresh');
+				return;
+			}
+
+			console.log('[GuildService] Loading from cache (needs refresh):', cached);
 			// Background refresh
 			this.fetchFromApi(this.id).then((fresh) => {
 				if (fresh) {
 					console.log('[GuildService] Background refresh success:', fresh);
 					this.info = fresh;
 					this.cacheGuild(fresh);
-				} else {
-					console.log('[GuildService] Background refresh failed or no change');
 				}
 			});
 			return;
@@ -54,14 +61,13 @@ class GuildService {
 		try {
 			// Try HTTP API first
 			let info = await this.fetchFromApi(this.id);
-			
+
 			// If HTTP failed, try NATS (if connected)
 			if (!info) {
 				console.log('[GuildService] HTTP failed, trying NATS...');
 				info = await this.fetchFromNats(this.id);
 			}
 
-			console.log('[GuildService] Fetch result:', info);
 			this.info = info || {
 				id: this.id,
 				name: 'Disc Golf League', // Fallback
@@ -101,12 +107,19 @@ class GuildService {
 
 	private async fetchFromApi(id: string): Promise<GuildInfo | null> {
 		try {
+			const headers: Record<string, string> = {
+				'Accept': 'application/json'
+			};
+			if (auth.token) {
+				headers['Authorization'] = `Bearer ${auth.token}`;
+			}
+
 			// Try club endpoint first (new system)
-			let response = await fetch(`${config.api.url}/clubs/${id}`);
-			
+			let response = await fetch(`${config.api.url}/clubs/${id}`, { headers });
+
 			// If not found, try legacy guild endpoint
 			if (!response.ok) {
-				response = await fetch(`${config.api.url}/guilds/${id}`);
+				response = await fetch(`${config.api.url}/guilds/${id}`, { headers });
 			}
 
 			if (!response.ok) return null;
@@ -118,12 +131,12 @@ class GuildService {
 				icon: data.icon_url || data.icon
 			};
 		} catch (e) {
-			console.error('Failed to fetch guild info:', e);
+			console.error('[GuildService] Failed to fetch guild info:', e);
 			return null;
 		}
 	}
 
-	private getCachedGuild(id: string): GuildInfo | null {
+	private getCachedGuild(id: string): CachedGuildInfo | null {
 		if (typeof window === 'undefined') return null;
 		const cached = localStorage.getItem(`guild:${id}`);
 		if (!cached) return null;
@@ -136,7 +149,11 @@ class GuildService {
 
 	private cacheGuild(guild: GuildInfo): void {
 		if (typeof window === 'undefined') return;
-		localStorage.setItem(`guild:${guild.id}`, JSON.stringify(guild));
+		const toCache: CachedGuildInfo = {
+			...guild,
+			lastUpdated: Date.now()
+		};
+		localStorage.setItem(`guild:${guild.id}`, JSON.stringify(toCache));
 	}
 
 	clear(): void {
@@ -145,3 +162,4 @@ class GuildService {
 }
 
 export const guildService = new GuildService();
+

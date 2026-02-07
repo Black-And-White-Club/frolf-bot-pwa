@@ -91,55 +91,72 @@ describe('GuildService (guild.svelte.ts)', () => {
 			expect(guildService.info).toEqual(cachedGuild);
 			expect(guildService.loading).toBe(false);
 			
-			// Wait for background refresh promise
-			await new Promise(process.nextTick);
+						// Wait for background refresh promise
+						await new Promise(process.nextTick);
 			
-			expect(fetchMock).toHaveBeenCalledWith(`https://api.test/clubs/club-123`);
-		});
-
-		it('loads info from API when no cache', async () => {
-			mockAuth.user = { activeClubUuid: 'club-new' };
+						expect(fetchMock).toHaveBeenCalledWith(
+							`https://api.test/clubs/club-123`,
+							expect.objectContaining({
+								headers: expect.any(Object)
+							})
+						);
+					});
 			
-			fetchMock.mockResolvedValueOnce({
-				ok: true,
-				json: async () => ({ name: 'API Club', icon_url: 'api.png' })
-			});
-
-			await guildService.loadGuildInfo();
-
-			expect(fetchMock).toHaveBeenCalledWith(`https://api.test/clubs/club-new`);
-			expect(guildService.info).toEqual({
-				id: 'club-new',
-				name: 'API Club',
-				icon: 'api.png'
-			});
-			expect(guildService.loading).toBe(false);
-		});
-
-		it('falls back to legacy endpoint if club endpoint fails', async () => {
-			mockAuth.user = { activeClubUuid: 'club-legacy' };
+					it('loads info from API when no cache', async () => {
+						mockAuth.user = { activeClubUuid: 'club-new' };
 			
-			// First call fails (clubs)
-			fetchMock.mockResolvedValueOnce({ ok: false });
-			// Second call succeeds (guilds)
-			fetchMock.mockResolvedValueOnce({
-				ok: true,
-				json: async () => ({ name: 'Legacy Guild', icon_url: 'legacy.png' })
-			});
-
-			await guildService.loadGuildInfo();
-
-			expect(fetchMock).toHaveBeenNthCalledWith(1, `https://api.test/clubs/club-legacy`);
-			expect(fetchMock).toHaveBeenNthCalledWith(2, `https://api.test/guilds/club-legacy`);
+						fetchMock.mockResolvedValueOnce({
+							ok: true,
+							json: async () => ({ name: 'API Club', icon_url: 'api.png' })
+						});
 			
-			expect(guildService.info).toEqual({
-				id: 'club-legacy',
-				name: 'Legacy Guild',
-				icon: 'legacy.png'
-			});
-		});
-
-		it('falls back to placeholder on API failure', async () => {
+						await guildService.loadGuildInfo();
+			
+						expect(fetchMock).toHaveBeenCalledWith(
+							`https://api.test/clubs/club-new`,
+							expect.objectContaining({
+								headers: expect.any(Object)
+							})
+						);
+						expect(guildService.info).toEqual({
+							id: 'club-new',
+							name: 'API Club',
+							icon: 'api.png'
+						});
+						expect(guildService.loading).toBe(false);
+					});
+			
+					it('falls back to legacy endpoint if club endpoint fails', async () => {
+						mockAuth.user = { activeClubUuid: 'club-legacy' };
+			
+						// First call fails (clubs)
+						fetchMock.mockResolvedValueOnce({ ok: false });
+						// Second call succeeds (guilds)
+						fetchMock.mockResolvedValueOnce({
+							ok: true,
+							json: async () => ({ name: 'Legacy Guild', icon_url: 'legacy.png' })
+						});
+			
+						await guildService.loadGuildInfo();
+			
+						expect(fetchMock).toHaveBeenNthCalledWith(
+							1,
+							`https://api.test/clubs/club-legacy`,
+							expect.any(Object)
+						);
+						expect(fetchMock).toHaveBeenNthCalledWith(
+							2,
+							`https://api.test/guilds/club-legacy`,
+							expect.any(Object)
+						);
+			
+						expect(guildService.info).toEqual({
+							id: 'club-legacy',
+							name: 'Legacy Guild',
+							icon: 'legacy.png'
+						});
+					});
+					it('falls back to placeholder on API failure', async () => {
 			mockAuth.user = { activeClubUuid: 'club-fail' };
 			
 			// Both fail
@@ -169,7 +186,8 @@ describe('GuildService (guild.svelte.ts)', () => {
 			expect(JSON.parse(cached!)).toEqual({
 				id: 'club-cache-test',
 				name: 'Cached Club',
-				icon: 'icon.png'
+				icon: 'icon.png',
+				lastUpdated: expect.any(Number)
 			});
 		});
 
