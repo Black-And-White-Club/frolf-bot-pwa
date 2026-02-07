@@ -37,6 +37,7 @@ export interface RoundRaw {
 	state: RoundState;
 	created_by: string;
 	event_message_id: string;
+	discord_event_id?: string; // Native Discord Scheduled Event ID
 	participants: ParticipantRaw[];
 	par_values?: number[];
 	holes?: number;
@@ -54,6 +55,7 @@ export interface Round {
 	state: RoundState;
 	createdBy: string;
 	eventMessageId: string;
+	discordEventId?: string; // Native Discord Scheduled Event ID
 	participants: Participant[];
 	parValues?: number[];
 	holes?: number;
@@ -99,6 +101,7 @@ function transformRound(raw: RoundRaw): Round {
 		state: mapRoundState(raw.state),
 		createdBy: raw.created_by,
 		eventMessageId: raw.event_message_id || '',
+		discordEventId: raw.discord_event_id,
 		participants: (raw.participants || []).map(transformParticipant),
 		parValues: raw.par_values,
 		holes: raw.holes,
