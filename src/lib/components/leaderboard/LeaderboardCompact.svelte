@@ -10,7 +10,12 @@
 
 <div class="leaderboard-compact">
 	{#each topEntries as entry, i (entry.userId)}
-		<div class="entry" class:top-3={i < 3}>
+		<div
+			class="entry"
+			class:rank-1={i === 0}
+			class:rank-2={i === 1}
+			class:rank-3={i === 2}
+		>
 			<div class="tag-number">{entry.tagNumber}</div>
 			<span class="name">{userProfiles.getDisplayName(entry.userId)}</span>
 		</div>
@@ -33,9 +38,17 @@
 		border-radius: 0.5rem;
 	}
 
-	.entry.top-3 {
+	.entry.rank-1 {
 		background: var(--guild-surface-elevated, #0f1f1f);
-		border: 1px solid rgba(180, 155, 94, 0.3);
+		border: 1px solid rgba(184, 155, 94, 0.3);
+	}
+	.entry.rank-2 {
+		background: var(--guild-surface-elevated, #0f1f1f);
+		border: 1px solid rgba(201, 201, 201, 0.3);
+	}
+	.entry.rank-3 {
+		background: var(--guild-surface-elevated, #0f1f1f);
+		border: 1px solid rgba(179, 116, 74, 0.3);
 	}
 
 	.tag-number {
@@ -52,9 +65,17 @@
 		flex-shrink: 0;
 	}
 
-	.entry.top-3 .tag-number {
+	.entry.rank-1 .tag-number {
 		background: linear-gradient(135deg, #b89b5e 0%, #7c6b3c 100%);
 		box-shadow: 0 2px 8px rgba(184, 155, 94, 0.3);
+	}
+	.entry.rank-2 .tag-number {
+		background: linear-gradient(135deg, #c9c9c9 0%, #8f8f8f 100%);
+		box-shadow: 0 2px 8px rgba(201, 201, 201, 0.3);
+	}
+	.entry.rank-3 .tag-number {
+		background: linear-gradient(135deg, #b3744a 0%, #7c4e2e 100%);
+		box-shadow: 0 2px 8px rgba(179, 116, 74, 0.3);
 	}
 
 	.name {

@@ -29,7 +29,7 @@
 	<div class="dashboard" class:tv-mode={mode === 'tv'} class:compact-mode={mode === 'compact'}>
 		<header class="dashboard-header">
 			<div class="flex items-center gap-2">
-				<h1 class="text-xl font-bold text-slate-100">
+				<h1 class="font-display text-xl font-bold text-slate-100">
 					{clubService.info?.name ?? 'Frolf Bot'}
 				</h1>
 			</div>
@@ -112,6 +112,7 @@
 	}
 
 	.panel-title {
+		font-family: 'Fraunces', serif;
 		font-size: 0.875rem;
 		font-weight: 600;
 		text-transform: uppercase;

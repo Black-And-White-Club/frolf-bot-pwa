@@ -43,4 +43,14 @@
 	.slide-up {
 		animation: slide-up var(--transition-base);
 	}
+
+	@keyframes scale-pulse {
+		0% { transform: scale(1); }
+		50% { transform: scale(1.2); }
+		100% { transform: scale(1); }
+	}
+	
+	.animate-scale-pulse {
+		animation: scale-pulse 300ms ease-out;
+	}
 }

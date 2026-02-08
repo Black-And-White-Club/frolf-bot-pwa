@@ -22,8 +22,9 @@ export default {
 					'Arial',
 					'sans-serif'
 				],
-				display: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
-				// alias used around the app as `font-secondary`
+				// Brand: "Classic" Feel for Headlines
+				display: ['Fraunces', 'serif'],
+				// Brand: "Sport" Feel for Data
 				secondary: ['Space Grotesk', 'system-ui', 'sans-serif'],
 				// explicit accessibility-first stack (use where readability matters)
 				accessible: ['Atkinson Hyperlegible', 'Inter', 'system-ui', 'sans-serif']
@@ -106,7 +107,13 @@ export default {
 
 			// Gradients / backgrounds
 			backgroundImage: {
-				'guild-gold-gradient': 'linear-gradient(135deg, #cba135 0%, #b38f2a 50%, #8f6e20 100%)'
+				'guild-gold-gradient': 'linear-gradient(135deg, #cba135 0%, #b38f2a 50%, #8f6e20 100%)',
+				'primary-glass': 'linear-gradient(180deg, #008B8B 0%, #007474 100%)'
+			},
+			
+			// Box Shadows
+			boxShadow: {
+				'aura': 'var(--guild-glow-aura, 0 0 15px rgba(139, 123, 184, 0.5))'
 			},
 
 			// ⚡ Transition timing for subtle motion consistency

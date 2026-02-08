@@ -65,8 +65,8 @@
 		bottom: 1rem;
 		left: 1rem;
 		right: 1rem;
-		background: var(--forest-800);
-		border: 1px solid var(--forest-600);
+		background: var(--guild-surface, #081212);
+		border: 1px solid var(--guild-border, rgba(0, 116, 116, 0.2));
 		border-radius: 0.75rem;
 		padding: 1rem;
 		display: flex;
@@ -93,11 +93,13 @@
 	}
 
 	.prompt-text strong {
-		color: var(--slate-100);
+		color: var(--guild-text, #f5fffa);
+		font-family: 'Fraunces', serif;
 	}
 
 	.prompt-text span {
-		color: var(--slate-400);
+		color: var(--guild-text-secondary, #9ca3af);
+		font-family: 'Space Grotesk', sans-serif;
 	}
 
 	.prompt-actions {
@@ -110,17 +112,21 @@
 		padding: 0.5rem 1rem;
 		border: none;
 		background: transparent;
-		color: var(--slate-400);
+		color: var(--guild-text-secondary, #9ca3af);
 		cursor: pointer;
+		font-family: 'Space Grotesk', sans-serif;
 	}
 
 	.btn-install {
 		padding: 0.5rem 1rem;
 		border: none;
-		background: var(--sage-600);
+		background: linear-gradient(180deg, #008B8B 0%, #007474 100%);
 		color: white;
 		border-radius: 0.375rem;
 		cursor: pointer;
+		font-weight: 500;
+		font-family: 'Space Grotesk', sans-serif;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 	}
 
 	@media (min-width: 640px) {

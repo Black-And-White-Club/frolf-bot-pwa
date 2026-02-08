@@ -37,7 +37,9 @@
 			<p class="text-sm text-[var(--guild-text-secondary)]">Hole {holeNumber}</p>
 		</div>
 		<div class="text-right">
-			<div class="text-2xl font-bold {scoreClass} font-secondary">{score}</div>
+			{#key score}
+				<div class="text-2xl font-bold {scoreClass} font-secondary animate-scale-pulse inline-block">{score}</div>
+			{/key}
 			<div class="text-sm text-[var(--guild-text-secondary)]">({scoreText})</div>
 		</div>
 	</div>

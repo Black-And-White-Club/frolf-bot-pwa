@@ -67,12 +67,20 @@
 	}
 
 	:root.dark {
-		--guild-background: rgb(15 15 15);
-		--guild-surface: rgb(26 26 26);
-		--guild-surface-elevated: rgb(32 32 32);
+		/* Obsidian Forest Theme */
+		--guild-background: #081212;
+		--guild-surface: #0d1919;
+		--guild-surface-elevated: #142020;
+		
 		--guild-text-rgb: 245 255 250;
 		--guild-text-secondary: rgb(203 213 225);
-		--guild-border: rgb(51 65 85);
+		
+		/* Liquid Surface Border (Skobeloff @ 20%) */
+		--guild-border: rgba(0, 116, 116, 0.2);
+		
+		/* Amethyst Aura Glow */
+		--guild-glow-aura: 0 0 15px rgba(139, 123, 184, 0.5);
+
 		--toggle-knob-border-color: rgba(245, 255, 250, 0.3);
 		color-scheme: dark;
 	}
