@@ -6,6 +6,7 @@
 	import { auth } from '$lib/stores/auth.svelte';
 	import { clubService } from '$lib/stores/club.svelte';
 	import { userProfiles } from '$lib/stores/userProfiles.svelte';
+	import { nats } from '$lib/stores/nats.svelte';
 
 	let showHamburger = $state(false);
 
@@ -105,7 +106,7 @@
 							>
 								{#each auth.user.clubs as club}
 									<option value={club.club_uuid} selected={club.club_uuid === auth.user.activeClubUuid}>
-										{clubService.knownClubs[club.club_uuid]?.name ?? `Club ${club.club_uuid.slice(0, 4)}`} ({club.role})
+										{clubService.knownClubs[club.club_uuid]?.name ?? `Club ${club.club_uuid.slice(0, 4)}`}
 									</option>
 								{/each}
 							</select>
