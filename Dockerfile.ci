@@ -9,8 +9,7 @@ WORKDIR /app
 # Install production dependencies only
 # This runs in QEMU on ARM64, but is much faster than a full build
 COPY package.json bun.lock ./
-RUN --mount=type=cache,target=/root/.bun 
-    bun install --frozen-lockfile --production
+RUN --mount=type=cache,target=/root/.bun bun install --frozen-lockfile --production
 
 # Copy pre-built application from GitHub Actions runner
 COPY build/ build/
@@ -21,7 +20,6 @@ USER app
 
 EXPOSE 3000
 
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s 
-    CMD wget -qO- http://localhost:3000/api/ping || exit 1
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s CMD wget -qO- http://localhost:3000/api/ping || exit 1
 
 CMD ["bun", "build/index.js"]
