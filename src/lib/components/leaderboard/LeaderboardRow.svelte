@@ -8,11 +8,15 @@
     let { entry, rank }: { entry: LeaderboardEntry; rank: number } = $props();
 
     let tagStyle = $derived(
-        rank <= 3
-            ? 'bg-amber-500 text-black font-bold'
-            : rank <= 10
-                ? 'bg-sage-600 text-white'
-                : 'bg-slate-700 text-slate-200'
+        rank === 1
+            ? 'bg-guild-gold-gradient text-white font-bold shadow-lg shadow-amber-900/20'
+            : rank === 2
+                ? 'bg-gradient-to-br from-slate-300 to-slate-500 text-black font-bold shadow-lg shadow-slate-400/30'
+                : rank === 3
+                    ? 'bg-gradient-to-br from-amber-600 to-amber-800 text-black font-bold shadow-lg shadow-amber-700/30'
+                    : rank <= 10
+                        ? 'bg-sage-600 text-white'
+                        : 'bg-slate-700 text-slate-200'
     );
 
     let movement = $derived(leaderboardService.getMovementIndicator(entry));

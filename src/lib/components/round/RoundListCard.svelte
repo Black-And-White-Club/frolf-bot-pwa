@@ -84,13 +84,15 @@
 				>
 					{#each sortedScores as p, i (p.userId)}
 						<div class="flex items-center gap-2">
-							<span class="font-mono text-xs font-bold text-slate-400">#{i + 1}</span>
+							<span class="font-secondary text-xs font-bold text-slate-400">#{i + 1}</span>
 							<ParticipantAvatar
 								userId={p.userId}
 								username={userProfiles.getDisplayName(p.userId)}
 								size={20}
 							/>
-							<span class="font-bold text-[var(--primary)]">{p.score}</span>
+							{#key p.score}
+								<span class="font-bold text-[var(--primary)] font-secondary animate-scale-pulse inline-block">{p.score}</span>
+							{/key}
 						</div>
 					{/each}
 				</div>

@@ -62,4 +62,9 @@
 		font-style: normal;
 		font-display: swap;
 	}
+	
+	/* Fraunces (Variable) - Sourced from Google Fonts via app.html */
+	.font-display {
+		font-family: 'Fraunces', serif;
+	}
 }

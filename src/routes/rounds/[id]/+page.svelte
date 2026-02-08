@@ -3,7 +3,7 @@
 	import RoundDetail from '$lib/components/round/RoundDetail.svelte';
 	import { roundService } from '$lib/stores/round.svelte';
 
-	let roundId = $derived($page.params.id);
+	let roundId = $derived($page.params.id ?? '');
 
 	let round = $derived(roundService.rounds.find((r) => r.id === roundId));
 </script>
