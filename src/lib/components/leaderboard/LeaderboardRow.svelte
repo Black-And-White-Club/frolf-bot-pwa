@@ -9,7 +9,7 @@
 
     let tagStyle = $derived(
         rank === 1
-            ? 'bg-guild-gold-gradient text-white font-bold shadow-lg shadow-amber-900/20'
+            ? 'bg-gradient-to-br from-amber-400 to-amber-600 text-black font-bold shadow-lg shadow-amber-500/30'
             : rank === 2
                 ? 'bg-gradient-to-br from-slate-300 to-slate-500 text-black font-bold shadow-lg shadow-slate-400/30'
                 : rank === 3
