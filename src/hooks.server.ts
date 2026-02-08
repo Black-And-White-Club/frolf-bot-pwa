@@ -11,9 +11,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const csp = [
 		"default-src 'self'",
 		"script-src 'self' 'unsafe-inline'",
-		"style-src 'self' 'unsafe-inline'",
+		"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
 		"img-src 'self' data: https://images.unsplash.com https://*.githubusercontent.com https://cdn.discordapp.com",
-		"font-src 'self' data:",
+		"font-src 'self' data: https://fonts.gstatic.com",
 		"manifest-src 'self'",
 		"connect-src 'self' https://api.github.com ws:",
 		"frame-ancestors 'none'",
