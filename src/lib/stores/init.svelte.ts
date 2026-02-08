@@ -89,8 +89,20 @@ class AppInitializer {
 	}
 
 	private async connectAndLoad(): Promise<void> {
-		// Connect to NATS
-		await nats.connect(auth.token as string);
+		// Connect to NATS with retry
+		let connected = false;
+		let attempts = 0;
+		while (!connected && attempts < 3) {
+			try {
+				await nats.connect(auth.token as string);
+				connected = true;
+			} catch (e) {
+				attempts++;
+				if (attempts >= 3) throw e;
+				console.warn(`[AppInit] NATS connection attempt ${attempts} failed, retrying...`, e);
+				await new Promise((r) => setTimeout(r, 1000));
+			}
+		}
 
 		// Now that NATS is connected, we can try loading club info.
 		// This allows the NATS fallback to work if HTTP fails (CSP blocks, etc).

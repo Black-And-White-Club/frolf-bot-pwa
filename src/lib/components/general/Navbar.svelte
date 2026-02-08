@@ -48,6 +48,13 @@
 			/* ignore */
 		}
 	}
+
+	$effect(() => {
+		if (auth.user?.clubs && nats.isConnected) {
+			const ids = auth.user.clubs.map((c) => c.club_uuid);
+			clubService.ensureClubsLoaded(ids);
+		}
+	});
 </script>
 
 <nav class="site-header">
@@ -55,7 +62,7 @@
 		<div class="flex w-full items-center justify-between">
 			<div class="flex items-center gap-8">
 				<h1 class="text-guild-primary card-title card-title--skobeloff text-xl font-bold">
-					{'Frolf Bot'}
+					{clubService.info?.name ?? 'Frolf Bot'}
 				</h1>
 
 				<!-- Desktop Navigation Links -->
@@ -98,7 +105,7 @@
 							>
 								{#each auth.user.clubs as club}
 									<option value={club.club_uuid} selected={club.club_uuid === auth.user.activeClubUuid}>
-										{club.club_uuid.slice(0, 8)}... ({club.role})
+										{clubService.knownClubs[club.club_uuid]?.name ?? `Club ${club.club_uuid.slice(0, 4)}`} ({club.role})
 									</option>
 								{/each}
 							</select>

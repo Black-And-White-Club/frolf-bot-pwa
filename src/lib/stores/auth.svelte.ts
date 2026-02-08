@@ -228,12 +228,43 @@ export class AuthService {
 			return;
 		}
 
-		// Update local state
-		this.user.activeClubUuid = clubUuid;
-		this.user.role = membership.role; // Update active role context
+		// 1. Inform backend of the switch and get a new ticket with updated activeClubUuid
+		// We use a query parameter to hint which club should be active in the new ticket
+		try {
+			const res = await fetch(`/api/auth/ticket?active_club=${clubUuid}`);
+			if (res.ok) {
+				const { ticket } = await res.json();
+				this.token = ticket;
+				const claims = this.parseJWT(ticket);
+				
+				// Update local user state from new claims
+				this.user = {
+					id: claims.sub?.replace('user:', '') || '',
+					uuid: claims.user_uuid,
+					activeClubUuid: claims.active_club_uuid,
+					guildId: claims.guild || '',
+					role: (claims.role || 'viewer') as AuthUser['role'],
+					clubs: claims.clubs || []
+				};
+			} else {
+				// Fallback: update local state if backend call fails
+				this.user.activeClubUuid = clubUuid;
+				this.user.role = membership.role;
+			}
+		} catch (e) {
+			console.error('Failed to switch club on backend:', e);
+			this.user.activeClubUuid = clubUuid;
+			this.user.role = membership.role;
+		}
+
 		localStorage.setItem('frolf_preferred_club', clubUuid);
 
-		// Reload app data — dynamic imports avoid circular dependency (init imports auth)
+		// 2. Reconnect NATS with the NEW token (critical for permissions/filtering)
+		const { nats } = await import('./nats.svelte');
+		await nats.disconnect();
+		await nats.connect(this.token as string);
+
+		// 3. Reload app data
 		const { subscriptionManager } = await import('./subscriptions.svelte');
 		const { dataLoader } = await import('./dataLoader.svelte');
 		const { clubService } = await import('./club.svelte');

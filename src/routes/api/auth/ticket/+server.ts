@@ -1,11 +1,16 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { serverConfig } from '$lib/server/config';
 
-export const GET: RequestHandler = async ({ fetch, request }) => {
+export const GET: RequestHandler = async ({ fetch, request, url }) => {
 	const { backendUrl } = serverConfig;
+	const activeClub = url.searchParams.get('active_club');
+	const backendTicketUrl = new URL(`${backendUrl}/api/auth/ticket`);
+	if (activeClub) {
+		backendTicketUrl.searchParams.set('active_club', activeClub);
+	}
 	
 	try {
-		const res = await fetch(`${backendUrl}/api/auth/ticket`, {
+		const res = await fetch(backendTicketUrl.toString(), {
 			method: 'GET',
 			headers: {
 				cookie: request.headers.get('cookie') || ''
