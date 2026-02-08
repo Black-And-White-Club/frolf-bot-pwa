@@ -27,10 +27,12 @@ jobs:
           bun-version: latest
 
       - name: Install Dependencies
-        run: bun install --frozen-lockfile
+        run: |
+          bun install --frozen-lockfile
+          bun run --bun prepare
 
       - name: Build Application
-        run: bun run build
+        run: bun run --bun build
         env:
           # If your build needs specific public vars baked in (static adapter), add them here.
           # Since you use $env/dynamic/public, this is likely not strictly needed for build,
