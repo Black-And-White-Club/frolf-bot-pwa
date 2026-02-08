@@ -1,0 +1,27 @@
+# PWA CI Image (Pre-built artifacts)
+# This Dockerfile expects the application to be already built in the 'build' directory.
+# It significantly speeds up CI builds by avoiding QEMU emulation for the build process.
+
+FROM oven/bun:1-alpine
+
+WORKDIR /app
+
+# Install production dependencies only
+# This runs in QEMU on ARM64, but is much faster than a full build
+COPY package.json bun.lock ./
+RUN --mount=type=cache,target=/root/.bun 
+    bun install --frozen-lockfile --production
+
+# Copy pre-built application from GitHub Actions runner
+COPY build/ build/
+
+# Create non-root user
+RUN addgroup -S app && adduser -S app -G app
+USER app
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s 
+    CMD wget -qO- http://localhost:3000/api/ping || exit 1
+
+CMD ["bun", "build/index.js"]

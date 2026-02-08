@@ -21,6 +21,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build Application
+        run: bun run build
+        env:
+          # If your build needs specific public vars baked in (static adapter), add them here.
+          # Since you use $env/dynamic/public, this is likely not strictly needed for build,
+          # but good practice if you switch to static.
+          VITE_DEBUG: false
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -40,10 +56,17 @@ jobs:
             type=sha,format=short
             type=raw,value=latest,enable={{is_default_branch}}
 
+      - name: Prepare Docker Context (Unignore build)
+        run: |
+          # Remove 'build' from .dockerignore so we can copy the artifacts
+          sed -i '/^build$/d' .dockerignore || true
+          sed -i '/^\.svelte-kit$/d' .dockerignore || true
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: Dockerfile.ci
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
