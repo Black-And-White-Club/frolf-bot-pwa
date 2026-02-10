@@ -23,12 +23,14 @@ export type ServiceUpdateSource = 'round' | 'manual' | 'system';
 
 // ============ Leaderboard Types ============
 
-export interface LeaderboardEntry {
+export interface LeaderboardEntryRaw {
 	tag_number: TagNumber;
 	user_id: DiscordID;
+	total_points: number;
+	rounds_played: number;
 }
 
-export type LeaderboardData = LeaderboardEntry[];
+export type LeaderboardData = LeaderboardEntryRaw[];
 
 export interface GetLeaderboardResponsePayload {
 	guild_id: GuildID;
@@ -151,5 +153,5 @@ export interface DashboardData {
 	user: User;
 	stats: UserStats;
 	recent_rounds: Round[];
-	leaderboard_preview: LeaderboardEntry[];
+	leaderboard_preview: LeaderboardEntryRaw[];
 }

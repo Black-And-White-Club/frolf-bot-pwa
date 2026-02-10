@@ -2,7 +2,8 @@
 	:root {
 		/* Typography Scale */
 		--font-primary: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-		--font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+		--font-display: 'Fraunces', serif;
+		--font-secondary: 'Space Grotesk', 'Inter', system-ui, sans-serif;
 
 		/* Brand tokens (single source of truth) */
 		--guild-primary-rgb: 0 116 116; /* #007474 */
@@ -13,7 +14,7 @@
 
 		--guild-accent-rgb: 184 155 94; /* #B89B5E */
 		--guild-accent: #b89b5e;
-		--guild-gold-gradient: linear-gradient(135deg, #b89b5e 0%, #a68a4a 50%, #7c6b3c 100%);
+		--guild-gold-gradient: linear-gradient(135deg, #b89b5e 45%, #7c6b3c 100%);
 
 		--guild-text-rgb: 26 26 26;
 		--guild-text: #1a1a1a;

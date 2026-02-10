@@ -5,6 +5,8 @@ export interface LeaderboardEntry {
 	tagNumber: number;
 	displayName?: string;
 	previousTagNumber?: number; // for movement indicator
+	totalPoints?: number;
+	roundsPlayed?: number;
 }
 
 export interface LeaderboardSnapshot {
@@ -19,6 +21,8 @@ export interface LeaderboardSnapshot {
 export interface LeaderboardEntryRaw {
 	user_id: string;
 	tag_number: number;
+	total_points: number;
+	rounds_played: number;
 }
 
 // The backend sends LeaderboardData which is just an array of entries
@@ -41,7 +45,9 @@ function transformLeaderboardEntries(
 		lastUpdated: new Date().toISOString(), // Backend doesn't provide this, use current time
 		entries: (entries || []).map((entry) => ({
 			userId: entry.user_id,
-			tagNumber: entry.tag_number
+			tagNumber: entry.tag_number,
+			totalPoints: entry.total_points,
+			roundsPlayed: entry.rounds_played
 		}))
 	};
 }

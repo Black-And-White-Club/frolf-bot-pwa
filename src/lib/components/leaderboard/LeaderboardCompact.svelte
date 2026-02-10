@@ -17,7 +17,12 @@
 			class:rank-3={i === 2}
 		>
 			<div class="tag-number">{entry.tagNumber}</div>
-			<span class="name">{userProfiles.getDisplayName(entry.userId)}</span>
+			<div class="info">
+				<span class="name">{userProfiles.getDisplayName(entry.userId)}</span>
+				{#if entry.totalPoints !== undefined}
+					<span class="points">{entry.totalPoints} pts</span>
+				{/if}
+			</div>
 		</div>
 	{/each}
 </div>
@@ -78,12 +83,26 @@
 		box-shadow: 0 2px 8px rgba(179, 116, 74, 0.3);
 	}
 
-	.name {
+	.info {
 		flex: 1;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+	}
+
+	.name {
+		font-family: var(--font-secondary, 'Space Grotesk', sans-serif);
 		font-size: 0.875rem;
 		color: var(--guild-text, #e5e7eb);
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	.points {
+		font-family: var(--font-display, 'Fraunces', serif);
+		font-size: 0.75rem;
+		color: var(--guild-accent, #b89b5e);
+		font-weight: 700;
 	}
 </style>

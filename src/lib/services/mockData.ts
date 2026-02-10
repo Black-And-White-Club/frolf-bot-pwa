@@ -85,7 +85,9 @@ export function getMockLeaderboard(): LeaderboardData {
 		.filter((u) => u.tag_number)
 		.map((u) => ({
 			tag_number: u.tag_number!,
-			user_id: u.user_id
+			user_id: u.user_id,
+			total_points: (u.total_rounds || 0) * 100, // Mock calculation
+			rounds_played: u.total_rounds || 0
 		}))
 		.sort((a, b) => a.tag_number - b.tag_number);
 }

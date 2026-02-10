@@ -101,14 +101,41 @@ export default {
 					700: '#4a7d61',
 					800: '#3a5d49',
 					900: '#2a3d31',
-					950: '#1A1A1A'
+					950: '#081212'
+				},
+				'amethyst-aura': '#8B7BB8',
+				forest: {
+					50: '#ecfdf5',
+					100: '#d1fae5',
+					200: '#a7f3d0',
+					300: '#6ee7b7',
+					400: '#34d399',
+					500: '#10b981',
+					600: '#059669',
+					700: '#047857',
+					800: '#065f46',
+					900: '#064e3b',
+					950: '#022c22'
+				},
+				sage: {
+					50: '#f6f7f6',
+					100: '#e3e8e5',
+					200: '#c5d3cd',
+					300: '#a2b9b1',
+					400: '#7a9f94',
+					500: '#5c8476',
+					600: '#4d7c5f',
+					700: '#3d5646',
+					800: '#33453b',
+					900: '#2a3831',
+					950: '#1a231f'
 				}
 			},
 
 			// Gradients / backgrounds
 			backgroundImage: {
-				'guild-gold-gradient': 'linear-gradient(135deg, #cba135 0%, #b38f2a 50%, #8f6e20 100%)',
-				'primary-glass': 'linear-gradient(180deg, #008B8B 0%, #007474 100%)'
+				'guild-gold-gradient': 'linear-gradient(135deg, #b89b5e 45%, #7c6b3c 100%)',
+				'liquid-skobeloff': 'linear-gradient(180deg, #008B8B 0%, #007474 100%)'
 			},
 			
 			// Box Shadows
