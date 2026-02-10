@@ -1,4 +1,4 @@
-import type { User, DashboardData, LeaderboardData, LeaderboardEntryRaw, UserStats } from '$lib/types/backend';
+import type { User, DashboardData, LeaderboardData, LeaderboardEntryDTO, UserStats } from '$lib/types/backend';
 import { mockRounds } from '$lib/mocks/mockRounds';
 
 // Mock users
@@ -48,7 +48,7 @@ export const mockUsers: User[] = [
 // Mock rounds - using imported mock data
 
 // Mock leaderboard
-const mockLeaderboard: LeaderboardEntryRaw[] = [
+const mockLeaderboard: LeaderboardEntryDTO[] = [
 	{ tag_number: 1, user_id: '123456789012345678', total_points: 1500, rounds_played: 15 },
 	{ tag_number: 2, user_id: '234567890123456789', total_points: 1200, rounds_played: 12 },
 	{ tag_number: 3, user_id: '345678901234567890', total_points: 1000, rounds_played: 10 }

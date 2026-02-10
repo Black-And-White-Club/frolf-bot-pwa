@@ -30,7 +30,5 @@
 		{tag.tagNumber}
 	</div>
 	<span class="text-center text-sm font-medium text-slate-200">{userProfiles.getDisplayName(tag.userId)}</span>
-	{#if tag.totalPoints !== undefined}
-		<span class="font-display text-xs font-bold text-guild-accent">{tag.totalPoints} pts</span>
-	{/if}
+	<span class="font-display text-xs font-bold text-guild-accent">{tag.totalPoints} pts</span>
 </div>

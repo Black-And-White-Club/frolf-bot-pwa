@@ -9,7 +9,7 @@
 
     const tagStyle = $derived(
         rank === 1
-            ? 'bg-guild-gold-gradient text-white font-bold shadow-lg shadow-guild-accent/30'
+            ? 'bg-guild-gold-gradient text-black font-bold shadow-lg shadow-guild-accent/30'
             : rank === 2
                 ? 'bg-gradient-to-br from-slate-300 to-slate-500 text-black font-bold shadow-lg shadow-slate-400/30'
                 : rank === 3
@@ -23,7 +23,7 @@
     const displayName = $derived(userProfiles.getDisplayName(entry.userId));
 </script>
 
-<div class="hover:bg-liquid-skobeloff flex items-center gap-4 rounded-lg p-3">
+<div class="hover:bg-liquid-skobeloff flex items-center gap-4 rounded-lg p-3 transition-colors duration-200">
     <!-- Tag Number Badge -->
     <div class={`flex h-10 w-10 items-center justify-center rounded-full ${tagStyle}`}>
         {entry.tagNumber}
@@ -42,14 +42,10 @@
     </div>
 
     <!-- Stats -->
-    {#if entry.totalPoints !== undefined}
-        <div class="mr-4 flex flex-col items-end">
-             <div class="font-display text-sm font-bold text-guild-accent">{entry.totalPoints} pts</div>
-             {#if entry.roundsPlayed !== undefined}
-                 <div class="font-secondary text-xs text-guild-text-secondary">{entry.roundsPlayed} rds</div>
-             {/if}
-        </div>
-    {/if}
+    <div class="mr-4 flex flex-col items-end">
+         <div class="font-display text-sm font-bold text-guild-accent">{entry.totalPoints} pts</div>
+         <div class="font-secondary text-xs text-guild-text-secondary">{entry.roundsPlayed} rds</div>
+    </div>
 
     <!-- Movement Indicator -->
     <MovementIndicator {entry} {movement} />

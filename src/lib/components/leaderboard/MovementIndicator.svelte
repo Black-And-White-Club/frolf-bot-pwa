@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { LeaderboardEntry } from '$lib/stores/leaderboard.svelte';
 
-	let { entry, movement }: { entry: LeaderboardEntry; movement: 'up' | 'down' | 'same' } = $props();
+	const { entry, movement }: { entry: LeaderboardEntry; movement: 'up' | 'down' | 'same' } = $props();
 
-	let display = $derived.by(() => {
+	const display = $derived.by(() => {
 		if (!entry.previousTagNumber || movement === 'same') {
 			return { icon: '—', color: 'text-slate-500', label: 'unchanged', change: 0 };
 		}

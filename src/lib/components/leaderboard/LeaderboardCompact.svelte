@@ -19,9 +19,7 @@
 			<div class="tag-number">{entry.tagNumber}</div>
 			<div class="info">
 				<span class="name">{userProfiles.getDisplayName(entry.userId)}</span>
-				{#if entry.totalPoints !== undefined}
-					<span class="points">{entry.totalPoints} pts</span>
-				{/if}
+				<span class="points">{entry.totalPoints} pts</span>
 			</div>
 		</div>
 	{/each}
