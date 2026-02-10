@@ -3,7 +3,7 @@
 /* @vitest-environment jsdom */
 import { render, cleanup } from '@testing-library/svelte';
 import Leaderboard from '../Leaderboard.svelte';
-import type { LeaderboardEntry } from '$lib/types/backend';
+import type { LeaderboardEntryDTO } from '$lib/types/backend';
 import { test, expect } from 'vitest';
 
 test('shows empty state when no entries', () => {
@@ -12,10 +12,10 @@ test('shows empty state when no entries', () => {
 });
 
 test('renders entries and respects compact prop', () => {
-	const entries: LeaderboardEntry[] = [
-		{ tag_number: 1, user_id: 'u1' },
-		{ tag_number: 2, user_id: 'u2' },
-		{ tag_number: 3, user_id: 'u3' }
+	const entries: LeaderboardEntryDTO[] = [
+		{ tag_number: 1, user_id: 'u1', total_points: 100, rounds_played: 1 },
+		{ tag_number: 2, user_id: 'u2', total_points: 200, rounds_played: 2 },
+		{ tag_number: 3, user_id: 'u3', total_points: 300, rounds_played: 3 }
 	];
 
 	// By default the component determines limits based on viewport. In unit

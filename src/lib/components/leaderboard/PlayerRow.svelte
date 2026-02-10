@@ -8,6 +8,8 @@
 		isCurrentUser?: boolean;
 		compact?: boolean;
 		showRank?: boolean;
+		totalPoints?: number;
+		roundsPlayed?: number;
 		testid?: string;
 		onclick?: (userId: string) => void;
 	};
@@ -19,6 +21,8 @@
 		isCurrentUser = false,
 		compact = false,
 		showRank = true,
+		totalPoints,
+		roundsPlayed,
 		testid,
 		onclick
 	}: Props = $props();
@@ -39,6 +43,17 @@
 		return r === 1 ? '🥇' : r === 2 ? '🥈' : r === 3 ? '🥉' : '';
 	}
 </script>
+
+{#snippet statsSection()}
+	{#if totalPoints !== undefined}
+		<div class="stats">
+			<span class="points">{totalPoints} pts</span>
+			{#if roundsPlayed !== undefined}
+				<span class="rounds">{roundsPlayed} rds</span>
+			{/if}
+		</div>
+	{/if}
+{/snippet}
 
 {#if onclick}
 	<button
@@ -71,6 +86,7 @@
 			</div>
 
 			<div class="right">
+				{@render statsSection()}
 				{#if isTopThree}
 					<span
 						class="medal"
@@ -117,6 +133,7 @@
 			</div>
 
 			<div class="right">
+				{@render statsSection()}
 				{#if isTopThree}
 					<span
 						class="medal"
@@ -404,7 +421,29 @@
 	.right {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 0.75rem;
+	}
+
+	.stats {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		text-align: right;
+		line-height: 1.1;
+	}
+
+	.points {
+		font-family: var(--font-display, 'Fraunces', serif);
+		font-weight: 700;
+		color: var(--guild-accent, #b89b5e);
+		font-size: 1rem;
+	}
+
+	.rounds {
+		font-family: var(--font-secondary, 'Space Grotesk', sans-serif);
+		font-size: 0.75rem;
+		color: var(--guild-text-secondary);
+		font-weight: 500;
 	}
 
 	.medal {

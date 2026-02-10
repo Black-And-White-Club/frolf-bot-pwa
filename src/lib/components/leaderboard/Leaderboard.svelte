@@ -41,6 +41,8 @@
 			name: `Player #${entry.tag_number}`,
 			tag: entry.tag_number,
 			userId: entry.user_id,
+			totalPoints: entry.total_points,
+			roundsPlayed: entry.rounds_played,
 			isCurrentUser: false,
 			isTopThree: index < 3
 		}));
@@ -91,6 +93,8 @@
 						userId={player.userId}
 						name={player.name}
 						rank={player.rank}
+						totalPoints={player.totalPoints}
+						roundsPlayed={player.roundsPlayed}
 						isCurrentUser={player.isCurrentUser}
 						{compact}
 						{showRank}

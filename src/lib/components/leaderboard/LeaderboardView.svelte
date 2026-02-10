@@ -31,7 +31,7 @@
 	<!-- Top 3 Highlight -->
 	{#if topThree.length > 0}
 		<div
-			class="bg-forest-800/30 border-sage-600/20 flex justify-center gap-8 rounded-lg border p-6"
+			class="bg-liquid-skobeloff border-sage-600/20 flex justify-center gap-8 rounded-lg border p-6"
 		>
 			{#each topThree as entry, index (index)}
 				<TagBadge tag={entry} rank={index + 1} size="lg" />
@@ -40,7 +40,7 @@
 	{/if}
 
 	<!-- Full Rankings Table -->
-	<div class="bg-forest-800/30 border-sage-600/20 rounded-lg border p-4">
+	<div class="bg-liquid-skobeloff border-sage-600/20 rounded-lg border p-4">
 		<div class="space-y-2">
 			{#each sortedEntries as entry, index (index)}
 				<LeaderboardRow {entry} rank={index + 1} />

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import type { LeaderboardEntry } from '$lib/stores/leaderboard.svelte';
 
-	let { entry, movement }: { entry: LeaderboardEntry; movement: 'up' | 'down' | 'same' } = $props();
+	const { entry, movement }: { entry: LeaderboardEntry; movement: 'up' | 'down' | 'same' } = $props();
 
-	let display = $derived(() => {
+	const display = $derived.by(() => {
 		if (!entry.previousTagNumber || movement === 'same') {
-			return { icon: '—', color: 'text-slate-500', label: 'unchanged' };
+			return { icon: '—', color: 'text-slate-500', label: 'unchanged', change: 0 };
 		}
 
 		const change = Math.abs(entry.previousTagNumber - entry.tagNumber);
@@ -18,9 +18,9 @@
 	});
 </script>
 
-<div class={`flex items-center gap-1 ${display().color}`} aria-label={display().label}>
-	<span class="text-xs">{display().icon}</span>
-	{#if display().change}
-		<span class="text-xs font-medium">{display().change}</span>
+<div class={`flex items-center gap-1 ${display.color}`} aria-label={display.label}>
+	<span class="text-xs">{display.icon}</span>
+	{#if display.change}
+		<span class="text-xs font-medium">{display.change}</span>
 	{/if}
 </div>
