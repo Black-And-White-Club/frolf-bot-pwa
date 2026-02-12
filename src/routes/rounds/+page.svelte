@@ -13,6 +13,9 @@
 
 <svelte:head>
 	<title>Rounds | {clubService.info?.name ?? 'Frolf Bot'}</title>
+	<meta name="description" content="Browse past disc golf rounds, scores, and course history for your club." />
+	<meta property="og:title" content="Rounds | Frolf Bot" />
+	<meta property="og:description" content="Browse past disc golf rounds, scores, and course history for your club." />
 </svelte:head>
 
 <main class="container mx-auto px-4 py-6">

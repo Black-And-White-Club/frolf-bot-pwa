@@ -231,6 +231,23 @@ export const STATUS_COLORS: Record<string, string> = {
 export const currentTheme = writable<GuildTheme>(defaultTheme);
 export const prefersDark = writable<boolean>(false);
 
+export const MOBILE_BREAKPOINT = 768;
+
+const MOBILE_QUERY = `(max-width: ${MOBILE_BREAKPOINT}px)`;
+
+const checkMobile = () => {
+	if (!isBrowser) return false;
+	return window.matchMedia(MOBILE_QUERY).matches;
+};
+
+export const isMobile = writable<boolean>(checkMobile());
+
+if (isBrowser) {
+	window.matchMedia(MOBILE_QUERY).addEventListener('change', (e) => {
+		isMobile.set(e.matches);
+	});
+}
+
 // ============================================================================
 // STORAGE UTILITIES
 // ============================================================================

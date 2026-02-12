@@ -1,5 +1,5 @@
 <script lang="ts">
-	type ViewMode = 'tags' | 'season';
+	type ViewMode = 'tags' | 'points';
 
 	let { mode, onchange }: { mode: ViewMode; onchange: (mode: ViewMode) => void } = $props();
 </script>
@@ -16,12 +16,12 @@
 	</button>
 	<button
 		class="toggle-tab"
-		class:active={mode === 'season'}
+		class:active={mode === 'points'}
 		role="tab"
-		aria-selected={mode === 'season'}
-		onclick={() => onchange('season')}
+		aria-selected={mode === 'points'}
+		onclick={() => onchange('points')}
 	>
-		Season
+		Points
 	</button>
 </div>
 

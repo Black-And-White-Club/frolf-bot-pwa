@@ -21,7 +21,7 @@
 
     const movement = $derived(leaderboardService.getMovementIndicator(entry));
     const displayName = $derived(userProfiles.getDisplayName(entry.userId));
-    const isSeasonMode = $derived(leaderboardService.viewMode === 'season');
+    const isSeasonMode = $derived(leaderboardService.viewMode === 'points');
 </script>
 
 <div class="hover:bg-liquid-skobeloff flex items-center gap-4 rounded-lg p-3 transition-colors duration-200">
