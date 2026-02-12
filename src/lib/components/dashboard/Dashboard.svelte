@@ -70,11 +70,12 @@
 				{:else if leaderboardService.entries.length === 0}
 					<EmptyState icon="🏆" title="No rankings" message="Waiting for leaderboard data" />
 				{:else}
-					<LeaderboardCompact
-						entries={leaderboardService.entries}
-						limit={mode === 'tv' ? 20 : 10}
-					/>
-				{/if}
+					                                                                              <LeaderboardCompact
+					                                                                                      entries={leaderboardService.currentView}
+					                                                                                      limit={mode === 'tv' ? 20 : 10}
+					                                                                                      mode={leaderboardService.viewMode}
+					                                                                              />
+					                                                                      {/if}
 			</section>
 		</div>
 	</div>

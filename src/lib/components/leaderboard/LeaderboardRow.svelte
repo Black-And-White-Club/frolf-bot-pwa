@@ -21,12 +21,13 @@
 
     const movement = $derived(leaderboardService.getMovementIndicator(entry));
     const displayName = $derived(userProfiles.getDisplayName(entry.userId));
+    const isSeasonMode = $derived(leaderboardService.viewMode === 'season');
 </script>
 
 <div class="hover:bg-liquid-skobeloff flex items-center gap-4 rounded-lg p-3 transition-colors duration-200">
-    <!-- Tag Number Badge -->
+    <!-- Tag Number/Rank Badge -->
     <div class={`flex h-10 w-10 items-center justify-center rounded-full ${tagStyle}`}>
-        {entry.tagNumber}
+        {isSeasonMode ? rank : entry.tagNumber}
     </div>
 
     <!-- Avatar -->
