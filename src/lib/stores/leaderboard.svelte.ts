@@ -57,11 +57,23 @@ class LeaderboardService {
 	version = $state(0);
 	isLoading = $state(false);
 	lastError = $state<string | null>(null);
+	viewMode = $state<'tags' | 'season'>('tags');
 
 	// Derived
 	entries = $derived(this.snapshot?.entries ?? []);
 
 	sortedEntries = $derived([...this.entries].sort((a, b) => a.tagNumber - b.tagNumber));
+
+	sortedByPoints = $derived(
+		[...this.entries].sort(
+			(a, b) =>
+				b.totalPoints - a.totalPoints ||
+				b.roundsPlayed - a.roundsPlayed ||
+				a.tagNumber - b.tagNumber
+		)
+	);
+
+	currentView = $derived(this.viewMode === 'tags' ? this.sortedEntries : this.sortedByPoints);
 
 	topTen = $derived(this.sortedEntries.slice(0, 10));
 
@@ -118,6 +130,10 @@ class LeaderboardService {
 				break;
 			}
 		}
+	}
+
+	setViewMode(mode: 'tags' | 'season'): void {
+		this.viewMode = mode;
 	}
 
 	clear(): void {

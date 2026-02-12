@@ -2,41 +2,47 @@
 	import type { LeaderboardData } from '$lib/types/backend';
 	import PlayerRow from './PlayerRow.svelte';
 	import ChevronCollapse from '$lib/components/general/ChevronCollapse.svelte';
+	import ViewToggle from './ViewToggle.svelte';
+	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
 
 	type Props = {
 		entries?: LeaderboardData;
 		showRank?: boolean;
 		compact?: boolean;
+		mode?: 'tags' | 'season';
 		testid?: string;
 		onViewAll?: () => void;
 	};
 
-	let { entries = [], showRank = true, compact = false, testid, onViewAll }: Props = $props();
+	let {
+		entries = [],
+		showRank = true,
+		compact = false,
+		mode,
+		testid,
+		onViewAll
+	}: Props = $props();
 
 	let collapsed = $state(false);
 
-	// (no debug logging)
+	// Fallback to service mode if not provided as a prop
+	const currentMode = $derived(mode ?? leaderboardService.viewMode);
+	const isSeasonMode = $derived(currentMode === 'season');
 
-	const MOBILE_LIMIT = 5;
-	const DESKTOP_LIMIT = 10;
-
-	let isMobile = $state(false);
-
-	$effect(() => {
-		const mediaQuery = window.matchMedia('(max-width: 768px)');
-		isMobile = mediaQuery.matches;
-
-		const handler = (e: MediaQueryListEvent) => {
-			isMobile = e.matches;
-		};
-
-		mediaQuery.addEventListener('change', handler);
-		return () => mediaQuery.removeEventListener('change', handler);
+	const sortedInputEntries = $derived.by(() => {
+		if (!isSeasonMode) return entries;
+		// Note: This sorting logic mirrors the one in LeaderboardService (src/lib/stores/leaderboard.svelte.ts).
+		// We are sorting DTOs here (snake_case) vs Models there (camelCase).
+		return [...entries].sort(
+			(a, b) =>
+				b.total_points - a.total_points ||
+				b.rounds_played - a.rounds_played ||
+				a.tag_number - b.tag_number
+		);
 	});
-
 	const displayEntries = $derived.by(() => {
 		const limit = isMobile ? MOBILE_LIMIT : DESKTOP_LIMIT;
-		return (collapsed ? [] : entries.slice(0, limit)).map((entry, index) => ({
+		return (collapsed ? [] : sortedInputEntries.slice(0, limit)).map((entry, index) => ({
 			rank: showRank ? index + 1 : undefined,
 			name: `Player #${entry.tag_number}`,
 			tag: entry.tag_number,
@@ -66,6 +72,10 @@
 		<h3 class="leaderboard-title">Leaderboard</h3>
 
 		<div class="header-controls">
+			<ViewToggle
+				mode={currentMode}
+				onchange={(m) => leaderboardService.setViewMode(m)}
+			/>
 			{#if showViewAllButton}
 				<button type="button" class="view-all-btn" onclick={handleViewAllClick}>
 					View all <span class="count">({entries.length})</span>

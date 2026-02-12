@@ -2,12 +2,13 @@
 	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
 	import LeaderboardRow from './LeaderboardRow.svelte';
 	import TagBadge from './TagBadge.svelte';
+	import ViewToggle from './ViewToggle.svelte';
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	let { guildId: _unusedGuildId }: { guildId?: string } = $props();
 
-	let sortedEntries = $derived(leaderboardService.sortedEntries);
-	let topThree = $derived(leaderboardService.sortedEntries.slice(0, 3));
+	let sortedEntries = $derived(leaderboardService.currentView);
+	let topThree = $derived(sortedEntries.slice(0, 3));
 
 	let lastUpdated = $derived(
 		leaderboardService.snapshot?.lastUpdated
@@ -23,9 +24,15 @@
 	<!-- Header -->
 	<div class="flex items-center justify-between">
 		<h1 class="text-3xl font-bold">Tag Leaderboard</h1>
-		{#if lastUpdated}
-			<span class="text-sm text-slate-400">Last updated: {lastUpdated}</span>
-		{/if}
+		<div class="flex items-center gap-4">
+			<ViewToggle
+				mode={leaderboardService.viewMode}
+				onchange={(m) => leaderboardService.setViewMode(m)}
+			/>
+			{#if lastUpdated}
+				<span class="text-sm text-slate-400">Last updated: {lastUpdated}</span>
+			{/if}
+		</div>
 	</div>
 
 	<!-- Top 3 Highlight -->

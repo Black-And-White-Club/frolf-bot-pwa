@@ -1,14 +1,28 @@
 <script lang="ts">
 	import { userProfiles } from '$lib/stores/userProfiles.svelte';
+	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
 	import type { LeaderboardEntry } from '$lib/stores/leaderboard.svelte';
-	// TagBadge intentionally unused in this compact list; remove the import to avoid lint noise.
+	import ViewToggle from './ViewToggle.svelte';
 
-	let { entries, limit = 10 }: { entries: LeaderboardEntry[]; limit?: number } = $props();
+	let {
+		entries,
+		limit = 10,
+		mode
+	}: { entries: LeaderboardEntry[]; limit?: number; mode?: 'tags' | 'season' } = $props();
 
+	const currentMode = $derived(mode ?? leaderboardService.viewMode);
 	const topEntries = $derived(entries.slice(0, limit));
+	const isSeasonMode = $derived(currentMode === 'season');
 </script>
 
 <div class="leaderboard-compact">
+	<div class="compact-header">
+		<ViewToggle
+			mode={currentMode}
+			onchange={(m) => leaderboardService.setViewMode(m)}
+		/>
+	</div>
+
 	{#each topEntries as entry, i (entry.userId)}
 		<div
 			class="entry"
@@ -16,10 +30,13 @@
 			class:rank-2={i === 1}
 			class:rank-3={i === 2}
 		>
-			<div class="tag-number">{entry.tagNumber}</div>
+			<div class="tag-number">{isSeasonMode ? i + 1 : entry.tagNumber}</div>
 			<div class="info">
 				<span class="name">{userProfiles.getDisplayName(entry.userId)}</span>
 				<span class="points">{entry.totalPoints} pts</span>
+				{#if entry.roundsPlayed}
+					<span class="rounds">{entry.roundsPlayed} rds</span>
+				{/if}
 			</div>
 		</div>
 	{/each}
@@ -30,6 +47,12 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
+	}
+
+	.compact-header {
+		display: flex;
+		justify-content: flex-end;
+		margin-bottom: 0.25rem;
 	}
 
 	.entry {
@@ -102,5 +125,12 @@
 		font-size: 0.75rem;
 		color: var(--guild-accent, #b89b5e);
 		font-weight: 700;
+	}
+
+	.rounds {
+		font-family: var(--font-secondary, 'Space Grotesk', sans-serif);
+		font-size: 0.625rem;
+		color: var(--guild-text-secondary, #9ca3af);
+		font-weight: 500;
 	}
 </style>
