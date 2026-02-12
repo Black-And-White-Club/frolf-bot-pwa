@@ -14,7 +14,7 @@
 	let { mode = 'default' }: Props = $props();
 
 	// View state
-	let viewMode = $state<'tags' | 'points'>('tags');
+	// let viewMode = $state<'tags' | 'points'>('tags'); // REMOVED: Using leaderboardService.viewMode
 
 	function handleMemberSelect(memberId: string) {
 		tagStore.selectMember(memberId);
@@ -25,14 +25,14 @@
 	{#if mode === 'default'}
 		<div class="header-controls">
 			<ViewToggle
-				mode={viewMode}
-				onchange={(m) => (viewMode = m)}
+				mode={leaderboardService.viewMode}
+				onchange={(m) => leaderboardService.setViewMode(m)}
 			/>
 		</div>
 	{/if}
 
 	<main class="content">
-		{#if viewMode === 'tags' && mode !== 'compact'}
+		{#if leaderboardService.viewMode === 'tags' && mode !== 'compact'}
 			<TagLeaderboard 
 				members={tagStore.memberList} 
 				onSelectMember={handleMemberSelect} 

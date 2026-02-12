@@ -1,4 +1,4 @@
-import type { UserProfileRaw } from './userProfiles.svelte';
+import { userProfiles, type UserProfileRaw } from './userProfiles.svelte';
 import type { LeaderboardEntryDTO } from '$lib/types/backend';
 
 export interface LeaderboardEntry {
@@ -165,11 +165,13 @@ class LeaderboardService {
 
 	/**
 	 * Set snapshot from raw API response (snake_case format)
-	 * @param entries Array of LeaderboardEntryDTO from API
-	 * @param guildId The guild ID
+	 * @param response LeaderboardResponseRaw from API
 	 */
-	setSnapshotFromApi(entries: LeaderboardEntryDTO[], guildId: string): void {
-		this.snapshot = transformLeaderboardEntries(entries, guildId);
+	setSnapshotFromApi(response: LeaderboardResponseRaw): void {
+		if (response.profiles) {
+			userProfiles.setProfilesFromApi(response.profiles);
+		}
+		this.snapshot = transformLeaderboardEntries(response.leaderboard, response.guild_id);
 		this.version = this.snapshot.version;
 	}
 

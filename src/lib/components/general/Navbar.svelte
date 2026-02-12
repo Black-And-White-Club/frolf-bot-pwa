@@ -169,7 +169,7 @@
 	</div>
 
 	<!-- Hamburger Menu Overlay -->
-	{#if showHamburger && page.data.session}
+	{#if showHamburger && (page.data.session || auth.isAuthenticated)}
 		<HamburgerMenu {closeHamburger} />
 	{/if}
 </nav>
