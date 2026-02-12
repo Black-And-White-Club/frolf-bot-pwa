@@ -57,7 +57,7 @@ class LeaderboardService {
 	version = $state(0);
 	isLoading = $state(false);
 	lastError = $state<string | null>(null);
-	viewMode = $state<'tags' | 'season'>('tags');
+	viewMode = $state<'tags' | 'points'>('tags');
 
 	// Derived
 	entries = $derived(this.snapshot?.entries ?? []);
@@ -73,7 +73,7 @@ class LeaderboardService {
 		)
 	);
 
-	currentView = $derived(this.viewMode === 'tags' ? this.sortedEntries : this.sortedByPoints);
+	currentView = $derived(this.viewMode === 'points' ? this.sortedByPoints : this.sortedEntries);
 
 	topTen = $derived(this.sortedEntries.slice(0, 10));
 
@@ -132,7 +132,7 @@ class LeaderboardService {
 		}
 	}
 
-	setViewMode(mode: 'tags' | 'season'): void {
+	setViewMode(mode: 'tags' | 'points'): void {
 		this.viewMode = mode;
 	}
 
@@ -172,6 +172,7 @@ class LeaderboardService {
 		this.snapshot = transformLeaderboardEntries(entries, guildId);
 		this.version = this.snapshot.version;
 	}
+
 }
 
 export const leaderboardService = new LeaderboardService();

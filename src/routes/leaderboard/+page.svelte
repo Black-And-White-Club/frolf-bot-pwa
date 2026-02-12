@@ -9,6 +9,9 @@
 
 <svelte:head>
 	<title>Leaderboard | {clubService.info?.name ?? 'Frolf Bot'}</title>
+	<meta name="description" content="See who's on top — club leaderboard rankings, Elo ratings, and player stats." />
+	<meta property="og:title" content="Leaderboard | Frolf Bot" />
+	<meta property="og:description" content="See who's on top — club leaderboard rankings, Elo ratings, and player stats." />
 </svelte:head>
 
 <main class="container mx-auto px-4 py-6">

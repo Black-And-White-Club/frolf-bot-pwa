@@ -1,149 +1,109 @@
 <script lang="ts">
-	import { roundService } from '$lib/stores/round.svelte';
-	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
-	import { auth } from '$lib/stores/auth.svelte';
-	import { appInit } from '$lib/stores/init.svelte';
-	import { clubService } from '$lib/stores/club.svelte';
-	import RoundListCompact from '$lib/components/round/RoundListCompact.svelte';
+	import Leaderboard from '$lib/components/leaderboard/Leaderboard.svelte';
+	import ViewToggle from '$lib/components/leaderboard/ViewToggle.svelte';
 	import LeaderboardCompact from '$lib/components/leaderboard/LeaderboardCompact.svelte';
-	import LiveIndicator from '$lib/components/general/LiveIndicator.svelte';
-	import ConnectionStatus from '$lib/components/general/ConnectionStatus.svelte';
-	import LoadingSkeleton from '$lib/components/general/LoadingSkeleton.svelte';
-	import EmptyState from '$lib/components/general/EmptyState.svelte';
-	import UnauthenticatedView from '$lib/components/general/UnauthenticatedView.svelte';
+	import TagLeaderboard from '$lib/components/leaderboard/TagLeaderboard.svelte';
+	import TagDetailSheet from '$lib/components/leaderboard/TagDetailSheet.svelte';
+	import { tagStore } from '$lib/stores/tags.svelte';
+	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
 
-	let { mode = 'default' }: { mode?: 'default' | 'tv' | 'compact' } = $props();
+	interface Props {
+		mode?: 'default' | 'tv' | 'compact';
+	}
 
-	const activeRounds = $derived(
-		roundService.rounds.filter((r) => r.state === 'started' || r.state === 'scheduled')
-	);
+	let { mode = 'default' }: Props = $props();
 
-	const finalizedRounds = $derived(
-		roundService.rounds.filter((r) => r.state === 'finalized' || r.state === 'cancelled')
-	);
+	// View state
+	let viewMode = $state<'tags' | 'points'>('tags');
+
+	function handleMemberSelect(memberId: string) {
+		tagStore.selectMember(memberId);
+	}
 </script>
 
-{#if !auth.isAuthenticated && appInit.mode !== 'mock'}
-	<UnauthenticatedView />
-{:else}
-	<div class="dashboard" class:tv-mode={mode === 'tv'} class:compact-mode={mode === 'compact'}>
-		<header class="dashboard-header">
-			<div class="flex items-center gap-2">
-				<h1 class="font-display text-xl font-bold text-slate-100">
-					{clubService.info?.name ?? 'Frolf Bot'}
-				</h1>
-			</div>
-			<ConnectionStatus />
-		</header>
-
-		<div class="dashboard-grid">
-			<!-- Rounds Panel -->
-			<section class="panel rounds-panel space-y-6">
-				<!-- Active Section -->
-				<div>
-					<h2 class="panel-title sticky top-0 z-10 bg-[var(--guild-surface,#081212)] pb-2">Active & Upcoming</h2>
-					{#if roundService.isLoading}
-						<LoadingSkeleton variant="card" count={2} />
-					{:else if activeRounds.length === 0}
-						<div class="py-4 text-center">
-							<EmptyState icon="🥏" title="No active rounds" message="Scheduled games appear here" />
-						</div>
-					{:else}
-						<RoundListCompact rounds={activeRounds} />
-					{/if}
-				</div>
-
-				<!-- History Section -->
-				{#if !roundService.isLoading && finalizedRounds.length > 0}
-					<div class="border-t border-[var(--guild-border)] pt-4">
-						<h2 class="panel-title sticky top-0 z-10 bg-[var(--guild-surface,#081212)] pb-2">Recent History</h2>
-						<RoundListCompact rounds={finalizedRounds} limit={5} />
-					</div>
-				{/if}
-			</section>
-
-			<!-- Leaderboard Panel -->
-			<section class="panel leaderboard-panel">
-				<h2 class="panel-title">Leaderboard</h2>
-				{#if leaderboardService.isLoading}
-					<LoadingSkeleton variant="row" count={10} />
-				{:else if leaderboardService.entries.length === 0}
-					<EmptyState icon="🏆" title="No rankings" message="Waiting for leaderboard data" />
-				{:else}
-					                                                                              <LeaderboardCompact
-					                                                                                      entries={leaderboardService.currentView}
-					                                                                                      limit={mode === 'tv' ? 20 : 10}
-					                                                                                      mode={leaderboardService.viewMode}
-					                                                                              />
-					                                                                      {/if}
-			</section>
+<div class="dashboard" class:tv-mode={mode === 'tv'} class:compact-mode={mode === 'compact'}>
+	{#if mode === 'default'}
+		<div class="header-controls">
+			<ViewToggle
+				mode={viewMode}
+				onchange={(m) => (viewMode = m)}
+			/>
 		</div>
-	</div>
-{/if}
+	{/if}
+
+	<main class="content">
+		{#if viewMode === 'tags' && mode !== 'compact'}
+			<TagLeaderboard 
+				members={tagStore.memberList} 
+				onSelectMember={handleMemberSelect} 
+			/>
+			
+			{#if tagStore.selectedMemberId}
+				<TagDetailSheet 
+					memberId={tagStore.selectedMemberId}
+					history={tagStore.selectedMemberHistory}
+					onClose={() => tagStore.selectMember(null)}
+				/>
+			{/if}
+		{:else if mode === 'compact'}
+			<LeaderboardCompact entries={leaderboardService.currentView} />
+		{:else}
+			<!-- Points / Season View -->
+			{#if mode === 'tv'}
+				<div class="tv-layout">
+					<div class="leaderboard-section">
+						<Leaderboard entries={leaderboardService.currentView.slice(0, 8)} />
+					</div>
+					<div class="recent-rounds-section">
+						<!-- Recent rounds component would go here -->
+					</div>
+				</div>
+			{:else}
+				<Leaderboard entries={leaderboardService.currentView} />
+			{/if}
+		{/if}
+	</main>
+</div>
 
 <style>
 	.dashboard {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: var(--space-md, 1rem);
 		display: flex;
 		flex-direction: column;
-		height: 100%;
-		padding: 1rem;
-		gap: 1rem;
+		gap: var(--space-lg, 1.5rem);
 	}
 
-	.dashboard-header {
+	.header-controls {
 		display: flex;
-		justify-content: space-between;
-		align-items: center;
+		justify-content: flex-end;
+		margin-bottom: var(--space-sm, 0.5rem);
 	}
 
-	.dashboard-grid {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 1rem;
-		flex: 1;
-		overflow: hidden;
+	.content {
+		position: relative; 
 	}
 
-	.panel {
-		background: var(--guild-surface, #081212);
-		border: 1px solid var(--guild-border, rgba(0, 116, 116, 0.2));
-		border-radius: 0.75rem;
-		padding: 1rem;
-		overflow-y: auto;
-	}
-
-	.panel-title {
-		font-family: 'Fraunces', serif;
-		font-size: 0.875rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: var(--guild-text-muted, #9ca3af);
-		margin-bottom: 0.75rem;
-	}
-
-	/* TV/Kiosk Mode - Portrait optimized */
+	/* TV Mode Styles */
 	.tv-mode {
-		padding: 1.5rem;
+		max-width: none;
+		padding: var(--space-xl, 2rem);
+		height: 100vh;
+		box-sizing: border-box;
+		background: #0a0f1c; /* Darker background for TV */
 	}
 
-	.tv-mode .dashboard-grid {
-		grid-template-columns: 1fr;
-		grid-template-rows: 1fr 1.5fr;
+	.tv-layout {
+		display: grid;
+		grid-template-columns: 2fr 1fr;
+		gap: var(--space-xl, 2rem);
+		height: 100%;
 	}
 
-	.tv-mode .panel-title {
-		font-size: 1rem;
-	}
-
-	/* Compact Mode - Mobile */
-	.compact-mode .dashboard-grid {
-		grid-template-columns: 1fr;
-	}
-
-	@media (max-width: 768px) {
-		.dashboard-grid {
-			grid-template-columns: 1fr;
-		}
+	/* Compact Mode Styles */
+	.compact-mode {
+		padding: 0;
+		gap: 0;
 	}
 </style>

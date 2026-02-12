@@ -21,6 +21,13 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Sign In | Frolf Bot</title>
+	<meta name="description" content="Sign in to Frolf Bot to track scores and compete with your disc golf club." />
+	<meta property="og:title" content="Sign In | Frolf Bot" />
+	<meta property="og:description" content="Sign in to Frolf Bot to track scores and compete with your disc golf club." />
+</svelte:head>
+
 <div class="flex min-h-screen items-center justify-center bg-[var(--guild-background)] p-4">
 	<div class="w-full max-w-md space-y-8 rounded-xl bg-[var(--guild-surface)] p-8 shadow-2xl">
 		<div class="text-center">

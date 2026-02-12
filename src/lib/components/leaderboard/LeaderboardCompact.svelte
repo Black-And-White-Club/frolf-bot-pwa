@@ -8,11 +8,11 @@
 		entries,
 		limit = 10,
 		mode
-	}: { entries: LeaderboardEntry[]; limit?: number; mode?: 'tags' | 'season' } = $props();
+	}: { entries: LeaderboardEntry[]; limit?: number; mode?: 'tags' | 'points' } = $props();
 
 	const currentMode = $derived(mode ?? leaderboardService.viewMode);
 	const topEntries = $derived(entries.slice(0, limit));
-	const isSeasonMode = $derived(currentMode === 'season');
+	const isSeasonMode = $derived(currentMode === 'points');
 </script>
 
 <div class="leaderboard-compact">

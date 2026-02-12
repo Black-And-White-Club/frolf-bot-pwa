@@ -1,15 +1,22 @@
 <script lang="ts">
-	import type { LeaderboardData } from '$lib/types/backend';
+	import type { LeaderboardEntry } from '$lib/stores/leaderboard.svelte';
 	import PlayerRow from './PlayerRow.svelte';
 	import ChevronCollapse from '$lib/components/general/ChevronCollapse.svelte';
 	import ViewToggle from './ViewToggle.svelte';
 	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
 
+	import { isMobile } from '$lib/stores/theme';
+
+	const MOBILE_LIMIT = 5;
+	const DESKTOP_LIMIT = 10;
+
+	type ViewMode = 'tags' | 'points';
+
 	type Props = {
-		entries?: LeaderboardData;
+		entries?: LeaderboardEntry[];
 		showRank?: boolean;
 		compact?: boolean;
-		mode?: 'tags' | 'season';
+		mode?: ViewMode;
 		testid?: string;
 		onViewAll?: () => void;
 	};
@@ -27,35 +34,33 @@
 
 	// Fallback to service mode if not provided as a prop
 	const currentMode = $derived(mode ?? leaderboardService.viewMode);
-	const isSeasonMode = $derived(currentMode === 'season');
+	const isSeasonMode = $derived(currentMode === 'points');
 
 	const sortedInputEntries = $derived.by(() => {
-		if (!isSeasonMode) return entries;
-		// Note: This sorting logic mirrors the one in LeaderboardService (src/lib/stores/leaderboard.svelte.ts).
-		// We are sorting DTOs here (snake_case) vs Models there (camelCase).
+		if (currentMode !== 'points') return entries; // Strict check against 'points'
 		return [...entries].sort(
 			(a, b) =>
-				b.total_points - a.total_points ||
-				b.rounds_played - a.rounds_played ||
-				a.tag_number - b.tag_number
+				b.totalPoints - a.totalPoints ||
+				b.roundsPlayed - a.roundsPlayed ||
+				a.tagNumber - b.tagNumber
 		);
 	});
 	const displayEntries = $derived.by(() => {
-		const limit = isMobile ? MOBILE_LIMIT : DESKTOP_LIMIT;
+		const limit = $isMobile ? MOBILE_LIMIT : DESKTOP_LIMIT;
 		return (collapsed ? [] : sortedInputEntries.slice(0, limit)).map((entry, index) => ({
 			rank: showRank ? index + 1 : undefined,
-			name: `Player #${entry.tag_number}`,
-			tag: entry.tag_number,
-			userId: entry.user_id,
-			totalPoints: entry.total_points,
-			roundsPlayed: entry.rounds_played,
+			name: entry.displayName ?? `Player #${entry.tagNumber}`,
+			tag: entry.tagNumber,
+			userId: entry.userId,
+			totalPoints: entry.totalPoints,
+			roundsPlayed: entry.roundsPlayed,
 			isCurrentUser: false,
 			isTopThree: index < 3
 		}));
 	});
 
 	const showViewAllButton = $derived.by(
-		() => entries.length > (isMobile ? MOBILE_LIMIT : DESKTOP_LIMIT) && !!onViewAll && !collapsed
+		() => entries.length > ($isMobile ? MOBILE_LIMIT : DESKTOP_LIMIT) && !!onViewAll && !collapsed
 	);
 
 	function handleViewAllClick() {
