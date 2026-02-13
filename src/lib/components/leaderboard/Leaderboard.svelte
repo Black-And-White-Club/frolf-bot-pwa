@@ -5,6 +5,8 @@
 	import ViewToggle from './ViewToggle.svelte';
 	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
 
+	import { userProfiles } from '$lib/stores/userProfiles.svelte';
+	import { auth } from '$lib/stores/auth.svelte';
 	import { isMobile } from '$lib/stores/theme';
 
 	const MOBILE_LIMIT = 5;
@@ -49,16 +51,19 @@
 	});
 	const displayEntries = $derived.by(() => {
 		const limit = $isMobile ? MOBILE_LIMIT : DESKTOP_LIMIT;
-		return (collapsed ? [] : sortedInputEntries.slice(0, limit)).map((entry, index) => ({
-			rank: showRank ? index + 1 : undefined,
-			name: entry.displayName ?? `Player #${entry.tagNumber}`,
-			tag: entry.tagNumber,
-			userId: entry.userId,
-			totalPoints: entry.totalPoints,
-			roundsPlayed: entry.roundsPlayed,
-			isCurrentUser: false,
-			isTopThree: index < 3
-		}));
+		return (collapsed ? [] : sortedInputEntries.slice(0, limit)).map((entry, index) => {
+			const displayName = userProfiles.getDisplayName(entry.userId);
+			return {
+				rank: showRank ? index + 1 : undefined,
+				name: displayName ?? entry.displayName ?? `Player #${entry.tagNumber}`,
+				tag: entry.tagNumber,
+				userId: entry.userId,
+				totalPoints: entry.totalPoints,
+				roundsPlayed: entry.roundsPlayed,
+				isCurrentUser: auth.user?.id === entry.userId,
+				isTopThree: index < 3
+			};
+		});
 	});
 
 	const showViewAllButton = $derived.by(

@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
-	import type { Transport } from '$lib/stores/leaderboardPreviewStore';
+	import type { Transport, LeaderboardState } from '$lib/stores/leaderboardPreviewStore';
 	import { createLeaderboardPreviewStore } from '$lib/stores/leaderboardPreviewStore';
 
 	type Props = {
@@ -9,20 +8,20 @@
 
 	let { transport }: Props = $props();
 
-	// Store is created once with initial transport - transport changes are not supported
-	const store = createLeaderboardPreviewStore(transport);
-	let state: { snapshot: any; lastVersion: number } = $state({ snapshot: null, lastVersion: 0 });
+	let state: LeaderboardState = $state({ snapshot: null, lastVersion: 0 });
 
-	const unsubscribe = store.subscribe((s) => {
-		state = s;
-	});
-
-	onMount(() => {
+	$effect(() => {
+		const store = createLeaderboardPreviewStore(transport);
 		store.start();
-	});
-	onDestroy(() => {
-		store.stop();
-		unsubscribe();
+
+		const unsubscribe = store.subscribe((s) => {
+			state = s;
+		});
+
+		return () => {
+			store.stop();
+			unsubscribe();
+		};
 	});
 </script>
 
