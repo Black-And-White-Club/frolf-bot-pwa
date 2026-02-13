@@ -48,14 +48,14 @@
 
 <button class="round-card" {onclick} type="button" aria-label="View round: {round.title}">
 	<div class="card-header">
-		<h3 class="round-title">{round.title}</h3>
+		<h3 class="round-title line-clamp-2">{round.title}</h3>
 	</div>
 
 	<div class="card-details">
 		{#if round.location}
 			<p class="detail-item location">
 				<span class="detail-icon">📍</span>
-				{round.location}
+				<span class="truncate">{round.location}</span>
 			</p>
 		{/if}
 
@@ -173,6 +173,7 @@
 		margin: 0;
 		font-size: 0.875rem;
 		color: var(--guild-text-muted, #9ca3af);
+		min-width: 0;
 	}
 
 	.detail-icon {

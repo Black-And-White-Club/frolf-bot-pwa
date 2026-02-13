@@ -1,6 +1,9 @@
 import { roundService } from '$lib/stores/round.svelte';
 import { leaderboardService } from '$lib/stores/leaderboard.svelte';
-import { mockLeaderboardSnapshot } from './mockLeaderboard';
+import { userProfiles } from '$lib/stores/userProfiles.svelte'; // Added
+import { tagStore } from '$lib/stores/tags.svelte'; // Added
+import { clubService } from '$lib/stores/club.svelte'; // Added
+import { mockLeaderboardSnapshot, mockLeaderboardEntries } from './mockLeaderboard'; // Added entries
 
 /**
  * Mock Data Provider for Development Mode
@@ -134,8 +137,65 @@ class MockDataProvider {
 		// Load initial mock data
 		mockRounds.forEach((round) => roundService.addRound(round));
 		leaderboardService.setSnapshot(mockLeaderboardSnapshot);
+
+		// Populate mock club info
+		clubService.info = {
+			id: 'guild-123',
+			name: 'Black & White Club',
+			icon: 'https://cdn.discordapp.com/icons/123456789/abcdef.png'
+		};
+		clubService.knownClubs['guild-123'] = clubService.info;
+		
+		// Populate mock profiles
+		const profiles: Record<string, any> = {};
+		
+		// From leaderboard
+		mockLeaderboardEntries.forEach(entry => {
+			profiles[entry.userId] = {
+				user_id: entry.userId,
+				display_name: entry.displayName || `User ${entry.userId}`,
+				avatar_url: `https://cdn.discordapp.com/embed/avatars/${Number(entry.userId) % 5}.png`
+			};
+		});
+
+		// From rounds (ensure participants have profiles)
+		mockRounds.forEach(round => {
+			round.participants.forEach(p => {
+				if (!profiles[p.userId]) {
+					profiles[p.userId] = {
+						user_id: p.userId,
+						display_name: `Player ${p.userId}`,
+						avatar_url: `https://cdn.discordapp.com/embed/avatars/${Number(p.userId) % 5}.png`
+					};
+				}
+			});
+			// Creator
+			if (!profiles[round.createdBy]) {
+				profiles[round.createdBy] = {
+					user_id: round.createdBy,
+					display_name: `Creator ${round.createdBy}`,
+					avatar_url: `https://cdn.discordapp.com/embed/avatars/0.png`
+				};
+			}
+		});
+
+		userProfiles.setProfilesFromApi(profiles);
+
+		// Populate mock tags
+		const mockTags = mockLeaderboardEntries.map(e => ({
+			member_id: e.userId,
+			current_tag: e.tagNumber,
+			last_active_at: new Date().toISOString()
+		}));
+
+		tagStore.applyTagListResponse({
+			guild_id: 'guild-123',
+			members: mockTags
+		});
+
 		roundService.isLoading = false;
 		leaderboardService.isLoading = false;
+		tagStore.setLoading(false); // Ensure tag store is ready
 
 		// Simulate periodic updates (optional)
 		this.intervalId = setInterval(() => {

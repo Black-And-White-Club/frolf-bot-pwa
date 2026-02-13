@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { LeaderboardEntry } from '$lib/stores/leaderboard.svelte';
+	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
 	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 
 	let {
@@ -14,7 +15,7 @@
 
 	let rankColor = $derived(
 		rank === 1
-			? 'bg-gradient-to-br from-amber-400 to-amber-600 shadow-lg shadow-amber-500/30'
+			? 'bg-guild-gold-gradient shadow-lg shadow-guild-accent/30'
 			: rank === 2
 				? 'bg-gradient-to-br from-slate-300 to-slate-500 shadow-lg shadow-slate-400/30'
 				: rank === 3
@@ -23,12 +24,12 @@
 	);
 </script>
 
-<div class="flex flex-col items-center gap-2">
+<div class="flex w-28 flex-col items-center gap-2">
 	<div
 		class={`${sizeClasses} ${rankColor} flex items-center justify-center rounded-full font-bold text-black`}
 	>
-		{tag.tagNumber}
+		{leaderboardService.viewMode === 'points' ? rank : tag.tagNumber}
 	</div>
-	<span class="text-center text-sm font-medium text-slate-200">{userProfiles.getDisplayName(tag.userId)}</span>
+	<span class="w-full truncate text-center text-sm font-medium text-slate-200">{userProfiles.getDisplayName(tag.userId)}</span>
 	<span class="font-display text-xs font-bold text-guild-accent">{tag.totalPoints} pts</span>
 </div>

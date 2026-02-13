@@ -127,7 +127,7 @@
 
 <!-- Slide-out menu -->
 <div
-	class="bg-guild-surface fixed top-0 right-0 z-50 h-full w-80 transform shadow-xl transition-transform"
+	class="bg-[var(--guild-surface)] fixed top-0 right-0 z-50 h-full w-80 transform shadow-xl transition-all duration-200"
 	role="dialog"
 	aria-modal="true"
 	aria-labelledby="hamburger-title"
@@ -187,10 +187,12 @@
 
 		<!-- Theme toggle -->
 		<div class="mb-6">
-			<label class="mb-2 block text-sm font-medium text-[var(--guild-text-secondary)]">
-				Theme
-				<ThemeToggle testid={themeToggleTestId} />
-			</label>
+			<div class="flex items-center justify-between rounded-md px-4 py-2">
+				<span class="text-sm font-medium text-[var(--guild-text)]">Theme</span>
+				<div class="flex items-center gap-2">
+					<ThemeToggle testid={themeToggleTestId} size="sm" />
+				</div>
+			</div>
 		</div>
 
 		<!-- Sign out -->
@@ -199,7 +201,7 @@
 				<button
 					type="submit"
 					onclick={handleSignOut}
-					class="text-guild-surface flex w-full justify-center rounded-md border border-transparent bg-[var(--guild-primary)] px-4 py-2 text-sm font-medium hover:bg-[var(--guild-primary)]/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--guild-primary)]/30"
+					class="text-guild-surface flex w-full justify-center rounded-md border border-transparent bg-liquid-skobeloff px-4 py-2 text-sm font-medium hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--guild-primary)]/30"
 					data-testid={btnSignoutTestId}
 				>
 					Sign out

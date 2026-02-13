@@ -23,7 +23,13 @@
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<div class="tag-detail-sheet" role="dialog" aria-label="Tag History for {memberId}" onkeydown={handleKeydown}>
+<div 
+	class="tag-detail-sheet" 
+	role="dialog" 
+	aria-label="Tag History for {memberId}" 
+	tabindex="-1"
+	onkeydown={handleKeydown}
+>
 	<div class="sheet-header">
 		<h3>Tag History</h3>
 		<button class="close-btn" onclick={() => onClose?.()} type="button" aria-label="Close">✕</button>
@@ -52,8 +58,8 @@
 	.tag-detail-sheet {
 		display: flex;
 		flex-direction: column;
-		background: var(--color-surface, #0f172a);
-		border: 1px solid var(--color-border, rgba(148, 163, 184, 0.1));
+		background: var(--guild-surface);
+		border: 1px solid var(--guild-border);
 		border-radius: var(--radius-lg, 0.75rem);
 		overflow: hidden;
 		max-height: 24rem;
@@ -64,18 +70,18 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: var(--space-md, 1rem);
-		border-bottom: 1px solid var(--color-border, rgba(148, 163, 184, 0.1));
+		border-bottom: 1px solid var(--guild-border);
 	}
 
 	.sheet-header h3 {
 		margin: 0;
-		color: var(--color-text-primary, #e2e8f0);
+		color: var(--guild-text);
 	}
 
 	.close-btn {
 		background: none;
 		border: none;
-		color: var(--color-text-muted, #94a3b8);
+		color: var(--guild-text-secondary);
 		cursor: pointer;
 		font-size: 1.25rem;
 		padding: 0.25rem;
@@ -83,7 +89,7 @@
 	}
 
 	.close-btn:hover {
-		color: var(--color-text-primary, #e2e8f0);
+		color: var(--guild-text);
 	}
 
 	.history-list {
@@ -96,7 +102,7 @@
 
 	.empty-state {
 		text-align: center;
-		color: var(--color-text-muted, #94a3b8);
+		color: var(--guild-text-secondary);
 		padding: var(--space-lg, 1.5rem) 0;
 	}
 
@@ -109,7 +115,7 @@
 
 	.entry-tag {
 		font-weight: 700;
-		color: var(--color-gold-accent, #c5a04e);
+		color: var(--guild-accent, #b89b5e);
 		min-width: 2.5rem;
 	}
 
@@ -121,12 +127,12 @@
 
 	.entry-reason {
 		font-size: var(--font-sm, 0.875rem);
-		color: var(--color-text-primary, #e2e8f0);
+		color: var(--guild-text);
 		text-transform: capitalize;
 	}
 
 	.entry-time {
 		font-size: var(--font-xs, 0.75rem);
-		color: var(--color-text-muted, #94a3b8);
+		color: var(--guild-text-secondary);
 	}
 </style>

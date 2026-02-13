@@ -2,7 +2,7 @@
 	<div class="max-w-md space-y-4">
 		<h1 class="text-4xl font-bold text-red-500">Auth Error</h1>
 		<p class="text-white/60">There was a problem signing you in. Please try again or contact support.</p>
-		<a href="/" class="inline-block rounded bg-[#007474] px-6 py-2 text-white hover:bg-[#008B8B] transition">
+		<a href="/" class="inline-block rounded bg-liquid-skobeloff px-6 py-2 text-white hover:brightness-110 transition">
 			Return Home
 		</a>
 	</div>

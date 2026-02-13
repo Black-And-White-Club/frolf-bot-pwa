@@ -52,4 +52,8 @@
 	.safe-area-inset-right {
 		padding-right: env(safe-area-inset-right, 0);
 	}
+
+	.bg-guild-gold-gradient {
+		background: var(--guild-gold-gradient);
+	}
 }

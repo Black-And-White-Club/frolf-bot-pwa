@@ -8,6 +8,7 @@
 		isCurrentUser?: boolean;
 		compact?: boolean;
 		showRank?: boolean;
+		highlightFirst?: boolean;
 		totalPoints?: number;
 		roundsPlayed?: number;
 		testid?: string;
@@ -21,13 +22,16 @@
 		isCurrentUser = false,
 		compact = false,
 		showRank = true,
+		highlightFirst = true,
 		totalPoints,
 		roundsPlayed,
+		avatarUrl,
 		testid,
-		onclick
-	}: Props = $props();
+		onclick,
+		children
+	}: Props & { children?: import('svelte').Snippet; avatarUrl?: string } = $props();
 
-	const isFirstPlace = $derived(rank === 1);
+	const isFirstPlace = $derived(highlightFirst && rank === 1);
 	const isTopThree = $derived(rank && rank <= 3);
 
 	function handleClick() {
@@ -36,11 +40,6 @@
 
 	function getAvatarInitial(n: string) {
 		return n ? n.charAt(0).toUpperCase() : '?';
-	}
-
-	function getMedalEmoji(r?: number) {
-		if (!r) return '';
-		return r === 1 ? '🥇' : r === 2 ? '🥈' : r === 3 ? '🥉' : '';
 	}
 </script>
 
@@ -55,103 +54,62 @@
 	{/if}
 {/snippet}
 
-{#if onclick}
-	<button
-		type="button"
-		class={cn(
-			'player-row',
-			compact && 'compact',
-			isFirstPlace && 'first-place',
-			isTopThree && 'top-three'
-		)}
-		onclick={handleClick}
-		data-testid={testid}
-	>
-		<div class="player-content">
-			<div class="left">
-				<div class="avatar" aria-hidden="true">
+<div
+	class={cn(
+		'player-row',
+		compact && 'compact',
+		isFirstPlace && 'first-place',
+		isTopThree && 'top-three',
+		onclick && 'interactive'
+	)}
+	data-testid={testid}
+>
+	{#if onclick}
+		<button
+			type="button"
+			class="row-action-overlay"
+			onclick={handleClick}
+			aria-label={`Select ${name}`}
+		></button>
+	{/if}
+
+	<div class="player-content" aria-hidden={!!onclick}>
+		<div class="left">
+			<div class="avatar" aria-hidden="true" class:has-image={!!avatarUrl}>
+				{#if avatarUrl}
+					<img src={avatarUrl} alt={name} class="avatar-img" />
+				{:else}
 					{getAvatarInitial(name)}
-				</div>
-
-				{#if showRank && rank}
-					<div class="rank">{rank}</div>
 				{/if}
-
-				<div class="meta">
-					<div class={cn('name', compact && 'small')}>{name}</div>
-					{#if isCurrentUser}
-						<div class="you-badge">(You)</div>
-					{/if}
-				</div>
 			</div>
 
-			<div class="right">
-				{@render statsSection()}
-				{#if isTopThree}
-					<span
-						class="medal"
-						class:gold={rank === 1}
-						class:silver={rank === 2}
-						class:bronze={rank === 3}
-					>
-						{getMedalEmoji(rank)}
-					</span>
+			{#if showRank && rank}
+				<div class="rank">{rank}</div>
+			{/if}
+
+			<div class="meta">
+				<div class={cn('name', compact && 'small')}>{name}</div>
+				{#if isCurrentUser}
+					<div class="you-badge">(You)</div>
 				{/if}
 			</div>
 		</div>
 
-		{#if isFirstPlace}
-			<div class="shine-overlay" aria-hidden="true"></div>
-		{/if}
-	</button>
-{:else}
-	<div
-		class={cn(
-			'player-row',
-			compact && 'compact',
-			isFirstPlace && 'first-place',
-			isTopThree && 'top-three'
-		)}
-		data-testid={testid}
-	>
-		<div class="player-content">
-			<div class="left">
-				<div class="avatar" aria-hidden="true">
-					{getAvatarInitial(name)}
+		<div class="right">
+			{@render statsSection()}
+			{#if children}
+				<!-- actions container sits above the overlay -->
+				<div class="actions">
+					{@render children()}
 				</div>
-
-				{#if showRank && rank}
-					<div class="rank">{rank}</div>
-				{/if}
-
-				<div class="meta">
-					<div class={cn('name', compact && 'small')}>{name}</div>
-					{#if isCurrentUser}
-						<div class="you-badge">(You)</div>
-					{/if}
-				</div>
-			</div>
-
-			<div class="right">
-				{@render statsSection()}
-				{#if isTopThree}
-					<span
-						class="medal"
-						class:gold={rank === 1}
-						class:silver={rank === 2}
-						class:bronze={rank === 3}
-					>
-						{getMedalEmoji(rank)}
-					</span>
-				{/if}
-			</div>
+			{/if}
 		</div>
-
-		{#if isFirstPlace}
-			<div class="shine-overlay" aria-hidden="true"></div>
-		{/if}
 	</div>
-{/if}
+
+	{#if isFirstPlace}
+		<div class="shine-overlay" aria-hidden="true"></div>
+	{/if}
+</div>
 
 <style>
 	.player-row {
@@ -166,15 +124,22 @@
 		transition: all 0.3s ease;
 	}
 
-	.player-row:is(button) {
-		width: 100%;
-		text-align: left;
-		cursor: pointer;
-	}
-
-	.player-row:is(button):hover {
+	.interactive:hover {
 		transform: translateX(2px);
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	.row-action-overlay {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		z-index: 2; /* Above content (z1), below actions (z3) */
+		padding: 0;
+		margin: 0;
 	}
 
 	.player-content {
@@ -184,32 +149,50 @@
 		width: 100%;
 		gap: 0.75rem;
 		position: relative;
-		z-index: 3; /* bring content above the shine overlay */
+		z-index: 1; 
+		pointer-events: none; /* Let clicks pass through to overlay */
+	}
+	
+	.left {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		min-width: 0;
+	}
+	
+	.right {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		flex-shrink: 0;
 	}
 
-	/* First place special styling */
+	.actions {
+		position: relative;
+		z-index: 3; /* Above overlay */
+		pointer-events: auto; /* Re-enable clicks for buttons */
+		display: flex;
+		align-items: center;
+	}
+
+	/* First place special styling - DARK MODE DEFAULT (Obsidian Forest) */
 	.player-row.first-place {
 		background: linear-gradient(
 			135deg,
-			rgba(255, 215, 0, 0.08) 0%,
-			rgba(255, 223, 77, 0.05) 50%,
-			rgba(255, 215, 0, 0.08) 100%
+			rgba(184, 155, 94, 0.2) 0%, /* #B89B5E */
+			rgba(124, 107, 60, 0.1) 100% /* #7C6B3C */
 		);
-		border-color: rgba(255, 215, 0, 0.3);
-		box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+		border-color: rgba(184, 155, 94, 0.5);
+		box-shadow: 0 0 20px rgba(184, 155, 94, 0.15);
 	}
 
-	.player-row.first-place:is(button):hover {
-		box-shadow: 0 0 30px rgba(255, 215, 0, 0.25);
-		border-color: rgba(255, 215, 0, 0.5);
+	.player-row.first-place.interactive:hover {
+		box-shadow: 0 0 30px rgba(184, 155, 94, 0.25);
+		border-color: rgba(184, 155, 94, 0.7);
 	}
 
-	/* Make first-place more visible in light color schemes while keeping
-	 the current dark-mode appearance untouched. This targets only light
-	 mode so we don't change the dark styling you already like. */
 	@media (prefers-color-scheme: light) {
 		.player-row.first-place {
-			/* brighter, warmer background and stronger glow */
 			background: linear-gradient(
 				135deg,
 				rgba(255, 245, 200, 0.9) 0%,
@@ -220,7 +203,7 @@
 			box-shadow: 0 6px 24px rgba(255, 200, 0, 0.18);
 		}
 
-		.player-row.first-place:is(button):hover {
+		.player-row.first-place.interactive:hover {
 			box-shadow: 0 8px 30px rgba(255, 200, 0, 0.22);
 			border-color: rgba(255, 185, 0, 0.7);
 		}
@@ -232,9 +215,6 @@
 		}
 	}
 
-	/* Make the shine overlay more visible in light mode: use a warm gold
-		 band, increase contrast and speed slightly, and ensure it sits above
-		 the content so the effect is noticeable. */
 	@media (prefers-color-scheme: light) {
 		.player-row.first-place .shine-overlay {
 			background: linear-gradient(
@@ -245,19 +225,12 @@
 				transparent 100%
 			);
 			animation: shine 2s ease-in-out infinite;
-			/* keep the overlay visually above background but below the content
-					 so it doesn't obscure the rank/avatars */
 			z-index: 0;
 			opacity: 0.35;
 			pointer-events: none;
 		}
 	}
 
-	/* If the app toggles theme via an HTML class ('.dark'), apply the same
-	 enhanced first-place styling when the page is in light-theme mode
-	 (i.e., html does NOT have the .dark class). This covers stored user
-	 preferences and theme toggles that don't change system-level media.
-*/
 	:global(html:not(.dark)) .player-row.first-place {
 		background: linear-gradient(
 			135deg,
@@ -269,7 +242,7 @@
 		box-shadow: 0 6px 24px rgba(255, 200, 0, 0.18);
 	}
 
-	:global(html:not(.dark)) .player-row.first-place:is(button):hover {
+	:global(html:not(.dark)) .player-row.first-place.interactive:hover {
 		box-shadow: 0 8px 30px rgba(255, 200, 0, 0.22);
 		border-color: rgba(255, 185, 0, 0.7);
 	}
@@ -289,21 +262,9 @@
 			transparent 100%
 		);
 		animation: shine 2s ease-in-out infinite;
-		z-index: 0; /* ensure content (z-index:1) remains above the shine */
+		z-index: 0;
 		opacity: 0.35;
 		pointer-events: none;
-	}
-
-	:global(html:not(.dark)) .player-row.first-place .rank {
-		/* Make the rank number clearly visible on light backgrounds: small
-			 gold pill with white text and subtle shadow for contrast. */
-		display: inline-block;
-		background: #ffd700;
-		color: #fff;
-		padding: 0.06rem 0.45rem;
-		border-radius: 9999px;
-		font-weight: 800;
-		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 	}
 
 	/* Animated shine effect for first place */
@@ -320,11 +281,9 @@
 			transparent 100%
 		);
 		animation: shine 3s ease-in-out infinite;
-		/* place overlay above background but below rank/avatar (we'll raise
-		   rank/avatar z-index) so the shine is visible but doesn't obscure
-		   the important UI elements */
-		z-index: 2;
+		z-index: 0; /* Background effect */
 		pointer-events: none;
+		opacity: 0.15; /* Subtle in dark mode */
 	}
 
 	@keyframes shine {
@@ -347,13 +306,6 @@
 		padding: 0.5rem;
 	}
 
-	.left {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		min-width: 0;
-	}
-
 	.avatar {
 		width: 2.5rem;
 		height: 2.5rem;
@@ -368,9 +320,27 @@
 	}
 
 	.first-place .avatar {
-		background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-		color: #000;
-		box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+		background: var(--guild-gold-gradient, linear-gradient(135deg, #b89b5e 45%, #7c6b3c 100%));
+		color: #ffffff;
+		box-shadow: 0 0 15px rgba(184, 155, 94, 0.4);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+	}
+
+	.avatar.has-image {
+		background: none;
+		padding: 0;
+		overflow: hidden;
+	}
+
+	.avatar-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.first-place .avatar.has-image {
+		border: 2px solid #b89b5e;
+		box-shadow: 0 0 10px rgba(184, 155, 94, 0.4);
 	}
 
 	.rank {
@@ -383,9 +353,9 @@
 	}
 
 	.first-place .rank {
-		color: #ffd700;
+		color: var(--guild-accent, #b89b5e);
 		font-size: 1.125rem;
-		text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+		text-shadow: 0 0 15px rgba(184, 155, 94, 0.4);
 	}
 
 	.meta {
@@ -418,18 +388,14 @@
 		font-weight: 600;
 	}
 
-	.right {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-	}
-
 	.stats {
 		display: flex;
 		flex-direction: column;
 		align-items: flex-end;
 		text-align: right;
 		line-height: 1.1;
+		gap: 0.25rem;
+		white-space: nowrap;
 	}
 
 	.points {
@@ -446,38 +412,6 @@
 		font-weight: 500;
 	}
 
-	.medal {
-		font-size: 1.5rem;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-	}
-
-	.medal.gold {
-		animation: pulse-gold 2s ease-in-out infinite;
-	}
-
-	@keyframes pulse-gold {
-		0%,
-		100% {
-			transform: scale(1);
-			filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
-		}
-		50% {
-			transform: scale(1.1);
-			filter: drop-shadow(0 4px 8px rgba(255, 215, 0, 0.5));
-		}
-	}
-
-	.medal.silver {
-		opacity: 0.95;
-	}
-
-	.medal.bronze {
-		opacity: 0.9;
-	}
-
 	@media (max-width: 639px) {
 		.player-row {
 			padding: 0.5rem 0.75rem;
@@ -491,16 +425,10 @@
 			min-width: 1.25rem;
 			font-size: 0.875rem;
 		}
-		.medal {
-			font-size: 1.25rem;
-		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
 		.shine-overlay {
-			animation: none;
-		}
-		.medal.gold {
 			animation: none;
 		}
 		.player-row {

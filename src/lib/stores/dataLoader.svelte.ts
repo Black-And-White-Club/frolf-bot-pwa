@@ -98,7 +98,7 @@ class DataLoader {
 			);
 
 			if (response?.leaderboard) {
-				leaderboardService.setSnapshotFromApi(response.leaderboard, subjectId);
+				leaderboardService.setSnapshotFromApi(response);
 			}
 			// Store profiles if included
 			if (response?.profiles) {

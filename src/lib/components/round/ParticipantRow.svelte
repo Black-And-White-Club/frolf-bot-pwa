@@ -71,7 +71,9 @@
 
 	{#if showScore && scoreDisplay()}
 		<div class="score {scoreColorClass()}">
-			<span class="score-value">{scoreDisplay()}</span>
+			{#key participant.score}
+				<span class="score-value animate-scale-pulse inline-block">{scoreDisplay()}</span>
+			{/key}
 			{#if participant.score !== null}
 				<span class="score-raw">({participant.score})</span>
 			{/if}

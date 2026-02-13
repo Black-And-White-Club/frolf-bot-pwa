@@ -159,7 +159,7 @@
 				<div class="mb-2 text-xl text-red-400">Connection Error</div>
 				<p class="mb-4 text-white/60">{appInit.error}</p>
 				<button
-					class="rounded bg-[#007474] px-4 py-2 text-white transition hover:bg-[#008B8B]"
+					class="rounded bg-liquid-skobeloff px-4 py-2 text-white transition hover:brightness-110"
 					onclick={() => appInit.initialize()}
 				>
 					Retry
@@ -193,7 +193,7 @@
 					<a
 						href="/auth/signin"
 						data-testid="btn-signin"
-						class="group text-guild-surface relative flex w-full justify-center rounded-md border border-transparent bg-[var(--guild-primary)] px-4 py-2 text-sm font-medium hover:bg-[var(--guild-primary)]/90 focus:ring-2 focus:ring-[var(--guild-primary)] focus:ring-offset-2 focus:outline-none"
+						class="group text-guild-surface relative flex w-full justify-center rounded-md border border-transparent bg-liquid-skobeloff px-4 py-2 text-sm font-medium hover:brightness-110 focus:ring-2 focus:ring-[var(--guild-primary)] focus:ring-offset-2 focus:outline-none"
 					>
 						Sign In
 					</a>

@@ -91,7 +91,7 @@
 		<div class="flex items-center space-x-2">
 			<button
 				bind:this={refreshBtn}
-				class="rounded bg-[var(--guild-primary)] px-3 py-1 text-white"
+				class="rounded bg-liquid-skobeloff px-3 py-1 text-white transition hover:brightness-110"
 				onclick={refresh}
 				onkeydown={(e) => e.key === 'Enter' && refresh()}>Refresh</button
 			>

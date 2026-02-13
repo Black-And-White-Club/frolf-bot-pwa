@@ -76,6 +76,25 @@ class AppInitializer {
 		// step 1: dynamic import to avoid bundling mocks in production
 		const { mockDataProvider } = await import('$lib/mocks/mockDataProvider.svelte');
 		console.log('[AppInit] Starting in mock mode');
+		
+		// Mock Auth
+		auth.user = {
+			id: 'user-1',
+			uuid: 'user-uuid-1',
+			activeClubUuid: 'guild-123',
+			guildId: 'guild-123',
+			role: 'admin',
+			clubs: [
+				{
+					club_uuid: 'guild-123',
+					role: 'admin',
+					display_name: 'Mock User',
+					avatar_url: 'https://cdn.discordapp.com/embed/avatars/0.png'
+				}
+			]
+		};
+		auth.status = 'authenticated';
+
 		mockDataProvider.start();
 		this.mode = 'mock';
 		this.status = 'ready';

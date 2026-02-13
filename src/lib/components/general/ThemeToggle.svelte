@@ -16,14 +16,14 @@
 
 	// computed class strings for the track and knob to keep markup clean
 	const trackClasses = $derived(
-		`relative inline-block rounded-full bg-[var(--guild-border)] transition-colors duration-200 ${
+		`relative inline-block rounded-full bg-[var(--guild-border)] border border-[var(--guild-text-secondary)]/30 transition-colors duration-200 ${
 			size === 'sm' ? 'h-5 w-10' : 'h-6 w-12'
 		}`
 	);
 
 	const knobClasses = $derived(
-		`absolute top-0 left-0 rounded-full bg-[var(--guild-surface)] shadow-md transition-transform duration-200 ${
-			size === 'sm' ? 'h-5 w-5' : 'h-6 w-6'
+		`absolute top-px left-px rounded-full bg-[var(--guild-surface)] shadow-md transition-transform duration-200 ${
+			size === 'sm' ? 'h-[18px] w-[18px]' : 'h-[22px] w-[22px]'
 		} ${isDark ? (size === 'sm' ? 'translate-x-5' : 'translate-x-6') : ''}`
 	);
 
@@ -99,12 +99,12 @@
 
 	<!-- Track: computed classes to keep markup simpler -->
 	<span class={trackClasses}>
-		<span class={knobClasses} style="left:0; top:0;"></span>
+		<span class={knobClasses}></span>
 	</span>
 
 	{#if !compact}
-		<span class="ml-3 hidden text-sm font-medium text-[var(--guild-text)] sm:inline">
-			{isDark ? '☀️' : '🌖'}
+		<span class="ml-2 text-sm font-medium text-[var(--guild-text)]">
+			{isDark ? '🌖' : '☀️'}
 		</span>
 	{/if}
 </button>

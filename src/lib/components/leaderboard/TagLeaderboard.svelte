@@ -4,6 +4,7 @@
 	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
 	import ViewToggle from './ViewToggle.svelte';
 	import ChevronCollapse from '$lib/components/general/ChevronCollapse.svelte';
+	import PlayerRow from './PlayerRow.svelte';
 
 	interface Props {
 		members?: TagListMember[];
@@ -50,31 +51,41 @@
 				<p class="empty-state">No tags assigned yet.</p>
 			{:else}
 				{#each sortedMembers as member (member.memberId)}
-					<div class="tag-row-content">
-						<button
-							class="tag-row-clickable"
-							onclick={() => onSelectMember?.(member.memberId)}
-							type="button"
-						>
-							<span class="tag-number">#{member.currentTag}</span>
-							<div class="member-info">
-								<span class="display-name">{userProfiles.getDisplayName(member.memberId)}</span>
-								<span class="member-id-sub">{member.memberId}</span>
-							</div>
-						</button>
-						<button 
-							class="history-btn"
-							onclick={(e) => { e.stopPropagation(); onSelectMember?.(member.memberId); }}
-							type="button"
-							aria-label="View History"
-							title="View Tag History"
-						>
-							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-								<circle cx="12" cy="12" r="10"></circle>
-								<polyline points="12 6 12 12 16 14"></polyline>
-							</svg>
-						</button>
-					</div>
+					<PlayerRow
+						userId={member.memberId}
+						name={userProfiles.getDisplayName(member.memberId)}
+						rank={member.currentTag ?? undefined}
+						highlightFirst={true}
+						isCurrentUser={false}
+						onclick={() => onSelectMember?.(member.memberId)}
+					>
+												<button
+													class="history-btn"
+													title="View Tag History"
+													type="button"
+													onclick={(e) => {
+														e.stopPropagation();
+														onSelectMember?.(member.memberId);
+													}}
+													aria-label="View Tag History"
+												>
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="16"
+														height="16"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														class="text-guild-text-secondary"
+													>
+														<circle cx="12" cy="12" r="10" />
+														<polyline points="12 6 12 12 16 14" />
+													</svg>
+												</button>
+					</PlayerRow>
 				{/each}
 			{/if}
 		</div>
@@ -131,7 +142,7 @@
 	.tag-list {
 		display: flex;
 		flex-direction: column;
-		gap: 2px;
+		gap: 0.5rem;
 	}
 
 	.empty-state {
@@ -141,79 +152,34 @@
 		color: var(--guild-text-secondary);
 	}
 
-	.tag-row-content {
-		display: flex;
-		align-items: center;
-		background: var(--color-surface-elevated, rgba(30, 41, 59, 0.6));
-		border: 1px solid var(--color-border, rgba(148, 163, 184, 0.1));
-		border-radius: var(--radius-md, 0.5rem);
-		transition: all 0.2s ease;
-	}
-	
-	.tag-row-content:hover {
-		background: var(--color-surface-hover, rgba(30, 41, 59, 0.8));
-		border-color: var(--color-gold-accent, #c5a04e);
-	}
+		.history-btn {
 
-	.tag-row-clickable {
-		flex: 1;
-		display: flex;
-		align-items: center;
-		gap: var(--space-md, 1rem);
-		padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
-		background: none;
-		border: none;
-		cursor: pointer;
-		text-align: left;
-		color: inherit;
-		font: inherit;
-		min-width: 0; /* Enable truncation in children */
-	}
+			background: none;
 
-	.history-btn {
-		background: none;
-		border: none;
-		padding: 0.5rem;
-		margin-right: 0.5rem;
-		color: var(--color-text-muted, #94a3b8);
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		border-radius: 4px;
-		transition: color 0.2s, background 0.2s;
-	}
+			border: none;
+
+			padding: 0.5rem;
+
+			margin-left: 0.5rem;
+
+			color: var(--guild-text-secondary);
+
+			display: flex;
+
+			align-items: center;
+
+			border-radius: 4px;
+
+			transition:
+
+				color 0.2s,
+
+				background 0.2s;
+
+		}
 
 	.history-btn:hover {
-		color: var(--color-text-primary, #e2e8f0);
-		background: rgba(255,255,255,0.05);
-	}
-
-	.tag-number {
-		font-weight: 700;
-		color: var(--color-gold-accent, #c5a04e);
-		min-width: 2.5rem;
-		font-size: 1.1rem;
-	}
-
-	.member-info {
-		display: flex;
-		flex-direction: column;
-		overflow: hidden;
-	}
-
-	.display-name {
-		color: var(--guild-text);
-		font-weight: 500;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.member-id-sub {
-		color: var(--guild-text-muted);
-		font-size: 0.75rem;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		color: var(--guild-primary);
+		background: rgba(var(--guild-primary-rgb), 0.1);
 	}
 </style>

@@ -59,7 +59,7 @@
 				<button
 					type="submit"
 					disabled={status === 'loading'}
-					class="flex w-full justify-center rounded-md bg-[var(--guild-primary)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--guild-primary)]/90 disabled:opacity-50"
+					class="flex w-full justify-center rounded-md bg-liquid-skobeloff px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
 				>
 					{status === 'loading' ? 'Sending...' : 'Send Magic Link'}
 				</button>

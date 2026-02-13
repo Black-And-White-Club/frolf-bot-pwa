@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Leaderboard from '$lib/components/leaderboard/Leaderboard.svelte';
-	import ViewToggle from '$lib/components/leaderboard/ViewToggle.svelte';
+	import RoundList from '$lib/components/round/RoundList.svelte';
+	import { goto } from '$app/navigation';
 	import LeaderboardCompact from '$lib/components/leaderboard/LeaderboardCompact.svelte';
 	import TagLeaderboard from '$lib/components/leaderboard/TagLeaderboard.svelte';
 	import TagDetailSheet from '$lib/components/leaderboard/TagDetailSheet.svelte';
@@ -13,54 +14,57 @@
 
 	let { mode = 'default' }: Props = $props();
 
-	// View state
-	// let viewMode = $state<'tags' | 'points'>('tags'); // REMOVED: Using leaderboardService.viewMode
-
 	function handleMemberSelect(memberId: string) {
 		tagStore.selectMember(memberId);
+	}
+
+	function handleRoundSelect(roundId: string) {
+		goto(`/rounds/${roundId}`);
 	}
 </script>
 
 <div class="dashboard" class:tv-mode={mode === 'tv'} class:compact-mode={mode === 'compact'}>
 	{#if mode === 'default'}
-		<div class="header-controls">
-			<ViewToggle
-				mode={leaderboardService.viewMode}
-				onchange={(m) => leaderboardService.setViewMode(m)}
-			/>
-		</div>
+		<!-- Header controls removed (redundant view toggle) -->
 	{/if}
 
 	<main class="content">
-		{#if leaderboardService.viewMode === 'tags' && mode !== 'compact'}
-			<TagLeaderboard 
-				members={tagStore.memberList} 
-				onSelectMember={handleMemberSelect} 
-			/>
-			
-			{#if tagStore.selectedMemberId}
-				<TagDetailSheet 
-					memberId={tagStore.selectedMemberId}
-					history={tagStore.selectedMemberHistory}
-					onClose={() => tagStore.selectMember(null)}
-				/>
-			{/if}
-		{:else if mode === 'compact'}
+		{#if mode === 'compact'}
 			<LeaderboardCompact entries={leaderboardService.currentView} />
-		{:else}
-			<!-- Points / Season View -->
-			{#if mode === 'tv'}
-				<div class="tv-layout">
-					<div class="leaderboard-section">
-						<Leaderboard entries={leaderboardService.currentView.slice(0, 8)} />
-					</div>
-					<div class="recent-rounds-section">
-						<!-- Recent rounds component would go here -->
-					</div>
+		{:else if mode === 'tv'}
+			<div class="tv-layout">
+				<div class="leaderboard-section">
+					<Leaderboard entries={leaderboardService.currentView.slice(0, 8)} />
 				</div>
-			{:else}
-				<Leaderboard entries={leaderboardService.currentView} />
-			{/if}
+				<div class="recent-rounds-section">
+					<!-- Recent rounds component would go here -->
+				</div>
+			</div>
+		{:else}
+			<!-- Default Dashboard Layout -->
+			<div class="rounds-section">
+				<h2 class="section-heading">Rounds</h2>
+				<RoundList onSelect={handleRoundSelect} />
+			</div>
+			
+			<div class="leaderboard-section">
+				{#if leaderboardService.viewMode === 'tags'}
+					<TagLeaderboard 
+						members={tagStore.memberList} 
+						onSelectMember={handleMemberSelect} 
+					/>
+					
+					{#if tagStore.selectedMemberId}
+						<TagDetailSheet 
+							memberId={tagStore.selectedMemberId}
+							history={tagStore.selectedMemberHistory}
+							onClose={() => tagStore.selectMember(null)}
+						/>
+					{/if}
+				{:else}
+					<Leaderboard entries={leaderboardService.currentView} title="Points Leaderboard" />
+				{/if}
+			</div>
 		{/if}
 	</main>
 </div>
@@ -75,14 +79,35 @@
 		gap: var(--space-lg, 1.5rem);
 	}
 
-	.header-controls {
-		display: flex;
-		justify-content: flex-end;
-		margin-bottom: var(--space-sm, 0.5rem);
-	}
+
 
 	.content {
 		position: relative; 
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-lg, 1.5rem);
+	}
+
+	@media (min-width: 1024px) {
+		.dashboard:not(.tv-mode):not(.compact-mode) .content {
+			display: grid;
+			grid-template-columns: 1fr 1.5fr;
+			align-items: start;
+			gap: 2rem;
+		}
+	}
+
+	.rounds-section {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-md, 1rem);
+	}
+
+	.section-heading {
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: var(--guild-text);
+		margin: 0;
 	}
 
 	/* TV Mode Styles */

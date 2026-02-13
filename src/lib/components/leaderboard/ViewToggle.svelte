@@ -29,6 +29,7 @@
 	.view-toggle {
 		display: inline-flex;
 		border: 1px solid var(--guild-border, rgba(0, 116, 116, 0.2));
+		background: var(--guild-surface-elevated, #142020); /* Added background */
 		border-radius: 0.5rem;
 		overflow: hidden;
 	}

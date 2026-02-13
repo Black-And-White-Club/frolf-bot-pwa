@@ -9,14 +9,12 @@
 
     const tagStyle = $derived(
         rank === 1
-            ? 'bg-guild-gold-gradient text-black font-bold shadow-lg shadow-guild-accent/30'
+            ? 'bg-guild-gold-gradient text-black font-extrabold shadow-lg shadow-guild-accent/30 text-xl'
             : rank === 2
                 ? 'bg-gradient-to-br from-slate-300 to-slate-500 text-black font-bold shadow-lg shadow-slate-400/30'
                 : rank === 3
                     ? 'bg-gradient-to-br from-amber-600 to-amber-800 text-black font-bold shadow-lg shadow-amber-700/30'
-                    : rank <= 10
-                        ? 'bg-sage-600 text-white'
-                        : 'bg-slate-700 text-slate-200'
+                    : 'bg-transparent text-[var(--guild-text-secondary)] font-semibold'
     );
 
     const movement = $derived(leaderboardService.getMovementIndicator(entry));
@@ -31,23 +29,27 @@
     </div>
 
     <!-- Avatar -->
-    <ParticipantAvatar 
-        userId={entry.userId} 
-        username={displayName} 
-        size={32} 
-    />
+    <div class="relative">
+        <ParticipantAvatar 
+            userId={entry.userId} 
+            username={displayName} 
+            size={32} 
+        />
+    </div>
 
     <!-- Player Info -->
-    <div class="flex flex-1 items-center gap-3">
-        <span class="font-medium">{displayName}</span>
+    <div class="flex flex-1 items-center gap-3 min-w-0">
+        <span class="font-medium truncate">{displayName}</span>
     </div>
 
     <!-- Stats -->
-    <div class="mr-4 flex flex-col items-end">
+    <div class="mr-4 flex min-w-[5rem] flex-col items-end">
          <div class="font-display text-sm font-bold text-guild-accent">{entry.totalPoints} pts</div>
          <div class="font-secondary text-xs text-guild-text-secondary">{entry.roundsPlayed} rds</div>
     </div>
 
     <!-- Movement Indicator -->
-    <MovementIndicator {entry} {movement} />
+    <div class="min-w-[3rem]">
+        <MovementIndicator {entry} {movement} />
+    </div>
 </div>

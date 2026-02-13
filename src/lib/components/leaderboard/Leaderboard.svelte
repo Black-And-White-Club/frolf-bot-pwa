@@ -19,6 +19,7 @@
 		mode?: ViewMode;
 		testid?: string;
 		onViewAll?: () => void;
+		title?: string;
 	};
 
 	let {
@@ -27,7 +28,8 @@
 		compact = false,
 		mode,
 		testid,
-		onViewAll
+		onViewAll,
+		title = 'Leaderboard'
 	}: Props = $props();
 
 	let collapsed = $state(false);
@@ -74,7 +76,10 @@
 
 <div class="leaderboard-container" data-testid={testid}>
 	<div class="leaderboard-header">
-		<h3 class="leaderboard-title">Leaderboard</h3>
+		<div class="title-group">
+			<h3 class="leaderboard-title">{title}</h3>
+			<span class="entry-count">{entries.length} members</span>
+		</div>
 
 		<div class="header-controls">
 			<ViewToggle
@@ -144,11 +149,23 @@
 		gap: 1rem;
 	}
 
+	.title-group {
+		display: flex;
+		align-items: baseline;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+	}
+
 	.leaderboard-title {
 		font-size: 1.125rem;
 		font-weight: 600;
 		color: var(--guild-text);
 		margin: 0;
+	}
+
+	.entry-count {
+		font-size: 0.875rem;
+		color: var(--guild-text-muted);
 	}
 
 	.header-controls {

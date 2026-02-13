@@ -33,29 +33,34 @@
 </script>
 
 <div class="round-list">
-	<!-- Live Now Section -->
-	{#if activeRounds.length > 0}
-		<section class="round-section">
-			<h2 class="section-title">Live Now</h2>
-			<div class="round-grid">
-				{#each activeRounds as round (round.id)}
-					<RoundListCard {round} onclick={() => handleSelect(round.id)} />
-				{/each}
-			</div>
-		</section>
-	{/if}
+	<!-- Live Now + Upcoming side-by-side -->
+	{#if activeRounds.length > 0 || scheduledRounds.length > 0}
+		<div class="live-upcoming-row">
+			{#if activeRounds.length > 0}
+				<section class="round-section">
+					<h2 class="section-title">Live Now</h2>
+					<div class="round-grid round-grid-single">
+						{#each activeRounds as round (round.id)}
+							<div class="round-card-wrapper glow-aura">
+								<RoundListCard {round} onclick={() => handleSelect(round.id)} />
+							</div>
+						{/each}
+					</div>
+				</section>
+			{/if}
 
-	<!-- Upcoming Section -->
-	{#if scheduledRounds.length > 0}
-		<section class="round-section">
-			<h2 class="section-title">Upcoming</h2>
-			<div class="round-grid">
-				{#each scheduledRounds as round (round.id)}
-					<RoundListCard {round} onclick={() => handleSelect(round.id)} />
-				{/each}
-			</div>
-		</section>
-	{:else if activeRounds.length === 0}
+			{#if scheduledRounds.length > 0}
+				<section class="round-section">
+					<h2 class="section-title">Upcoming</h2>
+					<div class="round-grid round-grid-single">
+						{#each scheduledRounds as round (round.id)}
+							<RoundListCard {round} onclick={() => handleSelect(round.id)} />
+						{/each}
+					</div>
+				</section>
+			{/if}
+		</div>
+	{:else}
 		<div class="empty-state">
 			<p class="empty-text">No upcoming rounds scheduled</p>
 		</div>
@@ -97,6 +102,29 @@
 		width: 100%;
 	}
 
+	       .round-card-wrapper {
+	               transition: transform 0.2s ease;
+	       }
+	
+	       .round-card-wrapper:hover {
+	               transform: translateY(-2px);
+	       }
+		.glow-aura {
+		border-radius: var(--border-radius-lg, 0.75rem);
+		box-shadow: var(--guild-glow-aura, 0 0 15px rgba(139, 123, 184, 0.5));
+		border: 1px solid rgba(139, 123, 184, 0.3);
+	}
+
+	.live-upcoming-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1.5rem;
+	}
+
+	.round-grid-single {
+		grid-template-columns: 1fr;
+	}
+
 	.round-section {
 		display: flex;
 		flex-direction: column;
@@ -114,7 +142,8 @@
 	.round-grid {
 		display: grid;
 		gap: 1rem;
-		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		/* Use auto-fit to ensure items stretch to fill the row if there are few items */
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 	}
 
 	.empty-state {
@@ -137,7 +166,7 @@
 	.loading-skeleton {
 		display: grid;
 		gap: 1rem;
-		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 	}
 
 	.skeleton-card {
@@ -164,6 +193,10 @@
 	}
 
 	@media (max-width: 640px) {
+		.live-upcoming-row {
+			grid-template-columns: 1fr;
+		}
+
 		.round-grid,
 		.loading-skeleton {
 			grid-template-columns: 1fr;
