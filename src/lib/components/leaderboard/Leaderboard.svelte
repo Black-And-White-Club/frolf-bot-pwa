@@ -58,6 +58,7 @@
 				name: displayName ?? entry.displayName ?? `Player #${entry.tagNumber}`,
 				tag: entry.tagNumber,
 				userId: entry.userId,
+				avatarUrl: userProfiles.getAvatarUrl(entry.userId),
 				totalPoints: entry.totalPoints,
 				roundsPlayed: entry.roundsPlayed,
 				isCurrentUser: auth.user?.id === entry.userId,
@@ -118,6 +119,7 @@
 						userId={player.userId}
 						name={player.name}
 						rank={player.rank}
+						avatarUrl={player.avatarUrl}
 						totalPoints={player.totalPoints}
 						roundsPlayed={player.roundsPlayed}
 						isCurrentUser={player.isCurrentUser}

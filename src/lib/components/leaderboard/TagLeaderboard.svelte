@@ -54,6 +54,7 @@
 					<PlayerRow
 						userId={member.memberId}
 						name={userProfiles.getDisplayName(member.memberId)}
+						avatarUrl={userProfiles.getAvatarUrl(member.memberId)}
 						rank={member.currentTag ?? undefined}
 						highlightFirst={true}
 						isCurrentUser={false}
