@@ -3,6 +3,9 @@
 	import RoundList from '$lib/components/round/RoundList.svelte';
 	import { goto } from '$app/navigation';
 	import LeaderboardCompact from '$lib/components/leaderboard/LeaderboardCompact.svelte';
+	import TagLeaderboard from '$lib/components/leaderboard/TagLeaderboard.svelte';
+	import TagDetailSheet from '$lib/components/leaderboard/TagDetailSheet.svelte';
+	import { tagStore } from '$lib/stores/tags.svelte';
 	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
 
 	interface Props {
@@ -11,9 +14,22 @@
 
 	let { mode = 'default' }: Props = $props();
 
+	function handleMemberSelect(memberId: string) {
+		tagStore.selectMember(memberId);
+	}
+
 	function handleRoundSelect(roundId: string) {
 		goto(`/rounds/${roundId}`);
 	}
+
+	// Map leaderboard entries to tag members to ensure the tag list is populated
+	const tagMembers = $derived(
+		leaderboardService.currentView.map((e) => ({
+			memberId: e.userId,
+			currentTag: e.tagNumber,
+			lastActiveAt: undefined
+		}))
+	);
 </script>
 
 <div class="dashboard" class:tv-mode={mode === 'tv'} class:compact-mode={mode === 'compact'}>
@@ -41,10 +57,25 @@
 			</div>
 			
 			<div class="leaderboard-section">
-				<Leaderboard 
-					entries={leaderboardService.currentView} 
-					title={leaderboardService.viewMode === 'tags' ? 'Tag Leaderboard' : 'Points Leaderboard'} 
-				/>
+				{#if leaderboardService.viewMode === 'tags'}
+					<TagLeaderboard 
+						members={tagMembers} 
+						onSelectMember={handleMemberSelect} 
+					/>
+					
+					{#if tagStore.selectedMemberId}
+						<TagDetailSheet 
+							memberId={tagStore.selectedMemberId}
+							history={tagStore.selectedMemberHistory}
+							onClose={() => tagStore.selectMember(null)}
+						/>
+					{/if}
+				{:else}
+					<Leaderboard 
+						entries={leaderboardService.currentView} 
+						title="Points Leaderboard"
+					/>
+				{/if}
 			</div>
 		{/if}
 	</main>
