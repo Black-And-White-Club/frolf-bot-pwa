@@ -30,6 +30,8 @@
 	>
 		{leaderboardService.viewMode === 'points' ? rank : tag.tagNumber}
 	</div>
-	<span class="w-full truncate text-center text-sm font-medium text-slate-200">{userProfiles.getDisplayName(tag.userId)}</span>
+	<span class="w-full truncate text-center text-sm font-medium text-slate-200"
+		>{userProfiles.getDisplayName(tag.userId)}</span
+	>
 	<span class="font-display text-xs font-bold text-guild-accent">{tag.totalPoints} pts</span>
 </div>

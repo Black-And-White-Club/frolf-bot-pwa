@@ -1,4 +1,4 @@
-import type { User, DashboardData, LeaderboardData, LeaderboardEntryDTO, UserStats } from '$lib/types/backend';
+import type { User, DashboardData, LeaderboardEntryDTO, UserStats } from '$lib/types/backend';
 import { mockRounds } from '$lib/mocks/mockRounds';
 
 // Mock users

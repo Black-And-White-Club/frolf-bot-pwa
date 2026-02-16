@@ -97,9 +97,17 @@ src/
 | `DISCORD_CLIENT_ID`     | Discord OAuth client ID   | ✅       |
 | `DISCORD_CLIENT_SECRET` | Discord OAuth secret      | ✅       |
 | `PUBLIC_API_URL`        | Backend API URL           | ✅       |
-| `PUBLIC_WS_URL`         | WebSocket endpoint        | ✅       |
+| `PUBLIC_NATS_URL`       | NATS WebSocket endpoint   | ✅       |
 
 Generate `AUTH_SECRET`: `openssl rand -base64 32`
+
+## Backend Deployment Security Requirements
+
+These are required in the backend environment (outside this repo):
+
+- Set a strong `JWT_SECRET` (at least 32 random bytes).
+- If `pprof` is exposed beyond localhost, set `PPROF_AUTH_TOKEN`.
+- Restrict `pprof` network access to trusted admin/internal ranges only.
 
 ## 🧪 Development Workflow
 

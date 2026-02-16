@@ -15,7 +15,9 @@ vi.mock('$env/dynamic/public', () => ({
 const { mockRoundService, mockUserProfiles } = vi.hoisted(() => {
 	return {
 		mockRoundService: {
-			rounds: [],
+			startedRounds: [],
+			recentCompletedRounds: [],
+			upcomingRounds: [],
 			isLoading: false
 		},
 		mockUserProfiles: {
@@ -35,15 +37,17 @@ vi.mock('$lib/stores/userProfiles.svelte', () => ({
 
 describe('RoundList', () => {
 	beforeEach(() => {
-		mockRoundService.rounds = [];
+		mockRoundService.startedRounds = [];
+		mockRoundService.recentCompletedRounds = [];
+		mockRoundService.upcomingRounds = [];
 		mockRoundService.isLoading = false;
 	});
 
 	it('shows active rounds', () => {
-		mockRoundService.rounds = [
-			{ 
-				id: '1', 
-				title: 'Active Round', 
+		mockRoundService.startedRounds = [
+			{
+				id: '1',
+				title: 'Active Round',
 				state: 'started',
 				startTime: new Date().toISOString(),
 				participants: [],
@@ -52,15 +56,15 @@ describe('RoundList', () => {
 		] as any;
 
 		const { getByText } = render(RoundList);
-		expect(getByText('Live Now')).toBeTruthy();
+		expect(getByText('Live Rounds')).toBeTruthy();
 		expect(getByText('Active Round')).toBeTruthy();
 	});
 
 	it('shows scheduled rounds', () => {
-		mockRoundService.rounds = [
-			{ 
-				id: '2', 
-				title: 'Upcoming Round', 
+		mockRoundService.upcomingRounds = [
+			{
+				id: '2',
+				title: 'Upcoming Round',
 				state: 'scheduled',
 				startTime: new Date().toISOString(),
 				participants: [],
@@ -69,15 +73,15 @@ describe('RoundList', () => {
 		] as any;
 
 		const { getByText } = render(RoundList);
-		expect(getByText('Upcoming')).toBeTruthy();
+		expect(getByText('Upcoming Rounds')).toBeTruthy();
 		expect(getByText('Upcoming Round')).toBeTruthy();
 	});
 
 	it('shows completed rounds', () => {
-		mockRoundService.rounds = [
-			{ 
-				id: '3', 
-				title: 'Past Round', 
+		mockRoundService.recentCompletedRounds = [
+			{
+				id: '3',
+				title: 'Past Round',
 				state: 'finalized',
 				startTime: new Date().toISOString(),
 				participants: [],
@@ -86,21 +90,21 @@ describe('RoundList', () => {
 		] as any;
 
 		const { getByText } = render(RoundList);
-		expect(getByText('Recent')).toBeTruthy();
+		expect(getByText('Recent Rounds')).toBeTruthy();
 		expect(getByText('Past Round')).toBeTruthy();
 	});
 
 	it('shows empty state when no rounds', () => {
-		mockRoundService.rounds = [];
+		mockRoundService.startedRounds = [];
 		const { getByText } = render(RoundList);
 		expect(getByText('No rounds found')).toBeTruthy();
 	});
 
 	it('calls onSelect when round clicked', async () => {
-		mockRoundService.rounds = [
-			{ 
-				id: '1', 
-				title: 'Active Round', 
+		mockRoundService.startedRounds = [
+			{
+				id: '1',
+				title: 'Active Round',
 				state: 'started',
 				startTime: new Date().toISOString(),
 				participants: [],
@@ -110,10 +114,10 @@ describe('RoundList', () => {
 
 		const onSelect = vi.fn();
 		const { getByText } = render(RoundList, { props: { onSelect } });
-		
+
 		const card = getByText('Active Round');
 		await fireEvent.click(card);
-		
+
 		expect(onSelect).toHaveBeenCalledWith('1');
 	});
 });

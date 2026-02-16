@@ -197,7 +197,7 @@
 
 		<!-- Sign out -->
 		<div class="border-t border-[var(--guild-border)] pt-6">
-			<form method="POST" action="/api/auth/signout" data-testid={formSignoutTestId}>
+			<form method="POST" action="/api/auth/logout" data-testid={formSignoutTestId}>
 				<button
 					type="submit"
 					onclick={handleSignOut}

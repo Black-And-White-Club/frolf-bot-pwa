@@ -1,9 +1,17 @@
 // @vitest-environment jsdom
 import { render, cleanup } from '@testing-library/svelte';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Navbar from '../Navbar.svelte';
 import { auth } from '$lib/stores/auth.svelte';
 import { userProfiles } from '$lib/stores/userProfiles.svelte';
+
+// Mock SvelteKit environment
+vi.mock('$env/dynamic/public', () => ({
+	env: {
+		PUBLIC_API_URL: 'http://localhost:8080',
+		PUBLIC_NATS_WS_URL: 'ws://localhost:4222'
+	}
+}));
 
 // Mock the stores
 vi.mock('$lib/stores/auth.svelte', () => ({
@@ -38,7 +46,7 @@ describe('Navbar Display Name Priority', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		cleanup();
-		
+
 		// Setup default auth user
 		auth.user = {
 			id: 'discord-id-123',
@@ -52,9 +60,9 @@ describe('Navbar Display Name Priority', () => {
 	});
 
 	it('Priority 1: Shows Club Nickname when available', () => {
-		// @ts-ignore
+		// @ts-expect-error test overrides mocked readonly shape
 		auth.displayName = 'Club Nickname';
-		
+
 		// Setup: Profile also exists with other names
 		vi.mocked(userProfiles.getProfile).mockReturnValue({
 			userId: 'discord-id-123',
@@ -70,9 +78,9 @@ describe('Navbar Display Name Priority', () => {
 
 	it('Priority 2: Shows UDisc Name when Club Nickname is missing', () => {
 		// Setup: Club nickname is fallback (same as ID) or missing
-		// @ts-ignore
+		// @ts-expect-error test overrides mocked readonly shape
 		auth.displayName = 'discord-id-123'; // Fallback value in auth store
-		
+
 		vi.mocked(userProfiles.getProfile).mockReturnValue({
 			userId: 'discord-id-123',
 			displayName: 'Global Discord Name',
@@ -87,9 +95,9 @@ describe('Navbar Display Name Priority', () => {
 
 	it('Priority 3: Shows UDisc Username when Club Nickname and UDisc Name are missing', () => {
 		// Setup: Club nickname fallback
-		// @ts-ignore
+		// @ts-expect-error test overrides mocked readonly shape
 		auth.displayName = 'discord-id-123';
-		
+
 		vi.mocked(userProfiles.getProfile).mockReturnValue({
 			userId: 'discord-id-123',
 			displayName: 'Global Discord Name',
@@ -104,9 +112,9 @@ describe('Navbar Display Name Priority', () => {
 
 	it('Priority 4: Shows Global Discord Name when others are missing', () => {
 		// Setup: Club nickname fallback
-		// @ts-ignore
+		// @ts-expect-error test overrides mocked readonly shape
 		auth.displayName = 'discord-id-123';
-		
+
 		vi.mocked(userProfiles.getProfile).mockReturnValue({
 			userId: 'discord-id-123',
 			displayName: 'Global Discord Name',
@@ -121,9 +129,9 @@ describe('Navbar Display Name Priority', () => {
 
 	it('Priority 5: Shows Discord ID as fallback', () => {
 		// Setup: Club nickname fallback
-		// @ts-ignore
+		// @ts-expect-error test overrides mocked readonly shape
 		auth.displayName = 'discord-id-123';
-		
+
 		// No profile or empty profile
 		vi.mocked(userProfiles.getProfile).mockReturnValue(undefined);
 

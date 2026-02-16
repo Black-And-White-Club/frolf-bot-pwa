@@ -12,7 +12,8 @@
 
 	const displayName = $derived.by(() => {
 		if (!auth.user) return 'Guest';
-		const profile = userProfiles.getProfile(auth.user.uuid) ?? userProfiles.getProfile(auth.user.id);
+		const profile =
+			userProfiles.getProfile(auth.user.uuid) ?? userProfiles.getProfile(auth.user.id);
 
 		// 1. Per-club nickname from JWT (Discord server nickname)
 		if (auth.displayName && auth.displayName !== auth.user.id) {
@@ -96,7 +97,7 @@
 					{#if auth.user && auth.user.clubs.length > 1}
 						<div class="hidden items-center lg:flex">
 							<span class="text-xs text-[var(--guild-text-muted)] mr-2">Club:</span>
-							<select 
+							<select
 								class="bg-[var(--guild-surface)] text-sm text-[var(--guild-text-secondary)] border border-[var(--guild-border)] rounded-md focus:ring-1 focus:ring-[var(--guild-primary)] focus:border-[var(--guild-primary)] cursor-pointer py-1 px-2"
 								value={auth.user.activeClubUuid}
 								onchange={(e: Event) => {
@@ -104,9 +105,13 @@
 									auth.switchClub(target.value);
 								}}
 							>
-								{#each auth.user.clubs as club}
-									<option value={club.club_uuid} selected={club.club_uuid === auth.user.activeClubUuid}>
-										{clubService.knownClubs[club.club_uuid]?.name ?? `Club ${club.club_uuid.slice(0, 4)}`}
+								{#each auth.user.clubs as club (club.club_uuid)}
+									<option
+										value={club.club_uuid}
+										selected={club.club_uuid === auth.user.activeClubUuid}
+									>
+										{clubService.knownClubs[club.club_uuid]?.name ??
+											`Club ${club.club_uuid.slice(0, 4)}`}
 									</option>
 								{/each}
 							</select>
@@ -147,7 +152,7 @@
 								Sign out
 							</button>
 						{:else}
-							<form method="POST" action="/api/auth/signout" data-testid="form-signout">
+							<form method="POST" action="/api/auth/logout" data-testid="form-signout">
 								<button
 									type="submit"
 									class="text-sm text-[var(--guild-primary)] hover:text-[var(--guild-primary)]/80"

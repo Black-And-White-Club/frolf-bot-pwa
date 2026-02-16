@@ -36,7 +36,7 @@ class GuildService {
 		const cached = this.getCachedGuild(this.id);
 		if (cached) {
 			this.info = { id: cached.id, name: cached.name, icon: cached.icon };
-			
+
 			// If cache is fresh, don't even background refresh
 			const now = Date.now();
 			if (now - cached.lastUpdated < CACHE_TTL) {
@@ -108,7 +108,7 @@ class GuildService {
 	private async fetchFromApi(id: string): Promise<GuildInfo | null> {
 		try {
 			const headers: Record<string, string> = {
-				'Accept': 'application/json'
+				Accept: 'application/json'
 			};
 			if (auth.token) {
 				headers['Authorization'] = `Bearer ${auth.token}`;
@@ -162,4 +162,3 @@ class GuildService {
 }
 
 export const guildService = new GuildService();
-

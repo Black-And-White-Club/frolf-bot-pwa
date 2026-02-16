@@ -145,12 +145,12 @@ class MockDataProvider {
 			icon: 'https://cdn.discordapp.com/icons/123456789/abcdef.png'
 		};
 		clubService.knownClubs['guild-123'] = clubService.info;
-		
+
 		// Populate mock profiles
 		const profiles: Record<string, any> = {};
-		
+
 		// From leaderboard
-		mockLeaderboardEntries.forEach(entry => {
+		mockLeaderboardEntries.forEach((entry) => {
 			profiles[entry.userId] = {
 				user_id: entry.userId,
 				display_name: entry.displayName || `User ${entry.userId}`,
@@ -159,8 +159,8 @@ class MockDataProvider {
 		});
 
 		// From rounds (ensure participants have profiles)
-		mockRounds.forEach(round => {
-			round.participants.forEach(p => {
+		mockRounds.forEach((round) => {
+			round.participants.forEach((p) => {
 				if (!profiles[p.userId]) {
 					profiles[p.userId] = {
 						user_id: p.userId,
@@ -182,7 +182,7 @@ class MockDataProvider {
 		userProfiles.setProfilesFromApi(profiles);
 
 		// Populate mock tags
-		const mockTags = mockLeaderboardEntries.map(e => ({
+		const mockTags = mockLeaderboardEntries.map((e) => ({
 			member_id: e.userId,
 			current_tag: e.tagNumber,
 			last_active_at: new Date().toISOString()

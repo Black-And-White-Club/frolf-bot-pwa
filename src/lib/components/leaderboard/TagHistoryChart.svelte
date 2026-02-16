@@ -32,6 +32,20 @@
 	const innerWidth = width - padding.left - padding.right;
 	const innerHeight = height - padding.top - padding.bottom;
 
+	const chartBounds = $derived.by(() => {
+		if (chartPoints.length === 0) {
+			return { minTag: 0, range: 1 };
+		}
+
+		let minTag = chartPoints[0].y;
+		let maxTag = chartPoints[0].y;
+		for (const point of chartPoints) {
+			if (point.y < minTag) minTag = point.y;
+			if (point.y > maxTag) maxTag = point.y;
+		}
+		return { minTag, range: maxTag - minTag || 1 };
+	});
+
 	// Scale functions
 	function scaleX(i: number): number {
 		if (chartPoints.length <= 1) return padding.left + innerWidth / 2;
@@ -40,18 +54,13 @@
 
 	function scaleY(tag: number): number {
 		if (chartPoints.length === 0) return padding.top + innerHeight / 2;
-		const maxTag = Math.max(...chartPoints.map((p) => p.y));
-		const minTag = Math.min(...chartPoints.map((p) => p.y));
-		const range = maxTag - minTag || 1;
 		// Invert: lower tag = higher on chart (better)
-		return padding.top + ((tag - minTag) / range) * innerHeight;
+		return padding.top + ((tag - chartBounds.minTag) / chartBounds.range) * innerHeight;
 	}
 
 	// Build SVG path
 	const pathD = $derived(
-		chartPoints
-			.map((p, i) => `${i === 0 ? 'M' : 'L'} ${scaleX(p.x)} ${scaleY(p.y)}`)
-			.join(' ')
+		chartPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${scaleX(p.x)} ${scaleY(p.y)}`).join(' ')
 	);
 </script>
 
@@ -61,7 +70,7 @@
 	{:else}
 		<svg viewBox="0 0 {width} {height}" class="chart-svg">
 			<!-- Grid lines -->
-			{#each Array(5) as _, i}
+			{#each Array.from({ length: 5 }, (_, i) => i) as i (i)}
 				<line
 					x1={padding.left}
 					y1={padding.top + (i / 4) * innerHeight}
@@ -76,7 +85,7 @@
 			<path d={pathD} fill="none" stroke="var(--color-gold-accent, #c5a04e)" stroke-width="2" />
 
 			<!-- Data points -->
-			{#each chartPoints as point}
+			{#each chartPoints as point (point.x)}
 				<circle
 					cx={scaleX(point.x)}
 					cy={scaleY(point.y)}

@@ -1,4 +1,11 @@
-import { trace, context, type Tracer, type Context, type TextMapPropagator } from '@opentelemetry/api';
+import {
+	trace,
+	context,
+	type Tracer,
+	type Context,
+	type TextMapPropagator
+} from '@opentelemetry/api';
+import { env } from '$env/dynamic/public';
 
 let propagator: TextMapPropagator | null = null;
 let initialized = false;
@@ -51,7 +58,7 @@ export async function withAsyncSpan<T>(
 // Extract traceparent from headers
 export function extractTraceContext(headers: Record<string, string>): Context {
 	if (!propagator) return context.active();
-	
+
 	return propagator.extract(context.active(), headers, {
 		get: (carrier, key) => carrier[key],
 		keys: (carrier) => Object.keys(carrier)
@@ -89,6 +96,14 @@ export async function initTracing(): Promise<void> {
 	if (initialized) return;
 
 	try {
+		const endpoint = env.PUBLIC_OTEL_ENDPOINT;
+
+		// Strictly require an endpoint to be configured to enable tracing.
+		// This avoids loading OTel SDK/exporter code in sessions where tracing is disabled.
+		if (!endpoint) {
+			return;
+		}
+
 		// Dynamic imports to reduce initial bundle size
 		const [
 			{ WebTracerProvider, BatchSpanProcessor },
@@ -102,16 +117,6 @@ export async function initTracing(): Promise<void> {
 			import('@opentelemetry/core')
 		]);
 
-		const endpoint = import.meta.env.VITE_OTEL_ENDPOINT;
-		
-		// Strictly require an endpoint to be configured to enable tracing.
-		// This prevents "connection refused" errors in any environment (dev or prod)
-		// where a collector is not explicitly available.
-		if (!endpoint) {
-			// console.debug('[OTel] Tracing disabled: VITE_OTEL_ENDPOINT is not set');
-			return;
-		}
-
 		const resource = resourceFromAttributes({
 			'service.name': 'frolf-pwa',
 			'service.version': '0.4.0',
@@ -119,7 +124,7 @@ export async function initTracing(): Promise<void> {
 		});
 
 		const exporter = new OTLPTraceExporter({
-			url: import.meta.env.VITE_OTEL_ENDPOINT || 'http://localhost:4318/v1/traces'
+			url: endpoint || 'http://localhost:4318/v1/traces'
 		});
 
 		const provider = new WebTracerProvider({

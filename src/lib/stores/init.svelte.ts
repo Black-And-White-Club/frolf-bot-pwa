@@ -5,11 +5,12 @@
  */
 
 import { browser } from '$app/environment';
-import { auth } from './auth.svelte';
+import { auth, type AuthInitializeResult } from './auth.svelte';
 import { nats } from './nats.svelte';
 import { subscriptionManager } from './subscriptions.svelte';
 import { dataLoader } from './dataLoader.svelte';
 import { initTracing } from '$lib/otel/tracing';
+import { env } from '$env/dynamic/public';
 // import { mockDataProvider } from '$lib/mocks/mockDataProvider.svelte';
 import { clubService } from './club.svelte';
 
@@ -20,13 +21,29 @@ class AppInitializer {
 	status = $state<InitStatus>('idle');
 	mode = $state<InitMode>('disconnected');
 	error = $state<string | null>(null);
+	private initPromise: Promise<void> | null = null;
+	private connectAndLoadPromise: Promise<void> | null = null;
+	private reconnectUnsubscribe: (() => void) | null = null;
+	private reconnectReloadTimer: ReturnType<typeof setTimeout> | null = null;
 
 	isReady = $derived(this.status === 'ready');
 	isLoading = $derived(this.status === 'initializing');
 
 	async initialize(): Promise<void> {
-		if (!browser || this.status === 'initializing' || this.status === 'ready') return;
+		if (!browser || this.status === 'ready') return;
+		if (this.initPromise) return this.initPromise;
 
+		this.initPromise = this.doInitialize();
+		try {
+			await this.initPromise;
+		} finally {
+			if (this.initPromise) {
+				this.initPromise = null;
+			}
+		}
+	}
+
+	private async doInitialize(): Promise<void> {
 		this.status = 'initializing';
 		this.error = null;
 
@@ -40,18 +57,20 @@ class AppInitializer {
 				return;
 			}
 
-			// Perform authentication and optional guild load
-			const authenticated = await this.authenticateAndLoadGuild();
-			if (!authenticated) {
-				// Not authenticated: mark ready but disconnected
+			// Perform authentication and optional club switch/load path
+			const authResult = await this.authenticateAndLoadGuild();
+			if (!authResult.authenticated) {
 				// Not authenticated — stay in disconnected mode
 				this.mode = 'disconnected';
 				this.status = 'ready';
 				return;
 			}
 
-			// Connect to NATS and load initial data/subscriptions
-			await this.connectAndLoad();
+			// If auth initialization already switched clubs and loaded data, don't duplicate it.
+			if (!authResult.switchedClubWithDataLoad) {
+				await this.connectAndLoad();
+			}
+			this.ensureReconnectRecovery();
 
 			this.mode = 'live';
 			this.status = 'ready';
@@ -64,19 +83,35 @@ class AppInitializer {
 	}
 
 	private isMockMode(): boolean {
-		try {
-			const urlParams = new URLSearchParams(window.location.search);
-			return urlParams.get('mock') === 'true' || import.meta.env.VITE_USE_MOCK === 'true';
-		} catch {
+		const envMockEnabled = env.PUBLIC_USE_MOCK === 'true';
+		const mockFlagSet = (() => {
+			try {
+				const urlParams = new URLSearchParams(window.location.search);
+				return urlParams.get('mock') === 'true' || envMockEnabled;
+			} catch {
+				return envMockEnabled;
+			}
+		})();
+
+		if (!import.meta.env.DEV) {
+			if (mockFlagSet) {
+				console.warn('[AppInit] Mock mode requested outside development build; ignoring.');
+			}
 			return false;
 		}
+
+		return mockFlagSet;
 	}
 
 	private async startMockMode(): Promise<void> {
+		if (!import.meta.env.DEV) {
+			throw new Error('Mock mode is disabled outside development builds');
+		}
+
 		// step 1: dynamic import to avoid bundling mocks in production
 		const { mockDataProvider } = await import('$lib/mocks/mockDataProvider.svelte');
 		console.log('[AppInit] Starting in mock mode');
-		
+
 		// Mock Auth
 		auth.user = {
 			id: 'user-1',
@@ -100,14 +135,30 @@ class AppInitializer {
 		this.status = 'ready';
 	}
 
-	private async authenticateAndLoadGuild(): Promise<boolean> {
+	private async authenticateAndLoadGuild(): Promise<AuthInitializeResult> {
 		// Initialize auth (extracts token, validates)
-		await auth.initialize();
+		const result = await auth.initialize();
 
-		return Boolean(auth.isAuthenticated && auth.token);
+		return {
+			authenticated: Boolean(auth.isAuthenticated && auth.token),
+			switchedClubWithDataLoad: result.switchedClubWithDataLoad
+		};
 	}
 
 	private async connectAndLoad(): Promise<void> {
+		if (this.connectAndLoadPromise) {
+			return this.connectAndLoadPromise;
+		}
+
+		this.connectAndLoadPromise = this.doConnectAndLoad();
+		try {
+			await this.connectAndLoadPromise;
+		} finally {
+			this.connectAndLoadPromise = null;
+		}
+	}
+
+	private async doConnectAndLoad(): Promise<void> {
 		// Connect to NATS with retry
 		let connected = false;
 		let attempts = 0;
@@ -123,23 +174,53 @@ class AppInitializer {
 			}
 		}
 
-		// Now that NATS is connected, we can try loading club info.
-		// This allows the NATS fallback to work if HTTP fails (CSP blocks, etc).
-		try {
-			await clubService.loadClubInfo();
-		} catch (e) {
+		this.ensureReconnectRecovery();
+
+		// Start loading club info right away once connected.
+		const clubLoadPromise = clubService.loadClubInfo().catch((e) => {
 			console.warn('[AppInit] Failed to load club info:', e);
-		}
+		});
 
 		// Start subscriptions and load initial data using the preferred identity (Club UUID)
 		const subscriptionId = auth.user?.activeClubUuid || auth.user?.guildId;
 		if (subscriptionId) {
 			subscriptionManager.start(subscriptionId);
-			await dataLoader.loadInitialData();
+			await Promise.all([dataLoader.loadInitialData(), clubLoadPromise]);
+			return;
 		}
+
+		await clubLoadPromise;
+	}
+
+	private ensureReconnectRecovery(): void {
+		if (this.reconnectUnsubscribe) return;
+
+		this.reconnectUnsubscribe = nats.onReconnect(() => {
+			if (this.reconnectReloadTimer) {
+				clearTimeout(this.reconnectReloadTimer);
+			}
+
+			this.reconnectReloadTimer = setTimeout(async () => {
+				const subscriptionId = auth.user?.activeClubUuid || auth.user?.guildId;
+				if (!subscriptionId) return;
+
+				// Re-establish subscriptions and fetch fresh snapshots in case events were missed.
+				subscriptionManager.start(subscriptionId);
+				await dataLoader.loadInitialData();
+			}, 400);
+		});
 	}
 
 	async teardown(): Promise<void> {
+		if (this.reconnectReloadTimer) {
+			clearTimeout(this.reconnectReloadTimer);
+			this.reconnectReloadTimer = null;
+		}
+		if (this.reconnectUnsubscribe) {
+			this.reconnectUnsubscribe();
+			this.reconnectUnsubscribe = null;
+		}
+
 		if (this.mode === 'mock') {
 			const { mockDataProvider } = await import('$lib/mocks/mockDataProvider.svelte');
 			mockDataProvider.stop();

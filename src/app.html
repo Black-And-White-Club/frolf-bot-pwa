@@ -5,7 +5,9 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="manifest" href="/manifest.json" />
-		<link rel="icon" href="/favicon.png" />
+		<link rel="icon" href="/favicon.ico" sizes="any" />
+		<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+		<link rel="icon" href="/favicon-16.png" type="image/png" sizes="16x16" />
 		<!-- Preconnects should be added only for origins used on first load.
 		     Removed preconnect to Unsplash (images.unsplash.com) because it is not
 		     requested on the initial render. Add it back on pages that actually
@@ -38,10 +40,13 @@
 			type="font/woff2"
 			crossorigin
 		/>
-		<meta name="description" content="Track disc golf scores, view leaderboards, and compete with your club using Frolf Bot." />
+		<meta
+			name="description"
+			content="Track disc golf scores, view leaderboards, and compete with your club using Frolf Bot."
+		/>
 		<meta property="og:type" content="website" />
 		<meta property="og:site_name" content="Frolf Bot" />
-		<meta property="og:image" content="/icons/icon-512.png" />
+		<meta property="og:image" content="/og-image.jpg" />
 		<meta name="theme-color" content="#007474" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="mobile-web-app-capable" content="yes" />
@@ -54,66 +59,11 @@
 		  the user's OS preference. This enables Tailwind's class-based dark
 		  mode and ensures colors are correct on first render (avoids flash).
 		-->
-		<script>
-			(function () {
-				try {
-					// Prefer the canonical persisted key used by the theme system.
-					const prefers = localStorage.getItem('frolf:prefers_dark');
-					if (prefers === '1') {
-						document.documentElement.classList.add('dark');
-					} else if (prefers === '0') {
-						document.documentElement.classList.remove('dark');
-					} else {
-						// Fallback to legacy 'theme' key for compatibility
-						const legacy = localStorage.getItem('theme');
-						if (legacy === 'dark') document.documentElement.classList.add('dark');
-						else if (legacy === 'light') document.documentElement.classList.remove('dark');
-						else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
-							document.documentElement.classList.add('dark');
-					}
-				} catch (e) {
-					/* ignore (private mode may throw) */
-				}
-			})();
-		</script>
+		<script src="/scripts/theme-init.js"></script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
-		<div style="display: contents">%sveltekit.body%</div>
-
-		<script>
-			// update meta theme-color to match CSS tokens so install UI reflects current theme
-			function updateMetaThemeColor() {
-				try {
-					const meta = document.querySelector('meta[name="theme-color"]');
-					if (!meta) return;
-					// We expose the primary color as an RGB token (--guild-primary-rgb).
-					// Read that and set the meta tag to an rgb(...) value so installers
-					// and OS UI reflect the current theme.
-					const rgb = getComputedStyle(document.documentElement)
-						.getPropertyValue('--guild-primary-rgb')
-						.trim();
-					if (rgb) {
-						meta.setAttribute('content', `rgb(${rgb})`);
-					} else {
-						// Fallback to sensible theme-based defaults
-						if (document.documentElement.classList.contains('dark'))
-							meta.setAttribute('content', '#0f0f0f');
-						else meta.setAttribute('content', '#007474');
-					}
-				} catch (e) {
-					// ignore
-				}
-			}
-			window.addEventListener('load', () => {
-				updateMetaThemeColor();
-				// observe changes to documentElement style attribute (light-weight)
-				const obs = new MutationObserver(() => updateMetaThemeColor());
-				obs.observe(document.documentElement, {
-					attributes: true,
-					attributeFilter: ['style', 'class']
-				});
-			});
-		</script>
+		<div class="svelte-root">%sveltekit.body%</div>
+		<script src="/scripts/theme-meta.js"></script>
 	</body>
 </html>

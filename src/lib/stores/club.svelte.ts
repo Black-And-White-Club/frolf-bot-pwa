@@ -1,6 +1,5 @@
 import { auth } from './auth.svelte';
-import { log } from '$lib/config';
-
+import { log, config } from '$lib/config';
 
 interface ClubInfo {
 	id: string;
@@ -12,6 +11,9 @@ class ClubService {
 	info = $state<ClubInfo | null>(null);
 	knownClubs = $state<Record<string, ClubInfo>>({});
 	loading = $state(false);
+	private loadClubInfoPromise: Promise<void> | null = null;
+	private loadClubInfoId: string | null = null;
+	private pendingClubRequests = new Map<string, Promise<ClubInfo | null>>();
 
 	// Preferred ID for current session (Club UUID or legacy Guild ID)
 	id = $derived(auth.user?.activeClubUuid ?? auth.user?.guildId ?? null);
@@ -26,21 +28,43 @@ class ClubService {
 			return;
 		}
 
+		if (this.loadClubInfoPromise && this.loadClubInfoId === this.id) {
+			return this.loadClubInfoPromise;
+		}
+
+		const targetId = this.id;
+		const loadPromise = this.loadClubInfoForId(targetId);
+		this.loadClubInfoPromise = loadPromise;
+		this.loadClubInfoId = targetId;
+
+		try {
+			await loadPromise;
+		} finally {
+			if (this.loadClubInfoPromise === loadPromise) {
+				this.loadClubInfoPromise = null;
+				this.loadClubInfoId = null;
+			}
+		}
+	}
+
+	private async loadClubInfoForId(targetId: string): Promise<void> {
+		if (!targetId) return;
+
 		// In development, clear cache to ensure fresh data
 		// But don't clear in tests, so we can verify caching logic
 		if (import.meta.env.DEV && !import.meta.env.TEST && typeof window !== 'undefined') {
 			log('[ClubService] DEV mode: Clearing club cache');
-			localStorage.removeItem(`club:${this.id}`);
+			localStorage.removeItem(`club:${targetId}`);
 		}
 
 		// Check localStorage cache first
-		const cached = this.getCachedClub(this.id);
+		const cached = this.getCachedClub(targetId);
 		if (cached) {
 			log('[ClubService] Loading from cache:', cached);
 			this.updateState(cached);
-			
+
 			// Background refresh via NATS
-			this.fetchFromNats(this.id).then((fresh) => {
+			this.fetchFromNatsDeduped(targetId).then((fresh) => {
 				if (fresh) {
 					log('[ClubService] Background refresh success:', fresh);
 					this.updateState(fresh);
@@ -50,21 +74,29 @@ class ClubService {
 			return;
 		}
 
-		log('[ClubService] Fetching fresh data for:', this.id);
+		log('[ClubService] Fetching fresh data for:', targetId);
 		this.loading = true;
 		try {
 			// NATS First Strategy (as requested)
 			log('[ClubService] Requesting info via NATS...');
-			const info = await this.fetchFromNats(this.id);
-			
+			const info = await this.fetchFromNatsDeduped(targetId);
+
 			if (info) {
 				log('[ClubService] NATS fetch success:', info);
 				this.updateState(info);
 				this.cacheClub(info);
 			} else {
-				console.warn('[ClubService] NATS fetch failed or returned null');
-				// Fallback to null if NATS fails
-				this.info = null;
+				// Fallback to API
+				log('[ClubService] NATS failed, falling back to API...');
+				const apiInfo = await this.fetchFromApi(targetId);
+				if (apiInfo) {
+					log('[ClubService] API fetch success:', apiInfo);
+					this.updateState(apiInfo);
+					this.cacheClub(apiInfo);
+				} else {
+					console.warn('[ClubService] All fetches failed');
+					this.info = null;
+				}
 			}
 		} finally {
 			this.loading = false;
@@ -86,7 +118,7 @@ class ClubService {
 			} else {
 				// Fetch individual via NATS
 				// Parallelize requests
-				this.fetchFromNats(id).then((info) => {
+				this.fetchFromNatsDeduped(id).then((info) => {
 					if (info) {
 						this.updateState(info);
 						this.cacheClub(info);
@@ -129,6 +161,45 @@ class ClubService {
 		return null;
 	}
 
+	private fetchFromNatsDeduped(id: string): Promise<ClubInfo | null> {
+		const inFlight = this.pendingClubRequests.get(id);
+		if (inFlight) {
+			return inFlight;
+		}
+
+		const request = this.fetchFromNats(id).finally(() => {
+			this.pendingClubRequests.delete(id);
+		});
+		this.pendingClubRequests.set(id, request);
+		return request;
+	}
+
+	private async fetchFromApi(id: string): Promise<ClubInfo | null> {
+		try {
+			const headers: Record<string, string> = {
+				Accept: 'application/json'
+			};
+			if (auth.token) {
+				headers['Authorization'] = `Bearer ${auth.token}`;
+			}
+
+			const baseUrl = config.api.url || '';
+			const url = `${baseUrl}/clubs/${id}`;
+
+			const res = await fetch(url, { headers });
+			if (res.ok) {
+				const data = await res.json();
+				return {
+					id: data.id || data.uuid || id,
+					name: data.name,
+					icon: data.icon_url || data.icon
+				};
+			}
+		} catch (e) {
+			console.warn(`[ClubService] API fetch failed for ${id}:`, e);
+		}
+		return null;
+	}
 
 	private getCachedClub(id: string): ClubInfo | null {
 		if (typeof window === 'undefined') return null;
@@ -147,6 +218,9 @@ class ClubService {
 	}
 
 	clear(): void {
+		this.loadClubInfoPromise = null;
+		this.loadClubInfoId = null;
+		this.pendingClubRequests.clear();
 		this.info = null;
 	}
 }

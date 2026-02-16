@@ -60,7 +60,12 @@
 	</div>
 
 	<div class="participant-info">
-		<ParticipantAvatar userId={participant.userId} avatar_url={participant.avatar_url} username={displayName} size={40} />
+		<ParticipantAvatar
+			userId={participant.userId}
+			avatar_url={participant.avatar_url}
+			username={displayName}
+			size={40}
+		/>
 		<div class="participant-details">
 			<span class="participant-name">{displayName}</span>
 			{#if participant.tagNumber}

@@ -12,7 +12,7 @@ declare global {
 }
 
 Cypress.Commands.add('visitWithToken', (path = '/', token = 'mock-jwt-token') => {
-	cy.visit(`${path}?t=${token}`);
+	cy.visit(`${path}#t=${token}`);
 });
 
 Cypress.Commands.add('visitMockMode', (path = '/') => {

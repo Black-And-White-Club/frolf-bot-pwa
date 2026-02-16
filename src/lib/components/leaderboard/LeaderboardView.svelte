@@ -23,7 +23,9 @@
 <div class="space-y-6">
 	<!-- Header -->
 	<div class="flex items-center justify-between">
-		<h1 class="text-3xl font-bold">{leaderboardService.viewMode === 'tags' ? 'Tag Leaderboard' : 'Points Leaderboard'}</h1>
+		<h1 class="text-3xl font-bold">
+			{leaderboardService.viewMode === 'tags' ? 'Tag Leaderboard' : 'Points Leaderboard'}
+		</h1>
 		<div class="flex items-center gap-4">
 			<ViewToggle
 				mode={leaderboardService.viewMode}

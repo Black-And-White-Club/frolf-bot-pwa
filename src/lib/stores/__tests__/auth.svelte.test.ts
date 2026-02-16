@@ -1,8 +1,14 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { get } from 'svelte/store';
 
 // Mock dependencies before importing the store
+vi.mock('$lib/stores/nats.svelte', () => ({
+	nats: {
+		disconnect: vi.fn(),
+		connect: vi.fn()
+	}
+}));
+
 vi.mock('$lib/stores/subscriptions.svelte', () => ({
 	subscriptionManager: {
 		start: vi.fn()
@@ -29,9 +35,10 @@ describe('AuthService (auth.svelte.ts)', () => {
 		vi.resetModules();
 		// Clear storage
 		sessionStorage.clear();
+		localStorage.clear();
 		// Reset URL
 		window.history.replaceState({}, '', '/');
-		
+
 		const mod = await import('../auth.svelte');
 		auth = mod.auth;
 	});
@@ -59,7 +66,7 @@ describe('AuthService (auth.svelte.ts)', () => {
 
 		it('extracts token from URL if not in storage', () => {
 			const validToken = createMockToken({ sub: 'user:456', exp: Date.now() / 1000 + 3600 });
-			
+
 			// Mock window.location.search
 			const originalLocation = window.location;
 			delete (window as any).location;
@@ -69,7 +76,7 @@ describe('AuthService (auth.svelte.ts)', () => {
 				pathname: '/',
 				hash: ''
 			};
-			
+
 			// Mock history.replaceState
 			const replaceStateSpy = vi.spyOn(window.history, 'replaceState');
 
@@ -78,12 +85,12 @@ describe('AuthService (auth.svelte.ts)', () => {
 			expect(auth.status).toBe('authenticated');
 			expect(auth.token).toBe(validToken);
 			expect(sessionStorage.getItem('auth_token')).toBe(validToken);
-			
+
 			// Should clean URL
 			expect(replaceStateSpy).toHaveBeenCalled();
-			const [state, title, url] = replaceStateSpy.mock.calls[0];
+			const [, , url] = replaceStateSpy.mock.calls[0];
 			expect(url).toBe('/');
-			
+
 			// Restore location
 			(window as any).location = originalLocation;
 		});
@@ -118,9 +125,7 @@ describe('AuthService (auth.svelte.ts)', () => {
 			const user = {
 				id: '123',
 				activeClubUuid: 'club-a',
-				clubs: [
-					{ club_uuid: 'club-a', display_name: 'Pro Golfer', role: 'player' }
-				]
+				clubs: [{ club_uuid: 'club-a', display_name: 'Pro Golfer', role: 'player' }]
 			};
 			// We can manually set the state for testing since it's a class instance
 			// but better to simulate a login or mock the state if possible.
@@ -169,20 +174,70 @@ describe('AuthService (auth.svelte.ts)', () => {
 			expect(auth.user.activeClubUuid).toBe('club-1');
 			expect(auth.canAdmin).toBe(false);
 
-			await auth.switchClub('club-2');
+			const switchedToken = createMockToken({
+				sub: 'user:123',
+				active_club_uuid: 'club-2',
+				role: 'admin',
+				clubs
+			});
+			vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+				new Response(JSON.stringify({ ticket: switchedToken }), {
+					status: 200,
+					headers: { 'content-type': 'application/json' }
+				})
+			);
 
+			const switched = await auth.switchClub('club-2');
+
+			expect(switched).toBe(true);
 			expect(auth.user.activeClubUuid).toBe('club-2');
 			expect(auth.canAdmin).toBe(true);
+			expect(localStorage.getItem('frolf_preferred_club')).toBe('club-2');
 
 			// Verify side effects
+			const { nats } = await import('../nats.svelte');
 			const { subscriptionManager } = await import('../subscriptions.svelte');
 			const { dataLoader } = await import('../dataLoader.svelte');
 			const { clubService } = await import('../club.svelte');
 
+			expect(nats.disconnect).toHaveBeenCalled();
+			expect(nats.connect).toHaveBeenCalledWith(switchedToken);
 			expect(subscriptionManager.start).toHaveBeenCalledWith('club-2');
 			expect(dataLoader.clearData).toHaveBeenCalled();
 			expect(clubService.loadClubInfo).toHaveBeenCalled();
 			expect(dataLoader.loadInitialData).toHaveBeenCalled();
+		});
+
+		it('keeps prior club and skips reconnect when backend switch fails', async () => {
+			const clubs = [
+				{ club_uuid: 'club-1', role: 'viewer' },
+				{ club_uuid: 'club-2', role: 'admin' }
+			];
+			const token = createMockToken({
+				sub: 'user:123',
+				active_club_uuid: 'club-1',
+				clubs
+			});
+			sessionStorage.setItem('auth_token', token);
+			auth.initialize();
+
+			vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(
+				new Response(JSON.stringify({ error: 'failed' }), { status: 500 })
+			);
+
+			const switched = await auth.switchClub('club-2');
+			expect(switched).toBe(false);
+			expect(auth.user.activeClubUuid).toBe('club-1');
+			expect(localStorage.getItem('frolf_preferred_club')).toBeNull();
+
+			const { nats } = await import('../nats.svelte');
+			const { subscriptionManager } = await import('../subscriptions.svelte');
+			const { dataLoader } = await import('../dataLoader.svelte');
+
+			expect(nats.disconnect).not.toHaveBeenCalled();
+			expect(nats.connect).not.toHaveBeenCalled();
+			expect(subscriptionManager.start).not.toHaveBeenCalled();
+			expect(dataLoader.clearData).not.toHaveBeenCalled();
 		});
 
 		it('does nothing if user not member of target club', async () => {
@@ -195,7 +250,7 @@ describe('AuthService (auth.svelte.ts)', () => {
 			auth.initialize();
 
 			const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-			
+
 			await auth.switchClub('club-99');
 
 			expect(auth.user.activeClubUuid).toBe('club-1');
@@ -234,6 +289,6 @@ function createMockToken(payload: any = {}) {
 		.replace(/\+/g, '-')
 		.replace(/\//g, '_')
 		.replace(/=/g, '');
-		
+
 	return `${header}.${p}.signature`;
 }

@@ -89,7 +89,7 @@ describe('ClubService (club.svelte.ts)', () => {
 			const cachedClub = { id: 'club-123', name: 'Cached Club', icon: 'icon.png' };
 			localStorage.setItem('club:club-123', JSON.stringify(cachedClub));
 			mockAuth.user = { activeClubUuid: 'club-123' };
-			
+
 			// Mock successful NATS response for background refresh
 			const { nats } = await import('../nats.svelte');
 			vi.mocked(nats.request).mockResolvedValueOnce({
@@ -102,16 +102,16 @@ describe('ClubService (club.svelte.ts)', () => {
 
 			expect(clubService.info).toEqual(cachedClub);
 			expect(clubService.loading).toBe(false);
-			
+
 			// Wait for background refresh promise
 			await new Promise(process.nextTick);
-			
+
 			expect(nats.request).toHaveBeenCalled();
 		});
 
 		it('loads info from NATS when no cache', async () => {
 			mockAuth.user = { activeClubUuid: 'club-new' };
-			
+
 			const { nats } = await import('../nats.svelte');
 			vi.mocked(nats.request).mockResolvedValueOnce({
 				uuid: 'club-new',
@@ -136,7 +136,7 @@ describe('ClubService (club.svelte.ts)', () => {
 
 		it('returns null if NATS fails', async () => {
 			mockAuth.user = { activeClubUuid: 'club-fail' };
-			
+
 			const { nats } = await import('../nats.svelte');
 			vi.mocked(nats.request).mockRejectedValueOnce(new Error('NATS Error'));
 
@@ -147,7 +147,7 @@ describe('ClubService (club.svelte.ts)', () => {
 
 		it('caches loaded club info', async () => {
 			mockAuth.user = { activeClubUuid: 'club-cache-test' };
-			
+
 			const { nats } = await import('../nats.svelte');
 			vi.mocked(nats.request).mockResolvedValueOnce({
 				uuid: 'club-cache-test',
@@ -171,8 +171,7 @@ describe('ClubService (club.svelte.ts)', () => {
 		it('clears club info', async () => {
 			mockAuth.user = { activeClubUuid: 'club-123' };
 			// Set some info directly for testing
-			// @ts-ignore
-			clubService.info = { id: 'test', name: 'Test' };
+			(clubService as any).info = { id: 'test', name: 'Test' };
 			expect(clubService.info).not.toBeNull();
 
 			clubService.clear();

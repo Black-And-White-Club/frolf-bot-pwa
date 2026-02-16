@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { auth } from '$lib/stores/auth.svelte';
 	let email = $state('');
 	let status = $state<'idle' | 'loading' | 'success' | 'error'>('idle');
 
-	async function handleSubmit() {
+	async function handleSubmit(event: SubmitEvent) {
+		event.preventDefault();
 		status = 'loading';
 		try {
 			// This would trigger a NATS request via the backend to send a magic link
@@ -23,9 +23,15 @@
 
 <svelte:head>
 	<title>Sign In | Frolf Bot</title>
-	<meta name="description" content="Sign in to Frolf Bot to track scores and compete with your disc golf club." />
+	<meta
+		name="description"
+		content="Sign in to Frolf Bot to track scores and compete with your disc golf club."
+	/>
 	<meta property="og:title" content="Sign In | Frolf Bot" />
-	<meta property="og:description" content="Sign in to Frolf Bot to track scores and compete with your disc golf club." />
+	<meta
+		property="og:description"
+		content="Sign in to Frolf Bot to track scores and compete with your disc golf club."
+	/>
 </svelte:head>
 
 <div class="flex min-h-screen items-center justify-center bg-[var(--guild-background)] p-4">

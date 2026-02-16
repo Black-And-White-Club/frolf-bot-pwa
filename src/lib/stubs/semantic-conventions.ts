@@ -15,5 +15,3 @@ export const ATTR_PROCESS_RUNTIME_DESCRIPTION = 'process.runtime.description';
 export const ATTR_EXCEPTION_MESSAGE = 'exception.message';
 export const ATTR_EXCEPTION_STACKTRACE = 'exception.stacktrace';
 export const ATTR_EXCEPTION_TYPE = 'exception.type';
-
-

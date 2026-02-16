@@ -74,7 +74,12 @@ async function run(cmd, args, opts = {}) {
 async function main() {
 	console.log('1) Building (this may take a moment)...');
 	try {
-		await run('bun', ['run', 'build']);
+		await run('bun', ['run', 'build'], {
+			env: {
+				...process.env,
+				PRIVATE_API_URL: process.env.PRIVATE_API_URL || 'http://localhost:8080'
+			}
+		});
 	} catch (err) {
 		console.warn('bun run build failed, trying bun build directly for diagnostics');
 		console.warn(err && err.message ? err.message : err);

@@ -18,7 +18,7 @@ export const reroute = (request: Request | URL | string | { url: string }): stri
 	try {
 		const url = new URL(urlStr, 'http://localhost');
 		return url.pathname;
-	} catch (e) {
+	} catch {
 		return urlStr;
 	}
 };

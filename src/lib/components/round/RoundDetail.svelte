@@ -3,7 +3,6 @@
 	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 	import ParticipantRow from './ParticipantRow.svelte';
 
-
 	type Props = {
 		roundId: string;
 	};

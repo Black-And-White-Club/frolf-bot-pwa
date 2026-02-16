@@ -28,9 +28,7 @@ describe('AuthService HTTP methods (auth.svelte.ts)', () => {
 		originalLocation = window.location;
 
 		// Mock fetch with proper promise handling
-		fetchMock = vi.fn().mockImplementation(() =>
-			Promise.resolve({ ok: false, status: 404 })
-		);
+		fetchMock = vi.fn().mockImplementation(() => Promise.resolve({ ok: false, status: 404 }));
 		global.fetch = fetchMock;
 
 		const mod = await import('../auth.svelte');
@@ -121,6 +119,25 @@ describe('AuthService HTTP methods (auth.svelte.ts)', () => {
 
 			const [, , url] = replaceStateSpy.mock.calls[0];
 			expect(url).toBe('/page#section');
+		});
+
+		it('prefers hash token and removes it from fragment params', () => {
+			const replaceStateSpy = vi.spyOn(window.history, 'replaceState');
+
+			Object.defineProperty(window, 'location', {
+				value: {
+					search: '?other=param',
+					pathname: '/page',
+					hash: '#t=hash-token&view=stats'
+				},
+				writable: true
+			});
+
+			const result = auth.extractTokenFromUrl();
+
+			expect(result).toBe('hash-token');
+			const [, , url] = replaceStateSpy.mock.calls[0];
+			expect(url).toBe('/page?other=param#view=stats');
 		});
 	});
 
@@ -289,7 +306,11 @@ describe('AuthService HTTP methods (auth.svelte.ts)', () => {
 
 			await auth.loginWithToken('magic-link-token');
 
-			expect(fetchMock).toHaveBeenCalledWith('/api/auth/callback?t=magic-link-token');
+			expect(fetchMock).toHaveBeenCalledWith('/api/auth/callback', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ token: 'magic-link-token' })
+			});
 			expect(auth.status).toBe('authenticated');
 		});
 
@@ -353,9 +374,7 @@ describe('AuthService HTTP methods (auth.svelte.ts)', () => {
 				sub: 'user:123',
 				user_uuid: 'u1',
 				active_club_uuid: 'club-a',
-				clubs: [
-					{ club_uuid: 'club-a', role: 'player', display_name: 'ProGolfer123' }
-				]
+				clubs: [{ club_uuid: 'club-a', role: 'player', display_name: 'ProGolfer123' }]
 			});
 			fetchMock.mockResolvedValueOnce({
 				ok: true,

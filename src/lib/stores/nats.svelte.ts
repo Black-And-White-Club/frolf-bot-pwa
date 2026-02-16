@@ -34,6 +34,7 @@ class NatsService {
 	private subscriptions: Map<string, Subscription> = new Map();
 	private codec: Codec<string> | null = null;
 	private natsLib: typeof import('nats.ws') | null = null;
+	private reconnectListeners: Set<() => void | Promise<void>> = new Set();
 
 	/**
 	 * Connect to NATS server with JWT token
@@ -84,6 +85,7 @@ class NatsService {
 						case 'reconnect':
 							this.status = 'connected';
 							this.reconnectAttempts = 0;
+							void this.emitReconnect();
 							break;
 						case 'error':
 							this.lastError = status.data?.toString() ?? 'Unknown error';
@@ -185,6 +187,23 @@ class NatsService {
 			sub.unsubscribe();
 		}
 		this.subscriptions.clear();
+	}
+
+	onReconnect(listener: () => void | Promise<void>): () => void {
+		this.reconnectListeners.add(listener);
+		return () => {
+			this.reconnectListeners.delete(listener);
+		};
+	}
+
+	private async emitReconnect(): Promise<void> {
+		for (const listener of this.reconnectListeners) {
+			try {
+				await listener();
+			} catch (error) {
+				console.error('NATS reconnect listener failed:', error);
+			}
+		}
 	}
 
 	/**
@@ -303,6 +322,7 @@ class NatsService {
 		this.connection?.close();
 		this.connection = null;
 		this.status = 'disconnected';
+		this.reconnectListeners.clear();
 	}
 }
 

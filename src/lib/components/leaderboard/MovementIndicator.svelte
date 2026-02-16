@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { LeaderboardEntry } from '$lib/stores/leaderboard.svelte';
 
-	const { entry, movement }: { entry: LeaderboardEntry; movement: 'up' | 'down' | 'same' } = $props();
+	const { entry, movement }: { entry: LeaderboardEntry; movement: 'up' | 'down' | 'same' } =
+		$props();
 
 	const display = $derived.by(() => {
 		if (!entry.previousTagNumber || movement === 'same') {
