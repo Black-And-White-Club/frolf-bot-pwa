@@ -52,6 +52,7 @@ sw.addEventListener('install', (event) => {
 			const cache = await caches.open(PRECACHE_NAME);
 			try {
 				await cache.addAll(PRECACHE_URLS);
+				await sw.skipWaiting();
 			} catch (error) {
 				// Ensure partial caches do not survive a failed install attempt.
 				await caches.delete(PRECACHE_NAME);
