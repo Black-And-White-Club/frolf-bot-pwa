@@ -28,7 +28,7 @@ Claim a specific tag number (1–100). If that tag is already held by another pl
 
 ## The leaderboard
 
-The leaderboard is visible in the [PWA dashboard](/leaderboard) and updates in real time. It shows:
+The leaderboard is visible in the [web dashboard](/leaderboard) and updates in real time. It shows:
 
 - Current tag holders ranked by tag number
 - Recent movement (up/down)

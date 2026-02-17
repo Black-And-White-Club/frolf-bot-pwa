@@ -115,10 +115,10 @@ Displays the leaderboard for a season. Omit `season_id` to view the current seas
 
 ---
 
-## PWA dashboard link
+## Dashboard link
 
 ```
 /dashboard
 ```
 
-Posts an ephemeral message with a link to the PWA dashboard. Works for any user — useful for sharing with new members.
+Posts an ephemeral message with a link to the web dashboard. Works for any user — useful for sharing with new members.

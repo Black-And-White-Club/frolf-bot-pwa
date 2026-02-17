@@ -77,5 +77,9 @@ Tiers (Gold / Silver / Bronze) are based on each player's tag ranking among acti
 
 > **New players:** Participants with fewer than 3 rounds played earn Base Win only — no tier bonuses yet.
 
+> **Gold tier:** Gold players earn Base Win only — no bonuses apply when beating lower-tier opponents.
+
+> **Untagged players:** Participants who haven't claimed a tag don't count as opponents for points. Only tag holders are included in the points calculation for a round.
+
 Outside of an active season, rounds are scored and tags are updated normally, but no points are awarded.
 Use `/season standings` to view the current points leaderboard.

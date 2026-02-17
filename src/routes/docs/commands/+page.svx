@@ -15,7 +15,7 @@ All Frolf Bot interactions use Discord slash commands. Commands are available in
 
 **Permission:** Everyone
 
-Posts an ephemeral link to the PWA dashboard. Useful for sharing with new members or finding the dashboard URL.
+Posts an ephemeral link to the web dashboard. Useful for sharing with new members or finding the dashboard URL.
 
 ---
 

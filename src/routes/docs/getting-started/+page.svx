@@ -5,7 +5,7 @@
 
 # Getting Started
 
-Everything starts with signing up. Once you're registered, you'll have access to rounds, scoring, the tag leaderboard, and the PWA dashboard.
+Everything starts with signing up. Once you're registered, you'll have access to rounds, scoring, the tag leaderboard, and the web dashboard.
 
 ---
 
@@ -46,10 +46,10 @@ Once your signup is processed, you'll receive the **Player role** and can:
 
 ## Accessing the dashboard
 
-Use the `/dashboard` command in any channel to get a link to the PWA. The dashboard shows:
+Use the `/dashboard` command in any channel to get a link to the web app. The dashboard shows:
 
 - Live leaderboard standings
 - Recent and upcoming rounds
 - Tag history and season stats
 
-You can also bookmark the PWA URL directly. Sign in with Discord to link your account.
+You can also bookmark the dashboard URL directly. Sign in with Discord to link your account.

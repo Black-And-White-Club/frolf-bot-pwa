@@ -5,7 +5,7 @@
 
 # Frolf Bot — Documentation
 
-Frolf Bot is an event-driven Discord companion for disc golf communities. It handles round scheduling, RSVP tracking, score submission, tag-based leaderboards, points seasons, and season management — all from Discord, with a live PWA companion for viewing stats.
+Frolf Bot is an event-driven Discord companion for disc golf communities. It handles round scheduling, RSVP tracking, score submission, tag-based leaderboards, points seasons, and season management — all from Discord, with a live web app for viewing stats.
 
 ---
 
@@ -39,4 +39,4 @@ Most commands require a role. Roles are automatically assigned during signup or 
 
 Frolf Bot is powered by an event-driven backend. When you run a slash command or click a button, it publishes an event that the backend processes asynchronously. Responses are sent back to Discord as the events complete — this means some actions (like signup or round creation) may have a brief delay before you see a confirmation.
 
-The [PWA dashboard](/leaderboard) updates in real time via a live data stream.
+The [web dashboard](/leaderboard) updates in real time via a live data stream.
