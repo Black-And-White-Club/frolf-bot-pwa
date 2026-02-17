@@ -1,0 +1,67 @@
+<svelte:head>
+  <title>Tags & Leaderboard — Frolf Bot Docs</title>
+  <meta name="description" content="Tag system, leaderboard, history, and season management in Frolf Bot." />
+</svelte:head>
+
+# Tags & Leaderboard
+
+The tag system is the heart of competitive disc golf tracking. Each registered player holds a numbered tag. Beat another player in a round and you take their tag — the lower the number, the better.
+
+---
+
+## Claiming a tag
+
+**Requires:** Player role
+
+```
+/claimtag <tag>
+```
+
+Claim a specific tag number (1–100). If that tag is already held by another player, you'll need to beat them in a round to take it. Tags you claim without a challenge are yours immediately.
+
+**Example:**
+```
+/claimtag 7
+```
+
+---
+
+## The leaderboard
+
+The leaderboard is visible in the [PWA dashboard](/leaderboard) and updates in real time. It shows:
+
+- Current tag holders ranked by tag number
+- Recent movement (up/down)
+- Season standings
+
+The leaderboard channel in Discord also shows a summary embed that updates automatically after each finalized round.
+
+---
+
+## Seasons
+
+Seasons let you track competitive periods with a defined start and end. During an active season, finalized rounds award points in addition to tag changes. Off-season, tag challenges still happen but no points are awarded.
+
+| Season state | Tag changes | Points |
+|--------------|-------------|--------|
+| **Active season** | Yes | Yes — see [Points System](/docs/scoring#points-system) |
+| **Off-season** | Yes | No |
+
+- **Active season** → `/season standings` shows a ranked points leaderboard
+- **Off-season** → leaderboard shows tag numbers only
+
+Season standings are separate from the all-time tag leaderboard.
+
+### Viewing standings
+
+```
+/season standings [season_id]
+```
+
+Shows the leaderboard for the current season. Pass a specific `season_id` to view a past season.
+
+---
+
+### Admin: Managing seasons
+
+See the [Admin Reference](/docs/admin) for commands to start and end seasons.

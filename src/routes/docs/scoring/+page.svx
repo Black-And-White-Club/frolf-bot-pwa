@@ -1,0 +1,81 @@
+<svelte:head>
+  <title>Scoring — Frolf Bot Docs</title>
+  <meta name="description" content="Submitting scores and importing UDisc scorecards with Frolf Bot." />
+</svelte:head>
+
+# Scoring
+
+Once a round is active, players submit their scores through Discord. Scores can be entered manually or imported from a UDisc scorecard URL.
+
+---
+
+## Submitting your score
+
+**Requires:** Player role, round must be active
+
+When a round goes active, the round embed shows a **Score** button. Click it to open the score submission form. Enter your total score for the round (strokes, not relative to par — e.g. `54`).
+
+Your response is visible only to you (ephemeral) until scores are finalized.
+
+---
+
+## Bulk score entry
+
+**Requires:** Editor or Admin role
+
+Editors and admins can enter scores for multiple players at once using the **Override** button on an active round embed. This is useful for entering scores from a physical scorecard after the fact.
+
+The bulk entry form accepts a list of Discord usernames and their scores.
+
+---
+
+## Importing from UDisc
+
+**Requires:** Player role
+
+If your round was tracked on UDisc, you can import the scorecard instead of entering scores manually.
+
+1. Find the **Upload Scorecard** button on the round embed
+2. Paste the UDisc scorecard URL (must start with `https://udisc.com/...`)
+3. Optionally add notes about the scorecard
+4. Submit — Frolf Bot will parse the scorecard and match players to their Discord accounts
+
+### How player matching works
+
+Frolf Bot matches UDisc names to Discord users using the identities you configure with [`/set-udisc-name`](/docs/admin#set-udisc-name). If your UDisc username or display name matches what's on the scorecard, your score is automatically attributed to you.
+
+If your score isn't matched, contact an Editor or Admin to manually assign it.
+
+---
+
+## Score finalization
+
+When all scores are in, an Editor or Admin finalizes the round. Finalization:
+
+- Locks scores so they can't be changed
+- Triggers tag reassignment based on round results
+- Updates the leaderboard
+- Posts a summary embed in the events channel
+
+Lower scores (fewer strokes) win tag challenges. The specific rules depend on your server's configured scoring format.
+
+---
+
+## Points System
+
+Points are earned during active seasons when a round is finalized.
+
+Each opponent you beat earns **+100 Base Win** points. On top of that, tier matchup bonuses apply:
+
+| Matchup | Bonus |
+|---------|-------|
+| Bronze beats Silver | +50 Standard Bonus |
+| Silver beats Gold | +50 Standard Bonus |
+| Bronze beats Gold | +75 Giant Slayer |
+
+Tiers (Gold / Silver / Bronze) are based on each player's tag ranking among active season participants.
+
+> **New players:** Participants with fewer than 3 rounds played earn Base Win only — no tier bonuses yet.
+
+Outside of an active season, rounds are scored and tags are updated normally, but no points are awarded.
+Use `/season standings` to view the current points leaderboard.

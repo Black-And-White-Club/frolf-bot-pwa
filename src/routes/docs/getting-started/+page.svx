@@ -1,0 +1,55 @@
+<svelte:head>
+  <title>Getting Started — Frolf Bot Docs</title>
+  <meta name="description" content="How to sign up for Frolf Bot and access your dashboard." />
+</svelte:head>
+
+# Getting Started
+
+Everything starts with signing up. Once you're registered, you'll have access to rounds, scoring, the tag leaderboard, and the PWA dashboard.
+
+---
+
+## Signing up
+
+Frolf Bot uses a **reaction-based signup flow** to keep things casual. Look for the signup message in the designated signup channel — it's pinned or posted by an admin when the bot is configured.
+
+1. **React** to the signup message with the 🥏 emoji
+2. **Check your DMs** — Frolf Bot will send you a message with a "Sign Up" button
+3. **Click the button** to open the signup form
+
+> **No DMs?** Make sure you have DMs enabled from server members. Discord settings → Privacy & Safety → Allow direct messages from server members.
+
+### The signup form
+
+The form has three optional fields:
+
+| Field | Description |
+|-------|-------------|
+| **Tag Number** | Your desired starting tag number (1–100). First-come, first-served — if it's taken you'll be assigned the next available. |
+| **UDisc Username** | Your `@username` on UDisc (e.g. `@janedoe`). Used for automatic scorecard matching. |
+| **UDisc Display Name** | Your name as it appears on UDisc scorecards. Used when your username isn't on the scorecard. |
+
+All fields are optional. You can update them later with [`/set-udisc-name`](/docs/admin#set-udisc-name).
+
+---
+
+## After signup
+
+Once your signup is processed, you'll receive the **Player role** and can:
+
+- Create and RSVP to rounds with `/createround`
+- Claim or challenge tags with `/claimtag`
+- Submit scores during active rounds
+- View your history with `/history`
+
+---
+
+## Accessing the dashboard
+
+Use the `/dashboard` command in any channel to get a link to the PWA. The dashboard shows:
+
+- Live leaderboard standings
+- Recent and upcoming rounds
+- Tag history and season stats
+
+You can also bookmark the PWA URL directly. Sign in with Discord to link your account.

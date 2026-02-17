@@ -213,6 +213,23 @@
 				{@render children?.()}
 			</main>
 		</div>
+	{:else if page.url.pathname.startsWith('/docs')}
+		<!-- Public docs — no auth required -->
+		<div class="flex min-h-screen flex-col bg-[var(--guild-background)]">
+			<header class="flex items-center justify-between border-b border-[var(--guild-border)] px-6 py-3">
+				<a href="/docs" class="text-guild-primary font-semibold">Frolf Bot Docs</a>
+				<div class="flex items-center gap-3">
+					<ThemeToggle testid="theme-toggle-docs" />
+					<a
+						href="/auth/signin"
+						class="text-sm text-[var(--guild-text-secondary)] hover:text-[var(--guild-text)] transition-colors"
+					>Sign In</a>
+				</div>
+			</header>
+			<main id="main-content" class="flex-1">
+				{@render children?.()}
+			</main>
+		</div>
 	{:else}
 		<!-- User is not signed in -->
 		<div class="flex min-h-screen items-center justify-center bg-[var(--guild-background)]">

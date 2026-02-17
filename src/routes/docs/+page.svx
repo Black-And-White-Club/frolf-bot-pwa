@@ -1,0 +1,42 @@
+<svelte:head>
+  <title>Docs — Frolf Bot</title>
+  <meta name="description" content="Documentation for Frolf Bot — Discord commands, round management, scoring, and more." />
+</svelte:head>
+
+# Frolf Bot — Documentation
+
+Frolf Bot is an event-driven Discord companion for disc golf communities. It handles round scheduling, RSVP tracking, score submission, tag-based leaderboards, points seasons, and season management — all from Discord, with a live PWA companion for viewing stats.
+
+---
+
+## Sections
+
+- [Getting Started](/docs/getting-started) — Signing up and accessing your dashboard
+- [Rounds](/docs/rounds) — Creating, editing, and RSVPing to rounds
+- [Scoring](/docs/scoring) — Submitting scores, importing UDisc scorecards, and the points system
+- [Tags & Leaderboard](/docs/tags) — Claiming tags, viewing history, and season standings
+- [Admin Reference](/docs/admin) — Server setup, roles, and season management
+- [Commands Reference](/docs/commands) — Full slash command reference
+
+---
+
+## Permission Levels
+
+Most commands require a role. Roles are automatically assigned during signup or by an editor.
+
+| Level | Who | What they can do |
+|-------|-----|------------------|
+| **Everyone** | Any Discord user | Sign up, view history and dashboard |
+| **Player** | Registered members | Create rounds, RSVP, claim tags, submit scores, upload scorecards, earn points |
+| **Editor** | Trusted members | All Player actions + manage roles, override scores |
+| **Admin** | Server admins | All Editor actions + server setup, season management |
+
+> **Note:** Points are only awarded during an active season. Outside of a season, rounds are scored and tags are updated normally, but no points are earned.
+
+---
+
+## How it works
+
+Frolf Bot is powered by an event-driven backend. When you run a slash command or click a button, it publishes an event that the backend processes asynchronously. Responses are sent back to Discord as the events complete — this means some actions (like signup or round creation) may have a brief delay before you see a confirmation.
+
+The [PWA dashboard](/leaderboard) updates in real time via a live data stream.

@@ -1,0 +1,136 @@
+<svelte:head>
+  <title>Commands Reference — Frolf Bot Docs</title>
+  <meta name="description" content="Full slash command reference for Frolf Bot — usage, permissions, and options." />
+</svelte:head>
+
+# Commands Reference
+
+All Frolf Bot interactions use Discord slash commands. Commands are available in any channel the bot has access to unless otherwise noted.
+
+---
+
+## Getting Started
+
+### `/dashboard`
+
+**Permission:** Everyone
+
+Posts an ephemeral link to the PWA dashboard. Useful for sharing with new members or finding the dashboard URL.
+
+---
+
+## Round Management
+
+### `/createround`
+
+**Permission:** Player
+
+Opens a modal to schedule a new disc golf round. After submitting, Frolf Bot posts a round embed in the events channel with RSVP buttons.
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `title` | Yes | Name of the round (max 100 characters) |
+| `description` | No | Details or notes (max 500 characters) |
+| `start_time` | Yes | Format: `YYYY-MM-DD HH:MM` (e.g. `2026-03-15 10:00`) |
+| `timezone` | No | IANA timezone string — defaults to `America/Chicago` |
+| `location` | Yes | Course name or address (max 100 characters) |
+
+---
+
+## Profile & Identity
+
+### `/set-udisc-name`
+
+**Permission:** Player
+
+Links your UDisc identity so that scorecard imports can automatically attribute your scores.
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `username` | No* | Your UDisc `@username` (e.g. `@janedoe`) |
+| `name` | No* | Your name as it appears on UDisc scorecards |
+
+*At least one field is required.
+
+---
+
+## Tags & Leaderboard
+
+### `/claimtag`
+
+**Permission:** Player
+
+Claim a specific tag number. If the tag is held by another player, you must beat them in a round to take it. Unchallenged claims are immediate.
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `tag` | Yes | Tag number to claim (1–100) |
+
+**Example:** `/claimtag 7`
+
+### `/season standings`
+
+**Permission:** Everyone
+
+Shows the points leaderboard for the current or a past season.
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `season_id` | No | ID of a past season — omit to view the current season |
+
+---
+
+## Season Management
+
+### `/season start`
+
+**Permission:** Admin
+
+Starts a new competitive season. Only one season can be active at a time. While a season is active, finalized rounds award points in addition to tag changes.
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `name` | Yes | Display name for the season |
+
+### `/season end`
+
+**Permission:** Admin
+
+Closes the current season. Season standings are preserved for historical reference. Tag challenges continue off-season but no points are awarded.
+
+---
+
+## Admin
+
+### `/updaterole`
+
+**Permission:** Editor
+
+Opens a button-based role selector to assign or change a user's Frolf Bot role.
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `user` | Yes | Discord member to update |
+
+After selecting a user, click the role button you want to assign.
+
+### `/frolf-setup`
+
+**Permission:** Administrator
+
+Run once when adding Frolf Bot to a new server. Opens a setup modal to configure channels, roles, and the signup message. Running again on an already-configured server shows the current configuration without making changes.
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| **Channel Name Prefix** | `frolf` | Prefix for auto-created channels (`frolf-events`, `frolf-leaderboard`) |
+| **Role Names** | `Frolf Player, Frolf Editor, Frolf Admin` | Comma-separated names for the three permission roles |
+| **Signup Message** | `React with 🥏 to sign up for frolf events!` | Message posted in the signup channel |
+| **Signup Emoji** | 🥏 | Emoji players react with to trigger the signup DM |
+
+### `/frolf-reset`
+
+**Permission:** Administrator
+
+Shows a confirmation dialog before resetting the bot configuration. Resetting deactivates the server config and unregisters all commands — run `/frolf-setup` again to re-enable.
+
+> **Safe to reset:** Round history, user profiles, scores, and leaderboard data are preserved. Re-running `/frolf-setup` restores access to all historical data.
