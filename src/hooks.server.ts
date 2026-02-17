@@ -21,6 +21,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const connectSrc = new Set<string>(["'self'", 'https://api.github.com']);
 	connectSrc.add(toOrigin(env.PUBLIC_API_URL) || 'https://api.frolf-bot.com');
 	connectSrc.add(toOrigin(env.PUBLIC_NATS_URL || env.PUBLIC_WS_URL) || 'wss://nats.frolf-bot.com');
+	if (env.PUBLIC_OTEL_ENDPOINT) {
+		connectSrc.add(toOrigin(env.PUBLIC_OTEL_ENDPOINT));
+	}
 
 	if (isDev) {
 		connectSrc.add('http://localhost:5173');
