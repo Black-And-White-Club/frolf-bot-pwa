@@ -38,6 +38,7 @@ jobs:
           # Since you use $env/dynamic/public, this is likely not strictly needed for build,
           # but good practice if you switch to static.
           VITE_DEBUG: false
+          PRIVATE_API_URL: ${{ secrets.PRIVATE_API_URL || 'http://localhost:8080' }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
