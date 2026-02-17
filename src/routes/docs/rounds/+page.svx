@@ -1,0 +1,78 @@
+<svelte:head>
+  <title>Rounds — Frolf Bot Docs</title>
+  <meta name="description" content="Creating, editing, and managing disc golf rounds with Frolf Bot." />
+</svelte:head>
+
+# Rounds
+
+Rounds are the core of Frolf Bot. Use `/createround` to schedule a round, then players RSVP, scores get submitted, and the round finalizes automatically.
+
+---
+
+## Creating a round
+
+**Requires:** Player role
+
+```
+/createround
+```
+
+Running this command opens a modal with the following fields:
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| **Title** | Yes | Name of the round (max 100 characters) |
+| **Description** | No | Details, notes, or additional info (max 500 characters) |
+| **Start Time** | Yes | Format: `YYYY-MM-DD HH:MM` (e.g. `2026-03-15 10:00`) |
+| **Timezone** | No | IANA timezone string. Defaults to `America/Chicago` if left blank |
+| **Location** | Yes | Course name or address (max 100 characters) |
+
+After submitting, Frolf Bot posts a round embed in the events channel with RSVP buttons.
+
+---
+
+## RSVPing
+
+Once a round is posted, anyone with the Player role can respond using the buttons on the round embed:
+
+| Button | Meaning |
+|--------|---------|
+| **Accept** | You're in — you'll be counted in the starting lineup |
+| **Decline** | You can't make it |
+| **Tentative** | Maybe — you won't be in the starting lineup but can join late |
+
+Players who marked Tentative or didn't respond can join a round after it starts using the **Join** button, if the round creator or an editor allows late additions.
+
+---
+
+## Editing a round
+
+**Requires:** Round creator, Editor, or Admin role
+
+Use the **Edit** button on the round embed to open the update modal. All fields are optional — only fill in what you want to change:
+
+- Title
+- Description
+- Start Time (same `YYYY-MM-DD HH:MM` format)
+- Timezone
+- Location
+
+---
+
+## Deleting a round
+
+**Requires:** Round creator, Editor, or Admin role
+
+Use the **Delete** button on the round embed. This permanently removes the round and its associated data.
+
+---
+
+## Round lifecycle
+
+Rounds move through three states:
+
+1. **Scheduled** — Round is posted, players are RSVPing
+2. **Active** — Round has started, score submission is open
+3. **Finalized** — Scores are locked in, the round is complete
+
+The transition from Scheduled → Active typically happens when the round creator or an admin starts the round. Once finalized, scores affect tag assignments on the leaderboard.

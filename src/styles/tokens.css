@@ -28,6 +28,9 @@
 		--guild-error-text: rgb(153 27 27);
 		--guild-error-border: rgb(254 202 202);
 
+		/* Liquid Skobeloff gradient (use as background-image) */
+		--liquid-skobeloff: linear-gradient(180deg, #008b8b 0%, #007474 100%);
+
 		/* Utility fallbacks */
 		--color-primary: var(--guild-primary-rgb);
 		--color-secondary: var(--guild-secondary-rgb);
@@ -63,6 +66,7 @@
 
 		--color-text: var(--guild-text-rgb);
 		--color-text-secondary: 71 85 105;
+		--guild-text-muted: rgb(148 163 184);
 
 		color-scheme: light;
 	}
@@ -84,6 +88,13 @@
 		--guild-glow-aura: 0 0 15px rgba(139, 123, 184, 0.5);
 
 		--toggle-knob-border-color: rgba(245, 255, 250, 0.3);
+
+		--guild-text-muted: rgb(148 163 184 / 0.7);
+
+		--guild-error-bg: rgba(153, 27, 27, 0.15);
+		--guild-error-text: rgb(252 165 165);
+		--guild-error-border: rgba(153, 27, 27, 0.3);
+
 		color-scheme: dark;
 	}
 }

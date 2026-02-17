@@ -87,6 +87,12 @@
 					>
 						Leaderboard
 					</a>
+					<a
+						href="/docs"
+						class="text-[var(--guild-text-secondary)] transition-colors hover:text-[var(--guild-text)]"
+					>
+						Docs
+					</a>
 				</nav>
 			</div>
 

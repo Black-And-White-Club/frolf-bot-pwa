@@ -1,0 +1,124 @@
+<svelte:head>
+  <title>Admin Reference — Frolf Bot Docs</title>
+  <meta name="description" content="Admin commands for Frolf Bot server setup, role management, and season control." />
+</svelte:head>
+
+# Admin Reference
+
+This page covers commands and features for server administrators and editors.
+
+---
+
+## Initial setup
+
+**Requires:** Administrator permission
+
+```
+/frolf-setup
+```
+
+Run this once when adding Frolf Bot to a new server. It opens a setup modal:
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| **Channel Name Prefix** | `frolf` | Prefix for auto-created channels (e.g. `frolf-events`, `frolf-leaderboard`) |
+| **Role Names** | `Frolf Player, Frolf Editor, Frolf Admin` | Comma-separated names for the three permission roles |
+| **Signup Message** | `React with 🥏 to sign up for frolf events!` | The message posted in the signup channel |
+| **Signup Emoji** | 🥏 | The emoji players react with to trigger the signup DM |
+
+Setup creates channels and roles automatically. If the bot is already configured, running `/frolf-setup` again shows the current configuration without making changes.
+
+---
+
+## Resetting the bot
+
+**Requires:** Administrator permission
+
+```
+/frolf-reset
+```
+
+Shows a confirmation dialog before resetting. Resetting:
+
+- Deactivates the server's bot configuration
+- Unregisters all bot commands from the server
+- Requires running `/frolf-setup` again to re-enable
+
+**Does NOT delete:** Round history, user profiles, scores, or leaderboard data. You can re-setup at any time and all historical data will still be there.
+
+---
+
+## Managing roles
+
+**Requires:** Editor role
+
+```
+/updaterole <user>
+```
+
+Opens a button-based role selector to assign or change a user's role. Available roles are determined by your server's configuration from `/frolf-setup`.
+
+| Option | Description |
+|--------|-------------|
+| `user` | The Discord member to update (required) |
+
+After selecting a user, you'll see buttons for each available role. Click the role you want to assign.
+
+---
+
+## UDisc identity
+
+**Requires:** Player role (any user can set their own)
+
+```
+/set-udisc-name [username] [name]
+```
+
+Links your UDisc identity for automatic scorecard matching. At least one field is required.
+
+| Option | Description |
+|--------|-------------|
+| `username` | Your UDisc `@username` (e.g. `@janedoe`) |
+| `name` | Your name as shown on UDisc scorecards |
+
+This can also be set during [signup](/docs/getting-started#the-signup-form) and updated any time.
+
+---
+
+## Season management
+
+**Requires:** Admin role
+
+### Start a season
+
+```
+/season start <name>
+```
+
+Starts a new competitive season with the given name. Only one season can be active at a time.
+
+### End the current season
+
+```
+/season end
+```
+
+Closes the current season. Season standings are preserved for historical reference.
+
+### View standings
+
+```
+/season standings [season_id]
+```
+
+Displays the leaderboard for a season. Omit `season_id` to view the current season.
+
+---
+
+## PWA dashboard link
+
+```
+/dashboard
+```
+
+Posts an ephemeral message with a link to the PWA dashboard. Works for any user — useful for sharing with new members.

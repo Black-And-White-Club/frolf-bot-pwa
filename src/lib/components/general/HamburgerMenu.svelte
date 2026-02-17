@@ -183,6 +183,13 @@
 			>
 				Leaderboard
 			</a>
+			<a
+				href="/docs"
+				class="block rounded-md px-4 py-2 text-[var(--guild-text)] transition-colors hover:bg-[var(--guild-surface-elevated)]"
+				onclick={closeHamburger}
+			>
+				Docs
+			</a>
 		</nav>
 
 		<!-- Theme toggle -->
