@@ -42,39 +42,51 @@
 			<LeaderboardCompact entries={leaderboardService.currentView} />
 		{:else if mode === 'tv'}
 			<div class="tv-layout">
-				<div class="leaderboard-section">
-					<Leaderboard entries={leaderboardService.currentView.slice(0, 8)} />
+				<div class="tv-column leaderboard-column">
+					{#if leaderboardService.viewMode === 'tags'}
+						<TagLeaderboard members={tagMembers} onSelectMember={handleMemberSelect} />
+
+						{#if tagStore.selectedMemberId}
+							<TagDetailSheet
+								memberId={tagStore.selectedMemberId}
+								history={tagStore.selectedMemberHistory}
+								onClose={() => tagStore.selectMember(null)}
+							/>
+						{/if}
+					{:else}
+						<Leaderboard
+							entries={leaderboardService.currentView}
+							limit={15}
+							title="Points Leaderboard"
+						/>
+					{/if}
 				</div>
-				<div class="recent-rounds-section">
-					<!-- Recent rounds component would go here -->
+				<div class="tv-column rounds-column">
+					<!-- Reusing RoundList which handles fetching and display of Live/Upcoming/Recent -->
+					<div class="rounds-wrapper">
+						<RoundList onSelect={handleRoundSelect} />
+					</div>
 				</div>
 			</div>
 		{:else}
 			<!-- Default Dashboard Layout -->
 			<div class="rounds-section">
-				<h2 class="section-heading">Rounds</h2>
 				<RoundList onSelect={handleRoundSelect} />
 			</div>
-			
+
 			<div class="leaderboard-section">
 				{#if leaderboardService.viewMode === 'tags'}
-					<TagLeaderboard 
-						members={tagMembers} 
-						onSelectMember={handleMemberSelect} 
-					/>
-					
+					<TagLeaderboard members={tagMembers} onSelectMember={handleMemberSelect} />
+
 					{#if tagStore.selectedMemberId}
-						<TagDetailSheet 
+						<TagDetailSheet
 							memberId={tagStore.selectedMemberId}
 							history={tagStore.selectedMemberHistory}
 							onClose={() => tagStore.selectMember(null)}
 						/>
 					{/if}
 				{:else}
-					<Leaderboard 
-						entries={leaderboardService.currentView} 
-						title="Points Leaderboard"
-					/>
+					<Leaderboard entries={leaderboardService.currentView} title="Points Leaderboard" />
 				{/if}
 			</div>
 		{/if}
@@ -91,10 +103,8 @@
 		gap: var(--space-lg, 1.5rem);
 	}
 
-
-
 	.content {
-		position: relative; 
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-lg, 1.5rem);
@@ -115,27 +125,77 @@
 		gap: var(--space-md, 1rem);
 	}
 
-	.section-heading {
-		font-size: 1.25rem;
-		font-weight: 600;
-		color: var(--guild-text);
-		margin: 0;
-	}
+	/* Removed section-heading */
 
 	/* TV Mode Styles */
+	:global(.app-main:has(.tv-mode)) {
+		max-width: none !important;
+		padding: 0 !important;
+	}
+
+	.tv-mode .content {
+		flex: 1;
+		min-height: 0;
+	}
+
 	.tv-mode {
 		max-width: none;
 		padding: var(--space-xl, 2rem);
 		height: 100vh;
+		width: 100vw;
 		box-sizing: border-box;
-		background: #0a0f1c; /* Darker background for TV */
+		background:
+			radial-gradient(circle at top right, rgba(0, 116, 116, 0.05), transparent),
+			var(--guild-background);
+		overflow: hidden; /* Prevent scrolling if everything fits */
+	}
+
+	/* Hide specific interactive elements in TV mode; .header-controls remain visible for ViewToggle */
+	.tv-mode :global(.chevron-collapse),
+	.tv-mode :global(.view-all-btn) {
+		display: none !important;
 	}
 
 	.tv-layout {
 		display: grid;
-		grid-template-columns: 2fr 1fr;
 		gap: var(--space-xl, 2rem);
 		height: 100%;
+		width: 100%;
+	}
+
+	/* Landscape (Default TV) */
+	@media (orientation: landscape) {
+		.tv-layout {
+			grid-template-columns: 2fr 1.2fr; /* Leaderboard gets more space */
+			grid-template-rows: 1fr;
+		}
+
+		/* Ensure columns scroll independently if needed */
+		.tv-column {
+			height: 100%;
+			overflow-y: auto;
+			padding-right: 0.5rem; /* Space for scrollbar */
+		}
+	}
+
+	/* Portrait (Vertical TV) */
+	@media (orientation: portrait) {
+		.tv-mode {
+			height: auto;
+			min-height: 100vh;
+			overflow-y: auto; /* Allow window scrolling */
+		}
+
+		.tv-layout {
+			grid-template-columns: 1fr;
+			grid-template-rows: min-content 1fr; /* Leaderboard takes what it needs, Rounds take rest */
+			height: auto; /* Let it grow */
+		}
+
+		.tv-column {
+			height: auto; /* Don't force internal scrolling */
+			overflow-y: visible;
+		}
 	}
 
 	/* Compact Mode Styles */

@@ -83,10 +83,10 @@ DISCORD_CLIENT_SECRET=your_dev_client_secret
 
 # Local backend endpoints
 PUBLIC_API_URL=http://localhost:8080
-PUBLIC_WS_URL=ws://localhost:8080/ws
+PUBLIC_NATS_URL=wss://localhost:4443
 
 # Optional: Enable debug logging
-DEBUG=true
+PUBLIC_DEBUG=true
 ```
 
 **Security Note:** Never commit `.env.local` - it's already in `.gitignore`
@@ -154,6 +154,11 @@ observability:
   tempo_insecure: true
   tempo_sample_rate: 1.0 # 100% sampling for local dev
 ```
+
+Backend security requirements:
+
+- Use a strong `JWT_SECRET` for any non-throwaway environment.
+- If enabling `pprof` outside localhost, require `PPROF_AUTH_TOKEN` and restrict network access.
 
 ---
 
@@ -319,7 +324,7 @@ Fill out the modal to create a test round.
 
 - Verify NATS is running: `curl http://localhost:8222/varz`
 - Check backend logs for WebSocket errors
-- Ensure `PUBLIC_WS_URL` in `.env.local` is correct
+- Ensure `PUBLIC_NATS_URL` in `.env.local` is correct
 
 ### OAuth Redirect Errors
 

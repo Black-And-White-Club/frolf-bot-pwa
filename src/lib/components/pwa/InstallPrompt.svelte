@@ -120,7 +120,7 @@
 	.btn-install {
 		padding: 0.5rem 1rem;
 		border: none;
-		background: linear-gradient(180deg, #008B8B 0%, #007474 100%);
+		background: linear-gradient(180deg, #008b8b 0%, #007474 100%);
 		color: white;
 		border-radius: 0.375rem;
 		cursor: pointer;

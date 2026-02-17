@@ -1,24 +1,7 @@
 <script lang="ts">
 	import { userProfiles } from '$lib/stores/userProfiles.svelte';
+	import type { Round } from '$lib/stores/round.svelte';
 	import ParticipantAvatar from './ParticipantAvatar.svelte';
-
-	type Round = {
-		id: string;
-		guildId: string;
-		title: string;
-		location: string;
-		description: string;
-		startTime: string;
-		state: 'scheduled' | 'started' | 'finalized' | 'cancelled';
-		createdBy: string;
-		eventMessageId: string;
-		participants: Array<{
-			userId: string;
-			response: 'accepted' | 'declined' | 'tentative';
-			score: number | null;
-			tagNumber: number | null;
-		}>;
-	};
 
 	type Props = {
 		round: Round;
@@ -27,16 +10,13 @@
 
 	let { round, onclick }: Props = $props();
 
-
-
 	let formattedDate = $derived(
-		new Intl.DateTimeFormat('en-US', {
+		new Intl.DateTimeFormat(undefined, {
 			weekday: 'short',
 			month: 'short',
 			day: 'numeric',
 			hour: 'numeric',
-			minute: '2-digit',
-			timeZoneName: 'short'
+			minute: '2-digit'
 		}).format(new Date(round.startTime))
 	);
 
@@ -61,9 +41,8 @@
 
 		<p class="detail-item date">
 			<span class="detail-icon">📅</span>
-			{formattedDate}
+			<span class="truncate">{formattedDate}</span>
 		</p>
-
 		<p class="detail-item participants">
 			<span class="detail-icon">👥</span>
 			{confirmedParticipants.length}
@@ -91,7 +70,10 @@
 								size={20}
 							/>
 							{#key p.score}
-								<span class="font-bold text-[var(--primary)] font-secondary animate-scale-pulse inline-block">{p.score}</span>
+								<span
+									class="font-bold text-[var(--guild-secondary)] font-secondary animate-scale-pulse inline-block"
+									>{p.score}</span
+								>
 							{/key}
 						</div>
 					{/each}
@@ -130,16 +112,19 @@
 		transition: all 0.2s ease;
 		width: 100%;
 		box-sizing: border-box;
+
+		/* Enable container queries */
+		container-type: inline-size;
 	}
 
 	.round-card:hover {
 		transform: translateY(-2px);
 		box-shadow: 0 4px 12px rgba(0, 116, 116, 0.15);
-		border-color: var(--primary, #007474);
+		border-color: var(--guild-primary, #007474);
 	}
 
 	.round-card:focus-visible {
-		outline: 2px solid var(--primary, #007474);
+		outline: 2px solid var(--guild-primary, #007474);
 		outline-offset: 2px;
 	}
 
@@ -152,8 +137,9 @@
 	.round-title {
 		flex: 1;
 		margin: 0;
+		font-family: var(--font-display);
 		font-size: 1.125rem;
-		font-weight: 600;
+		font-weight: 700;
 		color: var(--guild-text, #e5e7eb);
 		text-align: left;
 		line-height: 1.4;
@@ -223,6 +209,49 @@
 
 		.detail-item {
 			font-size: 0.8125rem;
+		}
+	}
+
+	/* Container Query for Responsive Card Layout */
+	@container (min-width: 440px) {
+		.round-card {
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1.5rem;
+			height: 100%; /* Ensure uniform height in grid */
+		}
+
+		.card-header {
+			flex: 0 0 auto;
+			max-width: 30%;
+			min-width: 150px;
+		}
+
+		.card-details {
+			flex: 1;
+			flex-direction: row;
+			justify-content: flex-start; /* Left-align details */
+			align-items: center;
+			flex-wrap: wrap;
+			padding-left: 0;
+			/* Add borders or separators if needed, for now just spacing */
+			gap: 1.5rem;
+		}
+
+		.detail-item {
+			width: auto;
+		}
+
+		.participant-avatars {
+			padding-left: 0;
+			justify-content: flex-end;
+		}
+
+		/* If we have scorecard preview */
+		.mt-2 {
+			margin-top: 0;
+			padding-left: 0;
 		}
 	}
 </style>

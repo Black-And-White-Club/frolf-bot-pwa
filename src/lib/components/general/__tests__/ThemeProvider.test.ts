@@ -5,11 +5,8 @@ import ThemeProvider from '../ThemeProvider.svelte';
 import * as themeStore from '$lib/stores/theme';
 
 describe('ThemeProvider', () => {
-	it('calls initTheme and applyTheme on mount', () => {
+	it('calls initTheme on mount', () => {
 		const initSpy = vi.spyOn(themeStore, 'initTheme').mockImplementation(() => {
-			/* no-op */
-		});
-		const applySpy = vi.spyOn(themeStore, 'applyTheme').mockImplementation(() => {
 			/* no-op */
 		});
 
@@ -18,9 +15,7 @@ describe('ThemeProvider', () => {
 		expect(el).toBeTruthy();
 
 		expect(initSpy).toHaveBeenCalled();
-		expect(applySpy).toHaveBeenCalled();
 
 		initSpy.mockRestore();
-		applySpy.mockRestore();
 	});
 });

@@ -37,11 +37,11 @@ test('shows avatars when avatar_url present and score displayed when present', (
 		],
 		status: 'active'
 	});
-	
+
 	// Populate user profiles store
 	userProfiles.setProfilesFromApi({
-		'u1': { user_id: 'u1', display_name: 'alice', avatar_url: 'https://example.com/a.png' },
-		'u2': { user_id: 'u2', display_name: 'bob', avatar_url: '' }
+		u1: { user_id: 'u1', display_name: 'alice', avatar_url: 'https://example.com/a.png' },
+		u2: { user_id: 'u2', display_name: 'bob', avatar_url: '' }
 	});
 
 	const { getByAltText, getByText } = render(ParticipantDisplay, {

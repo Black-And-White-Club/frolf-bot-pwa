@@ -5,15 +5,15 @@ import RoundListCompact from '../RoundListCompact.svelte';
 
 // Mock dependencies
 vi.mock('$lib/stores/round.svelte', () => ({
-    roundService: {
-        rounds: [],
-        isLoading: false
-    }
+	roundService: {
+		rounds: [],
+		isLoading: false
+	}
 }));
 
 describe('RoundListCompact', () => {
-    it('renders', () => {
-        const { container } = render(RoundListCompact, { props: { rounds: [] } });
-        expect(container).toBeTruthy();
-    });
+	it('renders', () => {
+		const { container } = render(RoundListCompact, { props: { rounds: [] } });
+		expect(container).toBeTruthy();
+	});
 });

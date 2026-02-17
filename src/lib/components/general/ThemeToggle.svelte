@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { prefersDark, initTheme, applyTheme, currentTheme } from '$lib/stores/theme';
-	import { get } from 'svelte/store';
+	import { prefersDark, initTheme } from '$lib/stores/theme';
 
 	type Props = {
 		testid?: string;
@@ -48,33 +47,7 @@
 
 	function toggle() {
 		const next = !isDark;
-		// Immediate visual toggle for first-paint or if ThemeProvider hasn't wired subscriptions yet
-		try {
-			if (typeof document !== 'undefined') document.documentElement.classList.toggle('dark', next);
-			// Persist both the canonical prefers_dark key and the legacy 'theme' key
-			if (typeof localStorage !== 'undefined') {
-				localStorage.setItem('frolf:prefers_dark', next ? '1' : '0');
-				try {
-					localStorage.setItem('theme', next ? 'dark' : 'light');
-				} catch {
-					// ignore if space-restricted
-				}
-			}
-
-			console.debug('[ThemeToggle] toggled ->', next ? 'dark' : 'light');
-		} catch {
-			/* ignore */
-		}
-
 		prefersDark.set(next);
-
-		// Immediately apply theme variables so UI updates without waiting for other subscribers
-		try {
-			const ct = get(currentTheme);
-			applyTheme(ct, next);
-		} catch {
-			/* ignore */
-		}
 	}
 
 	function handleKeydown(e: KeyboardEvent) {

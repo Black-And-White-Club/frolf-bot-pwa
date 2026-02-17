@@ -83,7 +83,7 @@ export class TagService {
 
 	get selectedMemberHistory() {
 		if (!this.selectedMemberId) return [];
-		return this.history.filter(h => h.newMemberId === this.selectedMemberId);
+		return this.history.filter((h) => h.newMemberId === this.selectedMemberId);
 	}
 
 	applyHistoryResponse(raw: TagHistoryResponseRaw) {
@@ -114,9 +114,7 @@ export class TagService {
 	}
 
 	get recentHistory() {
-		return [...this.history].sort(
-			(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-		);
+		return [...this.history].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
 	}
 }
 

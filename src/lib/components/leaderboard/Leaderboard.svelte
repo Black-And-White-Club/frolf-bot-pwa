@@ -22,6 +22,7 @@
 		testid?: string;
 		onViewAll?: () => void;
 		title?: string;
+		limit?: number;
 	};
 
 	let {
@@ -31,27 +32,19 @@
 		mode,
 		testid,
 		onViewAll,
-		title = 'Leaderboard'
+		title = 'Leaderboard',
+		limit
 	}: Props = $props();
 
 	let collapsed = $state(false);
 
 	// Fallback to service mode if not provided as a prop
 	const currentMode = $derived(mode ?? leaderboardService.viewMode);
-	const isSeasonMode = $derived(currentMode === 'points');
 
-	const sortedInputEntries = $derived.by(() => {
-		if (currentMode !== 'points') return entries; // Strict check against 'points'
-		return [...entries].sort(
-			(a, b) =>
-				b.totalPoints - a.totalPoints ||
-				b.roundsPlayed - a.roundsPlayed ||
-				a.tagNumber - b.tagNumber
-		);
-	});
 	const displayEntries = $derived.by(() => {
-		const limit = $isMobile ? MOBILE_LIMIT : DESKTOP_LIMIT;
-		return (collapsed ? [] : sortedInputEntries.slice(0, limit)).map((entry, index) => {
+		const defaultLimit = $isMobile ? MOBILE_LIMIT : DESKTOP_LIMIT;
+		const finalLimit = limit ?? defaultLimit;
+		return (collapsed ? [] : entries.slice(0, finalLimit)).map((entry, index) => {
 			const displayName = userProfiles.getDisplayName(entry.userId);
 			return {
 				rank: showRank ? index + 1 : undefined,
@@ -68,7 +61,10 @@
 	});
 
 	const showViewAllButton = $derived.by(
-		() => entries.length > ($isMobile ? MOBILE_LIMIT : DESKTOP_LIMIT) && !!onViewAll && !collapsed
+		() =>
+			entries.length > (limit ?? ($isMobile ? MOBILE_LIMIT : DESKTOP_LIMIT)) &&
+			!!onViewAll &&
+			!collapsed
 	);
 
 	function handleViewAllClick() {
@@ -88,10 +84,7 @@
 		</div>
 
 		<div class="header-controls">
-			<ViewToggle
-				mode={currentMode}
-				onchange={(m) => leaderboardService.setViewMode(m)}
-			/>
+			<ViewToggle mode={currentMode} onchange={(m) => leaderboardService.setViewMode(m)} />
 			{#if showViewAllButton}
 				<button type="button" class="view-all-btn" onclick={handleViewAllClick}>
 					View all <span class="count">({entries.length})</span>

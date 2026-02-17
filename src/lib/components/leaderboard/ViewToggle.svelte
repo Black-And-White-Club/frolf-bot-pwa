@@ -41,7 +41,9 @@
 		padding: 0.25rem 0.75rem;
 		border: none;
 		cursor: pointer;
-		transition: background 0.15s ease, color 0.15s ease;
+		transition:
+			background 0.15s ease,
+			color 0.15s ease;
 		background: transparent;
 		color: var(--guild-text-secondary, #9ca3af);
 	}

@@ -11,7 +11,14 @@
 		priority?: boolean;
 	};
 
-	let { userId, avatar_url, username, size = 24, extraClasses = '', priority = false }: Props = $props();
+	let {
+		userId,
+		avatar_url,
+		username,
+		size = 24,
+		extraClasses = '',
+		priority = false
+	}: Props = $props();
 
 	function optimizeDiscordAvatar(url: string | undefined, targetSize: number) {
 		if (!url) return undefined;
@@ -30,8 +37,8 @@
 	let rawAvatarUrl = $derived(avatar_url || profileAvatar);
 	let finalAvatarUrl = $derived(optimizeDiscordAvatar(rawAvatarUrl, size));
 
-    let profileDisplayName = $derived(userId ? userProfiles.getDisplayName(userId) : undefined);
-    let finalUsername = $derived(profileDisplayName || username);
+	let profileDisplayName = $derived(userId ? userProfiles.getDisplayName(userId) : undefined);
+	let finalUsername = $derived(profileDisplayName || username);
 
 	const isUnsplash = $derived(isUnsplashUrl(finalAvatarUrl));
 	const sizes = $derived(isUnsplash ? unsplashSizes(size) : undefined);

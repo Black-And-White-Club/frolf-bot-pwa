@@ -32,21 +32,21 @@ declare module '@oslojs/encoding' {
 }
 
 declare module '*.svelte' {
-	// Generic Svelte component type to satisfy imports in TypeScript tooling
+	// Generic Svelte component type to satisfy imports in TypeScript tooling.
 	const component: SvelteComponentTyped<unknown, unknown, unknown>;
 	export default component;
 }
 
-export {};
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
 declare global {
 	namespace App {
 		// interface Error {}
 		// interface Locals {}
-	// interface Locals {}
-} // interface PageData {}
-// interface PageState {}
+		// interface PageData {}
+		// interface PageState {}
+		// interface Platform {}
+	}
+}
 
-// interface Platform {}
 export {};

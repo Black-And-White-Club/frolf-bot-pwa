@@ -14,9 +14,7 @@ export default defineConfig({
 			$lib: path.resolve('./src/lib'),
 			$tests: path.resolve('./tests'),
 			'$tests/*': path.resolve('./tests/*'),
-			'@opentelemetry/semantic-conventions': path.resolve(
-				'./src/lib/stubs/semantic-conventions.ts'
-			)
+			'@opentelemetry/semantic-conventions': path.resolve('./src/lib/stubs/semantic-conventions.ts')
 		}
 	},
 
@@ -68,14 +66,6 @@ export default defineConfig({
 							cacheName: 'pwa-fonts',
 							expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 },
 							cacheableResponse: { statuses: [0, 200] }
-						}
-					},
-					{
-						urlPattern: /\/api\//,
-						handler: 'NetworkFirst',
-						options: {
-							cacheName: 'api-cache',
-							expiration: { maxEntries: 50, maxAgeSeconds: 60 * 5 }
 						}
 					}
 				]

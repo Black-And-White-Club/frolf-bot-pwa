@@ -1,7 +1,7 @@
 describe('Round Flow', () => {
 	beforeEach(() => {
 		cy.mockNats();
-		cy.visit('/?t=mock-jwt-token');
+		cy.visit('/#t=mock-jwt-token');
 		cy.wait(500); // Wait for connection
 	});
 

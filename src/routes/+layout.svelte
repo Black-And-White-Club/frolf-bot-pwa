@@ -8,9 +8,33 @@
 	import OfflineIndicator from '$lib/components/pwa/OfflineIndicator.svelte';
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
-	import { appInit } from '$lib/stores/init.svelte';
-	import { auth } from '$lib/stores/auth.svelte';
-	import { clubService } from '$lib/stores/club.svelte';
+
+	type AuthLike = {
+		isAuthenticated: boolean;
+	};
+
+	const noopAuth: AuthLike = {
+		isAuthenticated: false
+	};
+
+	let auth = $state<AuthLike>(noopAuth);
+
+	type AppInitLike = {
+		isLoading: boolean;
+		error: string | null;
+		initialize: () => Promise<void>;
+		teardown: () => Promise<void>;
+	};
+
+	const noopAppInit: AppInitLike = {
+		isLoading: false,
+		error: null,
+		initialize: async () => {},
+		teardown: async () => {}
+	};
+
+	let appInit = $state<AppInitLike>(noopAppInit);
+	let hasLoadedAppInit = false;
 
 	// These are client-only, non-critical components — load them lazily to keep the
 	// initial bundle smaller. Use Svelte 5 `$state` so updates are reactive.
@@ -22,6 +46,13 @@
 	let swListener: (ev: Event) => void;
 
 	onMount(async () => {
+		try {
+			const { auth: loadedAuth } = await import('$lib/stores/auth.svelte');
+			auth = loadedAuth;
+		} catch (err) {
+			console.warn('failed to load auth store', err);
+		}
+
 		// In development, force unregister any existing service workers to prevent stale caching
 		if (import.meta.env.DEV && 'serviceWorker' in navigator) {
 			const registrations = await navigator.serviceWorker.getRegistrations();
@@ -97,8 +128,15 @@
 	onMount(() => {
 		// Defer heavy initialization (NATS, OTel) until the main thread is idle
 		// This significantly improves Total Blocking Time (TBT) and LCP
-		const initWork = () => {
-			appInit.initialize();
+		const initWork = async () => {
+			try {
+				const { appInit: loadedAppInit } = await import('$lib/stores/init.svelte');
+				appInit = loadedAppInit;
+				hasLoadedAppInit = true;
+				await loadedAppInit.initialize();
+			} catch (err) {
+				console.warn('deferred app init failed', err);
+			}
 		};
 
 		let idleHandle: number;
@@ -113,7 +151,9 @@
 		return () => {
 			if (idleHandle) (window as any).cancelIdleCallback(idleHandle);
 			if (timeoutHandle) clearTimeout(timeoutHandle);
-			appInit.teardown();
+			if (hasLoadedAppInit) {
+				appInit.teardown();
+			}
 		};
 	});
 
@@ -123,12 +163,9 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href="/favicon.png" type="image/png" />
-	<!-- Preconnect to common image CDN to reduce LCP latency (reported by Lighthouse) -->
-	<link rel="dns-prefetch" href="https://images.unsplash.com" />
-	<link rel="preconnect" href="https://images.unsplash.com" crossorigin="anonymous" />
-	<link rel="preconnect" href="https://cdn.discordapp.com" crossorigin="anonymous" />
-	<link rel="preconnect" href="https://nats.frolf-bot.com" crossorigin="anonymous" />
+	{#if auth.isAuthenticated}
+		<link rel="preconnect" href="https://cdn.discordapp.com" crossorigin="anonymous" />
+	{/if}
 </svelte:head>
 
 <!-- Skip link for keyboard/mobile users -->
@@ -169,7 +206,9 @@
 	{:else if auth.isAuthenticated}
 		<!-- User is signed in -->
 		<div class="app-container">
-			<Navbar />
+			{#if page.url.searchParams.get('mode') !== 'tv'}
+				<Navbar />
+			{/if}
 			<main id="main-content" aria-hidden={$modalOpen} class="app-main">
 				{@render children?.()}
 			</main>
@@ -182,9 +221,7 @@
 					<ThemeToggle testid="theme-toggle-guest" />
 				</div>
 				<div>
-					<h1 class="text-guild-primary text-center text-3xl font-extrabold">
-						{'Frolf Bot'}
-					</h1>
+					<h1 class="text-guild-primary text-center text-3xl font-extrabold">Frolf Bot</h1>
 					<p class="text-guild-text-secondary mt-2 text-center text-sm">
 						Sign in with Discord to access your disc golf games.
 					</p>

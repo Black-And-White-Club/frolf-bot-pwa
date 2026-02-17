@@ -16,8 +16,8 @@ DEV_PID=$!
 # Wait for server to start
 sleep 3
 
-# Open browser with token
-open "http://localhost:5173/?t=$TOKEN"
+# Open browser with token in hash (preferred over query for reduced leakage)
+open "http://localhost:5173/#t=$TOKEN"
 
 # Wait for Ctrl+C
 trap "kill $DEV_PID" EXIT

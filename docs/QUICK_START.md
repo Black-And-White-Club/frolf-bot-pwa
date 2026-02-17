@@ -146,7 +146,7 @@ bun run check
 | `DISCORD_CLIENT_ID`     | Discord OAuth client ID       | From dev.discord.com                    |
 | `DISCORD_CLIENT_SECRET` | Discord OAuth secret          | From dev.discord.com                    |
 | `PUBLIC_API_URL`        | Backend API base URL          | `http://localhost:8080`                 |
-| `PUBLIC_WS_URL`         | WebSocket endpoint            | `ws://localhost:8080/ws`                |
+| `PUBLIC_NATS_URL`       | NATS WebSocket endpoint       | `wss://localhost:4443`                  |
 
 **Security:** Never commit `.env.local` - it's in `.gitignore`
 

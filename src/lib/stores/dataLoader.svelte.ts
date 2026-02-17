@@ -14,6 +14,8 @@ interface RoundListResponseRaw {
 class DataLoader {
 	loading = $state(false);
 	error = $state<string | null>(null);
+	private initialLoadPromise: Promise<void> | null = null;
+	private initialLoadId: string | null = null;
 
 	/**
 	 * Request initial data snapshots after NATS connection established
@@ -34,6 +36,32 @@ class DataLoader {
 			return;
 		}
 
+		if (this.initialLoadPromise) {
+			if (this.initialLoadId === preferredId) {
+				return this.initialLoadPromise;
+			}
+			await this.initialLoadPromise;
+		}
+
+		const loadPromise = this.loadInitialDataForId(preferredId, clubUuid, guildId);
+		this.initialLoadPromise = loadPromise;
+		this.initialLoadId = preferredId;
+
+		try {
+			await loadPromise;
+		} finally {
+			if (this.initialLoadPromise === loadPromise) {
+				this.initialLoadPromise = null;
+				this.initialLoadId = null;
+			}
+		}
+	}
+
+	private async loadInitialDataForId(
+		preferredId: string,
+		clubUuid: string,
+		guildId: string
+	): Promise<void> {
 		this.loading = true;
 		this.error = null;
 
@@ -82,7 +110,11 @@ class DataLoader {
 		}
 	}
 
-	private async loadLeaderboard(subjectId: string, clubUuid: string, guildId: string): Promise<void> {
+	private async loadLeaderboard(
+		subjectId: string,
+		clubUuid: string,
+		guildId: string
+	): Promise<void> {
 		leaderboardService.setLoading(true);
 
 		try {
@@ -113,6 +145,8 @@ class DataLoader {
 	}
 
 	reset(): void {
+		this.initialLoadPromise = null;
+		this.initialLoadId = null;
 		this.loading = false;
 		this.error = null;
 	}

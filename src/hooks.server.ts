@@ -1,4 +1,16 @@
 import type { Handle } from '@sveltejs/kit';
+import { env } from '$env/dynamic/public';
+
+const isDev = import.meta.env.DEV;
+
+function toOrigin(value: string | undefined): string | null {
+	if (!value) return null;
+	try {
+		return new URL(value).origin;
+	} catch {
+		return null;
+	}
+}
 
 // Minimal security headers and CSP suitable for this app. Adjust as needed for
 // external integrations (analytics, CDNs, etc.). This runs for every request
@@ -6,16 +18,29 @@ import type { Handle } from '@sveltejs/kit';
 export const handle: Handle = async ({ event, resolve }) => {
 	const response = await resolve(event);
 
-	// Conservative CSP - allow self, same-origin for most resources. If you add
-	// inline scripts/styles or external analytics, update this accordingly.
+	const connectSrc = new Set<string>(["'self'", 'https://api.github.com']);
+	connectSrc.add(toOrigin(env.PUBLIC_API_URL) || 'https://api.frolf-bot.com');
+	connectSrc.add(toOrigin(env.PUBLIC_NATS_URL || env.PUBLIC_WS_URL) || 'wss://nats.frolf-bot.com');
+
+	if (isDev) {
+		connectSrc.add('http://localhost:5173');
+		connectSrc.add('ws://localhost:5173');
+		connectSrc.add('http://localhost:8080');
+		connectSrc.add('ws://localhost:8080');
+	}
+
+	// SvelteKit injects an inline bootstrap script in %sveltekit.body% during SSR pages.
+	// Keep script-src strict to self + required inline bootstrap support.
 	const csp = [
 		"default-src 'self'",
 		"script-src 'self' 'unsafe-inline'",
-		"style-src 'self' 'unsafe-inline'",
+		"style-src 'self'",
+		"style-src-elem 'self'",
+		"style-src-attr 'unsafe-inline'",
 		"img-src 'self' data: https://images.unsplash.com https://*.githubusercontent.com https://cdn.discordapp.com",
 		"font-src 'self' data:",
 		"manifest-src 'self'",
-		"connect-src 'self' https://api.github.com ws:",
+		`connect-src ${Array.from(connectSrc).join(' ')}`,
 		"frame-ancestors 'none'",
 		"base-uri 'self'",
 		"object-src 'none'"

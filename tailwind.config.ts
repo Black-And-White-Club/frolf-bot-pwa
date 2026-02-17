@@ -137,10 +137,10 @@ export default {
 				'guild-gold-gradient': 'linear-gradient(135deg, #b89b5e 45%, #7c6b3c 100%)',
 				'liquid-skobeloff': 'linear-gradient(180deg, #008B8B 0%, #007474 100%)'
 			},
-			
+
 			// Box Shadows
 			boxShadow: {
-				'aura': 'var(--guild-glow-aura, 0 0 15px rgba(139, 123, 184, 0.5))'
+				aura: 'var(--guild-glow-aura, 0 0 15px rgba(139, 123, 184, 0.5))'
 			},
 
 			// ⚡ Transition timing for subtle motion consistency

@@ -149,17 +149,17 @@
 		width: 100%;
 		gap: 0.75rem;
 		position: relative;
-		z-index: 1; 
+		z-index: 1;
 		pointer-events: none; /* Let clicks pass through to overlay */
 	}
-	
+
 	.left {
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
 		min-width: 0;
 	}
-	
+
 	.right {
 		display: flex;
 		align-items: center;
@@ -179,8 +179,8 @@
 	.player-row.first-place {
 		background: linear-gradient(
 			135deg,
-			rgba(184, 155, 94, 0.2) 0%, /* #B89B5E */
-			rgba(124, 107, 60, 0.1) 100% /* #7C6B3C */
+			rgba(184, 155, 94, 0.2) 0%,
+			/* #B89B5E */ rgba(124, 107, 60, 0.1) 100% /* #7C6B3C */
 		);
 		border-color: rgba(184, 155, 94, 0.5);
 		box-shadow: 0 0 20px rgba(184, 155, 94, 0.15);

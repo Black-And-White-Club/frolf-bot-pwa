@@ -123,14 +123,23 @@ export class RoundService {
 
 	activeRound = $derived(this.rounds.find((r) => r.state === 'started') ?? null);
 
+	startedRounds = $derived(this.rounds.filter((r) => r.state === 'started'));
+
 	upcomingRounds = $derived(
 		this.rounds
 			.filter((r) => r.state === 'scheduled')
-			.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+			.sort((a, b) => Date.parse(a.startTime) - Date.parse(b.startTime))
 	);
 
 	pastRounds = $derived(
 		this.rounds.filter((r) => r.state === 'finalized' || r.state === 'cancelled')
+	);
+
+	recentCompletedRounds = $derived(
+		this.pastRounds
+			.filter((r) => r.state === 'finalized')
+			.sort((a, b) => Date.parse(b.startTime) - Date.parse(a.startTime))
+			.slice(0, 10)
 	);
 
 	// Methods

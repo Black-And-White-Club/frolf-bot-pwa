@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { roundService } from '$lib/stores/round.svelte';
 	import RoundListCard from './RoundListCard.svelte';
+	import RoundSection from './RoundSection.svelte';
 
 	type Props = {
 		onSelect?: (roundId: string) => void;
@@ -9,23 +10,11 @@
 	let { onSelect }: Props = $props();
 
 	// Group rounds by status using $derived
-	let scheduledRounds = $derived(
-		roundService.rounds
-			.filter((r) => r.state === 'scheduled')
-			.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
-	);
+	let scheduledRounds = $derived(roundService.upcomingRounds);
 
-	let activeRounds = $derived(roundService.rounds.filter((r) => r.state === 'started'));
+	let activeRounds = $derived(roundService.startedRounds);
 
-	let completedRounds = $derived(
-		roundService.rounds
-			.filter((r) => r.state === 'finalized')
-			.sort((a, b) => {
-				// Sort by startTime descending (most recent first)
-				return new Date(b.startTime).getTime() - new Date(a.startTime).getTime();
-			})
-			.slice(0, 10) // Last 10 completed
-	);
+	let completedRounds = $derived(roundService.recentCompletedRounds);
 
 	function handleSelect(roundId: string) {
 		onSelect?.(roundId);
@@ -33,49 +22,47 @@
 </script>
 
 <div class="round-list">
-	<!-- Live Now + Upcoming side-by-side -->
-	{#if activeRounds.length > 0 || scheduledRounds.length > 0}
-		<div class="live-upcoming-row">
-			{#if activeRounds.length > 0}
-				<section class="round-section">
-					<h2 class="section-title">Live Now</h2>
-					<div class="round-grid round-grid-single">
-						{#each activeRounds as round (round.id)}
-							<div class="round-card-wrapper glow-aura">
-								<RoundListCard {round} onclick={() => handleSelect(round.id)} />
-							</div>
-						{/each}
+	<!-- Active Rounds -->
+	{#if activeRounds.length > 0}
+		<RoundSection
+			title="Live Rounds"
+			badges={[{ label: 'Active', color: 'secondary' }]}
+			initiallyCollapsed={false}
+		>
+			<div class="round-grid">
+				{#each activeRounds as round (round.id)}
+					<div class="round-card-wrapper glow-aura">
+						<RoundListCard {round} onclick={() => handleSelect(round.id)} />
 					</div>
-				</section>
-			{/if}
-
-			{#if scheduledRounds.length > 0}
-				<section class="round-section">
-					<h2 class="section-title">Upcoming</h2>
-					<div class="round-grid round-grid-single">
-						{#each scheduledRounds as round (round.id)}
-							<RoundListCard {round} onclick={() => handleSelect(round.id)} />
-						{/each}
-					</div>
-				</section>
-			{/if}
-		</div>
-	{:else}
-		<div class="empty-state">
-			<p class="empty-text">No upcoming rounds scheduled</p>
-		</div>
+				{/each}
+			</div>
+		</RoundSection>
 	{/if}
 
-	<!-- Recent Section -->
+	<!-- Scheduled Rounds -->
+	{#if scheduledRounds.length > 0}
+		<RoundSection
+			title="Upcoming Rounds"
+			badges={[{ label: `${scheduledRounds.length}`, color: 'secondary' }]}
+			initiallyCollapsed={false}
+		>
+			<div class="round-grid">
+				{#each scheduledRounds as round (round.id)}
+					<RoundListCard {round} onclick={() => handleSelect(round.id)} />
+				{/each}
+			</div>
+		</RoundSection>
+	{/if}
+
+	<!-- Completed Rounds -->
 	{#if completedRounds.length > 0}
-		<section class="round-section">
-			<h2 class="section-title">Recent</h2>
+		<RoundSection title="Recent Rounds" initiallyCollapsed={false}>
 			<div class="round-grid">
 				{#each completedRounds as round (round.id)}
 					<RoundListCard {round} onclick={() => handleSelect(round.id)} />
 				{/each}
 			</div>
-		</section>
+		</RoundSection>
 	{/if}
 
 	<!-- Global Empty State -->
@@ -98,52 +85,26 @@
 	.round-list {
 		display: flex;
 		flex-direction: column;
-		gap: 2rem;
-		width: 100%;
-	}
-
-	       .round-card-wrapper {
-	               transition: transform 0.2s ease;
-	       }
-	
-	       .round-card-wrapper:hover {
-	               transform: translateY(-2px);
-	       }
-		.glow-aura {
-		border-radius: var(--border-radius-lg, 0.75rem);
-		box-shadow: var(--guild-glow-aura, 0 0 15px rgba(139, 123, 184, 0.5));
-		border: 1px solid rgba(139, 123, 184, 0.3);
-	}
-
-	.live-upcoming-row {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
 		gap: 1.5rem;
-	}
-
-	.round-grid-single {
-		grid-template-columns: 1fr;
-	}
-
-	.round-section {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-	}
-
-	.section-title {
-		font-size: 1.25rem;
-		font-weight: 600;
-		color: var(--guild-text, #e5e7eb);
-		margin: 0;
-		padding: 0 0.5rem;
+		width: 100%;
 	}
 
 	.round-grid {
 		display: grid;
 		gap: 1rem;
-		/* Use auto-fit to ensure items stretch to fill the row if there are few items */
+		/* Unified grid: auto-fit with min-width 280px */
 		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		width: 100%;
+	}
+
+	.round-card-wrapper {
+		transition: transform 0.2s ease;
+		border-radius: var(--border-radius-lg, 0.75rem);
+	}
+
+	.glow-aura {
+		box-shadow: var(--guild-glow-aura, 0 0 15px rgba(139, 123, 184, 0.5));
+		border: 1px solid rgba(139, 123, 184, 0.3);
 	}
 
 	.empty-state {
@@ -166,7 +127,7 @@
 	.loading-skeleton {
 		display: grid;
 		gap: 1rem;
-		grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 	}
 
 	.skeleton-card {
@@ -189,17 +150,6 @@
 		}
 		100% {
 			background-position: -200% 0;
-		}
-	}
-
-	@media (max-width: 640px) {
-		.live-upcoming-row {
-			grid-template-columns: 1fr;
-		}
-
-		.round-grid,
-		.loading-skeleton {
-			grid-template-columns: 1fr;
 		}
 	}
 </style>

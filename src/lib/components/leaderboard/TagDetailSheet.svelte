@@ -22,17 +22,17 @@
 	);
 </script>
 
-<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<div 
-	class="tag-detail-sheet" 
-	role="dialog" 
-	aria-label="Tag History for {memberId}" 
+<div
+	class="tag-detail-sheet"
+	role="dialog"
+	aria-label="Tag History for {memberId}"
 	tabindex="-1"
 	onkeydown={handleKeydown}
 >
 	<div class="sheet-header">
 		<h3>Tag History</h3>
-		<button class="close-btn" onclick={() => onClose?.()} type="button" aria-label="Close">✕</button>
+		<button class="close-btn" onclick={() => onClose?.()} type="button" aria-label="Close">✕</button
+		>
 	</div>
 
 	<div class="history-list">

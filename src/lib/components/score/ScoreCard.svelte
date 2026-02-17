@@ -38,7 +38,11 @@
 		</div>
 		<div class="text-right">
 			{#key score}
-				<div class="text-2xl font-bold {scoreClass} font-secondary animate-scale-pulse inline-block">{score}</div>
+				<div
+					class="text-2xl font-bold {scoreClass} font-secondary animate-scale-pulse inline-block"
+				>
+					{score}
+				</div>
 			{/key}
 			<div class="text-sm text-[var(--guild-text-secondary)]">({scoreText})</div>
 		</div>

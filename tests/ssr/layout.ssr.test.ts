@@ -2,11 +2,11 @@ import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('$env/dynamic/public', () => ({
 	env: {
-		PUBLIC_VITE_NATS_URL: 'wss://mock-nats',
-		PUBLIC_VITE_OTEL_ENDPOINT: 'http://mock-otel',
-		PUBLIC_VITE_API_URL: 'https://mock-api',
-		PUBLIC_VITE_USE_MOCK: 'true',
-		PUBLIC_VITE_DEBUG: 'false'
+		PUBLIC_NATS_URL: 'wss://mock-nats',
+		PUBLIC_OTEL_ENDPOINT: 'http://mock-otel',
+		PUBLIC_API_URL: 'https://mock-api',
+		PUBLIC_USE_MOCK: 'true',
+		PUBLIC_DEBUG: 'false'
 	}
 }));
 

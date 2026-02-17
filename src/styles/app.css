@@ -5,3 +5,7 @@
 @import './components.css';
 @import './utilities.css';
 @import './animations.css';
+
+.svelte-root {
+	display: contents;
+}

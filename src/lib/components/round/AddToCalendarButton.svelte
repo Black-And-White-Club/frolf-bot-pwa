@@ -45,7 +45,7 @@
 	async function handleAction(e: Event) {
 		e.preventDefault();
 		e.stopPropagation();
-		
+
 		const startDate = round.start_time ? new Date(round.start_time) : new Date(round.created_at);
 		const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000); // 2 hours later
 
@@ -66,7 +66,7 @@
 			endTime: toTimeStr(endDate),
 			location: round.location || 'TBD',
 			options: ['Apple', 'Google', 'iCal', 'Microsoft365', 'Outlook.com', 'Yahoo'],
-			timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+			timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
 		});
 
 		announce('Opened calendar options');

@@ -17,19 +17,11 @@
 
 <div class="leaderboard-compact">
 	<div class="compact-header">
-		<ViewToggle
-			mode={currentMode}
-			onchange={(m) => leaderboardService.setViewMode(m)}
-		/>
+		<ViewToggle mode={currentMode} onchange={(m) => leaderboardService.setViewMode(m)} />
 	</div>
 
 	{#each topEntries as entry, i (entry.userId)}
-		<div
-			class="entry"
-			class:rank-1={i === 0}
-			class:rank-2={i === 1}
-			class:rank-3={i === 2}
-		>
+		<div class="entry" class:rank-1={i === 0} class:rank-2={i === 1} class:rank-3={i === 2}>
 			<div class="tag-number">{isSeasonMode ? i + 1 : entry.tagNumber}</div>
 			<div class="info">
 				<span class="name">{userProfiles.getDisplayName(entry.userId)}</span>

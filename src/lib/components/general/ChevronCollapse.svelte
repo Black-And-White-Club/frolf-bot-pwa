@@ -19,8 +19,6 @@
 		class: incomingClass
 	}: Props = $props();
 
-	const rotationClass = $derived(collapsed ? '' : 'rotate-180');
-
 	function handleClick(e: MouseEvent) {
 		if (!disabled) {
 			onclick?.(e);
@@ -39,13 +37,14 @@
 	onclick={handleClick}
 >
 	<svg
-		class="chevron-icon {rotationClass}"
+		class="chevron-icon"
 		width="20"
 		height="20"
 		viewBox="0 0 24 24"
 		fill="none"
 		xmlns="http://www.w3.org/2000/svg"
 		aria-hidden="true"
+		style="transform: rotate({collapsed ? 0 : 180}deg)"
 	>
 		<path
 			d="M6 9l6 6 6-6"
@@ -93,9 +92,5 @@
 		width: 20px;
 		height: 20px;
 		transition: transform 200ms ease;
-	}
-
-	.chevron-icon.rotate-180 {
-		transform: rotate(180deg);
 	}
 </style>

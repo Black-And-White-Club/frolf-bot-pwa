@@ -34,7 +34,7 @@
 				mode={leaderboardService.viewMode}
 				onchange={(m) => leaderboardService.setViewMode(m)}
 			/>
-			
+
 			<ChevronCollapse
 				{collapsed}
 				disabled={false}
@@ -60,32 +60,32 @@
 						isCurrentUser={false}
 						onclick={() => onSelectMember?.(member.memberId)}
 					>
-												<button
-													class="history-btn"
-													title="View Tag History"
-													type="button"
-													onclick={(e) => {
-														e.stopPropagation();
-														onSelectMember?.(member.memberId);
-													}}
-													aria-label="View Tag History"
-												>
-													<svg
-														xmlns="http://www.w3.org/2000/svg"
-														width="16"
-														height="16"
-														viewBox="0 0 24 24"
-														fill="none"
-														stroke="currentColor"
-														stroke-width="2"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														class="text-guild-text-secondary"
-													>
-														<circle cx="12" cy="12" r="10" />
-														<polyline points="12 6 12 12 16 14" />
-													</svg>
-												</button>
+						<button
+							class="history-btn"
+							title="View Tag History"
+							type="button"
+							onclick={(e) => {
+								e.stopPropagation();
+								onSelectMember?.(member.memberId);
+							}}
+							aria-label="View Tag History"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="text-guild-text-secondary"
+							>
+								<circle cx="12" cy="12" r="10" />
+								<polyline points="12 6 12 12 16 14" />
+							</svg>
+						</button>
 					</PlayerRow>
 				{/each}
 			{/if}
@@ -153,31 +153,27 @@
 		color: var(--guild-text-secondary);
 	}
 
-		.history-btn {
+	.history-btn {
+		background: none;
 
-			background: none;
+		border: none;
 
-			border: none;
+		padding: 0.5rem;
 
-			padding: 0.5rem;
+		margin-left: 0.5rem;
 
-			margin-left: 0.5rem;
+		color: var(--guild-text-secondary);
 
-			color: var(--guild-text-secondary);
+		display: flex;
 
-			display: flex;
+		align-items: center;
 
-			align-items: center;
+		border-radius: 4px;
 
-			border-radius: 4px;
-
-			transition:
-
-				color 0.2s,
-
-				background 0.2s;
-
-		}
+		transition:
+			color 0.2s,
+			background 0.2s;
+	}
 
 	.history-btn:hover {
 		color: var(--guild-primary);

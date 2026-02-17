@@ -62,16 +62,20 @@ class LeaderboardService {
 	// Derived
 	entries = $derived(this.snapshot?.entries ?? []);
 
-	sortedEntries = $derived([...this.entries].sort((a, b) => a.tagNumber - b.tagNumber));
-
-	sortedByPoints = $derived(
-		[...this.entries].sort(
+	private sortedViews = $derived.by(() => {
+		const sortedByTag = [...this.entries].sort((a, b) => a.tagNumber - b.tagNumber);
+		const sortedByPoints = [...sortedByTag].sort(
 			(a, b) =>
 				b.totalPoints - a.totalPoints ||
 				b.roundsPlayed - a.roundsPlayed ||
 				a.tagNumber - b.tagNumber
-		)
-	);
+		);
+		return { sortedByTag, sortedByPoints };
+	});
+
+	sortedEntries = $derived(this.sortedViews.sortedByTag);
+
+	sortedByPoints = $derived(this.sortedViews.sortedByPoints);
 
 	currentView = $derived(this.viewMode === 'points' ? this.sortedByPoints : this.sortedEntries);
 
@@ -174,7 +178,6 @@ class LeaderboardService {
 		this.snapshot = transformLeaderboardEntries(response.leaderboard, response.guild_id);
 		this.version = this.snapshot.version;
 	}
-
 }
 
 export const leaderboardService = new LeaderboardService();
