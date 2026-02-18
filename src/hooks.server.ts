@@ -22,7 +22,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 	connectSrc.add(toOrigin(env.PUBLIC_API_URL) || 'https://api.frolf-bot.com');
 	connectSrc.add(toOrigin(env.PUBLIC_NATS_URL || env.PUBLIC_WS_URL) || 'wss://nats.frolf-bot.com');
 	if (env.PUBLIC_OTEL_ENDPOINT) {
-		connectSrc.add(toOrigin(env.PUBLIC_OTEL_ENDPOINT));
+		const otelOrigin = toOrigin(env.PUBLIC_OTEL_ENDPOINT);
+		if (otelOrigin) connectSrc.add(otelOrigin);
 	}
 
 	if (isDev) {

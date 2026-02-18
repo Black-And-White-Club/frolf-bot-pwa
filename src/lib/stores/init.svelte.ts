@@ -21,6 +21,8 @@ class AppInitializer {
 	status = $state<InitStatus>('idle');
 	mode = $state<InitMode>('disconnected');
 	error = $state<string | null>(null);
+	/** True when the user is authenticated but has no club memberships yet. */
+	needsClub = $state(false);
 	private initPromise: Promise<void> | null = null;
 	private connectAndLoadPromise: Promise<void> | null = null;
 	private reconnectUnsubscribe: (() => void) | null = null;
@@ -65,6 +67,17 @@ class AppInitializer {
 				this.status = 'ready';
 				return;
 			}
+
+			// If the user is authenticated but has no club memberships, show the
+			// club discovery flow instead of connecting to NATS.
+			if (!auth.user?.clubs?.length) {
+				this.needsClub = true;
+				this.mode = 'disconnected';
+				this.status = 'ready';
+				return;
+			}
+
+			this.needsClub = false;
 
 			// If auth initialization already switched clubs and loaded data, don't duplicate it.
 			if (!authResult.switchedClubWithDataLoad) {
