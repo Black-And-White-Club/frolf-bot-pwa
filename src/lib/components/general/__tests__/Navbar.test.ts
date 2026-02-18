@@ -139,3 +139,17 @@ describe('Navbar Display Name Priority', () => {
 		expect(getByText('Welcome, discord-id-123!')).toBeTruthy();
 	});
 });
+
+describe('Account link visibility', () => {
+	it('shows Account link when authenticated', () => {
+		auth.isAuthenticated = true;
+		const { getByRole } = render(Navbar);
+		expect(getByRole('link', { name: 'Account' })).toBeTruthy();
+	});
+
+	it('hides Account link when not authenticated', () => {
+		auth.isAuthenticated = false;
+		const { queryByRole } = render(Navbar);
+		expect(queryByRole('link', { name: 'Account' })).toBeNull();
+	});
+});

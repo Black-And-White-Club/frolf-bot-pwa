@@ -26,6 +26,16 @@ export const GET: RequestHandler = async ({ fetch, request, url }) => {
 		return new Response(null, { status: 302, headers });
 	}
 
-	headers.set('Location', '/');
+	const backendLoc = res.headers.get('location');
+	let redirectPath = '/';
+	if (backendLoc) {
+		try {
+			const u = new URL(backendLoc, url.origin);
+			redirectPath = u.pathname + u.search;
+		} catch {
+			/* keep default '/' */
+		}
+	}
+	headers.set('Location', redirectPath);
 	return new Response(null, { status: 302, headers });
 };

@@ -93,6 +93,14 @@
 					>
 						Docs
 					</a>
+					{#if auth.isAuthenticated}
+						<a
+							href="/account"
+							class="text-[var(--guild-text-secondary)] transition-colors hover:text-[var(--guild-text)]"
+						>
+							Account
+						</a>
+					{/if}
 				</nav>
 			</div>
 

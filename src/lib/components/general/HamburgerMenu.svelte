@@ -190,6 +190,13 @@
 			>
 				Docs
 			</a>
+			<a
+				href="/account"
+				class="block rounded-md px-4 py-2 text-[var(--guild-text)] transition-colors hover:bg-[var(--guild-surface-elevated)]"
+				onclick={closeHamburger}
+			>
+				Account
+			</a>
 		</nav>
 
 		<!-- Theme toggle -->
