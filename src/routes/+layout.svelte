@@ -22,6 +22,7 @@
 	type AppInitLike = {
 		isLoading: boolean;
 		error: string | null;
+		needsClub: boolean;
 		initialize: () => Promise<void>;
 		teardown: () => Promise<void>;
 	};
@@ -29,6 +30,7 @@
 	const noopAppInit: AppInitLike = {
 		isLoading: false,
 		error: null,
+		needsClub: false,
 		initialize: async () => {},
 		teardown: async () => {}
 	};
@@ -40,6 +42,7 @@
 	// initial bundle smaller. Use Svelte 5 `$state` so updates are reactive.
 	let LiveAnnouncer = $state<any>(null);
 	let UpdateSnackbarClient = $state<any>(null);
+	let ClubDiscovery = $state<any>(null);
 	// Defer importing PWA helpers so they don't bloat the initial layout chunk.
 	// We'll dynamically import them after the app is idle.
 
@@ -107,12 +110,14 @@
 		// Lazy-load a11y and update UI components after hydration so they don't
 		// inflate the initial JS payload.
 		try {
-			const [live, upd] = await Promise.all([
+			const [live, upd, discovery] = await Promise.all([
 				import('$lib/components/general/LiveAnnouncer.svelte'),
-				import('$lib/components/general/UpdateSnackbar.client.svelte')
+				import('$lib/components/general/UpdateSnackbar.client.svelte'),
+				import('$lib/components/auth/ClubDiscovery.svelte')
 			]);
 			LiveAnnouncer = live.default;
 			UpdateSnackbarClient = upd.default;
+			ClubDiscovery = discovery.default;
 		} catch (err) {
 			// best-effort, keep app usable without these features
 
@@ -204,15 +209,26 @@
 			</div>
 		</div>
 	{:else if auth.isAuthenticated}
-		<!-- User is signed in -->
-		<div class="app-container">
-			{#if page.url.searchParams.get('mode') !== 'tv'}
-				<Navbar />
+		{#if appInit.needsClub && !page.url.pathname.startsWith('/join') && !page.url.pathname.startsWith('/auth')}
+			<!-- Authenticated but not yet a club member — show discovery flow -->
+			{#if ClubDiscovery}
+				<ClubDiscovery />
+			{:else}
+				<div class="flex min-h-screen items-center justify-center bg-[#081212]">
+					<div class="h-8 w-8 animate-spin rounded-full border-2 border-[#007474] border-t-transparent"></div>
+				</div>
 			{/if}
-			<main id="main-content" aria-hidden={$modalOpen} class="app-main">
-				{@render children?.()}
-			</main>
-		</div>
+		{:else}
+			<!-- User is signed in and has a club -->
+			<div class="app-container">
+				{#if page.url.searchParams.get('mode') !== 'tv'}
+					<Navbar />
+				{/if}
+				<main id="main-content" aria-hidden={$modalOpen} class="app-main">
+					{@render children?.()}
+				</main>
+			</div>
+		{/if}
 	{:else if page.url.pathname.startsWith('/docs')}
 		<!-- Public docs — no auth required -->
 		<div class="flex min-h-screen flex-col bg-[var(--guild-background)]">
