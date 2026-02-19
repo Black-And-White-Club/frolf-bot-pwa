@@ -221,6 +221,11 @@
 					Sign out
 				</button>
 			</form>
+			<p class="mt-4 text-center text-xs text-[var(--guild-text-secondary)]">
+				<a href="/privacy" onclick={closeHamburger} class="underline hover:text-[var(--guild-text)]">Privacy Policy</a>
+				·
+				<a href="/tos" onclick={closeHamburger} class="underline hover:text-[var(--guild-text)]">Terms of Service</a>
+			</p>
 		</div>
 	</div>
 </div>

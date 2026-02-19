@@ -176,6 +176,10 @@
 								</button>
 							</form>
 						{/if}
+						<a
+							href="/privacy"
+							class="text-xs text-[var(--guild-text-secondary)] transition-colors hover:text-[var(--guild-text)]"
+						>Privacy</a>
 					</div>
 				</div>
 			{:else}

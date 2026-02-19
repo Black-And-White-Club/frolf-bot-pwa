@@ -273,6 +273,11 @@
 						Sign In
 					</a>
 				</div>
+				<p class="text-center text-xs text-[var(--guild-text-secondary)]">
+					<a href="/privacy" class="underline hover:text-[var(--guild-text)]">Privacy Policy</a>
+					·
+					<a href="/tos" class="underline hover:text-[var(--guild-text)]">Terms of Service</a>
+				</p>
 			</div>
 		</div>
 	{/if}
