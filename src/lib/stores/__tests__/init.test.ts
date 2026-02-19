@@ -17,7 +17,8 @@ const authState = {
 	user: {
 		activeClubUuid: 'club-123',
 		guildId: 'guild-123',
-		clubs: [{ club_uuid: 'club-123', role: 'admin' }]
+		clubs: [{ club_uuid: 'club-123', role: 'admin' }],
+		linkedProviders: []
 	},
 	status: 'authenticated',
 	initialize: vi.fn(async () => ({ authenticated: true, switchedClubWithDataLoad: true })),

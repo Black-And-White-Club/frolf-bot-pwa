@@ -191,7 +191,7 @@
 						<span class="font-['Space_Grotesk'] font-medium text-[var(--guild-text)]">Discord</span>
 					</div>
 					{#if isDiscordLinked}
-						<span class="font-['Space_Grotesk'] text-sm font-medium text-[#007474]">Connected</span>
+						<span class="font-['Space_Grotesk'] text-sm font-medium text-guild-primary">Connected</span>
 					{:else}
 						<a
 							href="/api/auth/discord/link"
@@ -229,7 +229,7 @@
 						<span class="font-['Space_Grotesk'] font-medium text-[var(--guild-text)]">Google</span>
 					</div>
 					{#if isGoogleLinked}
-						<span class="font-['Space_Grotesk'] text-sm font-medium text-[#007474]">Connected</span>
+						<span class="font-['Space_Grotesk'] text-sm font-medium text-guild-primary">Connected</span>
 					{:else}
 						<a
 							href="/api/auth/google/link"
