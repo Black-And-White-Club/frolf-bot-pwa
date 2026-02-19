@@ -54,7 +54,8 @@ describe('Navbar Display Name Priority', () => {
 			activeClubUuid: 'club-uuid-1',
 			guildId: 'guild-id-1',
 			role: 'player',
-			clubs: []
+			clubs: [],
+			linkedProviders: []
 		};
 		auth.isAuthenticated = true;
 	});

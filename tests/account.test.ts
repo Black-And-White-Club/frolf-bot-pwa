@@ -27,7 +27,8 @@ vi.mock('$lib/stores/auth.svelte', () => ({
 			role: 'player',
 			activeClubUuid: 'club-123',
 			guildId: 'guild-123',
-			clubs: []
+			clubs: [],
+			linkedProviders: []
 		}
 	}
 }));
@@ -52,7 +53,8 @@ describe('Account Page', () => {
 			role: 'player',
 			activeClubUuid: 'club-123',
 			guildId: 'guild-123',
-			clubs: []
+			clubs: [],
+			linkedProviders: []
 		};
 		// Reset URL
 		page.url = new URL('http://localhost/account') as any;

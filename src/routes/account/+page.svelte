@@ -34,9 +34,6 @@
 
 	const isDiscordLinked = $derived(auth.user?.linkedProviders.includes('discord') ?? false);
 	const isGoogleLinked = $derived(auth.user?.linkedProviders.includes('google') ?? false);
-	const linkedCount = $derived(auth.user?.linkedProviders.length ?? 0);
-	const canUnlinkDiscord = $derived(isDiscordLinked && linkedCount > 1);
-	const canUnlinkGoogle = $derived(isGoogleLinked && linkedCount > 1);
 
 	const canManageInvites = $derived(
 		auth.user?.role === 'editor' || auth.user?.role === 'admin'
@@ -220,17 +217,13 @@
 					{#if isDiscordLinked}
 						<div class="flex items-center gap-3">
 							<span class="font-['Space_Grotesk'] text-sm font-medium text-guild-primary">Connected</span>
-							{#if canUnlinkDiscord}
-								<button
-									onclick={() => unlinkProvider('discord')}
-									disabled={unlinkingProvider === 'discord'}
-									class="rounded-lg border border-red-500/30 px-3 py-1.5 font-['Space_Grotesk'] text-xs text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
-								>
-									{unlinkingProvider === 'discord' ? 'Disconnecting…' : 'Disconnect'}
-								</button>
-							{:else}
-								<span class="font-['Space_Grotesk'] text-xs text-[var(--guild-text-muted)]">Link another account first</span>
-							{/if}
+							<button
+								onclick={() => unlinkProvider('discord')}
+								disabled={unlinkingProvider === 'discord'}
+								class="rounded-lg border border-red-500/30 px-3 py-1.5 font-['Space_Grotesk'] text-xs text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+							>
+								{unlinkingProvider === 'discord' ? 'Disconnecting…' : 'Disconnect'}
+							</button>
 						</div>
 					{:else}
 						<a
@@ -271,17 +264,13 @@
 					{#if isGoogleLinked}
 						<div class="flex items-center gap-3">
 							<span class="font-['Space_Grotesk'] text-sm font-medium text-guild-primary">Connected</span>
-							{#if canUnlinkGoogle}
-								<button
-									onclick={() => unlinkProvider('google')}
-									disabled={unlinkingProvider === 'google'}
-									class="rounded-lg border border-red-500/30 px-3 py-1.5 font-['Space_Grotesk'] text-xs text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
-								>
-									{unlinkingProvider === 'google' ? 'Disconnecting…' : 'Disconnect'}
-								</button>
-							{:else}
-								<span class="font-['Space_Grotesk'] text-xs text-[var(--guild-text-muted)]">Link another account first</span>
-							{/if}
+							<button
+								onclick={() => unlinkProvider('google')}
+								disabled={unlinkingProvider === 'google'}
+								class="rounded-lg border border-red-500/30 px-3 py-1.5 font-['Space_Grotesk'] text-xs text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+							>
+								{unlinkingProvider === 'google' ? 'Disconnecting…' : 'Disconnect'}
+							</button>
 						</div>
 					{:else}
 						<a
