@@ -139,7 +139,8 @@ class AppInitializer {
 					display_name: 'Mock User',
 					avatar_url: 'https://cdn.discordapp.com/embed/avatars/0.png'
 				}
-			]
+			],
+			linkedProviders: []
 		};
 		auth.status = 'authenticated';
 

@@ -258,8 +258,49 @@ describe('AuthService HTTP methods (auth.svelte.ts)', () => {
 				activeClubUuid: 'club-abc',
 				guildId: 'guild-xyz',
 				role: 'admin',
-				clubs: [{ club_uuid: 'club-abc', role: 'admin' }]
+				clubs: [{ club_uuid: 'club-abc', role: 'admin' }],
+				linkedProviders: []
 			});
+		});
+
+		it('parses linked_providers from token claims', async () => {
+			const ticketPayload = {
+				sub: 'user:456',
+				user_uuid: 'uuid-456',
+				active_club_uuid: 'club-xyz',
+				clubs: [],
+				linked_providers: ['discord', 'google']
+			};
+			const ticket = createMockToken(ticketPayload);
+
+			fetchMock.mockResolvedValueOnce({
+				ok: true,
+				json: () => Promise.resolve({ ticket })
+			});
+
+			await auth.refreshSession();
+
+			expect(auth.user?.linkedProviders).toEqual(['discord', 'google']);
+		});
+
+		it('defaults linkedProviders to [] when absent from token', async () => {
+			const ticketPayload = {
+				sub: 'user:789',
+				user_uuid: 'uuid-789',
+				active_club_uuid: 'club-abc',
+				clubs: []
+				// no linked_providers field
+			};
+			const ticket = createMockToken(ticketPayload);
+
+			fetchMock.mockResolvedValueOnce({
+				ok: true,
+				json: () => Promise.resolve({ ticket })
+			});
+
+			await auth.refreshSession();
+
+			expect(auth.user?.linkedProviders).toEqual([]);
 		});
 
 		it('handles missing role in claims', async () => {

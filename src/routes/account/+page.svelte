@@ -30,6 +30,9 @@
 	const linkSuccess = $derived(page.url.searchParams.get('success') === 'linked');
 	const linkError = $derived(page.url.searchParams.get('error') === 'link_failed');
 
+	const isDiscordLinked = $derived(auth.user?.linkedProviders.includes('discord') ?? false);
+	const isGoogleLinked = $derived(auth.user?.linkedProviders.includes('google') ?? false);
+
 	const canManageInvites = $derived(
 		auth.user?.role === 'editor' || auth.user?.role === 'admin'
 	);
@@ -187,12 +190,16 @@
 						</svg>
 						<span class="font-['Space_Grotesk'] font-medium text-[var(--guild-text)]">Discord</span>
 					</div>
-					<a
-						href="/api/auth/discord/link"
-						class="rounded-lg bg-liquid-skobeloff px-4 py-2 font-['Space_Grotesk'] text-sm font-medium text-white hover:brightness-110 transition-all"
-					>
-						Connect Discord
-					</a>
+					{#if isDiscordLinked}
+						<span class="font-['Space_Grotesk'] text-sm font-medium text-guild-primary">Connected</span>
+					{:else}
+						<a
+							href="/api/auth/discord/link"
+							class="rounded-lg bg-liquid-skobeloff px-4 py-2 font-['Space_Grotesk'] text-sm font-medium text-white hover:brightness-110 transition-all"
+						>
+							Connect Discord
+						</a>
+					{/if}
 				</div>
 
 				<!-- Google -->
@@ -221,12 +228,16 @@
 						</svg>
 						<span class="font-['Space_Grotesk'] font-medium text-[var(--guild-text)]">Google</span>
 					</div>
-					<a
-						href="/api/auth/google/link"
-						class="rounded-lg bg-liquid-skobeloff px-4 py-2 font-['Space_Grotesk'] text-sm font-medium text-white hover:brightness-110 transition-all"
-					>
-						Connect Google
-					</a>
+					{#if isGoogleLinked}
+						<span class="font-['Space_Grotesk'] text-sm font-medium text-guild-primary">Connected</span>
+					{:else}
+						<a
+							href="/api/auth/google/link"
+							class="rounded-lg bg-liquid-skobeloff px-4 py-2 font-['Space_Grotesk'] text-sm font-medium text-white hover:brightness-110 transition-all"
+						>
+							Connect Google
+						</a>
+					{/if}
 				</div>
 			</div>
 		</section>

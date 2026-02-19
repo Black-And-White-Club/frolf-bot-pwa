@@ -14,6 +14,7 @@ interface AuthUser {
 	guildId: string; // Discord Guild ID (legacy)
 	role: 'viewer' | 'player' | 'editor' | 'admin';
 	clubs: ClubRole[];
+	linkedProviders: string[]; // OAuth providers linked to this account e.g. ['discord', 'google']
 }
 
 interface TokenClaims {
@@ -21,6 +22,7 @@ interface TokenClaims {
 	user_uuid: string;
 	active_club_uuid: string;
 	clubs: ClubRole[];
+	linked_providers: string[]; // OAuth providers linked to this account
 	guild: string; // Legacy Guild ID
 	role: string; // Legacy Role
 	exp: number; // expiry timestamp
@@ -224,7 +226,8 @@ export class AuthService {
 				activeClubUuid: claims.active_club_uuid,
 				guildId: claims.guild || '',
 				role: (claims.role || 'viewer') as AuthUser['role'],
-				clubs: claims.clubs || []
+				clubs: claims.clubs || [],
+				linkedProviders: claims.linked_providers || []
 			};
 
 			this.status = 'authenticated';
@@ -319,7 +322,8 @@ export class AuthService {
 				activeClubUuid: claims.active_club_uuid,
 				guildId: claims.guild || '',
 				role: (claims.role || 'viewer') as AuthUser['role'],
-				clubs: claims.clubs || []
+				clubs: claims.clubs || [],
+				linkedProviders: claims.linked_providers || []
 			};
 		} catch (e) {
 			console.error('Failed to switch club on backend:', e);
