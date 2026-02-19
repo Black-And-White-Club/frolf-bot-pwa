@@ -1,11 +1,15 @@
 /**
  * Tag store — manages tag history, tag list, and chart data for the PWA.
  *
- * Mirrors the request-reply pattern established by the leaderboard store:
- * 1. Publish a request event via NATS
- * 2. Subscribe to the response topic
- * 3. Transform the raw payload into typed data structures
+ * Data-loading strategy:
+ * - Tag list: fetched on startup via DataLoader (needed globally for member pickers)
+ * - Tag history: fetched on-demand per-page via fetchTagHistory()
+ *
+ * Pattern: NATS request-reply (no push subscriptions needed — the Discord bot
+ * consumes tag history events; the PWA only reads on-demand).
  */
+
+import { nats } from './nats.svelte';
 
 export interface TagHistoryEntry {
 	id: number;
@@ -66,6 +70,17 @@ function transformTagList(raw: TagListResponseRaw): TagListMember[] {
 	}));
 }
 
+// ---- Outbound request payloads ----
+interface TagHistoryRequestPayload {
+	guild_id: string;
+	member_id?: string;
+	limit?: number;
+}
+
+interface TagListRequestPayload {
+	guild_id: string;
+}
+
 export class TagService {
 	history = $state<TagHistoryEntry[]>([]);
 	tagList = $state<TagListMember[]>([]);
@@ -105,6 +120,56 @@ export class TagService {
 	setError(message: string) {
 		this.error = message;
 		this.loading = false;
+	}
+
+	/**
+	 * Fetch tag history for a member (or guild-wide if memberId omitted).
+	 * Called on-demand from the tags page, not on startup.
+	 */
+	async fetchTagHistory(guildId: string, memberId?: string, limit = 100): Promise<void> {
+		this.loading = true;
+		this.error = null;
+
+		try {
+			const payload: TagHistoryRequestPayload = {
+				guild_id: guildId,
+				...(memberId ? { member_id: memberId } : {}),
+				limit
+			};
+			const response = await nats.request<TagHistoryRequestPayload, TagHistoryResponseRaw>(
+				`leaderboard.tag.history.requested.v1.${guildId}`,
+				payload,
+				{ timeout: 5000 }
+			);
+			if (response) {
+				this.applyHistoryResponse(response);
+			}
+		} catch (e) {
+			const msg = e instanceof Error ? e.message : 'Failed to load tag history';
+			this.setError(msg);
+		}
+	}
+
+	/**
+	 * Re-fetch the tag list on-demand (e.g. after reconnect or if startup load failed).
+	 */
+	async fetchTagList(guildId: string): Promise<void> {
+		this.loading = true;
+		this.error = null;
+
+		try {
+			const response = await nats.request<TagListRequestPayload, TagListResponseRaw>(
+				`leaderboard.tag.list.requested.v1.${guildId}`,
+				{ guild_id: guildId },
+				{ timeout: 5000 }
+			);
+			if (response) {
+				this.applyTagListResponse(response);
+			}
+		} catch (e) {
+			const msg = e instanceof Error ? e.message : 'Failed to load tag list';
+			this.setError(msg);
+		}
 	}
 
 	get sortedTagList() {

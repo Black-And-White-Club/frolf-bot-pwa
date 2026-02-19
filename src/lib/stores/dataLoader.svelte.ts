@@ -1,6 +1,7 @@
 import { nats } from './nats.svelte';
 import { roundService, type RoundRaw } from './round.svelte';
 import { leaderboardService, type LeaderboardResponseRaw } from './leaderboard.svelte';
+import { tagStore, type TagListResponseRaw } from './tags.svelte';
 import { auth } from './auth.svelte';
 import { userProfiles, type UserProfileRaw } from './userProfiles.svelte';
 import { log } from '$lib/config';
@@ -68,7 +69,8 @@ class DataLoader {
 		try {
 			await Promise.all([
 				this.loadRounds(preferredId, clubUuid, guildId),
-				this.loadLeaderboard(preferredId, clubUuid, guildId)
+				this.loadLeaderboard(preferredId, clubUuid, guildId),
+				this.loadTagList(preferredId, guildId)
 			]);
 			log('DataLoader: Initial data loaded successfully');
 		} catch (e) {
@@ -144,6 +146,30 @@ class DataLoader {
 		}
 	}
 
+	private async loadTagList(subjectId: string, guildId: string): Promise<void> {
+		tagStore.setLoading(true);
+
+		try {
+			const response = await nats.request<
+				{ guild_id: string },
+				TagListResponseRaw
+			>(
+				`leaderboard.tag.list.requested.v1.${subjectId}`,
+				{ guild_id: guildId },
+				{ timeout: 5000 }
+			);
+
+			if (response?.members) {
+				tagStore.applyTagListResponse(response);
+			}
+		} catch (e) {
+			// Non-fatal: tag list will be fetched on-demand from the tags page
+			log('DataLoader: Tag list snapshot request failed, will retry on-demand', e);
+		} finally {
+			tagStore.setLoading(false);
+		}
+	}
+
 	reset(): void {
 		this.initialLoadPromise = null;
 		this.initialLoadId = null;
@@ -156,6 +182,8 @@ class DataLoader {
 		roundService.clear();
 		leaderboardService.clear();
 		userProfiles.clear();
+		tagStore.history = [];
+		tagStore.tagList = [];
 	}
 }
 

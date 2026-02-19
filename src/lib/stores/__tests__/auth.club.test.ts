@@ -16,6 +16,7 @@ describe('AuthService Club Logic', () => {
 			activeClubUuid: 'club-A',
 			guildId: 'guild-A',
 			role: 'player',
+			linkedProviders: [],
 			clubs: [
 				{
 					club_uuid: 'club-A',
@@ -41,6 +42,7 @@ describe('AuthService Club Logic', () => {
 			activeClubUuid: 'club-C', // User is not in this club list
 			guildId: 'guild-C',
 			role: 'player',
+			linkedProviders: [],
 			clubs: [
 				{
 					club_uuid: 'club-A',
@@ -60,6 +62,7 @@ describe('AuthService Club Logic', () => {
 			activeClubUuid: 'club-A',
 			guildId: 'guild-A',
 			role: 'player',
+			linkedProviders: [],
 			clubs: [
 				{
 					club_uuid: 'club-A',
