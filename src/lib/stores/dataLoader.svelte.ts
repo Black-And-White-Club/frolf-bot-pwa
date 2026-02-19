@@ -131,7 +131,7 @@ class DataLoader {
 				{ timeout: 5000 }
 			);
 
-			if (response?.leaderboard) {
+			if (response?.leaderboard !== undefined) {
 				leaderboardService.setSnapshotFromApi(response);
 			}
 			// Store profiles if included
