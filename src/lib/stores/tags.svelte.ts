@@ -79,6 +79,7 @@ interface TagHistoryRequestPayload {
 
 interface TagListRequestPayload {
 	guild_id: string;
+	club_uuid?: string;
 }
 
 export class TagService {
@@ -153,14 +154,19 @@ export class TagService {
 	/**
 	 * Re-fetch the tag list on-demand (e.g. after reconnect or if startup load failed).
 	 */
-	async fetchTagList(guildId: string): Promise<void> {
+	async fetchTagList(guildId: string, clubUuid?: string): Promise<void> {
 		this.loading = true;
 		this.error = null;
 
 		try {
+			const payload: TagListRequestPayload = {
+				guild_id: guildId,
+				...(clubUuid ? { club_uuid: clubUuid } : {})
+			};
+
 			const response = await nats.request<TagListRequestPayload, TagListResponseRaw>(
-				`leaderboard.tag.list.requested.v1.${guildId}`,
-				{ guild_id: guildId },
+				`leaderboard.tag.list.requested.v1.${clubUuid || guildId}`,
+				payload,
 				{ timeout: 5000 }
 			);
 			if (response) {

@@ -3,6 +3,7 @@
 	import ThemeToggle from './ThemeToggle.svelte';
 	import { onMount, onDestroy } from 'svelte';
 	import { setModalOpen } from '$lib/stores/overlay';
+	import { auth } from '$lib/stores/auth.svelte';
 
 	type Props = {
 		closeHamburger: () => void;
@@ -197,6 +198,15 @@
 			>
 				Account
 			</a>
+			{#if auth.canAdmin}
+				<a
+					href="/admin"
+					class="block rounded-md px-4 py-2 font-semibold text-[#B89B5E] transition-colors hover:bg-[var(--guild-surface-elevated)]"
+					onclick={closeHamburger}
+				>
+					Admin
+				</a>
+			{/if}
 		</nav>
 
 		<!-- Theme toggle -->

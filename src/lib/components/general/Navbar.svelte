@@ -101,6 +101,14 @@
 							Account
 						</a>
 					{/if}
+					{#if auth.canAdmin}
+						<a
+							href="/admin"
+							class="font-semibold text-[#B89B5E] transition-colors hover:text-[#B89B5E]/80"
+						>
+							Admin
+						</a>
+					{/if}
 				</nav>
 			</div>
 

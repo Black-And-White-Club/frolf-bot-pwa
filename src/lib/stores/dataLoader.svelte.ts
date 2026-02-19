@@ -70,7 +70,7 @@ class DataLoader {
 			await Promise.all([
 				this.loadRounds(preferredId, clubUuid, guildId),
 				this.loadLeaderboard(preferredId, clubUuid, guildId),
-				this.loadTagList(preferredId, guildId)
+				this.loadTagList(preferredId, guildId, clubUuid)
 			]);
 			log('DataLoader: Initial data loaded successfully');
 		} catch (e) {
@@ -146,16 +146,21 @@ class DataLoader {
 		}
 	}
 
-	private async loadTagList(subjectId: string, guildId: string): Promise<void> {
+	private async loadTagList(subjectId: string, guildId: string, clubUuid?: string): Promise<void> {
 		tagStore.setLoading(true);
 
 		try {
+			const payload: { guild_id: string; club_uuid?: string } = {
+				guild_id: guildId,
+				...(clubUuid ? { club_uuid: clubUuid } : {})
+			};
+
 			const response = await nats.request<
-				{ guild_id: string },
+				{ guild_id: string; club_uuid?: string },
 				TagListResponseRaw
 			>(
 				`leaderboard.tag.list.requested.v1.${subjectId}`,
-				{ guild_id: guildId },
+				payload,
 				{ timeout: 5000 }
 			);
 
