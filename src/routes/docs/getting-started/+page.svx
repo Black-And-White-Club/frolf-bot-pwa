@@ -44,6 +44,19 @@ Once your signup is processed, you'll receive the **Player role** and can:
 
 ---
 
+## Joining via invite
+
+If an editor sends you an invite code, you can join their club directly — no reaction-based signup needed.
+
+1. Go to the Frolf Bot PWA and navigate to the join page
+2. Enter the invite code
+3. The preview shows the club name and what role you'll receive
+4. Confirm to complete membership
+
+Invite codes are created by editors from the [account page](/docs/account#managing-invite-codes).
+
+---
+
 ## Accessing the dashboard
 
 Use the `/dashboard` command in any channel to get a link to the web app. The dashboard shows:
@@ -53,3 +66,5 @@ Use the `/dashboard` command in any channel to get a link to the web app. The da
 - Tag history and season stats
 
 You can also bookmark the dashboard URL directly. Sign in with Discord to link your account.
+
+The [account page](/docs/account) (`/account`) is where you manage linked sign-in providers and, for editors, create invite codes for your club. If you don't have a club membership yet, the dashboard will show clubs on your Discord servers that use Frolf Bot — you can join directly from there.

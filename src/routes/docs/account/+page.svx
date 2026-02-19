@@ -1,0 +1,57 @@
+<svelte:head>
+  <title>Account & Invites — Frolf Bot Docs</title>
+  <meta name="description" content="Manage linked providers and invite codes on the Frolf Bot account page." />
+</svelte:head>
+
+# Account & Invites
+
+The account page (`/account`) is your hub for managing connected sign-in providers and creating invite codes for your club.
+
+---
+
+## Linked providers
+
+Frolf Bot supports signing in with **Discord** and **Google**. You can link multiple providers to a single account. Linking a provider from the account page adds it to your existing session — to sign in with a provider, use the sign-in page (`/auth/signin`).
+
+### Connecting a provider
+
+On the account page, each unlinked provider shows a **Connect** button. Clicking it starts the OAuth flow for that provider and links it to your current account.
+
+| Provider | What linking enables |
+|----------|---------------------|
+| **Discord** | Sign in with Discord from the PWA sign-in page. Also required for club discovery — the app uses your Discord guild list to suggest clubs you can join. |
+| **Google** | Sign in with Google from the PWA sign-in page. |
+
+### Disconnecting a provider
+
+Each linked provider shows a **Disconnect** button. Clicking it removes that provider from your account.
+
+If it's your only connected provider, the request is blocked with an explanatory message — you must keep at least one provider linked to retain sign-in access.
+
+---
+
+## Managing invite codes
+
+**Requires:** Editor or Admin role
+
+The invite codes panel is visible on the account page for Editors and Admins. Use it to create join links for new members — no reaction-based signup needed.
+
+### Creating a code
+
+Click **Create invite** to open the code options:
+
+| Option | Description |
+|--------|-------------|
+| **Role** | Role assigned when someone joins via this code. Defaults to `player`. |
+| **Max Uses** | How many times the code can be used before it expires. Leave blank for unlimited. |
+| **Expires In** | Days until the code automatically expires. Leave blank for no expiry. |
+
+Each code is 12 characters and unique to your club.
+
+### Viewing active codes
+
+The account page lists all active codes with their current use count, max uses, and expiry date. Expired and fully-used codes are removed automatically.
+
+### Revoking a code
+
+Click **Revoke** next to any active code to invalidate it immediately. Members who have already joined via that code are unaffected.

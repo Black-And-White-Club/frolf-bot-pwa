@@ -122,3 +122,23 @@ Displays the leaderboard for a season. Omit `season_id` to view the current seas
 ```
 
 Posts an ephemeral message with a link to the web dashboard. Works for any user — useful for sharing with new members.
+
+---
+
+## Managing invites
+
+**Requires:** Editor role
+
+```
+/invite
+```
+
+Posts an ephemeral link to the [account page](/docs/account#managing-invite-codes) on the web dashboard where you can create and manage invite codes for your club.
+
+| Option | Description |
+|--------|-------------|
+| **Role** | Role assigned to players who join via this code (`player` by default) |
+| **Max Uses** | Limit how many times a code can be used (blank = unlimited) |
+| **Expires In** | Days until the code expires (blank = no expiry) |
+
+On the account page you can create new codes, see current use counts, and revoke codes at any time.

@@ -17,6 +17,12 @@ All Frolf Bot interactions use Discord slash commands. Commands are available in
 
 Posts an ephemeral link to the web dashboard. Useful for sharing with new members or finding the dashboard URL.
 
+### `/invite`
+
+**Permission:** Editor
+
+Posts an ephemeral link to the web dashboard's [account page](/docs/account#managing-invite-codes) where you can create and manage invite codes for your club.
+
 ---
 
 ## Round Management

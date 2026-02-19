@@ -6,6 +6,7 @@
 	const navItems = [
 		{ href: '/docs', label: 'Overview', exact: true },
 		{ href: '/docs/getting-started', label: 'Getting Started' },
+		{ href: '/docs/account', label: 'Account & Invites' },
 		{ href: '/docs/rounds', label: 'Rounds' },
 		{ href: '/docs/scoring', label: 'Scoring' },
 		{ href: '/docs/tags', label: 'Tags & Leaderboard' },
@@ -140,6 +141,7 @@
 	}
 
 	:global(.docs-prose h3) {
+		font-family: var(--font-secondary, 'Space Grotesk', sans-serif);
 		font-size: 1.1rem;
 		font-weight: 600;
 		color: var(--guild-text);
@@ -257,5 +259,14 @@
 
 	:global(.docs-prose .callout p) {
 		margin: 0;
+	}
+
+	:global(.dark .docs-prose .callout) {
+		box-shadow: 0 0 12px rgba(139, 123, 184, 0.15);
+		border-left-color: var(--guild-secondary);
+	}
+
+	aside nav a {
+		font-family: var(--font-secondary, 'Space Grotesk', sans-serif);
 	}
 </style>
