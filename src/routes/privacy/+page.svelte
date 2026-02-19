@@ -24,10 +24,6 @@
 				href="/tos"
 				class="text-[var(--guild-text-secondary)] transition-colors hover:text-[var(--guild-text)]"
 			>Terms of Service</a>
-			<a
-				href="/auth/signin"
-				class="rounded-md bg-[var(--guild-primary)] px-3 py-1.5 text-sm font-medium text-white transition hover:brightness-110"
-			>Sign In</a>
 		</nav>
 	</div>
 </header>
@@ -36,7 +32,7 @@
 	<article>
 		<h1 class="font-display mb-2 text-3xl font-bold text-[var(--guild-text)]">Privacy Policy</h1>
 		<p class="mb-8 text-sm text-[var(--guild-text-secondary)]">
-			Last updated: <time datetime="2025-01-01">January 1, 2025</time>
+			Last updated: <time datetime="2026-02-19">February 19, 2026</time>
 		</p>
 
 		<p class="mb-8 text-[var(--guild-text-secondary)]">
