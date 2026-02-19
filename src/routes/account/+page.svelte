@@ -25,6 +25,8 @@
 	let createError = $state<string | null>(null);
 
 	let copyFeedback = $state<Record<string, boolean>>({});
+	let unlinkingProvider = $state<string | null>(null);
+	let unlinkError = $state<string | null>(null);
 
 	// Success message from link callback
 	const linkSuccess = $derived(page.url.searchParams.get('success') === 'linked');
@@ -112,6 +114,25 @@
 		}
 	}
 
+	async function unlinkProvider(provider: string) {
+		unlinkingProvider = provider;
+		unlinkError = null;
+		try {
+			const res = await fetch(`/api/auth/${provider}/unlink`, { method: 'DELETE' });
+			if (res.status === 409) {
+				unlinkError = 'Cannot disconnect your only linked account.';
+				return;
+			}
+			if (!res.ok) throw new Error(`Failed to disconnect (${res.status})`);
+			// Refresh session to get updated linked_providers in the JWT
+			await auth.refreshSession();
+		} catch (e) {
+			unlinkError = e instanceof Error ? e.message : 'Failed to disconnect';
+		} finally {
+			unlinkingProvider = null;
+		}
+	}
+
 	async function copyLink(code: string) {
 		try {
 			await navigator.clipboard.writeText(`${window.location.origin}/join?code=${code}`);
@@ -166,6 +187,11 @@
 				Failed to link provider. Please try again.
 			</div>
 		{/if}
+		{#if unlinkError}
+			<div class="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+				{unlinkError}
+			</div>
+		{/if}
 
 		<!-- Section 1: Connected Accounts -->
 		<section>
@@ -182,16 +208,23 @@
 					class="flex items-center justify-between rounded-xl border border-[#007474]/20 bg-[var(--guild-surface)] px-5 py-4"
 				>
 					<div class="flex items-center gap-3">
-						<!-- Discord icon -->
-						<svg class="h-6 w-6 text-[#5865F2]" viewBox="0 0 24 24" fill="currentColor">
-							<path
-								d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.03.056a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"
-							/>
+						<!-- Discord icon (official brand asset) -->
+						<svg class="h-6 w-auto" viewBox="0 0 126.644 96" xmlns="http://www.w3.org/2000/svg" aria-label="Discord">
+							<path fill="#5865F2" d="M81.15,0c-1.2376,2.1973-2.3489,4.4704-3.3591,6.794-9.5975-1.4396-19.3718-1.4396-28.9945,0-.985-2.3236-2.1216-4.5967-3.3591-6.794-9.0166,1.5407-17.8059,4.2431-26.1405,8.0568C2.779,32.5304-1.6914,56.3725.5312,79.8863c9.6732,7.1476,20.5083,12.603,32.0505,16.0884,2.6014-3.4854,4.8998-7.1981,6.8698-11.0623-3.738-1.3891-7.3497-3.1318-10.8098-5.1523.9092-.6567,1.7932-1.3386,2.6519-1.9953,20.281,9.547,43.7696,9.547,64.0758,0,.8587.7072,1.7427,1.3891,2.6519,1.9953-3.4601,2.0457-7.0718,3.7632-10.835,5.1776,1.97,3.8642,4.2683,7.5769,6.8698,11.0623,11.5419-3.4854,22.3769-8.9156,32.0509-16.0631,2.626-27.2771-4.496-50.9172-18.817-71.8548C98.9811,4.2684,90.1918,1.5659,81.1752.0505l-.0252-.0505ZM42.2802,65.4144c-6.2383,0-11.4159-5.6575-11.4159-12.6535s4.9755-12.6788,11.3907-12.6788,11.5169,5.708,11.4159,12.6788c-.101,6.9708-5.026,12.6535-11.3907,12.6535ZM84.3576,65.4144c-6.2637,0-11.3907-5.6575-11.3907-12.6535s4.9755-12.6788,11.3907-12.6788,11.4917,5.708,11.3906,12.6788c-.101,6.9708-5.026,12.6535-11.3906,12.6535Z"/>
 						</svg>
 						<span class="font-['Space_Grotesk'] font-medium text-[var(--guild-text)]">Discord</span>
 					</div>
 					{#if isDiscordLinked}
-						<span class="font-['Space_Grotesk'] text-sm font-medium text-guild-primary">Connected</span>
+						<div class="flex items-center gap-3">
+							<span class="font-['Space_Grotesk'] text-sm font-medium text-guild-primary">Connected</span>
+							<button
+								onclick={() => unlinkProvider('discord')}
+								disabled={unlinkingProvider === 'discord'}
+								class="rounded-lg border border-red-500/30 px-3 py-1.5 font-['Space_Grotesk'] text-xs text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+							>
+								{unlinkingProvider === 'discord' ? 'Disconnecting…' : 'Disconnect'}
+							</button>
+						</div>
 					{:else}
 						<a
 							href="/api/auth/discord/link"
@@ -229,7 +262,16 @@
 						<span class="font-['Space_Grotesk'] font-medium text-[var(--guild-text)]">Google</span>
 					</div>
 					{#if isGoogleLinked}
-						<span class="font-['Space_Grotesk'] text-sm font-medium text-guild-primary">Connected</span>
+						<div class="flex items-center gap-3">
+							<span class="font-['Space_Grotesk'] text-sm font-medium text-guild-primary">Connected</span>
+							<button
+								onclick={() => unlinkProvider('google')}
+								disabled={unlinkingProvider === 'google'}
+								class="rounded-lg border border-red-500/30 px-3 py-1.5 font-['Space_Grotesk'] text-xs text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+							>
+								{unlinkingProvider === 'google' ? 'Disconnecting…' : 'Disconnect'}
+							</button>
+						</div>
 					{:else}
 						<a
 							href="/api/auth/google/link"
