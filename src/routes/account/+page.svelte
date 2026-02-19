@@ -35,9 +35,7 @@
 	const isDiscordLinked = $derived(auth.user?.linkedProviders.includes('discord') ?? false);
 	const isGoogleLinked = $derived(auth.user?.linkedProviders.includes('google') ?? false);
 
-	const canManageInvites = $derived(
-		auth.user?.role === 'editor' || auth.user?.role === 'admin'
-	);
+	const canManageInvites = $derived(auth.canEdit);
 
 	// --- Redirect if not authenticated ---
 	$effect(() => {

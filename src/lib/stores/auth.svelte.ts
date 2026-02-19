@@ -47,8 +47,13 @@ export class AuthService {
 
 	// Derived state
 	isAuthenticated = $derived(this.status === 'authenticated');
-	canEdit = $derived(this.user?.role === 'editor' || this.user?.role === 'admin');
-	canAdmin = $derived(this.user?.role === 'admin');
+	activeRole = $derived.by(() => {
+		if (!this.user) return 'viewer';
+		const membership = this.user.clubs.find((c) => c.club_uuid === this.user?.activeClubUuid);
+		return membership?.role ?? this.user.role;
+	});
+	canEdit = $derived(this.activeRole === 'editor' || this.activeRole === 'admin');
+	canAdmin = $derived(this.activeRole === 'admin');
 	private switchClubPromise: Promise<boolean> | null = null;
 	private switchClubTarget: string | null = null;
 

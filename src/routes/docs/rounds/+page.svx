@@ -27,21 +27,17 @@ Running this command opens a modal with the following fields:
 | **Timezone** | No | IANA timezone string. Defaults to `America/Chicago` if left blank |
 | **Location** | Yes | Course name or address (max 100 characters) |
 
-After submitting, Frolf Bot posts a round embed in the events channel with RSVP buttons.
+After submitting, Frolf Bot creates a native Discord event and posts a round embed in the events channel.
 
 ---
 
 ## RSVPing
 
-Once a round is posted, anyone with the Player role can respond using the buttons on the round embed:
+Once a round is scheduled, Frolf Bot will create a native Discord scheduled event along with an embedded event message.
 
-| Button | Meaning |
-|--------|---------|
-| **Accept** | You're in — you'll be counted in the starting lineup |
-| **Decline** | You can't make it |
-| **Tentative** | Maybe — you won't be in the starting lineup but can join late |
+To RSVP, navigate to the natively created Discord event and click the **Interested** button. Since we use the native Discord event scheduler, this is the only way to RSVP to a round before it begins.
 
-Players who marked Tentative or didn't respond can join a round after it starts using the **Join** button, if the round creator or an editor allows late additions.
+Players who didn't RSVP can still join a round after it starts using the **Join** button on the round embed, if the round creator or an editor allows late additions.
 
 ---
 

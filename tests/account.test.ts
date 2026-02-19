@@ -21,6 +21,8 @@ vi.mock('$lib/stores/auth.svelte', () => ({
 	auth: {
 		isAuthenticated: true,
 		status: 'idle',
+		canEdit: false,
+		canAdmin: false,
 		user: {
 			id: 'user-123',
 			uuid: 'uuid-123',
@@ -47,6 +49,8 @@ describe('Account Page', () => {
 		vi.clearAllMocks();
 		// Reset auth state
 		auth.isAuthenticated = true;
+		auth.canEdit = false;
+		auth.canAdmin = false;
 		auth.user = {
 			id: 'user-123',
 			uuid: 'uuid-123',
@@ -102,19 +106,19 @@ describe('Account Page', () => {
 		});
 
 		it('hides invite section for players', () => {
-			auth.user!.role = 'player';
+			auth.canEdit = false;
 			const { queryByText } = render(AccountPage);
 			expect(queryByText('Invite Links')).toBeNull();
 		});
 
 		it('shows invite section for editors', () => {
-			auth.user!.role = 'editor';
+			auth.canEdit = true;
 			const { getByText } = render(AccountPage);
 			expect(getByText('Invite Links')).toBeTruthy();
 		});
 
 		it('shows invite section for admins', () => {
-			auth.user!.role = 'admin';
+			auth.canEdit = true;
 			const { getByText } = render(AccountPage);
 			expect(getByText('Invite Links')).toBeTruthy();
 		});
