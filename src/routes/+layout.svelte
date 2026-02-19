@@ -246,6 +246,11 @@
 				{@render children?.()}
 			</main>
 		</div>
+	{:else if page.url.pathname === '/privacy' || page.url.pathname === '/tos'}
+		<!-- Public legal pages — no auth required -->
+		<main id="main-content" class="min-h-screen bg-[var(--guild-background)]">
+			{@render children?.()}
+		</main>
 	{:else}
 		<!-- User is not signed in -->
 		<div class="flex min-h-screen items-center justify-center bg-[var(--guild-background)]">
