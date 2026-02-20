@@ -8,7 +8,7 @@
 
 <div class="guild-header">
 	{#if guildIcon}
-		<img src={guildIcon} alt="" class="guild-icon" />
+		<img src={guildIcon} alt="" class="guild-icon" loading="lazy" decoding="async" />
 	{:else}
 		<div class="guild-icon-placeholder">
 			<span>🥏</span>

@@ -167,6 +167,7 @@
 										alt=""
 										class="h-7 w-7 rounded-full"
 										loading="lazy"
+										decoding="async"
 									/>
 									<span class="text-[var(--guild-text)] truncate max-w-[120px]">
 										{userProfiles.getDisplayName(row.memberId)}

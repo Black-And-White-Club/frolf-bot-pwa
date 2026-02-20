@@ -1,11 +1,11 @@
 <script lang="ts">
+	import { page } from '$app/state';
+
 	let email = $state('');
 	let status = $state<'idle' | 'loading' | 'success' | 'error'>('idle');
 	let errorMessage = $state('');
 
-	const urlParams =
-		typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-	const oauthError = urlParams?.get('error') === 'oauth_failed';
+	const oauthError = $derived(page.url.searchParams.get('error') === 'oauth_failed');
 
 	async function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();

@@ -44,7 +44,9 @@ describe('/api/clubs/[uuid]/invites', () => {
 		it('handles non-JSON error response from backend', async () => {
 			mockFetch.mockResolvedValue({
 				status: 500,
-				json: async () => { throw new Error('Not JSON'); }
+				json: async () => {
+					throw new Error('Not JSON');
+				}
 			});
 
 			const res = await GET({ fetch: mockFetch, request: mockRequest, params } as any);
@@ -91,7 +93,7 @@ describe('/api/clubs/[uuid]/invites', () => {
 			expect(mockFetch).toHaveBeenCalledWith(
 				expect.anything(),
 				expect.objectContaining({
-					body: 'null' 
+					body: 'null'
 				})
 			);
 		});

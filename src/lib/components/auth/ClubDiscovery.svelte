@@ -121,6 +121,8 @@
 									src={club.icon_url}
 									alt={club.name}
 									class="h-10 w-10 rounded-full object-cover"
+									loading="lazy"
+									decoding="async"
 								/>
 							{:else}
 								<div

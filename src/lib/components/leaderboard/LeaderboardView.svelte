@@ -10,6 +10,14 @@
 	let sortedEntries = $derived(leaderboardService.currentView);
 	let topThree = $derived(sortedEntries.slice(0, 3));
 
+	let limit = $state(50);
+	const displayEntries = $derived(sortedEntries.slice(0, limit));
+	const hasMore = $derived(limit < sortedEntries.length);
+
+	function loadMore() {
+		limit += 50;
+	}
+
 	let lastUpdated = $derived(
 		leaderboardService.snapshot?.lastUpdated
 			? new Intl.DateTimeFormat('en-US', {
@@ -51,9 +59,20 @@
 	<!-- Full Rankings Table -->
 	<div class="bg-liquid-skobeloff border-sage-600/20 rounded-lg border p-4">
 		<div class="space-y-2">
-			{#each sortedEntries as entry, index (index)}
+			{#each displayEntries as entry, index (index)}
 				<LeaderboardRow {entry} rank={index + 1} />
 			{/each}
 		</div>
+		
+		{#if hasMore}
+			<div class="mt-6 flex justify-center">
+				<button 
+					class="bg-sage-700/50 hover:bg-sage-600 border-sage-600/30 text-guild-text rounded-md border px-4 py-2 text-sm font-medium transition-colors"
+					onclick={loadMore}
+				>
+					Load More
+				</button>
+			</div>
+		{/if}
 	</div>
 </div>

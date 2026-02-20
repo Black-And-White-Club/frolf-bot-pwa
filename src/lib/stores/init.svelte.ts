@@ -50,14 +50,14 @@ class AppInitializer {
 		this.error = null;
 
 		try {
-			// Step 1: Initialize tracing
-			await initTracing();
-
 			// Handle mock mode early
 			if (this.isMockMode()) {
 				await this.startMockMode();
 				return;
 			}
+
+			// Step 1: Initialize tracing
+			await initTracing();
 
 			// Perform authentication and optional club switch/load path
 			const authResult = await this.authenticateAndLoadGuild();
@@ -106,7 +106,9 @@ class AppInitializer {
 			}
 		})();
 
-		if (!import.meta.env.DEV) {
+		const allowProdMock = env.PUBLIC_ALLOW_MOCK_PROD === 'true';
+
+		if (!import.meta.env.DEV && !allowProdMock) {
 			if (mockFlagSet) {
 				console.warn('[AppInit] Mock mode requested outside development build; ignoring.');
 			}
@@ -117,7 +119,9 @@ class AppInitializer {
 	}
 
 	private async startMockMode(): Promise<void> {
-		if (!import.meta.env.DEV) {
+		const allowProdMock = env.PUBLIC_ALLOW_MOCK_PROD === 'true';
+
+		if (!import.meta.env.DEV && !allowProdMock) {
 			throw new Error('Mock mode is disabled outside development builds');
 		}
 
@@ -144,9 +148,13 @@ class AppInitializer {
 		};
 		auth.status = 'authenticated';
 
-		mockDataProvider.start();
 		this.mode = 'mock';
 		this.status = 'ready';
+
+		// Defer heavy data generation to next tick to unblock main thread and allow initial paint
+		setTimeout(() => {
+			mockDataProvider.start();
+		}, 0);
 	}
 
 	private async authenticateAndLoadGuild(): Promise<AuthInitializeResult> {

@@ -125,6 +125,8 @@
 						src={preview.icon_url}
 						alt={preview.club_name}
 						class="mx-auto h-20 w-20 rounded-full object-cover"
+						loading="lazy"
+						decoding="async"
 					/>
 				{:else}
 					<div

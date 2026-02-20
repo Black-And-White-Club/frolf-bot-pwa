@@ -44,7 +44,7 @@ describe('GET /api/auth/google/callback', () => {
 		mockFetch.mockResolvedValue({
 			status: 302,
 			headers: new Headers({
-				'location': 'https://frolf-bot.duckdns.org/account'
+				location: 'https://frolf-bot.duckdns.org/account'
 			})
 		});
 

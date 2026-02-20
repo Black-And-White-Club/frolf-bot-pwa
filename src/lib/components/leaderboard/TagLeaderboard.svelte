@@ -5,20 +5,36 @@
 	import ViewToggle from './ViewToggle.svelte';
 	import ChevronCollapse from '$lib/components/general/ChevronCollapse.svelte';
 	import PlayerRow from './PlayerRow.svelte';
+	import { isMobile } from '$lib/stores/theme';
 
 	interface Props {
 		members?: TagListMember[];
 		onSelectMember?: (memberId: string) => void;
+		onViewAll?: () => void;
 	}
 
-	let { members, onSelectMember }: Props = $props();
+	let { members, onSelectMember, onViewAll }: Props = $props();
 
 	let collapsed = $state(false);
 
 	const sortedMembers = $derived(members ?? tagStore.sortedTagList);
 
+	const MOBILE_LIMIT = 5;
+	const DESKTOP_LIMIT = 10;
+	// When displayed in a limited context (e.g. Dashboard), restrict the number of visible rows
+	const displayLimit = $derived($isMobile ? MOBILE_LIMIT : DESKTOP_LIMIT);
+	const displayMembers = $derived(collapsed ? [] : sortedMembers.slice(0, displayLimit));
+	
+	const showViewAllButton = $derived(
+		sortedMembers.length > displayLimit && !!onViewAll && !collapsed
+	);
+
 	function toggleCollapse() {
 		collapsed = !collapsed;
+	}
+
+	function handleViewAllClick() {
+		onViewAll?.();
 	}
 </script>
 
@@ -35,6 +51,12 @@
 				onchange={(m) => leaderboardService.setViewMode(m)}
 			/>
 
+			{#if showViewAllButton}
+				<button type="button" class="view-all-btn" onclick={handleViewAllClick}>
+					View all <span class="count">({sortedMembers.length})</span>
+				</button>
+			{/if}
+
 			<ChevronCollapse
 				{collapsed}
 				disabled={false}
@@ -47,10 +69,10 @@
 
 	{#if !collapsed}
 		<div class="tag-list" id="tag-list">
-			{#if sortedMembers.length === 0}
+			{#if displayMembers.length === 0}
 				<p class="empty-state">No tags assigned yet.</p>
 			{:else}
-				{#each sortedMembers as member (member.memberId)}
+				{#each displayMembers as member (member.memberId)}
 					<PlayerRow
 						userId={member.memberId}
 						name={userProfiles.getDisplayName(member.memberId)}
@@ -138,6 +160,25 @@
 		align-items: center;
 		gap: 0.75rem;
 		flex-shrink: 0;
+	}
+
+	.view-all-btn {
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: var(--guild-primary);
+		background: none;
+		border: none;
+		cursor: pointer;
+		padding: 0.25rem 0.5rem;
+		white-space: nowrap;
+	}
+
+	.view-all-btn:hover {
+		text-decoration: underline;
+	}
+
+	.count {
+		opacity: 0.7;
 	}
 
 	.tag-list {

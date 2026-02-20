@@ -77,7 +77,13 @@
 		<div class="left">
 			<div class="avatar" aria-hidden="true" class:has-image={!!avatarUrl}>
 				{#if avatarUrl}
-					<img src={avatarUrl} alt={name} class="avatar-img" />
+					<img
+						src={avatarUrl}
+						alt={name}
+						class="avatar-img"
+						loading="lazy"
+						decoding="async"
+					/>
 				{:else}
 					{getAvatarInitial(name)}
 				{/if}
@@ -271,7 +277,7 @@
 	.shine-overlay {
 		position: absolute;
 		top: 0;
-		left: -100%;
+		left: 0;
 		width: 100%;
 		height: 100%;
 		background: linear-gradient(
@@ -280,19 +286,21 @@
 			rgba(255, 255, 255, 0.18) 50%,
 			transparent 100%
 		);
+		transform: translateX(-100%);
 		animation: shine 3s ease-in-out infinite;
 		z-index: 0; /* Background effect */
 		pointer-events: none;
 		opacity: 0.15; /* Subtle in dark mode */
+		will-change: transform;
 	}
 
 	@keyframes shine {
 		0% {
-			left: -100%;
+			transform: translateX(-100%);
 		}
 		50%,
 		100% {
-			left: 100%;
+			transform: translateX(100%);
 		}
 	}
 

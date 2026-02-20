@@ -166,11 +166,7 @@ class DataLoader {
 			const response = await nats.request<
 				{ guild_id: string; club_uuid?: string },
 				TagListResponseRaw
-			>(
-				`leaderboard.tag.list.requested.v1.${subjectId}`,
-				payload,
-				{ timeout: 5000 }
-			);
+			>(`leaderboard.tag.list.requested.v1.${subjectId}`, payload, { timeout: 5000 });
 
 			if (response?.members) {
 				tagStore.applyTagListResponse(response);

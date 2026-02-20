@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Dashboard from '$lib/components/dashboard/Dashboard.svelte';
 	import { clubService } from '$lib/stores/club.svelte';
 	import { page } from '$app/state';
+	import Dashboard from '$lib/components/dashboard/Dashboard.svelte';
 
 	const mode = $derived(
 		(page.url.searchParams.get('mode') as 'default' | 'tv' | 'compact' | null) ?? 'default'

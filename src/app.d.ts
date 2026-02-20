@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import type { SvelteComponentTyped } from 'svelte';
 
 // Project-level ambient declarations to help svelte-check find types for

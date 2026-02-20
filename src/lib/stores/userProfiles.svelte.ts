@@ -77,16 +77,21 @@ class UserProfileService {
 	 */
 	getAvatarUrl(userId: string, size?: number): string {
 		const profile = this.profiles[userId];
-		const url = profile?.avatarUrl;
+		let url = profile?.avatarUrl;
 
 		if (!url) {
 			return this.getDefaultAvatarUrl(userId);
 		}
 
-		// If it's a Discord URL, we can append size
-		if (size && url.includes('cdn.discordapp.com')) {
-			const separator = url.includes('?') ? '&' : '?';
-			return `${url}${separator}size=${size}`;
+		// If it's a Discord URL, we can append size and optimize format
+		if (url.includes('cdn.discordapp.com')) {
+			// Convert to webp for better performance (Discord CDN supports this)
+			url = url.replace(/\.(png|jpe?g)(\?.*)?$/i, '.webp$2');
+			
+			if (size) {
+				const separator = url.includes('?') ? '&' : '?';
+				return `${url}${separator}size=${size}`;
+			}
 		}
 
 		return url;

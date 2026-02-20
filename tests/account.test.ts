@@ -69,10 +69,10 @@ describe('Account Page', () => {
 			const { getByText, getByRole } = render(AccountPage);
 
 			expect(getByText('Connected Accounts')).toBeTruthy();
-			
+
 			const discordLink = getByRole('link', { name: 'Connect Discord' });
 			expect(discordLink.getAttribute('href')).toBe('/api/auth/discord/link');
-			
+
 			const googleLink = getByRole('link', { name: 'Connect Google' });
 			expect(googleLink.getAttribute('href')).toBe('/api/auth/google/link');
 		});
@@ -130,7 +130,7 @@ describe('Account Page', () => {
 			// Fraunces for headings
 			const h1 = container.querySelector('h1');
 			expect(h1?.className).toContain("font-['Fraunces']");
-			
+
 			// Space Grotesk for body/labels
 			const p = container.querySelector('p');
 			expect(p?.className).toContain("font-['Space_Grotesk']");

@@ -44,7 +44,7 @@ describe('GET /api/auth/discord/callback', () => {
 		mockFetch.mockResolvedValue({
 			status: 302,
 			headers: new Headers({
-				'location': 'https://frolf-bot.duckdns.org/account'
+				location: 'https://frolf-bot.duckdns.org/account'
 			})
 		});
 
@@ -58,7 +58,7 @@ describe('GET /api/auth/discord/callback', () => {
 		mockFetch.mockResolvedValue({
 			status: 302,
 			headers: new Headers({
-				'location': 'https://frolf-bot.duckdns.org/account?error=link_failed'
+				location: 'https://frolf-bot.duckdns.org/account?error=link_failed'
 			})
 		});
 

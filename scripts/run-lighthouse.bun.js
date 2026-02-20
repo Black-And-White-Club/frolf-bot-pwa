@@ -77,7 +77,8 @@ async function main() {
 		await run('bun', ['run', 'build'], {
 			env: {
 				...process.env,
-				PRIVATE_API_URL: process.env.PRIVATE_API_URL || 'http://localhost:8080'
+				PRIVATE_API_URL: process.env.PRIVATE_API_URL || 'http://localhost:8080',
+				PUBLIC_ALLOW_MOCK_PROD: 'true'
 			}
 		});
 	} catch (err) {
@@ -94,6 +95,10 @@ async function main() {
 	console.log('2) Starting preview server');
 	const preview = Bun.spawn({
 		cmd: ['bun', 'run', 'preview', '--', '--port', '5173'],
+		env: {
+			...process.env,
+			PUBLIC_ALLOW_MOCK_PROD: 'true'
+		},
 		stdout: 'inherit',
 		stderr: 'inherit',
 		stdin: 'pipe',
@@ -130,9 +135,12 @@ async function main() {
 		const jsonPath = path.resolve(distDir, 'lighthouse.report.json');
 
 		// Run via bunx
+		// Use mock mode to bypass backend auth checks and test the full authenticated UI state
+		const targetUrl = `${HOST}/?mock=true`;
+
 		await run('bunx', [
 			'lighthouse',
-			HOST,
+			targetUrl,
 			'--output',
 			'html',
 			'--output-path',
@@ -141,7 +149,7 @@ async function main() {
 		]);
 		await run('bunx', [
 			'lighthouse',
-			HOST,
+			targetUrl,
 			'--output',
 			'json',
 			'--output-path',

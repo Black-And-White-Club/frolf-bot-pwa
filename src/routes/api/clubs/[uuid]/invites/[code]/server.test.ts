@@ -50,7 +50,9 @@ describe('/api/clubs/[uuid]/invites/[code]', () => {
 		it('handles non-JSON error response', async () => {
 			mockFetch.mockResolvedValue({
 				status: 500,
-				json: async () => { throw new Error('Not JSON'); }
+				json: async () => {
+					throw new Error('Not JSON');
+				}
 			});
 
 			const res = await DELETE({ fetch: mockFetch, request: mockRequest, params } as any);

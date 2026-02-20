@@ -31,7 +31,7 @@ describe('GET /api/auth/google/link', () => {
 	it('redirects to provider on success', async () => {
 		mockFetch.mockResolvedValue({
 			headers: new Headers({
-				'location': 'https://accounts.google.com/o/oauth2/auth',
+				location: 'https://accounts.google.com/o/oauth2/auth',
 				'set-cookie': 'oauth_state=xyz; Path=/'
 			})
 		});
@@ -41,9 +41,12 @@ describe('GET /api/auth/google/link', () => {
 		expect(res.status).toBe(302);
 		expect(res.headers.get('location')).toBe('https://accounts.google.com/o/oauth2/auth');
 		expect(res.headers.get('set-cookie')).toBe('oauth_state=xyz; Path=/');
-		expect(mockFetch).toHaveBeenCalledWith('http://backend/api/auth/google/link', expect.objectContaining({
-			redirect: 'manual'
-		}));
+		expect(mockFetch).toHaveBeenCalledWith(
+			'http://backend/api/auth/google/link',
+			expect.objectContaining({
+				redirect: 'manual'
+			})
+		);
 	});
 
 	it('returns 502 if backend returns no location', async () => {
@@ -59,7 +62,7 @@ describe('GET /api/auth/google/link', () => {
 	it('forwards cookies to backend', async () => {
 		mockRequest.headers.set('cookie', 'refresh_token=valid');
 		mockFetch.mockResolvedValue({
-			headers: new Headers({ 'location': 'https://google.com' })
+			headers: new Headers({ location: 'https://google.com' })
 		});
 
 		await GET({ fetch: mockFetch, request: mockRequest } as any);

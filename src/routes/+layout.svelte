@@ -1,13 +1,13 @@
 <script lang="ts">
 	import '../styles/app.css';
 	import { page } from '$app/state';
-	import Navbar from '$lib/components/general/Navbar.svelte';
+	import OfflineIndicator from '$lib/components/pwa/OfflineIndicator.svelte';
 	import ThemeProvider from '$lib/components/general/ThemeProvider.svelte';
 	import ThemeToggle from '$lib/components/general/ThemeToggle.svelte';
-	import InstallPrompt from '$lib/components/pwa/InstallPrompt.svelte';
-	import OfflineIndicator from '$lib/components/pwa/OfflineIndicator.svelte';
+	import { modalOpen } from '$lib/stores/overlay';
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
+	import Navbar from '$lib/components/general/Navbar.svelte';
 
 	type AuthLike = {
 		isAuthenticated: boolean;
@@ -43,6 +43,7 @@
 	let LiveAnnouncer = $state<any>(null);
 	let UpdateSnackbarClient = $state<any>(null);
 	let ClubDiscovery = $state<any>(null);
+	let InstallPrompt = $state<any>(null);
 	// Defer importing PWA helpers so they don't bloat the initial layout chunk.
 	// We'll dynamically import them after the app is idle.
 
@@ -110,14 +111,16 @@
 		// Lazy-load a11y and update UI components after hydration so they don't
 		// inflate the initial JS payload.
 		try {
-			const [live, upd, discovery] = await Promise.all([
+			const [live, upd, discovery, prompt] = await Promise.all([
 				import('$lib/components/general/LiveAnnouncer.svelte'),
 				import('$lib/components/general/UpdateSnackbar.client.svelte'),
-				import('$lib/components/auth/ClubDiscovery.svelte')
+				import('$lib/components/auth/ClubDiscovery.svelte'),
+				import('$lib/components/pwa/InstallPrompt.svelte')
 			]);
 			LiveAnnouncer = live.default;
 			UpdateSnackbarClient = upd.default;
 			ClubDiscovery = discovery.default;
+			InstallPrompt = prompt.default;
 		} catch (err) {
 			// best-effort, keep app usable without these features
 
@@ -163,8 +166,6 @@
 	});
 
 	let { children } = $props();
-
-	import { modalOpen } from '$lib/stores/overlay';
 </script>
 
 <svelte:head>
@@ -178,11 +179,11 @@
 	>Skip to content</a
 >
 
-<ThemeProvider>
-	<OfflineIndicator />
-	{#if LiveAnnouncer}
-		<LiveAnnouncer />
-	{/if}
+	<ThemeProvider>
+		<OfflineIndicator />
+		{#if LiveAnnouncer}
+			<LiveAnnouncer />
+		{/if}
 	{#if UpdateSnackbarClient}
 		<UpdateSnackbarClient />
 	{/if}
@@ -281,5 +282,7 @@
 			</div>
 		</div>
 	{/if}
-	<InstallPrompt />
-</ThemeProvider>
+	{#if InstallPrompt}
+		<InstallPrompt />
+	{/if}
+	</ThemeProvider>

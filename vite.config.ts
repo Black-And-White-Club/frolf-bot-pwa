@@ -54,7 +54,9 @@ export default defineConfig({
 				'fonts/space-grotesk-v22-latin-500.woff2',
 				'fonts/space-grotesk-v22-latin-600.woff2',
 				'fonts/space-grotesk-v22-latin-700.woff2',
-				'fonts/fraunces-variable-latin.woff2'
+				'fonts/fraunces-variable-latin.woff2',
+				'icons/icon-192.webp',
+				'icons/icon-512.webp'
 			],
 			workbox: {
 				maximumFileSizeToCacheInBytes: 5_000_000,

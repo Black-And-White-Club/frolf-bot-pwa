@@ -2,7 +2,7 @@ name: Build and Push PWA to OCIR
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ['main']
   workflow_dispatch:
 
 env:

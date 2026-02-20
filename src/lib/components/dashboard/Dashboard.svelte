@@ -1,18 +1,40 @@
 <script lang="ts">
-	import Leaderboard from '$lib/components/leaderboard/Leaderboard.svelte';
-	import RoundList from '$lib/components/round/RoundList.svelte';
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import LeaderboardCompact from '$lib/components/leaderboard/LeaderboardCompact.svelte';
-	import TagLeaderboard from '$lib/components/leaderboard/TagLeaderboard.svelte';
-	import TagDetailSheet from '$lib/components/leaderboard/TagDetailSheet.svelte';
 	import { tagStore } from '$lib/stores/tags.svelte';
 	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
+	import Leaderboard from '$lib/components/leaderboard/Leaderboard.svelte';
+	import RoundList from '$lib/components/round/RoundList.svelte';
 
 	interface Props {
 		mode?: 'default' | 'tv' | 'compact';
 	}
 
 	let { mode = 'default' }: Props = $props();
+
+	// Dynamic components (lazy load specialized views)
+	let LeaderboardCompact = $state<any>(null);
+	let TagLeaderboard = $state<any>(null);
+	let TagDetailSheet = $state<any>(null);
+
+	onMount(async () => {
+		try {
+			if (mode === 'compact') {
+				const lbCompact = await import('$lib/components/leaderboard/LeaderboardCompact.svelte');
+				LeaderboardCompact = lbCompact.default;
+			} else {
+				// We load TagLeaderboard since users can toggle between them.
+				const [tl, tds] = await Promise.all([
+					import('$lib/components/leaderboard/TagLeaderboard.svelte'),
+					import('$lib/components/leaderboard/TagDetailSheet.svelte')
+				]);
+				TagLeaderboard = tl.default;
+				TagDetailSheet = tds.default;
+			}
+		} catch (err) {
+			console.error('Failed to load dashboard dynamic components', err);
+		}
+	});
 
 	function handleMemberSelect(memberId: string) {
 		tagStore.selectMember(memberId);
@@ -39,14 +61,18 @@
 
 	<main class="content">
 		{#if mode === 'compact'}
-			<LeaderboardCompact entries={leaderboardService.currentView} />
+			{#if LeaderboardCompact}
+				<LeaderboardCompact entries={leaderboardService.currentView} />
+			{:else}
+				<div class="animate-pulse rounded-lg bg-[var(--guild-surface)] h-[200px]"></div>
+			{/if}
 		{:else if mode === 'tv'}
 			<div class="tv-layout">
 				<div class="tv-column leaderboard-column">
-					{#if leaderboardService.viewMode === 'tags'}
+					{#if leaderboardService.viewMode === 'tags' && TagLeaderboard}
 						<TagLeaderboard members={tagMembers} onSelectMember={handleMemberSelect} />
 
-						{#if tagStore.selectedMemberId}
+						{#if tagStore.selectedMemberId && TagDetailSheet}
 							<TagDetailSheet
 								memberId={tagStore.selectedMemberId}
 								history={tagStore.selectedMemberHistory}
@@ -75,10 +101,10 @@
 			</div>
 
 			<div class="leaderboard-section">
-				{#if leaderboardService.viewMode === 'tags'}
-					<TagLeaderboard members={tagMembers} onSelectMember={handleMemberSelect} />
+				{#if leaderboardService.viewMode === 'tags' && TagLeaderboard}
+					<TagLeaderboard members={tagMembers} onSelectMember={handleMemberSelect} onViewAll={() => goto('/leaderboard')} />
 
-					{#if tagStore.selectedMemberId}
+					{#if tagStore.selectedMemberId && TagDetailSheet}
 						<TagDetailSheet
 							memberId={tagStore.selectedMemberId}
 							history={tagStore.selectedMemberHistory}
@@ -86,7 +112,7 @@
 						/>
 					{/if}
 				{:else}
-					<Leaderboard entries={leaderboardService.currentView} title="Points Leaderboard" />
+					<Leaderboard entries={leaderboardService.currentView} title="Points Leaderboard" onViewAll={() => goto('/leaderboard')} />
 				{/if}
 			</div>
 		{/if}
