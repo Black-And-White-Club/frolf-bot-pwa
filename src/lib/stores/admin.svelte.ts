@@ -5,6 +5,7 @@
  */
 
 import { nats } from './nats.svelte';
+import { dataLoader } from './dataLoader.svelte';
 
 interface TagAssignment {
 	userId: string;
@@ -84,6 +85,7 @@ class AdminService {
 			const count = msg.data.assignment_count ?? assignments.length;
 			this.successMessage = `Tags updated successfully (${count} assignment${count !== 1 ? 's' : ''})`;
 			this.scheduleMessageClear();
+			dataLoader.reload();
 			cleanup();
 		});
 

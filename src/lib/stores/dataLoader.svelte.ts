@@ -58,6 +58,14 @@ class DataLoader {
 		}
 	}
 
+	/**
+	 * Force a data reload
+	 */
+	async reload(): Promise<void> {
+		this.initialLoadPromise = null;
+		await this.loadInitialData();
+	}
+
 	private async loadInitialDataForId(
 		preferredId: string,
 		clubUuid: string,

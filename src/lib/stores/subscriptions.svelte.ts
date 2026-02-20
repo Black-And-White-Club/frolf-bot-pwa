@@ -6,6 +6,7 @@
 import { nats } from './nats.svelte';
 import { roundService } from './round.svelte';
 import { leaderboardService } from './leaderboard.svelte';
+import { dataLoader } from './dataLoader.svelte';
 
 class SubscriptionManager {
 	private unsubscribers: (() => void)[] = [];
@@ -97,7 +98,7 @@ class SubscriptionManager {
 		// Full leaderboard update
 		this.unsubscribers.push(
 			nats.subscribe(`leaderboard.updated.v1.${guildId}`, (msg: any) => {
-				leaderboardService.setSnapshot(msg.data.leaderboard_data);
+				dataLoader.reload();
 			})
 		);
 
