@@ -98,7 +98,7 @@
 	async function handleSubmit() {
 		if (!auth.user || hasConflicts || changedCount === 0) return;
 
-		const guildId = auth.user.activeClubUuid || auth.user.guildId;
+		const guildId = auth.user.guildId;
 		const adminId = auth.user.id;
 
 		const assignments = rows
