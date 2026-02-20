@@ -5,6 +5,7 @@ declare global {
 		interface Chainable {
 			getMockNats(): Chainable<any>;
 			publishNatsEvent(subject: string, payload: unknown): Chainable<void>;
+			stubNatsRequest(subject: string, payload: unknown): Chainable<void>;
 			visitWithToken(path?: string, token?: string): Chainable<void>;
 			visitMockMode(path?: string): Chainable<void>;
 		}
