@@ -5,8 +5,13 @@ import { forwardSetCookieHeaders } from '$lib/server/http';
 /**
  * Proxy the Google OAuth login initiation to the backend.
  */
-export const GET: RequestHandler = async ({ fetch }) => {
-	const res = await fetch(`${serverConfig.backendUrl}/api/auth/google/login`, {
+export const GET: RequestHandler = async ({ fetch, url }) => {
+	const backendUrl = new URL('/api/auth/google/login', serverConfig.backendUrl);
+	url.searchParams.forEach((value, key) => {
+		backendUrl.searchParams.set(key, value);
+	});
+
+	const res = await fetch(backendUrl.toString(), {
 		redirect: 'manual'
 	});
 

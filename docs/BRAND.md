@@ -1,58 +1,71 @@
-# Frolf-Bot Brand Guide (v1)
+# Frolf-Bot Brand Design Guide (v0.4 - 2026 Refresh)
 
-This file captures the essential pieces of the Frolf-Bot brand as extracted from the design guide in the repo.
+## Vision and Identity
 
-## Vision & Identity
+Frolf-Bot is a high-performance, event-driven companion for the modern disc golfer. It bridges Classic Sporting Heritage and High-Frequency Tech. The v0.4 refresh shifts away from standard dark mode into an atmospheric, tactile experience.
 
-Frolf-Bot is your intelligent disc golf companion — smart, approachable, rewarding, and modern-classic.
+## Brand Personality Keywords
 
-## Personality Keywords
+- Atmospheric: immersive, deep, and grounded in nature.
+- Tactile: interfaces feel like liquid glass or polished stone.
+- Kinetic: subtle motion that responds to live data.
+- Modern Classic: confident serif typography paired with fast, technical UI behavior.
 
-- Intelligent
-- Approachable
-- Rewarding
-- Modern Classic
+## Core Color System (2026 Obsidian Forest Edition)
 
-## Core Colors (Design Tokens)
+### Foundation (Backgrounds)
 
-- Primary (Skobeloff): `#007474` — UI Hero (primary actions, navigation)
-- Secondary (Amethyst): `#8B7BB8` — Brand Hero (highlights, marketing)
-- Accent (Satin Sheen Gold): `#CBA135` — Rewarding accents (5-10% usage)
-- Background (Mint Cream): `#F5FFFA` — light backgrounds
-- Text (Charcoal): `#1A1A1A` — primary typography
+- Obsidian Forest `#081212`
+- Role: default dark base across the app.
+- Usage: global app background; replaces `#1A1A1A` as dark foundation.
 
-## Usage Priorities
+### Hero (Primary Action)
 
-1. Skobeloff (#007474) — primary UI actions and navigation
-2. Amethyst (#8B7BB8) — secondary actions, highlights
-3. Mint (#F5FFFA) — backgrounds (light mode)
-4. Charcoal (#1A1A1A) — text, dark-mode base
-5. Gold (#CBA135) — celebratory accents (rare)
+- Liquid Skobeloff `#007474`
+- Role: primary action anchor.
+- Usage rule: never flat-fill primary action blocks.
+- Gradient recipe: `#008B8B -> #007474` top-down linear gradient for subtle glass depth.
 
-## Icon & Stroke Guidance (2025 best practice)
+### Energy (Secondary and Live Highlights)
 
-- Use `currentColor` in inline SVGs for single-color icons so icons inherit `text-*` classes.
-- Standard stroke weight (UI icons): `1.8px - 2px` for 24px icons. Use `stroke-opacity: 1` for clear outlines.
-- Multi-part icons may use theme variables (e.g., `var(--guild-primary)`) for specific fills.
+- Amethyst Aura `#8B7BB8`
+- Role: live-state indicators and energy pulses.
+- Usage: active NATS stream indicators and PWA syncing states.
+- Effect: pair with approximately 15px blur glow for active emphasis.
 
-## Dark & Light mode
+### Prestige (Accents)
 
-- Use the same token roles. Backgrounds switch to Charcoal in dark mode while maintaining Skobeloff and Amethyst for actionable accents.
+- Matte Heritage Gold `#B89B5E`
+- Role: celebration moments and premium accents.
+- Gradient recipe: `#B89B5E 45% -> #7C6B3C 100%`.
+- Usage: brushed metal, never glossy metallic.
 
-## Accessibility & Contrast
+## Typography (Classic Bridge)
 
-- Ensure text has a contrast ratio >= 4.5:1 on the background.
-- Primary contrast on actionable elements (buttons) should be at least 3:1 on surface.
+### Display and Headlines
 
-## Component Notes
+- Font: Fraunces (variable serif).
+- Weight target: soft 700.
+- Usage: major headings, round summaries, key totals.
 
-- Buttons: use Skobeloff for primary, Amethyst for secondary/marketing supported buttons.
-- Badges: brand accents (Gold) for achievements; statuses use Skobeloff/Amethyst as appropriate.
+### Functional UI and Data
 
-## Files of record
+- Font: Space Grotesk.
+- Usage: controls, labels, data-heavy views, event logs.
 
-- `src/lib/stores/theme.ts` — design tokens and available guild themes.
+## Interaction Design (EDA Style)
 
----
+### Reactive States
 
-Generated from user-provided brand guide and repo tokens.
+- When JetStream events land, apply subtle kinetic typography (small scale pulse) to indicate fresh data.
+
+### Liquid Surfaces
+
+- Cards and elevated surfaces should use a 1px Skobeloff border at 20% opacity.
+- Surfaces should read as floating layers against Obsidian Forest.
+
+## Implementation Notes
+
+- Prefer tokenized CSS variables over hard-coded color values.
+- Preserve contrast and readability for all foreground/background pairings.
+- Keep motion meaningful and state-driven, not ornamental.

@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET } from './+server';
-import { serverConfig } from '$lib/server/config';
 
 vi.mock('$lib/server/config', () => ({
 	serverConfig: {
@@ -38,6 +37,23 @@ describe('GET /api/auth/google/callback', () => {
 
 		expect(res.status).toBe(302);
 		expect(res.headers.get('location')).toBe('/auth/signin?error=oauth_failed');
+	});
+
+	it('preserves redirect from oauth_return_to cookie on backend failure', async () => {
+		mockRequest.headers = new Headers({
+			cookie: 'oauth_return_to=%2Fjoin%3Fcode%3Dabc; oauth_state=xyz'
+		});
+		mockFetch.mockResolvedValue({
+			status: 401,
+			headers: new Headers()
+		});
+
+		const res = await GET({ fetch: mockFetch, request: mockRequest, url: mockUrl } as any);
+
+		expect(res.status).toBe(302);
+		expect(res.headers.get('location')).toBe(
+			'/auth/signin?error=oauth_failed&redirect=%2Fjoin%3Fcode%3Dabc'
+		);
 	});
 
 	it('extracts path from backend location', async () => {

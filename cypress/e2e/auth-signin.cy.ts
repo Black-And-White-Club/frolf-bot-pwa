@@ -28,41 +28,25 @@ describe('Auth and Sign-in Routes', () => {
 		arrangeAuthenticated('/auth/signin');
 
 		signinScreen.root().should('be.visible');
+		signinScreen.expectOAuthOnlyUi();
 		signinScreen.discordButton().should('have.attr', 'href', '/api/auth/discord/login');
 		signinScreen.googleButton().should('have.attr', 'href', '/api/auth/google/login');
+	});
+
+	it('preserves redirect query on oauth links', () => {
+		arrangeAuthenticated('/auth/signin?redirect=%2Fjoin%3Fcode%3Dclub-abc');
+
+		signinScreen
+			.discordButton()
+			.should('have.attr', 'href', '/api/auth/discord/login?redirect=%2Fjoin%3Fcode%3Dclub-abc');
+		signinScreen
+			.googleButton()
+			.should('have.attr', 'href', '/api/auth/google/login?redirect=%2Fjoin%3Fcode%3Dclub-abc');
 	});
 
 	it('shows oauth error banner when error query param is set', () => {
 		arrangeAuthenticated('/auth/signin?error=oauth_failed');
 
 		signinScreen.expectOAuthError();
-	});
-
-	it('submits magic-link email successfully', () => {
-		cy.intercept('POST', '**/api/auth/login', {
-			statusCode: 200,
-			body: { ok: true }
-		}).as('magicLinkRequest');
-		arrangeAuthenticated('/auth/signin');
-
-		signinScreen.emailInput().type('player@example.com');
-		signinScreen.submitMagicLinkButton().click();
-
-		cy.wait('@magicLinkRequest');
-		signinScreen.expectMagicLinkSuccess();
-	});
-
-	it('shows magic-link error when login request fails', () => {
-		cy.intercept('POST', '**/api/auth/login', {
-			statusCode: 500,
-			body: { error: 'Internal error' }
-		}).as('magicLinkRequest');
-		arrangeAuthenticated('/auth/signin');
-
-		signinScreen.emailInput().type('player@example.com');
-		signinScreen.submitMagicLinkButton().click();
-
-		cy.wait('@magicLinkRequest');
-		signinScreen.expectMagicLinkError();
 	});
 });
