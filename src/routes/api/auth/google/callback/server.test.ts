@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET } from './+server';
-import { serverConfig } from '$lib/server/config';
 
 vi.mock('$lib/server/config', () => ({
 	serverConfig: {
