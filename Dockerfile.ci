@@ -9,6 +9,8 @@ WORKDIR /app
 # Install production dependencies only
 # This runs in QEMU on ARM64, but is much faster than a full build
 COPY package.json bun.lock ./
+# Include workspace manifests so --frozen-lockfile does not try to rewrite bun.lock.
+COPY packages/ws-contract-testkit/package.json packages/ws-contract-testkit/package.json
 RUN --mount=type=cache,target=/root/.bun bun install --frozen-lockfile --production
 
 # Copy pre-built application from GitHub Actions runner
