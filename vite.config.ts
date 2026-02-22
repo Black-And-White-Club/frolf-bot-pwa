@@ -43,34 +43,10 @@ export default defineConfig({
 			injectManifest: {
 				swSrc: 'src/service-worker.ts'
 			},
-			includeAssets: [
-				'favicon.svg',
-				'offline.html',
-				'fonts/inter-v20-latin-regular.woff2',
-				'fonts/inter-v20-latin-500.woff2',
-				'fonts/inter-v20-latin-600.woff2',
-				'fonts/inter-v20-latin-700.woff2',
-				'fonts/space-grotesk-v22-latin-regular.woff2',
-				'fonts/space-grotesk-v22-latin-500.woff2',
-				'fonts/space-grotesk-v22-latin-600.woff2',
-				'fonts/space-grotesk-v22-latin-700.woff2',
-				'fonts/fraunces-variable-latin.woff2',
-				'icons/icon-192.webp',
-				'icons/icon-512.webp'
-			],
+			includeAssets: ['favicon.svg', 'offline.html', 'icons/icon-192.webp', 'icons/icon-512.webp'],
 			workbox: {
 				maximumFileSizeToCacheInBytes: 5_000_000,
-				runtimeCaching: [
-					{
-						urlPattern: /\/fonts\/.*\.woff2$/,
-						handler: 'CacheFirst',
-						options: {
-							cacheName: 'pwa-fonts',
-							expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 30 },
-							cacheableResponse: { statuses: [0, 200] }
-						}
-					}
-				]
+				runtimeCaching: []
 			}
 		}),
 		...(process.env.ANALYZE

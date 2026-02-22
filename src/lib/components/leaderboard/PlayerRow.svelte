@@ -63,6 +63,7 @@
 		onclick && 'interactive'
 	)}
 	data-testid={testid}
+	data-user-id={userId}
 >
 	{#if onclick}
 		<button
@@ -77,13 +78,7 @@
 		<div class="left">
 			<div class="avatar" aria-hidden="true" class:has-image={!!avatarUrl}>
 				{#if avatarUrl}
-					<img
-						src={avatarUrl}
-						alt={name}
-						class="avatar-img"
-						loading="lazy"
-						decoding="async"
-					/>
+					<img src={avatarUrl} alt={name} class="avatar-img" loading="lazy" decoding="async" />
 				{:else}
 					{getAvatarInitial(name)}
 				{/if}

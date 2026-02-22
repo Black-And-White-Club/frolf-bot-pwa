@@ -90,42 +90,83 @@ class LeaderboardService {
 	}
 
 	applyPatch(patch: PatchOperation): void {
-		if (!this.snapshot) return;
+		const currentSnapshot = this.snapshot;
+		if (!currentSnapshot) {
+			return;
+		}
+
+		const updateSnapshot = (entries: LeaderboardEntry[]) => {
+			const nextVersion = this.version + 1;
+			this.snapshot = {
+				...currentSnapshot,
+				entries,
+				version: nextVersion,
+				lastUpdated: new Date().toISOString()
+			};
+			this.version = nextVersion;
+		};
 
 		switch (patch.op) {
 			case 'upsert_entry': {
-				const idx = this.snapshot.entries.findIndex((e) => e.userId === patch.entry.userId);
+				const idx = currentSnapshot.entries.findIndex(
+					(entry) => entry.userId === patch.entry.userId
+				);
 				if (idx >= 0) {
-					this.snapshot.entries[idx] = { ...this.snapshot.entries[idx], ...patch.entry };
+					const nextEntries = currentSnapshot.entries.map((entry, index) =>
+						index === idx ? { ...entry, ...patch.entry } : entry
+					);
+					updateSnapshot(nextEntries);
 				} else {
-					this.snapshot.entries.push({
-						tagNumber: 0,
-						totalPoints: 0,
-						roundsPlayed: 0,
-						...patch.entry
-					} as LeaderboardEntry);
+					const nextEntries = [
+						...currentSnapshot.entries,
+						{
+							tagNumber: 0,
+							totalPoints: 0,
+							roundsPlayed: 0,
+							...patch.entry
+						} as LeaderboardEntry
+					];
+					updateSnapshot(nextEntries);
 				}
-				this.version++;
 				break;
 			}
 
 			case 'remove_entry': {
-				this.snapshot.entries = this.snapshot.entries.filter((e) => e.userId !== patch.userId);
-				this.version++;
+				const nextEntries = currentSnapshot.entries.filter(
+					(entry) => entry.userId !== patch.userId
+				);
+				updateSnapshot(nextEntries);
 				break;
 			}
 
 			case 'swap_tags': {
-				const entryA = this.snapshot.entries.find((e) => e.userId === patch.userIdA);
-				const entryB = this.snapshot.entries.find((e) => e.userId === patch.userIdB);
-				if (entryA && entryB) {
-					const tempTag = entryA.tagNumber;
-					entryA.previousTagNumber = entryA.tagNumber;
-					entryB.previousTagNumber = entryB.tagNumber;
-					entryA.tagNumber = entryB.tagNumber;
-					entryB.tagNumber = tempTag;
-					this.version++;
+				const entryA = currentSnapshot.entries.find((entry) => entry.userId === patch.userIdA);
+				const entryB = currentSnapshot.entries.find((entry) => entry.userId === patch.userIdB);
+				if (!entryA || !entryB) {
+					break;
 				}
+
+				const entryANextTag = entryB.tagNumber;
+				const entryBNextTag = entryA.tagNumber;
+				const nextEntries = currentSnapshot.entries.map((entry) => {
+					if (entry.userId === patch.userIdA) {
+						return {
+							...entry,
+							previousTagNumber: entry.tagNumber,
+							tagNumber: entryANextTag
+						};
+					}
+					if (entry.userId === patch.userIdB) {
+						return {
+							...entry,
+							previousTagNumber: entry.tagNumber,
+							tagNumber: entryBNextTag
+						};
+					}
+					return entry;
+				});
+
+				updateSnapshot(nextEntries);
 				break;
 			}
 

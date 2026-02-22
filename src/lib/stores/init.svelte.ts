@@ -50,48 +50,81 @@ class AppInitializer {
 		this.error = null;
 
 		try {
-			// Handle mock mode early
-			if (this.isMockMode()) {
-				await this.startMockMode();
-				return;
-			}
-
-			// Step 1: Initialize tracing
-			await initTracing();
-
-			// Perform authentication and optional club switch/load path
-			const authResult = await this.authenticateAndLoadGuild();
-			if (!authResult.authenticated) {
-				// Not authenticated — stay in disconnected mode
-				this.mode = 'disconnected';
-				this.status = 'ready';
-				return;
-			}
-
-			// If the user is authenticated but has no club memberships, show the
-			// club discovery flow instead of connecting to NATS.
-			if (!auth.user?.clubs?.length) {
-				this.needsClub = true;
-				this.mode = 'disconnected';
-				this.status = 'ready';
-				return;
-			}
-
-			this.needsClub = false;
-
-			// If auth initialization already switched clubs and loaded data, don't duplicate it.
-			if (!authResult.switchedClubWithDataLoad) {
-				await this.connectAndLoad();
-			}
-			this.ensureReconnectRecovery();
-
-			this.mode = 'live';
-			this.status = 'ready';
+			await this.initializeByMode();
 		} catch (err) {
-			this.status = 'error';
-			this.mode = 'disconnected';
-			this.error = err instanceof Error ? err.message : 'Initialization failed';
+			this.handleInitializationError(err);
 			console.error('[AppInit] Failed:', err);
+		}
+	}
+
+	private async initializeByMode(): Promise<void> {
+		if (this.isMockMode()) {
+			await this.startMockMode();
+			return;
+		}
+
+		await initTracing();
+		const authResult = await this.authenticateAndLoadGuild();
+		await this.completeAuthenticatedInitialization(authResult);
+	}
+
+	private async completeAuthenticatedInitialization(
+		authResult: AuthInitializeResult
+	): Promise<void> {
+		if (!authResult.authenticated) {
+			this.setDisconnectedReady();
+			return;
+		}
+
+		if (!auth.user?.clubs?.length) {
+			this.setNeedsClubReady();
+			return;
+		}
+
+		this.needsClub = false;
+
+		if (!authResult.switchedClubWithDataLoad) {
+			await this.connectAndLoad();
+		}
+		this.ensureReconnectRecovery();
+		this.setLiveReady();
+	}
+
+	private setDisconnectedReady(): void {
+		this.mode = 'disconnected';
+		this.status = 'ready';
+	}
+
+	private setNeedsClubReady(): void {
+		this.needsClub = true;
+		this.mode = 'disconnected';
+		this.status = 'ready';
+	}
+
+	private setLiveReady(): void {
+		this.mode = 'live';
+		this.status = 'ready';
+	}
+
+	private handleInitializationError(err: unknown): void {
+		this.status = 'error';
+		this.mode = 'disconnected';
+		this.error = this.toErrorMessage(err);
+	}
+
+	private toErrorMessage(err: unknown): string {
+		if (err instanceof Error) {
+			return err.message;
+		}
+
+		if (typeof err === 'string' && err.trim().length > 0) {
+			return err;
+		}
+
+		try {
+			return JSON.stringify(err);
+		} catch {
+			return 'Initialization failed';
 		}
 	}
 

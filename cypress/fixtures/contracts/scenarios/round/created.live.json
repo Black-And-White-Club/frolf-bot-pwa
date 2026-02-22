@@ -1,0 +1,22 @@
+{
+	"subject_id": "guild-123",
+	"steps": [
+		{
+			"action": "emit",
+			"subject": "round.created.v1.{scope_id}",
+			"validate": false,
+			"payload": {
+				"id": "round-live-2",
+				"guild_id": "guild-123",
+				"title": "Live Round from WS",
+				"location": "Pier Park",
+				"description": "",
+				"start_time": "2026-01-25T10:00:00Z",
+				"state": "scheduled",
+				"created_by": "user-1",
+				"event_message_id": "msg-live-2",
+				"participants": []
+			}
+		}
+	]
+}

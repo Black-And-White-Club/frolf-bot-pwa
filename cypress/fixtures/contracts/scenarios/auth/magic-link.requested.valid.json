@@ -1,0 +1,15 @@
+{
+	"subject_id": "guild-123",
+	"steps": [
+		{
+			"action": "emit",
+			"contract_subject": "auth.magic-link.requested.v1",
+			"payload_overrides": {
+				"correlation_id": "corr-123",
+				"guild_id": "guild-123",
+				"role": "admin",
+				"user_id": "user-123"
+			}
+		}
+	]
+}

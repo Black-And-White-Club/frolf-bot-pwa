@@ -1,0 +1,29 @@
+{
+	"subject_id": "guild-123",
+	"steps": [
+		{
+			"action": "emit",
+			"subject": "round.created.v1.{scope_id}",
+			"validate": false,
+			"payload": {
+				"id": "round-1",
+				"guild_id": "guild-123",
+				"title": "Weekly Tag",
+				"location": "Pier Park",
+				"description": "",
+				"start_time": "2026-01-25T10:00:00Z",
+				"state": "finalized",
+				"created_by": "user-1",
+				"event_message_id": "msg-finalized-1",
+				"participants": [
+					{
+						"user_id": "user-2",
+						"response": "accepted",
+						"score": null,
+						"tag_number": 5
+					}
+				]
+			}
+		}
+	]
+}

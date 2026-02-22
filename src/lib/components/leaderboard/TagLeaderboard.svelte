@@ -24,7 +24,7 @@
 	// When displayed in a limited context (e.g. Dashboard), restrict the number of visible rows
 	const displayLimit = $derived($isMobile ? MOBILE_LIMIT : DESKTOP_LIMIT);
 	const displayMembers = $derived(collapsed ? [] : sortedMembers.slice(0, displayLimit));
-	
+
 	const showViewAllButton = $derived(
 		sortedMembers.length > displayLimit && !!onViewAll && !collapsed
 	);
@@ -80,6 +80,7 @@
 						rank={member.currentTag ?? undefined}
 						highlightFirst={true}
 						isCurrentUser={false}
+						testid={`leaderboard-row-${member.memberId}`}
 						onclick={() => onSelectMember?.(member.memberId)}
 					>
 						<button

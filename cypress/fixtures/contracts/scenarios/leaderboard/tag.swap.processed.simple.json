@@ -1,0 +1,14 @@
+{
+	"subject_id": "guild-123",
+	"steps": [
+		{
+			"action": "emit",
+			"contract_subject": "leaderboard.tag.swap.processed.v1",
+			"payload_overrides": {
+				"guild_id": "guild-123",
+				"requestor_id": "user-1",
+				"target_id": "user-2"
+			}
+		}
+	]
+}
