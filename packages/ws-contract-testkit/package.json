@@ -1,0 +1,17 @@
+{
+	"name": "@frolf/ws-contract-testkit",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/core.mjs",
+		"./core": "./src/core.mjs",
+		"./scenario": "./src/scenario.mjs",
+		"./cypress-adapter": "./src/cypress-adapter.mjs",
+		"./cli/sync-contracts": "./src/cli/sync-contracts.mjs",
+		"./cli/validate-fixtures": "./src/cli/validate-fixtures.mjs"
+	},
+	"files": [
+		"src"
+	]
+}

@@ -71,7 +71,7 @@ function mapResponse(response: string): ParticipantResponse {
 }
 
 // Transform participant from snake_case to camelCase
-function transformParticipant(raw: ParticipantRaw): Participant {
+export function participantFromRaw(raw: ParticipantRaw): Participant {
 	return {
 		userId: raw.user_id,
 		response: mapResponse(raw.response),
@@ -90,23 +90,33 @@ function mapRoundState(state: string): RoundState {
 }
 
 // Transform raw API response to internal format
-function transformRound(raw: RoundRaw): Round {
+export function roundFromRaw(raw: RoundRaw): Round {
 	return {
 		id: raw.id,
 		guildId: raw.guild_id,
 		title: raw.title || '',
 		location: raw.location || '',
 		description: raw.description || '',
-		startTime: raw.start_time || new Date().toISOString(), // Fallback to now if null
+		startTime: raw.start_time || '1970-01-01T00:00:00.000Z', // Stable fallback when backend omits start time
 		state: mapRoundState(raw.state),
 		createdBy: raw.created_by,
 		eventMessageId: raw.event_message_id || '',
 		discordEventId: raw.discord_event_id,
-		participants: (raw.participants || []).map(transformParticipant),
+		participants: (raw.participants || []).map(participantFromRaw),
 		parValues: raw.par_values,
 		holes: raw.holes,
 		currentHole: raw.current_hole
 	};
+}
+
+function isRoundRaw(value: Round | RoundRaw): value is RoundRaw {
+	return (
+		typeof value === 'object' &&
+		value !== null &&
+		'guild_id' in value &&
+		'created_by' in value &&
+		'event_message_id' in value
+	);
 }
 
 // ============ RoundService Class ============
@@ -148,14 +158,18 @@ export class RoundService {
 		if (this.rounds.find((r) => r.id === round.id)) {
 			return;
 		}
-		this.rounds.push(round);
+		this.rounds = [...this.rounds, round];
 	}
 
 	updateRound(id: string, update: Partial<Round>): void {
-		const idx = this.rounds.findIndex((r) => r.id === id);
-		if (idx !== -1) {
-			this.rounds[idx] = { ...this.rounds[idx], ...update };
+		const roundIndex = this.rounds.findIndex((round) => round.id === id);
+		if (roundIndex === -1) {
+			return;
 		}
+
+		this.rounds = this.rounds.map((round, index) =>
+			index === roundIndex ? { ...round, ...update } : round
+		);
 	}
 
 	removeRound(id: string): void {
@@ -168,40 +182,67 @@ export class RoundService {
 
 	// Participant methods
 	updateParticipant(roundId: string, userId: string, update: Partial<Participant>): void {
-		const round = this.rounds.find((r) => r.id === roundId);
-		if (!round) return;
-
-		const participantIdx = round.participants.findIndex((p) => p.userId === userId);
-		if (participantIdx !== -1) {
-			round.participants[participantIdx] = {
-				...round.participants[participantIdx],
-				...update
-			};
+		const round = this.rounds.find((entry) => entry.id === roundId);
+		if (!round) {
+			return;
 		}
+
+		const participantIndex = round.participants.findIndex(
+			(participant) => participant.userId === userId
+		);
+		if (participantIndex === -1) {
+			return;
+		}
+
+		const nextParticipants = round.participants.map((participant, index) =>
+			index === participantIndex ? { ...participant, ...update } : participant
+		);
+
+		this.rounds = this.rounds.map((entry) =>
+			entry.id === roundId ? { ...entry, participants: nextParticipants } : entry
+		);
 	}
 
 	addParticipant(roundId: string, participant: Participant): void {
-		const round = this.rounds.find((r) => r.id === roundId);
-		if (!round) return;
+		const round = this.rounds.find((entry) => entry.id === roundId);
+		if (!round) {
+			return;
+		}
 
 		// Avoid duplicates
 		if (round.participants.find((p) => p.userId === participant.userId)) {
 			return;
 		}
 
-		round.participants.push(participant);
+		this.rounds = this.rounds.map((entry) =>
+			entry.id === roundId
+				? {
+						...entry,
+						participants: [...entry.participants, participant]
+					}
+				: entry
+		);
 	}
 
 	removeParticipant(roundId: string, userId: string): void {
-		const round = this.rounds.find((r) => r.id === roundId);
-		if (!round) return;
+		const round = this.rounds.find((entry) => entry.id === roundId);
+		if (!round) {
+			return;
+		}
 
-		round.participants = round.participants.filter((p) => p.userId !== userId);
+		this.rounds = this.rounds.map((entry) =>
+			entry.id === roundId
+				? {
+						...entry,
+						participants: entry.participants.filter((participant) => participant.userId !== userId)
+					}
+				: entry
+		);
 	}
 
 	// Event handlers (called by NatsService)
-	handleRoundCreated(payload: Round): void {
-		this.addRound(payload);
+	handleRoundCreated(payload: Round | RoundRaw): void {
+		this.addRound(isRoundRaw(payload) ? roundFromRaw(payload) : payload);
 	}
 
 	handleRoundUpdated(payload: { roundId: string; update: Partial<Round> }): void {
@@ -235,7 +276,7 @@ export class RoundService {
 	 * Set rounds from raw API response (snake_case format)
 	 */
 	setRoundsFromApi(rawRounds: RoundRaw[]): void {
-		this.rounds = rawRounds.map(transformRound);
+		this.rounds = rawRounds.map(roundFromRaw);
 	}
 
 	/**

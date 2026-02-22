@@ -114,6 +114,57 @@ export class TagService {
 		this.error = null;
 	}
 
+	upsertTagMember({
+		memberId,
+		currentTag,
+		lastActiveAt
+	}: {
+		memberId: string;
+		currentTag: number | null;
+		lastActiveAt?: string;
+	}) {
+		const memberIndex = this.tagList.findIndex((member) => member.memberId === memberId);
+		if (memberIndex === -1) {
+			this.tagList = [
+				...this.tagList,
+				{
+					memberId,
+					currentTag,
+					lastActiveAt
+				}
+			];
+			return;
+		}
+
+		this.tagList = this.tagList.map((member, index) =>
+			index === memberIndex
+				? {
+						...member,
+						currentTag,
+						lastActiveAt: lastActiveAt ?? member.lastActiveAt
+					}
+				: member
+		);
+	}
+
+	swapTagMembers(memberIdA: string, memberIdB: string) {
+		const memberA = this.tagList.find((member) => member.memberId === memberIdA);
+		const memberB = this.tagList.find((member) => member.memberId === memberIdB);
+		if (!memberA || !memberB) {
+			return;
+		}
+
+		this.tagList = this.tagList.map((member) => {
+			if (member.memberId === memberIdA) {
+				return { ...member, currentTag: memberB.currentTag };
+			}
+			if (member.memberId === memberIdB) {
+				return { ...member, currentTag: memberA.currentTag };
+			}
+			return member;
+		});
+	}
+
 	setLoading(isLoading: boolean) {
 		this.loading = isLoading;
 	}

@@ -1,0 +1,67 @@
+{
+	"entries": [
+		{
+			"fixture": "cypress/fixtures/contracts/scenarios/round/created.simple.json",
+			"step": 1,
+			"subject": "round.created.v1.guild-123",
+			"contract_subject": "round.created.v1",
+			"reason": "PWA round card tests currently require legacy payload shape for round.created.",
+			"owner": "@jace",
+			"created_at": "2026-02-22"
+		},
+		{
+			"fixture": "cypress/fixtures/contracts/scenarios/round/created.live.json",
+			"step": 1,
+			"subject": "round.created.v1.guild-123",
+			"contract_subject": "round.created.v1",
+			"reason": "Live-round scenario uses legacy payload shape consumed by the current PWA round store.",
+			"owner": "@jace",
+			"created_at": "2026-02-22"
+		},
+		{
+			"fixture": "cypress/fixtures/contracts/scenarios/round/started.round-1.json",
+			"step": 1,
+			"subject": "round.started.v1.guild-123",
+			"contract_subject": "round.started.v1",
+			"reason": "PWA state transition assertions still rely on minimal payload shape for round.started.",
+			"owner": "@jace",
+			"created_at": "2026-02-22"
+		},
+		{
+			"fixture": "cypress/fixtures/contracts/scenarios/round/participant.joined.round-1.json",
+			"step": 1,
+			"subject": "round.participant.joined.v1.guild-123",
+			"contract_subject": "round.participant.joined.v1",
+			"reason": "Participant-join UI tests currently rely on legacy participant payload structure.",
+			"owner": "@jace",
+			"created_at": "2026-02-22"
+		},
+		{
+			"fixture": "cypress/fixtures/contracts/scenarios/round/participant.score.updated.round-1-user-2.json",
+			"step": 1,
+			"subject": "round.participant.score.updated.v1.guild-123",
+			"contract_subject": "round.participant.score.updated.v1",
+			"reason": "Score update tests still use legacy payload shape expected by current PWA finalized-round rendering.",
+			"owner": "@jace",
+			"created_at": "2026-02-22"
+		},
+		{
+			"fixture": "cypress/fixtures/contracts/scenarios/round/deleted.round-1.json",
+			"step": 1,
+			"subject": "round.deleted.v1.guild-123",
+			"contract_subject": "round.deleted.v1",
+			"reason": "Round deletion tests depend on minimal legacy payload shape consumed in current PWA reducer.",
+			"owner": "@jace",
+			"created_at": "2026-02-22"
+		},
+		{
+			"fixture": "cypress/fixtures/contracts/scenarios/round/created.finalized.with-score-target.json",
+			"step": 1,
+			"subject": "round.created.v1.guild-123",
+			"contract_subject": "round.created.v1",
+			"reason": "Finalized round score preview tests still need the legacy round.created participant payload shape.",
+			"owner": "@jace",
+			"created_at": "2026-02-22"
+		}
+	]
+}

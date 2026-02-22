@@ -10,12 +10,24 @@ import { config, log } from '$lib/config';
 // ============ Types ============
 
 type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'reconnecting' | 'error';
+type NatsLib = typeof import('nats.ws');
 
 interface NatsMessage<T = unknown> {
 	subject: string;
 	data: T;
 	headers?: Map<string, string[]>;
 }
+
+type CypressNatsBridge = {
+	subscribe: (subject: string, handler: (payload: unknown) => void) => () => void;
+	publish: (subject: string, payload: unknown) => void;
+	request: (subject: string, payload: unknown, timeoutMs?: number) => Promise<unknown>;
+};
+
+type CypressWindowBridge = Window &
+	typeof globalThis & {
+		__FROLF_CYPRESS_NATS__?: CypressNatsBridge;
+	};
 
 // ============ NatsService Class ============
 
@@ -33,14 +45,26 @@ class NatsService {
 	// Private
 	private subscriptions: Map<string, Subscription> = new Map();
 	private codec: Codec<string> | null = null;
-	private natsLib: typeof import('nats.ws') | null = null;
+	private natsLib: NatsLib | null = null;
 	private reconnectListeners: Set<() => void | Promise<void>> = new Set();
+	private cypressBridge: CypressNatsBridge | null = null;
+	private cypressSubscriptions: Map<string, () => void> = new Map();
 
 	/**
 	 * Connect to NATS server with JWT token
 	 */
 	async connect(token: string): Promise<void> {
 		if (this.status === 'connecting' || this.status === 'connected') {
+			return;
+		}
+
+		const bridge = this.getCypressBridge();
+		if (bridge) {
+			this.cypressBridge = bridge;
+			this.status = 'connected';
+			this.lastError = null;
+			this.reconnectAttempts = 0;
+			log('Connected to Cypress NATS bridge with token length:', token?.length);
 			return;
 		}
 
@@ -102,10 +126,25 @@ class NatsService {
 		}
 	}
 
+	private getCypressBridge(): CypressNatsBridge | null {
+		if (typeof window === 'undefined') {
+			return null;
+		}
+		return (window as CypressWindowBridge).__FROLF_CYPRESS_NATS__ ?? null;
+	}
+
 	/**
 	 * Disconnect from NATS server
 	 */
 	async disconnect(): Promise<void> {
+		if (this.cypressBridge) {
+			this.unsubscribeAll();
+			this.cypressBridge = null;
+			this.status = 'disconnected';
+			this.reconnectAttempts = 0;
+			return;
+		}
+
 		if (this.connection) {
 			await this.connection.close();
 			this.connection = null;
@@ -119,6 +158,19 @@ class NatsService {
 	 * Returns unsubscribe function for $effect cleanup
 	 */
 	subscribe<T>(subject: string, handler: (msg: NatsMessage<T>) => void): () => void {
+		if (this.cypressBridge) {
+			this.unsubscribe(subject);
+			const unsubscribe = this.cypressBridge.subscribe(subject, (payload) => {
+				handler({
+					subject,
+					data: payload as T,
+					headers: new Map<string, string[]>()
+				});
+			});
+			this.cypressSubscriptions.set(subject, unsubscribe);
+			return () => this.unsubscribe(subject);
+		}
+
 		if (!this.connection || !this.codec) {
 			console.warn('Cannot subscribe: not connected');
 			return () => {};
@@ -172,6 +224,15 @@ class NatsService {
 	 * Unsubscribe from a NATS subject
 	 */
 	unsubscribe(subject: string): void {
+		if (this.cypressBridge) {
+			const unsubscribe = this.cypressSubscriptions.get(subject);
+			if (unsubscribe) {
+				unsubscribe();
+				this.cypressSubscriptions.delete(subject);
+			}
+			return;
+		}
+
 		const sub = this.subscriptions.get(subject);
 		if (sub) {
 			sub.unsubscribe();
@@ -183,6 +244,14 @@ class NatsService {
 	 * Unsubscribe from all subjects
 	 */
 	unsubscribeAll(): void {
+		if (this.cypressBridge) {
+			for (const unsubscribe of this.cypressSubscriptions.values()) {
+				unsubscribe();
+			}
+			this.cypressSubscriptions.clear();
+			return;
+		}
+
 		for (const sub of this.subscriptions.values()) {
 			sub.unsubscribe();
 		}
@@ -210,6 +279,12 @@ class NatsService {
 	 * Publish a message to a NATS subject
 	 */
 	publish<T>(subject: string, data: T, customHeaders?: Record<string, string>): void {
+		if (this.cypressBridge) {
+			void customHeaders;
+			this.cypressBridge.publish(subject, data);
+			return;
+		}
+
 		if (!this.connection || !this.natsLib || !this.codec) {
 			console.warn('Cannot publish: not connected');
 			return;
@@ -262,12 +337,13 @@ class NatsService {
 		data: TReq,
 		options: { timeout?: number } = {}
 	): Promise<TRes | null> {
-		if (!this.connection || !this.natsLib || !this.codec) {
-			throw new Error('Not connected to NATS');
+		if (this.cypressBridge) {
+			return this.requestViaCypressBridge(subject, data, options.timeout);
 		}
 
+		const requestDeps = this.getRequestDependencies();
 		const timeout = options.timeout ?? 5000;
-		const payload = this.codec.encode(JSON.stringify(data));
+		const payload = requestDeps.codec.encode(JSON.stringify(data));
 
 		const tracer = getTracer();
 		const span = tracer.startSpan(`nats.request.${subject}`, {
@@ -278,35 +354,20 @@ class NatsService {
 		});
 
 		// Create a unique inbox for this request
-		const inbox = this.natsLib.createInbox();
+		const inbox = requestDeps.natsLib.createInbox();
 
 		try {
 			// Subscribe to the inbox for the response
-			const sub = this.connection.subscribe(inbox, { max: 1, timeout });
+			const sub = requestDeps.connection.subscribe(inbox, { max: 1, timeout });
 
 			// Create headers with reply_to for JetStream compatibility
-			const natsHeaders = this.natsLib.headers();
-			natsHeaders.append('reply_to', inbox);
-
-			// Inject trace context
-			const traceHeaders: Record<string, string> = {};
-			injectTraceContext(traceHeaders);
-			for (const [key, value] of Object.entries(traceHeaders)) {
-				natsHeaders.append(key, value);
-			}
+			const natsHeaders = this.buildRequestHeaders(requestDeps.natsLib, inbox);
 
 			// Publish the request with the reply_to header
-			this.connection.publish(subject, payload, { headers: natsHeaders });
-
-			// Wait for the response
-			for await (const msg of sub) {
-				const response = JSON.parse(this.codec.decode(msg.data)) as TRes;
-				span.end();
-				return response;
-			}
-
-			// If we get here, subscription timed out or no message received
-			throw new Error(`Request to ${subject} timed out`);
+			requestDeps.connection.publish(subject, payload, { headers: natsHeaders });
+			const response = await this.readRequestResponse<TRes>(sub, requestDeps.codec, subject);
+			span.end();
+			return response;
 		} catch (e) {
 			span.recordException(e as Error);
 			span.end();
@@ -314,10 +375,70 @@ class NatsService {
 		}
 	}
 
+	private async requestViaCypressBridge<TReq, TRes>(
+		subject: string,
+		data: TReq,
+		timeoutMs?: number
+	): Promise<TRes | null> {
+		const timeout = timeoutMs ?? 5000;
+		const response = await this.cypressBridge!.request(subject, data, timeout);
+		return response as TRes;
+	}
+
+	private getRequestDependencies(): {
+		connection: NatsConnection;
+		natsLib: NatsLib;
+		codec: Codec<string>;
+	} {
+		if (!this.connection || !this.natsLib || !this.codec) {
+			throw new Error('Not connected to NATS');
+		}
+
+		return {
+			connection: this.connection,
+			natsLib: this.natsLib,
+			codec: this.codec
+		};
+	}
+
+	private buildRequestHeaders(natsLib: NatsLib, inbox: string): ReturnType<NatsLib['headers']> {
+		const natsHeaders = natsLib.headers();
+		natsHeaders.append('reply_to', inbox);
+
+		const traceHeaders: Record<string, string> = {};
+		injectTraceContext(traceHeaders);
+		for (const [key, value] of Object.entries(traceHeaders)) {
+			natsHeaders.append(key, value);
+		}
+
+		return natsHeaders;
+	}
+
+	private async readRequestResponse<TRes>(
+		sub: Subscription,
+		codec: Codec<string>,
+		subject: string
+	): Promise<TRes> {
+		for await (const msg of sub) {
+			return JSON.parse(codec.decode(msg.data)) as TRes;
+		}
+
+		throw new Error(`Request to ${subject} timed out`);
+	}
+
 	/**
 	 * Cleanup all resources
 	 */
 	destroy(): void {
+		if (this.cypressBridge) {
+			this.unsubscribeAll();
+			this.cypressBridge = null;
+			this.status = 'disconnected';
+			this.lastError = null;
+			this.reconnectListeners.clear();
+			return;
+		}
+
 		this.unsubscribeAll();
 		this.connection?.close();
 		this.connection = null;

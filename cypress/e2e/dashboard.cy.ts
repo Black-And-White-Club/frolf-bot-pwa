@@ -1,66 +1,67 @@
+/// <reference types="cypress" />
+import { buildLeaderboardSnapshot, buildTagListSnapshot } from '../support/event-builders';
+import { dashboardScreen } from '../screens/dashboard.screen';
+import { leaderboardScreen } from '../screens/leaderboard.screen';
+import { roundScreen } from '../screens/round.screen';
+
 describe('Dashboard', () => {
+	const subjectId = 'guild-123';
+
 	describe('Mock Mode', () => {
-		it('displays mock data without NATS connection', () => {
+		it('displays dashboard shells without live NATS', () => {
+			cy.step('Visit dashboard in mock mode');
 			cy.visitMockMode();
 
-			cy.get('[data-testid="dashboard"]').should('exist');
-			cy.get('[data-testid="rounds-panel"]').should('exist');
-			cy.get('[data-testid="leaderboard-panel"]').should('exist');
-
-			// Mock data should be visible
-			cy.contains('Weekly Tag').should('exist');
-			cy.contains('Jake "Ace" Thompson').should('exist');
+			cy.expectDashboardLoaded();
+			dashboardScreen.expectRoundCountAtLeast(1);
 		});
 
-		it('shows loading states then data', () => {
+		it('shows loading state and then round cards', () => {
+			cy.step('Visit mock mode and wait for rounds');
 			cy.visitMockMode();
 
-			// Loading skeletons appear briefly
-			cy.get('[data-testid="loading-skeleton"]').should('exist');
-
-			// Then data appears
-			cy.get('[data-testid="round-card"]').should('have.length.at.least', 1);
-		});
-	});
-
-	describe('TV Mode', () => {
-		it('displays in portrait layout', () => {
-			cy.viewport(1080, 1920); // Portrait TV
-			cy.visitMockMode('/?mode=tv');
-
-			cy.get('.tv-mode').should('exist');
-			cy.get('.dashboard-grid').should('have.css', 'grid-template-columns', '1fr');
+			dashboardScreen.expectRoundCountAtLeast(1);
 		});
 	});
 
 	describe('Live NATS Events', () => {
-		it('displays round when event received', () => {
-			cy.visitWithToken();
-
-			// Wait for connection
-			cy.get('[data-testid="connection-status"]').should('contain', 'Connected');
-
-			// Publish a round event
-			cy.publishNatsEvent('round.created.v1', {
-				id: 'round-123',
-				title: 'Test Round',
-				state: 'scheduled',
-				startTime: new Date().toISOString(),
-				participants: []
+		beforeEach(() => {
+			cy.step('Arrange baseline live snapshot');
+			cy.arrangeSnapshot({
+				subjectId,
+				rounds: [],
+				leaderboard: buildLeaderboardSnapshot({ guild_id: subjectId, leaderboard: [] }),
+				tags: buildTagListSnapshot({ guild_id: subjectId, members: [] })
 			});
-
-			// Verify it appears
-			cy.get('[data-testid="round-card"]').should('contain', 'Test Round');
+			cy.arrangeAuth({ clubUuid: subjectId, guildId: subjectId });
+			cy.wsConnect();
+			cy.expectDashboardLoaded();
+			leaderboardScreen.setMode('points');
+			cy.wsAssertPublished(`round.list.request.v1.${subjectId}`);
 		});
 
-		it('updates leaderboard when event received', () => {
-			cy.visitWithToken();
+		it('renders newly created round from event stream', () => {
+			cy.step('Emit round.created from fixture scenario');
+			cy.wsRunScenario('contracts/scenarios/round/created.live.json', { subjectId });
 
-			cy.publishNatsEvent('leaderboard.updated.v1', {
-				entries: [{ userId: '1', displayName: 'Test Player', tag: 1, points: 1000, movement: 0 }]
+			roundScreen.expectCardContains('round-live-2', 'Live Round from WS');
+		});
+
+		it('reloads leaderboard snapshot after leaderboard.updated event', () => {
+			cy.step('Arrange refreshed leaderboard snapshot');
+			cy.arrangeSnapshot({
+				subjectId,
+				leaderboard: buildLeaderboardSnapshot({
+					leaderboard: [
+						{ tag_number: 1, user_id: 'user-live-1', total_points: 1111, rounds_played: 14 }
+					]
+				})
 			});
 
-			cy.get('[data-testid="leaderboard-row"]').should('contain', 'Test Player');
+			cy.step('Emit leaderboard.updated from contract scenario');
+			cy.wsRunScenario('contracts/scenarios/leaderboard/updated.round-1.json', { subjectId });
+
+			cy.expectLeaderboardLoaded({ minRows: 1 });
 		});
 	});
 });

@@ -26,7 +26,15 @@
 	let overflowCount = $derived(Math.max(0, confirmedParticipants.length - 5));
 </script>
 
-<button class="round-card" {onclick} type="button" aria-label="View round: {round.title}">
+<button
+	class="round-card"
+	{onclick}
+	type="button"
+	aria-label="View round: {round.title}"
+	data-testid="round-card"
+	data-round-id={round.id}
+	data-state={round.state}
+>
 	<div class="card-header">
 		<h3 class="round-title line-clamp-2">{round.title}</h3>
 	</div>
@@ -71,7 +79,7 @@
 							/>
 							{#key p.score}
 								<span
-									class="font-bold text-[var(--guild-secondary)] font-secondary animate-scale-pulse inline-block"
+									class="font-secondary animate-scale-pulse inline-block font-bold text-[var(--guild-secondary)]"
 									>{p.score}</span
 								>
 							{/key}

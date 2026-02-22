@@ -1,0 +1,14 @@
+{
+	"subject_id": "guild-123",
+	"steps": [
+		{
+			"action": "emit",
+			"contract_subject": "leaderboard.updated.v1",
+			"payload_overrides": {
+				"guild_id": "guild-123",
+				"leaderboard_id": 1,
+				"round_id": [1]
+			}
+		}
+	]
+}

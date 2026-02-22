@@ -1,138 +1,84 @@
+/// <reference types="cypress" />
+import { buildLeaderboardSnapshot, buildTagListSnapshot } from '../support/event-builders';
+import { roundScreen } from '../screens/round.screen';
+
 describe('Round Flow', () => {
+	const subjectId = 'guild-123';
+
 	beforeEach(() => {
-		cy.mockNats();
-		cy.visit('/#t=mock-jwt-token');
-		cy.wait(500); // Wait for connection
-	});
-
-	it('displays round when created event received', () => {
-		cy.sendNatsMessage('round.created.v1.guild-123', {
-			id: 'round-1',
-			guild_id: 'guild-123',
-			title: 'Weekly Tag Round',
-			location: 'Pier Park',
-			description: 'Casual weekly round',
-			start_time: '2026-01-25T10:00:00Z',
-			state: 'scheduled',
-			created_by: 'user-1',
-			event_message_id: 'msg-1',
-			participants: []
+		cy.step('Arrange round/leaderboard/tag snapshots');
+		cy.arrangeSnapshot({
+			subjectId,
+			rounds: [],
+			leaderboard: buildLeaderboardSnapshot({ guild_id: subjectId, leaderboard: [] }),
+			tags: buildTagListSnapshot({ guild_id: subjectId, members: [] })
 		});
-
-		cy.get('[data-testid="round-card"]')
-			.should('exist')
-			.and('contain', 'Weekly Tag Round')
-			.and('contain', 'Pier Park');
-	});
-
-	it('updates round when started event received', () => {
-		// First create the round
-		cy.sendNatsMessage('round.created.v1.guild-123', {
-			id: 'round-1',
-			guild_id: 'guild-123',
-			title: 'Weekly Tag',
-			location: 'Pier Park',
-			description: '',
-			start_time: '2026-01-25T10:00:00Z',
-			state: 'scheduled',
-			created_by: 'user-1',
-			event_message_id: 'msg-1',
-			participants: []
-		});
-
-		cy.get('[data-testid="round-card"]').should('exist');
-
-		// Then start it
-		cy.sendNatsMessage('round.started.v1.guild-123', {
-			round_id: 'round-1'
-		});
-
-		cy.get('[data-testid="round-card"]').should('have.attr', 'data-state', 'started');
-	});
-
-	it('adds participant when joined event received', () => {
-		// Create round
-		cy.sendNatsMessage('round.created.v1.guild-123', {
-			id: 'round-1',
-			guild_id: 'guild-123',
-			title: 'Weekly Tag',
-			location: 'Pier Park',
-			description: '',
-			start_time: '2026-01-25T10:00:00Z',
-			state: 'scheduled',
-			created_by: 'user-1',
-			event_message_id: 'msg-1',
-			participants: []
-		});
-
-		// Participant joins
-		cy.sendNatsMessage('round.participant.joined.v1.guild-123', {
-			round_id: 'round-1',
-			participant: {
-				user_id: 'user-2',
-				response: 'accepted',
-				score: null,
-				tag_number: 5
-			}
-		});
-
-		cy.get('[data-testid="participant-count"]').should('contain', '1');
-	});
-
-	it('updates score when score event received', () => {
-		// Create round with participant
-		cy.sendNatsMessage('round.created.v1.guild-123', {
-			id: 'round-1',
-			guild_id: 'guild-123',
-			title: 'Weekly Tag',
-			location: 'Pier Park',
-			description: '',
-			start_time: '2026-01-25T10:00:00Z',
-			state: 'started',
-			created_by: 'user-1',
-			event_message_id: 'msg-1',
-			participants: [
-				{
-					user_id: 'user-2',
-					response: 'accepted',
-					score: null,
-					tag_number: 5
-				}
+		cy.step('Arrange authenticated session');
+		cy.arrangeAuth({ clubUuid: subjectId, guildId: subjectId });
+		cy.wsConnect({
+			requiredSubjects: [
+				`round.created.v1.${subjectId}`,
+				`round.started.v1.${subjectId}`,
+				`round.participant.joined.v1.${subjectId}`,
+				`round.participant.score.updated.v1.${subjectId}`,
+				`round.deleted.v1.${subjectId}`
 			]
 		});
-
-		// Score update
-		cy.sendNatsMessage('round.participant.score.updated.v1.guild-123', {
-			round_id: 'round-1',
-			user_id: 'user-2',
-			score: -3
-		});
-
-		cy.get('[data-testid="participant-score"]').should('contain', '-3');
+		cy.expectDashboardLoaded();
+		cy.wsAssertPublished(`round.list.request.v1.${subjectId}`);
 	});
 
-	it('removes round when deleted event received', () => {
-		// Create round
-		cy.sendNatsMessage('round.created.v1.guild-123', {
-			id: 'round-1',
-			guild_id: 'guild-123',
-			title: 'Weekly Tag',
-			location: 'Pier Park',
-			description: '',
-			start_time: '2026-01-25T10:00:00Z',
-			state: 'scheduled',
-			created_by: 'user-1',
-			event_message_id: 'msg-1',
-			participants: []
+	it('displays a new round when round.created is received', () => {
+		cy.step('Emit round.created from scenario fixture');
+		cy.wsRunScenario('contracts/scenarios/round/created.simple.json', { subjectId });
+
+		roundScreen.expectCardVisible('round-1');
+		roundScreen.expectCardContains('round-1', 'Weekly Tag Round');
+		roundScreen.expectCardContains('round-1', 'Pier Park');
+	});
+
+	it('updates card state when round.started is received', () => {
+		cy.step('Seed scheduled round from fixture');
+		cy.wsRunScenario('contracts/scenarios/round/created.simple.json', { subjectId });
+
+		cy.step('Emit round.started from fixture');
+		cy.wsRunScenario('contracts/scenarios/round/started.round-1.json', { subjectId });
+
+		roundScreen.expectCardState('round-1', 'started');
+	});
+
+	it('updates participant count when round.participant.joined is received', () => {
+		cy.step('Seed round for participant join');
+		cy.wsRunScenario('contracts/scenarios/round/created.simple.json', { subjectId });
+
+		cy.step('Emit round.participant.joined from fixture');
+		cy.wsRunScenario('contracts/scenarios/round/participant.joined.round-1.json', { subjectId });
+
+		roundScreen.expectParticipantLabel('round-1', 1);
+	});
+
+	it('shows score preview after round.participant.score.updated on finalized rounds', () => {
+		cy.step('Seed finalized round from fixture');
+		cy.wsRunScenario('contracts/scenarios/round/created.finalized.with-score-target.json', {
+			subjectId
 		});
 
-		cy.get('[data-testid="round-card"]').should('exist');
-
-		// Delete round
-		cy.sendNatsMessage('round.deleted.v1.guild-123', {
-			round_id: 'round-1'
+		cy.step('Emit round.participant.score.updated from fixture');
+		cy.wsRunScenario('contracts/scenarios/round/participant.score.updated.round-1-user-2.json', {
+			subjectId
 		});
 
-		cy.get('[data-testid="round-card"]').should('not.exist');
+		roundScreen.expectCardContains('round-1', '-3');
+	});
+
+	it('removes the round card when round.deleted is received', () => {
+		cy.step('Seed round to delete');
+		cy.wsRunScenario('contracts/scenarios/round/created.simple.json', { subjectId });
+		roundScreen.expectCardVisible('round-1');
+
+		cy.step('Emit round.deleted from fixture');
+		cy.wsRunScenario('contracts/scenarios/round/deleted.round-1.json', { subjectId });
+
+		roundScreen.expectCardMissing('round-1');
 	});
 });

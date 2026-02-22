@@ -1,0 +1,36 @@
+export const selectors = {
+	dashboard: '[data-testid="dashboard"]',
+	roundsPanel: '[data-testid="rounds-panel"]',
+	leaderboardPanel: '[data-testid="leaderboard-panel"]',
+	loadingSkeleton: '[data-testid="loading-skeleton"], .loading-skeleton',
+	roundCard: '[data-testid="round-card"]',
+	participantCount: '.detail-item.participants',
+	participantScore: '.score-badge',
+	leaderboardRow: '[data-testid^="leaderboard-row-"]',
+	leaderboardEntry: '[data-testid^="leaderboard-row-"]',
+	movementIndicator: '.player-row.first-place',
+	skipLink: '[data-testid="skip-link"]',
+	signInButton: '[data-testid="btn-signin"]',
+	navbar: '.site-header',
+	navbarSignOutButton: '[data-testid="btn-signout-magic"]',
+	hamburgerOpenButton: 'button[aria-label="Open menu"]',
+	hamburgerDialog: '[role="dialog"][aria-modal="true"]',
+	hamburgerCloseButton: 'button[aria-label="Close menu"]',
+	hamburgerSignOutButton: '[data-testid="btn-signout-mobile"]',
+	offlineBanner: '.offline-banner',
+	installPrompt: '.install-prompt',
+	installPromptDismiss: '.install-prompt .btn-dismiss',
+	installPromptInstall: '.install-prompt .btn-install',
+	accountCreateRole: '#create-role',
+	accountCreateMaxUses: '#create-max-uses',
+	accountCreateExpires: '#create-expires',
+	joinCodeInput: 'input[name="code"]',
+	joinLookupButton: 'button[type="submit"]',
+	pointMemberSelect: '#point-member',
+	pointDeltaInput: '#point-delta',
+	pointReasonInput: '#point-reason'
+} as const;
+
+export function leaderboardEntryByUser(userId: string): string {
+	return `[data-testid="leaderboard-row-${userId}"]`;
+}

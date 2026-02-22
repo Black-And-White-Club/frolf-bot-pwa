@@ -1,28 +1,42 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { log } from '$lib/config';
+	import { onMount } from 'svelte';
 
 	let deferredPrompt: BeforeInstallPromptEvent | null = $state(null);
 	let showPrompt = $state(false);
+	let hasUserInteracted = $state(false);
+	let dismissedForSession = $state(false);
 
 	interface BeforeInstallPromptEvent extends Event {
 		prompt(): Promise<void>;
 		userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 	}
 
-	$effect(() => {
-		if (!browser) return;
+	function maybeShowPrompt() {
+		if (!deferredPrompt) return;
+		if (dismissedForSession) return;
+		if (!hasUserInteracted) return;
+		showPrompt = true;
+	}
 
-		const handler = (e: Event) => {
-			log('[PWA] beforeinstallprompt event fired');
-			e.preventDefault();
-			deferredPrompt = e as BeforeInstallPromptEvent;
-			showPrompt = true;
-		};
-
-		window.addEventListener('beforeinstallprompt', handler);
-		return () => window.removeEventListener('beforeinstallprompt', handler);
+	onMount(() => {
+		dismissedForSession = sessionStorage.getItem('pwa-prompt-dismissed') === 'true';
+		hasUserInteracted = Boolean(navigator.userActivation?.hasBeenActive);
+		maybeShowPrompt();
 	});
+
+	function handleBeforeInstallPrompt(e: Event) {
+		log('[PWA] beforeinstallprompt event fired');
+		e.preventDefault();
+		deferredPrompt = e as BeforeInstallPromptEvent;
+		maybeShowPrompt();
+	}
+
+	function handleFirstInteraction() {
+		if (hasUserInteracted) return;
+		hasUserInteracted = true;
+		maybeShowPrompt();
+	}
 
 	async function handleInstall() {
 		if (!deferredPrompt) return;
@@ -38,12 +52,20 @@
 
 	function handleDismiss() {
 		showPrompt = false;
+		dismissedForSession = true;
 		// Don't show again this session
 		sessionStorage.setItem('pwa-prompt-dismissed', 'true');
 	}
 </script>
 
-{#if showPrompt && !sessionStorage.getItem('pwa-prompt-dismissed')}
+<svelte:window
+	onbeforeinstallprompt={handleBeforeInstallPrompt}
+	onpointerdown={handleFirstInteraction}
+	onkeydown={handleFirstInteraction}
+	ontouchstart={handleFirstInteraction}
+/>
+
+{#if showPrompt}
 	<div class="install-prompt">
 		<div class="prompt-content">
 			<span class="prompt-icon">📲</span>

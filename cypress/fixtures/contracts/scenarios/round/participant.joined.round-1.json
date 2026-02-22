@@ -1,0 +1,21 @@
+{
+	"subject_id": "guild-123",
+	"steps": [
+		{
+			"action": "emit",
+			"subject": "round.participant.joined.v1.{scope_id}",
+			"validate": false,
+			"payload": {
+				"round_id": "round-1",
+				"accepted_participants": [
+					{
+						"user_id": "user-2",
+						"response": "accepted",
+						"score": null,
+						"tag_number": 5
+					}
+				]
+			}
+		}
+	]
+}

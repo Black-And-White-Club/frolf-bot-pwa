@@ -68,7 +68,7 @@
 	<!-- Global Empty State -->
 	{#if activeRounds.length === 0 && scheduledRounds.length === 0 && completedRounds.length === 0}
 		{#if roundService.isLoading}
-			<div class="loading-skeleton">
+			<div class="loading-skeleton" data-testid="loading-skeleton">
 				<div class="skeleton-card"></div>
 				<div class="skeleton-card"></div>
 				<div class="skeleton-card"></div>

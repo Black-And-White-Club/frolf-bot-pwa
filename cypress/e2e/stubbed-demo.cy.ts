@@ -1,52 +1,85 @@
-describe('Dashboard with Stubbed NATS', () => {
+/// <reference types="cypress" />
+import {
+	buildLeaderboardSnapshot,
+	buildRoundCreated,
+	buildTagListSnapshot
+} from '../support/event-builders';
+import { leaderboardScreen } from '../screens/leaderboard.screen';
+import { roundScreen } from '../screens/round.screen';
+
+describe('Dashboard Snapshot + Live Events', () => {
+	const subjectId = 'guild-123';
+
 	beforeEach(() => {
-		// Stub the leaderboard request that the dashboard makes on load
-		cy.stubNatsRequest('leaderboard.get.v1', {
-			entries: [
-				{ userId: 'player1', displayName: 'Stubbed Player One', tag: 1, points: 500, movement: 0 },
-				{ userId: 'player2', displayName: 'Stubbed Player Two', tag: 2, points: 450, movement: 0 }
-			]
-		});
-
-		// Stub the active rounds request
-		cy.stubNatsRequest('round.list.current.v1', [
-			{
-				id: 'round-stub-123',
-				title: 'Stubbed Round',
-				state: 'in_progress',
-				startTime: new Date().toISOString(),
-				participants: [
-					{ userId: 'player1', displayName: 'Stubbed Player One' }
+		cy.step('Arrange snapshot with stubbed players/rounds');
+		cy.arrangeSnapshot({
+			subjectId,
+			rounds: [
+				buildRoundCreated({
+					id: 'round-stub-1',
+					guild_id: subjectId,
+					title: 'Stubbed Round',
+					state: 'started',
+					participants: [
+						{
+							user_id: 'user-1',
+							response: 'accepted',
+							score: null,
+							tag_number: 1
+						}
+					]
+				})
+			],
+			leaderboard: buildLeaderboardSnapshot({
+				guild_id: subjectId,
+				leaderboard: [
+					{ user_id: 'user-1', tag_number: 2, total_points: 500, rounds_played: 8 },
+					{ user_id: 'user-2', tag_number: 5, total_points: 450, rounds_played: 7 }
 				]
+			}),
+			tags: buildTagListSnapshot({
+				guild_id: subjectId,
+				members: [
+					{ member_id: 'user-1', current_tag: 2 },
+					{ member_id: 'user-2', current_tag: 5 }
+				]
+			}),
+			profiles: {
+				'user-1': {
+					user_id: 'user-1',
+					display_name: 'Stubbed Player One',
+					avatar_url: 'https://cdn.discordapp.com/embed/avatars/0.png'
+				},
+				'user-2': {
+					user_id: 'user-2',
+					display_name: 'Stubbed Player Two',
+					avatar_url: 'https://cdn.discordapp.com/embed/avatars/1.png'
+				}
 			}
-		]);
-
-		cy.visitWithToken();
-	});
-
-	it('displays the stubbed leaderboard and active round immediately', () => {
-		// Wait for data to load and assert on the DOM
-		cy.get('[data-testid="leaderboard-row"]').should('have.length', 2);
-		cy.contains('Stubbed Player One').should('exist');
-		
-		cy.get('[data-testid="round-card"]').should('have.length', 1);
-		cy.contains('Stubbed Round').should('exist');
-	});
-
-	it('updates the leaderboard when receiving a live server event', () => {
-		cy.get('[data-testid="leaderboard-row"]').should('have.length', 2);
-
-		// Simulate the Discord bot updating the leaderboard
-		cy.publishNatsEvent('leaderboard.updated.v1', {
-			entries: [
-				{ userId: 'player1', displayName: 'Stubbed Player One', tag: 2, points: 500, movement: -1 },
-				{ userId: 'player2', displayName: 'Stubbed Player Two', tag: 1, points: 550, movement: 1 },
-				{ userId: 'player3', displayName: 'New Live Player', tag: 3, points: 300, movement: 0 }
-			]
 		});
 
-		// Assert the DOM updated in real-time
-		cy.get('[data-testid="leaderboard-row"]').should('have.length', 3);
-		cy.contains('New Live Player').should('exist');
+		cy.arrangeAuth({ clubUuid: subjectId, guildId: subjectId });
+		cy.wsConnect();
+		cy.expectDashboardLoaded();
+		cy.wsAssertPublished(`round.list.request.v1.${subjectId}`);
+	});
+
+	it('renders snapshot data without waiting for full end-to-end flow', () => {
+		roundScreen.cards().should('have.length', 1);
+		roundScreen.expectCardContains('round-stub-1', 'Stubbed Round');
+		leaderboardScreen.expectRowCount(2);
+		cy.contains('Stubbed Player One').should('exist');
+	});
+
+	it('applies live websocket events after initial snapshot', () => {
+		cy.step('Emit live round + leaderboard tag updates');
+		roundScreen.cards().should('have.length', 1);
+
+		cy.wsRunScenario('contracts/scenarios/round/created.live.json', { subjectId });
+		cy.wsRunScenario('contracts/scenarios/leaderboard/tag.updated.simple.json', { subjectId });
+
+		roundScreen.cards().should('have.length', 2);
+		roundScreen.expectCardContains('round-live-2', 'Live Round from WS');
+		leaderboardScreen.expectFirstUser('user-2');
 	});
 });

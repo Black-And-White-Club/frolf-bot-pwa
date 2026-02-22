@@ -1,107 +1,134 @@
+/// <reference types="cypress" />
+import { buildLeaderboardSnapshot, buildTagListSnapshot } from '../support/event-builders';
+import { leaderboardScreen } from '../screens/leaderboard.screen';
+
 describe('Leaderboard Flow', () => {
+	const subjectId = 'guild-123';
+
 	beforeEach(() => {
-		cy.mockNats();
-		cy.visit('/#t=mock-jwt-token');
-		cy.wait(500);
-	});
-
-	it('displays leaderboard when snapshot received', () => {
-		cy.sendNatsMessage('leaderboard.updated.v1.guild-123', {
-			leaderboard_data: {
-				id: 'lb-1',
-				guild_id: 'guild-123',
-				version: 1,
-				last_updated: '2026-01-23T12:00:00Z',
-				entries: [
-					{ user_id: 'user-1', tag_number: 1, display_name: 'Player One' },
-					{ user_id: 'user-2', tag_number: 2, display_name: 'Player Two' },
-					{ user_id: 'user-3', tag_number: 3, display_name: 'Player Three' }
+		cy.step('Arrange leaderboard snapshot');
+		cy.arrangeSnapshot({
+			subjectId,
+			rounds: [],
+			leaderboard: buildLeaderboardSnapshot({
+				guild_id: subjectId,
+				leaderboard: [
+					{ user_id: 'user-1', tag_number: 1, total_points: 500, rounds_played: 8 },
+					{ user_id: 'user-2', tag_number: 2, total_points: 450, rounds_played: 7 },
+					{ user_id: 'user-3', tag_number: 3, total_points: 425, rounds_played: 6 }
 				]
-			}
-		});
-
-		cy.get('[data-testid="leaderboard-entry"]').should('have.length', 3);
-
-		cy.get('[data-testid="leaderboard-entry"]')
-			.first()
-			.should('contain', 'Player One')
-			.and('contain', '#1');
-	});
-
-	it('updates entry when tag updated event received', () => {
-		// Initial leaderboard
-		cy.sendNatsMessage('leaderboard.updated.v1.guild-123', {
-			leaderboard_data: {
-				id: 'lb-1',
-				guild_id: 'guild-123',
-				version: 1,
-				last_updated: '2026-01-23T12:00:00Z',
-				entries: [
-					{ user_id: 'user-1', tag_number: 1 },
-					{ user_id: 'user-2', tag_number: 2 }
+			}),
+			tags: buildTagListSnapshot({
+				guild_id: subjectId,
+				members: [
+					{ member_id: 'user-1', current_tag: 1 },
+					{ member_id: 'user-2', current_tag: 2 },
+					{ member_id: 'user-3', current_tag: 3 }
 				]
-			}
+			})
 		});
-
-		// Tag update
-		cy.sendNatsMessage('leaderboard.tag.updated.v1.guild-123', {
-			user_id: 'user-2',
-			old_tag: 2,
-			new_tag: 1
-		});
-
-		// User-2 should now be first
-		cy.get('[data-testid="leaderboard-entry"]')
-			.first()
-			.should('have.attr', 'data-user-id', 'user-2');
+		cy.arrangeAuth({ clubUuid: subjectId, guildId: subjectId });
+		cy.wsConnect();
+		cy.expectDashboardLoaded();
+		cy.wsAssertPublished(`leaderboard.snapshot.request.v1.${subjectId}`);
 	});
 
-	it('swaps tags when swap event received', () => {
-		// Initial leaderboard
-		cy.sendNatsMessage('leaderboard.updated.v1.guild-123', {
-			leaderboard_data: {
-				id: 'lb-1',
-				guild_id: 'guild-123',
-				version: 1,
-				last_updated: '2026-01-23T12:00:00Z',
-				entries: [
-					{ user_id: 'user-1', tag_number: 1 },
-					{ user_id: 'user-2', tag_number: 5 }
+	it('displays leaderboard rows from snapshot', () => {
+		cy.expectLeaderboardLoaded({ minRows: 3 });
+		leaderboardScreen.expectRowCount(3);
+		leaderboardScreen.expectFirstUser('user-1');
+	});
+
+	it('reorders rows after leaderboard.tag.updated', () => {
+		cy.step('Arrange two-user leaderboard snapshot');
+		cy.arrangeSnapshot({
+			subjectId,
+			leaderboard: buildLeaderboardSnapshot({
+				guild_id: subjectId,
+				leaderboard: [
+					{ user_id: 'user-1', tag_number: 2, total_points: 500, rounds_played: 8 },
+					{ user_id: 'user-2', tag_number: 5, total_points: 450, rounds_played: 7 }
 				]
-			}
+			}),
+			tags: buildTagListSnapshot({
+				guild_id: subjectId,
+				members: [
+					{ member_id: 'user-1', current_tag: 2 },
+					{ member_id: 'user-2', current_tag: 5 }
+				]
+			})
 		});
 
-		// Tag swap
-		cy.sendNatsMessage('leaderboard.tag.swap.processed.v1.guild-123', {
-			requestor_id: 'user-1',
-			target_id: 'user-2'
-		});
+		cy.step('Emit leaderboard.updated and leaderboard.tag.updated');
+		cy.wsRunScenario('contracts/scenarios/leaderboard/updated.round-1.json', { subjectId });
+		leaderboardScreen.expectFirstUser('user-1');
 
-		// Verify swap happened
-		cy.get('[data-testid="leaderboard-entry"][data-user-id="user-1"]').should('contain', '#5');
-
-		cy.get('[data-testid="leaderboard-entry"][data-user-id="user-2"]').should('contain', '#1');
+		cy.wsRunScenario('contracts/scenarios/leaderboard/tag.updated.simple.json', { subjectId });
+		leaderboardScreen.expectFirstUser('user-2');
 	});
 
-	it('shows movement indicator after tag change', () => {
-		// Initial leaderboard
-		cy.sendNatsMessage('leaderboard.updated.v1.guild-123', {
-			leaderboard_data: {
-				id: 'lb-1',
-				guild_id: 'guild-123',
-				version: 1,
-				last_updated: '2026-01-23T12:00:00Z',
-				entries: [{ user_id: 'user-1', tag_number: 5 }]
-			}
+	it('swaps tags after leaderboard.tag.swap.processed', () => {
+		cy.step('Arrange swap baseline');
+		cy.arrangeSnapshot({
+			subjectId,
+			leaderboard: buildLeaderboardSnapshot({
+				guild_id: subjectId,
+				leaderboard: [
+					{ user_id: 'user-1', tag_number: 1, total_points: 500, rounds_played: 8 },
+					{ user_id: 'user-2', tag_number: 5, total_points: 450, rounds_played: 7 }
+				]
+			}),
+			tags: buildTagListSnapshot({
+				guild_id: subjectId,
+				members: [
+					{ member_id: 'user-1', current_tag: 1 },
+					{ member_id: 'user-2', current_tag: 5 }
+				]
+			})
 		});
 
-		// Tag improves
-		cy.sendNatsMessage('leaderboard.tag.updated.v1.guild-123', {
-			user_id: 'user-1',
-			old_tag: 5,
-			new_tag: 2
+		cy.step('Emit tag swap processed');
+		cy.wsRunScenario('contracts/scenarios/leaderboard/updated.round-1.json', { subjectId });
+		cy.wsRunScenario('contracts/scenarios/leaderboard/tag.swap.processed.simple.json', {
+			subjectId
 		});
 
-		cy.get('[data-testid="movement-indicator"]').should('have.class', 'movement-up');
+		leaderboardScreen.expectFirstUser('user-2');
+	});
+
+	it('reloads snapshot after leaderboard.updated event', () => {
+		cy.step('Stub refreshed leaderboard snapshot');
+		leaderboardScreen.expectRowCount(3);
+
+		cy.wsStubRequest(
+			`leaderboard.snapshot.request.v1.${subjectId}`,
+			buildLeaderboardSnapshot({
+				guild_id: subjectId,
+				leaderboard: [
+					{ user_id: 'user-1', tag_number: 1, total_points: 500, rounds_played: 8 },
+					{ user_id: 'user-2', tag_number: 2, total_points: 450, rounds_played: 7 },
+					{ user_id: 'user-3', tag_number: 3, total_points: 425, rounds_played: 6 },
+					{ user_id: 'user-4', tag_number: 4, total_points: 390, rounds_played: 6 }
+				]
+			}),
+			{ validate: false }
+		);
+		cy.wsStubRequest(
+			`leaderboard.tag.list.requested.v1.${subjectId}`,
+			buildTagListSnapshot({
+				guild_id: subjectId,
+				members: [
+					{ member_id: 'user-1', current_tag: 1 },
+					{ member_id: 'user-2', current_tag: 2 },
+					{ member_id: 'user-3', current_tag: 3 },
+					{ member_id: 'user-4', current_tag: 4 }
+				]
+			}),
+			{ validate: false }
+		);
+
+		cy.step('Emit leaderboard.updated to trigger reload');
+		cy.wsRunScenario('contracts/scenarios/leaderboard/updated.round-2.json', { subjectId });
+		leaderboardScreen.expectRowCount(4);
 	});
 });

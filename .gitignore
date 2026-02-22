@@ -64,3 +64,6 @@ brand-guide.md
 asyncapi.yaml
 tasks/
 docs/INTEGRATION_TESTING.md
+cypress/screenshots
+cypress/videos
+AGENTS.md

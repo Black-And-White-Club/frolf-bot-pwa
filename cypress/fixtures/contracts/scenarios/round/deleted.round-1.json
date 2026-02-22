@@ -1,0 +1,13 @@
+{
+	"subject_id": "guild-123",
+	"steps": [
+		{
+			"action": "emit",
+			"subject": "round.deleted.v1.{scope_id}",
+			"validate": false,
+			"payload": {
+				"round_id": "round-1"
+			}
+		}
+	]
+}

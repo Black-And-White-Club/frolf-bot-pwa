@@ -54,7 +54,12 @@
 	);
 </script>
 
-<div class="dashboard" class:tv-mode={mode === 'tv'} class:compact-mode={mode === 'compact'}>
+<div
+	class="dashboard"
+	class:tv-mode={mode === 'tv'}
+	class:compact-mode={mode === 'compact'}
+	data-testid="dashboard"
+>
 	{#if mode === 'default'}
 		<!-- Header controls removed (redundant view toggle) -->
 	{/if}
@@ -64,7 +69,7 @@
 			{#if LeaderboardCompact}
 				<LeaderboardCompact entries={leaderboardService.currentView} />
 			{:else}
-				<div class="animate-pulse rounded-lg bg-[var(--guild-surface)] h-[200px]"></div>
+				<div class="h-[200px] animate-pulse rounded-lg bg-[var(--guild-surface)]"></div>
 			{/if}
 		{:else if mode === 'tv'}
 			<div class="tv-layout">
@@ -96,13 +101,17 @@
 			</div>
 		{:else}
 			<!-- Default Dashboard Layout -->
-			<div class="rounds-section">
+			<div class="rounds-section" data-testid="rounds-panel">
 				<RoundList onSelect={handleRoundSelect} />
 			</div>
 
-			<div class="leaderboard-section">
+			<div class="leaderboard-section" data-testid="leaderboard-panel">
 				{#if leaderboardService.viewMode === 'tags' && TagLeaderboard}
-					<TagLeaderboard members={tagMembers} onSelectMember={handleMemberSelect} onViewAll={() => goto('/leaderboard')} />
+					<TagLeaderboard
+						members={tagMembers}
+						onSelectMember={handleMemberSelect}
+						onViewAll={() => goto('/leaderboard')}
+					/>
 
 					{#if tagStore.selectedMemberId && TagDetailSheet}
 						<TagDetailSheet
@@ -112,7 +121,11 @@
 						/>
 					{/if}
 				{:else}
-					<Leaderboard entries={leaderboardService.currentView} title="Points Leaderboard" onViewAll={() => goto('/leaderboard')} />
+					<Leaderboard
+						entries={leaderboardService.currentView}
+						title="Points Leaderboard"
+						onViewAll={() => goto('/leaderboard')}
+					/>
 				{/if}
 			</div>
 		{/if}
