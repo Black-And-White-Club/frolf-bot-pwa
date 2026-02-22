@@ -1,31 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/state';
 
-	let email = $state('');
-	let status = $state<'idle' | 'loading' | 'success' | 'error'>('idle');
-	let errorMessage = $state('');
-
 	const oauthError = $derived(page.url.searchParams.get('error') === 'oauth_failed');
+	const redirect = $derived(page.url.searchParams.get('redirect'));
 
-	async function handleSubmit(event: SubmitEvent) {
-		event.preventDefault();
-		status = 'loading';
-		errorMessage = '';
-		try {
-			const res = await fetch('/api/auth/login', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email })
-			});
-			if (res.ok) status = 'success';
-			else {
-				status = 'error';
-				errorMessage = 'Something went wrong. Please try again.';
-			}
-		} catch {
-			status = 'error';
-			errorMessage = 'Something went wrong. Please try again.';
-		}
+	function withRedirect(path: string): string {
+		if (!redirect) return path;
+		const params = new URLSearchParams({ redirect });
+		return `${path}?${params.toString()}`;
 	}
 </script>
 
@@ -33,33 +15,51 @@
 	<title>Sign In | Frolf Bot</title>
 	<meta
 		name="description"
-		content="Sign in to Frolf Bot to track scores and compete with your disc golf club."
+		content="Sign in with Discord or Google to access your Frolf Bot rounds, scores, and leaderboard."
 	/>
 	<meta property="og:title" content="Sign In | Frolf Bot" />
 	<meta
 		property="og:description"
-		content="Sign in to Frolf Bot to track scores and compete with your disc golf club."
+		content="Sign in with Discord or Google to access your Frolf Bot rounds, scores, and leaderboard."
 	/>
 </svelte:head>
 
-<div class="flex min-h-screen items-center justify-center bg-[var(--guild-background)] p-4">
-	<div class="w-full max-w-md space-y-8 rounded-xl bg-[var(--guild-surface)] p-8 shadow-2xl">
-		<div class="text-center">
-			<h2 class="text-guild-primary text-3xl font-bold">Sign In</h2>
-			<p class="text-guild-text-secondary mt-2">Choose how you'd like to sign in</p>
+<div
+	class="relative flex min-h-screen items-center justify-center overflow-hidden bg-[var(--guild-background)] px-4 py-10"
+>
+	<div
+		class="pointer-events-none absolute -top-28 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-[var(--guild-secondary)]/10 blur-[96px]"
+	></div>
+	<div
+		class="pointer-events-none absolute right-1/3 -bottom-28 h-72 w-72 rounded-full bg-[var(--guild-primary)]/15 blur-[88px]"
+	></div>
+
+	<div
+		class="relative w-full max-w-md space-y-6 rounded-2xl border border-[var(--guild-border)] bg-[var(--guild-surface)]/90 p-8 shadow-[0_20px_45px_rgba(0,0,0,0.35)] backdrop-blur-sm"
+	>
+		<div class="space-y-2 text-center">
+			<h2
+				class="[font-family:var(--font-display)] text-4xl [font-weight:700] text-[var(--guild-text)]"
+			>
+				Sign In
+			</h2>
+			<p class="[font-family:var(--font-secondary)] text-sm text-[var(--guild-text-secondary)]">
+				Continue with your Discord or Google account.
+			</p>
 		</div>
 
 		{#if oauthError}
-			<div class="rounded-lg bg-red-900/20 p-3 text-center text-sm text-red-400">
+			<div
+				class="rounded-lg border border-[var(--guild-error-border)] bg-[var(--guild-error-bg)] p-3 text-center [font-family:var(--font-secondary)] text-sm text-[var(--guild-error-text)]"
+			>
 				Sign-in failed. Please try again.
 			</div>
 		{/if}
 
-		<!-- Social sign-in buttons -->
 		<div class="space-y-3">
 			<a
-				href="/api/auth/discord/login"
-				class="flex w-full items-center justify-center gap-3 rounded-md bg-[#5865F2] px-4 py-3 text-sm font-semibold text-white transition hover:brightness-110"
+				href={withRedirect('/api/auth/discord/login')}
+				class="flex w-full items-center justify-center gap-3 rounded-lg bg-[image:var(--liquid-skobeloff)] px-4 py-3 [font-family:var(--font-secondary)] text-sm font-semibold text-white transition hover:brightness-110 focus-visible:ring-2 focus-visible:ring-[var(--guild-primary)] focus-visible:ring-offset-2 focus-visible:outline-none"
 			>
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 127.14 96.36">
 					<path
@@ -71,10 +71,15 @@
 			</a>
 
 			<a
-				href="/api/auth/google/login"
-				class="flex w-full items-center justify-center gap-3 rounded-md border border-white/20 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+				href={withRedirect('/api/auth/google/login')}
+				class="flex w-full items-center justify-center gap-3 rounded-lg border border-[var(--guild-border)] bg-[var(--guild-surface-elevated,var(--guild-surface))] px-4 py-3 [font-family:var(--font-secondary)] text-sm font-semibold text-[var(--guild-text)] transition hover:border-[var(--guild-primary)]/50 hover:bg-[var(--guild-surface)] focus-visible:ring-2 focus-visible:ring-[var(--guild-primary)] focus-visible:ring-offset-2 focus-visible:outline-none"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 48 48">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-5 w-5"
+					viewBox="0 0 48 48"
+					aria-hidden="true"
+				>
 					<path
 						fill="#FFC107"
 						d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"
@@ -96,46 +101,13 @@
 			</a>
 		</div>
 
-		<div class="flex items-center gap-4">
-			<div class="flex-1 border-t border-white/10"></div>
-			<span class="text-xs text-white/40">or</span>
-			<div class="flex-1 border-t border-white/10"></div>
-		</div>
-
-		<!-- Magic link form -->
-		{#if status === 'success'}
-			<div class="rounded-lg bg-green-900/20 p-4 text-center text-green-400">
-				Check your email for the magic link!
-			</div>
-		{:else}
-			<form class="space-y-4" onsubmit={handleSubmit}>
-				<div>
-					<label for="email" class="block text-sm font-medium text-white/70">Email address</label>
-					<input
-						type="email"
-						id="email"
-						bind:value={email}
-						required
-						class="mt-1 block w-full rounded-md border border-white/10 bg-black/20 px-4 py-2 text-white focus:border-[var(--guild-primary)] focus:ring-1 focus:ring-[var(--guild-primary)]"
-					/>
-				</div>
-
-				{#if status === 'error'}
-					<p class="text-sm text-red-500">{errorMessage}</p>
-				{/if}
-
-				<button
-					type="submit"
-					disabled={status === 'loading'}
-					class="flex w-full justify-center rounded-md bg-liquid-skobeloff px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
-				>
-					{status === 'loading' ? 'Sending...' : 'Send Magic Link'}
-				</button>
-			</form>
-		{/if}
-
 		<div class="text-center">
-			<a href="/" class="text-sm text-white/40 transition hover:text-white">Back to Home</a>
+			<a
+				href="/"
+				class="[font-family:var(--font-secondary)] text-sm text-[var(--guild-text-secondary)] transition hover:text-[var(--guild-text)]"
+			>
+				Back to Home
+			</a>
 		</div>
 	</div>
 </div>

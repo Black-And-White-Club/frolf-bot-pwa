@@ -179,11 +179,11 @@
 	>Skip to content</a
 >
 
-	<ThemeProvider>
-		<OfflineIndicator />
-		{#if LiveAnnouncer}
-			<LiveAnnouncer />
-		{/if}
+<ThemeProvider>
+	<OfflineIndicator />
+	{#if LiveAnnouncer}
+		<LiveAnnouncer />
+	{/if}
 	{#if UpdateSnackbarClient}
 		<UpdateSnackbarClient />
 	{/if}
@@ -202,7 +202,7 @@
 				<div class="mb-2 text-xl text-red-400">Connection Error</div>
 				<p class="mb-4 text-white/60">{appInit.error}</p>
 				<button
-					class="rounded bg-liquid-skobeloff px-4 py-2 text-white transition hover:brightness-110"
+					class="bg-liquid-skobeloff rounded px-4 py-2 text-white transition hover:brightness-110"
 					onclick={() => appInit.initialize()}
 				>
 					Retry
@@ -216,7 +216,9 @@
 				<ClubDiscovery />
 			{:else}
 				<div class="flex min-h-screen items-center justify-center bg-[#081212]">
-					<div class="h-8 w-8 animate-spin rounded-full border-2 border-[#007474] border-t-transparent"></div>
+					<div
+						class="h-8 w-8 animate-spin rounded-full border-2 border-[#007474] border-t-transparent"
+					></div>
 				</div>
 			{/if}
 		{:else}
@@ -233,14 +235,17 @@
 	{:else if page.url.pathname.startsWith('/docs')}
 		<!-- Public docs — no auth required -->
 		<div class="flex min-h-screen flex-col bg-[var(--guild-background)]">
-			<header class="flex items-center justify-between border-b border-[var(--guild-border)] px-6 py-3">
+			<header
+				class="flex items-center justify-between border-b border-[var(--guild-border)] px-6 py-3"
+			>
 				<a href="/docs" class="text-guild-primary font-semibold">Frolf Bot Docs</a>
 				<div class="flex items-center gap-3">
 					<ThemeToggle testid="theme-toggle-docs" />
 					<a
 						href="/auth/signin"
-						class="text-sm text-[var(--guild-text-secondary)] hover:text-[var(--guild-text)] transition-colors"
-					>Sign In</a>
+						class="text-sm text-[var(--guild-text-secondary)] transition-colors hover:text-[var(--guild-text)]"
+						>Sign In</a
+					>
 				</div>
 			</header>
 			<main id="main-content" class="flex-1">
@@ -262,14 +267,14 @@
 				<div>
 					<h1 class="text-guild-primary text-center text-3xl font-extrabold">Frolf Bot</h1>
 					<p class="text-guild-text-secondary mt-2 text-center text-sm">
-						Sign in with Discord to access your disc golf games.
+						Sign in with Discord or Google to access your disc golf games.
 					</p>
 				</div>
 				<div>
 					<a
 						href="/auth/signin"
 						data-testid="btn-signin"
-						class="group text-guild-surface relative flex w-full justify-center rounded-md border border-transparent bg-liquid-skobeloff px-4 py-2 text-sm font-medium hover:brightness-110 focus:ring-2 focus:ring-[var(--guild-primary)] focus:ring-offset-2 focus:outline-none"
+						class="group text-guild-surface bg-liquid-skobeloff relative flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium hover:brightness-110 focus:ring-2 focus:ring-[var(--guild-primary)] focus:ring-offset-2 focus:outline-none"
 					>
 						Sign In
 					</a>
@@ -285,4 +290,4 @@
 	{#if InstallPrompt}
 		<InstallPrompt />
 	{/if}
-	</ThemeProvider>
+</ThemeProvider>

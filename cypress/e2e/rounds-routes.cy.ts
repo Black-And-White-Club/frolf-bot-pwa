@@ -84,6 +84,8 @@ describe('Rounds Routes', () => {
 		cy.arrangeGuest({ path: '/rounds' });
 
 		cy.get('[data-testid="btn-signin"]').should('be.visible');
-		cy.contains('Sign in with Discord to access your disc golf games.').should('be.visible');
+		cy.contains('Sign in with Discord or Google to access your disc golf games.').should(
+			'be.visible'
+		);
 	});
 });

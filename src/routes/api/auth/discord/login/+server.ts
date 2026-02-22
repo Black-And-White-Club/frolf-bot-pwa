@@ -8,8 +8,13 @@ import { forwardSetCookieHeaders } from '$lib/server/http';
  * and returns a 302 redirect to Discord's authorization page.
  * We forward both the cookie and the redirect to the browser.
  */
-export const GET: RequestHandler = async ({ fetch }) => {
-	const res = await fetch(`${serverConfig.backendUrl}/api/auth/discord/login`, {
+export const GET: RequestHandler = async ({ fetch, url }) => {
+	const backendUrl = new URL('/api/auth/discord/login', serverConfig.backendUrl);
+	url.searchParams.forEach((value, key) => {
+		backendUrl.searchParams.set(key, value);
+	});
+
+	const res = await fetch(backendUrl.toString(), {
 		redirect: 'manual'
 	});
 
