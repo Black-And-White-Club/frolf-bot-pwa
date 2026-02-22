@@ -252,6 +252,11 @@
 				{@render children?.()}
 			</main>
 		</div>
+	{:else if page.url.pathname.startsWith('/auth')}
+		<!-- Public auth routes (signin, auth error) -->
+		<main id="main-content" class="min-h-screen bg-[var(--guild-background)]">
+			{@render children?.()}
+		</main>
 	{:else if page.url.pathname === '/privacy' || page.url.pathname === '/tos'}
 		<!-- Public legal pages — no auth required -->
 		<main id="main-content" class="min-h-screen bg-[var(--guild-background)]">

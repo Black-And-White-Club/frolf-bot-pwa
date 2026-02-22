@@ -24,8 +24,8 @@ describe('Auth and Sign-in Routes', () => {
 		cy.contains('a', 'Terms of Service').should('have.attr', 'href', '/tos');
 	});
 
-	it('renders sign-in page for authenticated sessions', () => {
-		arrangeAuthenticated('/auth/signin');
+	it('renders sign-in page for guests', () => {
+		cy.arrangeGuest({ path: '/auth/signin' });
 
 		signinScreen.root().should('be.visible');
 		signinScreen.expectOAuthOnlyUi();
