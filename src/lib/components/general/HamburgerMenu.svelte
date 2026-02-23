@@ -128,7 +128,7 @@
 
 <!-- Slide-out menu -->
 <div
-	class="bg-[var(--guild-surface)] fixed top-0 right-0 z-50 h-full w-80 transform shadow-xl transition-all duration-200"
+	class="fixed top-0 right-0 z-50 h-full w-80 transform bg-[var(--guild-surface)] shadow-xl transition-all duration-200"
 	role="dialog"
 	aria-modal="true"
 	aria-labelledby="hamburger-title"
@@ -225,16 +225,20 @@
 				<button
 					type="submit"
 					onclick={handleSignOut}
-					class="text-guild-surface flex w-full justify-center rounded-md border border-transparent bg-liquid-skobeloff px-4 py-2 text-sm font-medium hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--guild-primary)]/30"
+					class="text-guild-surface bg-liquid-skobeloff flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--guild-primary)]/30"
 					data-testid={btnSignoutTestId}
 				>
 					Sign out
 				</button>
 			</form>
 			<p class="mt-4 text-center text-xs text-[var(--guild-text-secondary)]">
-				<a href="/privacy" onclick={closeHamburger} class="underline hover:text-[var(--guild-text)]">Privacy Policy</a>
+				<a href="/privacy" onclick={closeHamburger} class="underline hover:text-[var(--guild-text)]"
+					>Privacy Policy</a
+				>
 				·
-				<a href="/tos" onclick={closeHamburger} class="underline hover:text-[var(--guild-text)]">Terms of Service</a>
+				<a href="/tos" onclick={closeHamburger} class="underline hover:text-[var(--guild-text)]"
+					>Terms of Service</a
+				>
 			</p>
 		</div>
 	</div>

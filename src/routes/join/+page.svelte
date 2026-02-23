@@ -106,7 +106,7 @@
 				/>
 				<button
 					type="submit"
-					class="flex w-full justify-center rounded-md bg-liquid-skobeloff px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110"
+					class="bg-liquid-skobeloff flex w-full justify-center rounded-md px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110"
 				>
 					Look up code
 				</button>
@@ -115,7 +115,8 @@
 			<div class="text-center">
 				<h2 class="text-2xl font-bold text-white">Invalid Invite</h2>
 				<p class="mt-2 text-sm text-red-400">{previewError}</p>
-				<a href="/join" class="mt-4 block text-sm text-white/40 hover:text-white">Try another code</a
+				<a href="/join" class="mt-4 block text-sm text-white/40 hover:text-white"
+					>Try another code</a
 				>
 			</div>
 		{:else if preview}
@@ -130,7 +131,7 @@
 					/>
 				{:else}
 					<div
-						class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-liquid-skobeloff/30 text-3xl font-bold text-white"
+						class="bg-liquid-skobeloff/30 mx-auto flex h-20 w-20 items-center justify-center rounded-full text-3xl font-bold text-white"
 					>
 						{preview.club_name[0]}
 					</div>
@@ -149,21 +150,23 @@
 				<button
 					onclick={joinClub}
 					disabled={joinStatus === 'loading'}
-					class="flex w-full justify-center rounded-md bg-liquid-skobeloff px-4 py-3 font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
+					class="bg-liquid-skobeloff flex w-full justify-center rounded-md px-4 py-3 font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
 				>
 					{joinStatus === 'loading' ? 'Joining...' : `Join ${preview.club_name}`}
 				</button>
 			{:else}
 				<a
 					href={`/auth/signin?redirect=/join?code=${encodeURIComponent(code)}`}
-					class="flex w-full justify-center rounded-md bg-liquid-skobeloff px-4 py-3 font-semibold text-white transition hover:brightness-110"
+					class="bg-liquid-skobeloff flex w-full justify-center rounded-md px-4 py-3 font-semibold text-white transition hover:brightness-110"
 				>
 					Sign in to join
 				</a>
 			{/if}
 		{:else}
 			<div class="flex justify-center py-8">
-				<div class="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white/80"></div>
+				<div
+					class="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white/80"
+				></div>
 			</div>
 		{/if}
 	</div>

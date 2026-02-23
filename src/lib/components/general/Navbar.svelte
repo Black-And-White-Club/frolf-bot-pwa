@@ -10,28 +10,45 @@
 
 	let showHamburger = $state(false);
 
-	const displayName = $derived.by(() => {
+	type ProfileNameSource = {
+		udiscName?: string | null;
+		udiscUsername?: string | null;
+		displayName?: string | null;
+	};
+
+	function getCustomDisplayName(discordID: string): string | null {
+		if (auth.displayName && auth.displayName !== discordID) {
+			return auth.displayName;
+		}
+		return null;
+	}
+
+	function getProfileDisplayName(profile: ProfileNameSource | null | undefined): string | null {
+		if (profile?.udiscName) return profile.udiscName;
+		if (profile?.udiscUsername) return profile.udiscUsername;
+		if (profile?.displayName) return profile.displayName;
+		return null;
+	}
+
+	function resolveDisplayName(): string {
 		if (!auth.user) return 'Guest';
 		const profile =
 			userProfiles.getProfile(auth.user.uuid) ?? userProfiles.getProfile(auth.user.id);
 
-		// 1. Per-club nickname from JWT (Discord server nickname)
-		if (auth.displayName && auth.displayName !== auth.user.id) {
-			return auth.displayName;
+		const customDisplayName = getCustomDisplayName(auth.user.id);
+		if (customDisplayName) {
+			return customDisplayName;
 		}
 
-		// 2. UDisc Name (name shown on casual rounds)
-		if (profile?.udiscName) return profile.udiscName;
+		const profileDisplayName = getProfileDisplayName(profile);
+		if (profileDisplayName) {
+			return profileDisplayName;
+		}
 
-		// 3. UDisc Username (@handle)
-		if (profile?.udiscUsername) return profile.udiscUsername;
-
-		// 4. Global display name from profile (Discord username)
-		if (profile?.displayName) return profile.displayName;
-
-		// 5. Final fallback to Discord ID
 		return auth.user.id;
-	});
+	}
+
+	const displayName = $derived.by(() => resolveDisplayName());
 
 	function toggleHamburger() {
 		showHamburger = !showHamburger;
@@ -118,9 +135,9 @@
 					<!-- Club Switcher (if multiple clubs) -->
 					{#if auth.user && auth.user.clubs.length > 1}
 						<div class="hidden items-center lg:flex">
-							<span class="text-xs text-[var(--guild-text-muted)] mr-2">Club:</span>
+							<span class="mr-2 text-xs text-[var(--guild-text-muted)]">Club:</span>
 							<select
-								class="bg-[var(--guild-surface)] text-sm text-[var(--guild-text-secondary)] border border-[var(--guild-border)] rounded-md focus:ring-1 focus:ring-[var(--guild-primary)] focus:border-[var(--guild-primary)] cursor-pointer py-1 px-2"
+								class="cursor-pointer rounded-md border border-[var(--guild-border)] bg-[var(--guild-surface)] px-2 py-1 text-sm text-[var(--guild-text-secondary)] focus:border-[var(--guild-primary)] focus:ring-1 focus:ring-[var(--guild-primary)]"
 								value={auth.user.activeClubUuid}
 								onchange={(e: Event) => {
 									const target = e.currentTarget as HTMLSelectElement;
@@ -187,7 +204,8 @@
 						<a
 							href="/privacy"
 							class="text-xs text-[var(--guild-text-secondary)] transition-colors hover:text-[var(--guild-text)]"
-						>Privacy</a>
+							>Privacy</a
+						>
 					</div>
 				</div>
 			{:else}

@@ -7,29 +7,58 @@
 import { nats } from './nats.svelte';
 import { dataLoader } from './dataLoader.svelte';
 
-interface TagAssignment {
+type TagAssignment = {
 	userId: string;
 	tagNumber: number; // 0 = remove tag
-}
+};
 
-interface BatchTagPayload {
+type BatchTagPayload = {
 	guild_id: string;
 	requester_user_id: string;
 	batch_id: string;
 	assignments: Array<{ user_id: string; tag_number: number }>;
 	source: string;
-}
+};
 
-interface PointAdjustPayload {
+type PointAdjustPayload = {
 	guild_id: string;
 	member_id: string;
 	points_delta: number;
 	reason: string;
 	admin_id: string;
-}
+};
+
+type AdminScorecardUploadInput = {
+	guildId: string;
+	userId: string;
+	roundId: string;
+	eventMessageId?: string;
+	file: File;
+	notes?: string;
+};
+
+type AdminScorecardUploadPayload = {
+	guild_id: string;
+	round_id: string;
+	import_id: string;
+	source: string;
+	user_id: string;
+	channel_id: string;
+	message_id: string;
+	file_data: string;
+	file_name: string;
+	notes: string;
+	allow_guest_players: boolean;
+	overwrite_existing_scores: boolean;
+	timestamp: string;
+};
 
 const OPERATION_TIMEOUT_MS = 10_000;
 const MESSAGE_CLEAR_MS = 5_000;
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+const SUPPORTED_EXTENSIONS = new Set(['csv', 'xlsx']);
+const ADMIN_SCORECARD_UPLOAD_SUBJECT = 'round.scorecard.admin.upload.requested.v1';
+const ADMIN_SCORECARD_UPLOAD_SOURCE = 'admin_pwa_upload';
 
 class AdminService {
 	loading = $state(false);
@@ -191,6 +220,113 @@ class AdminService {
 				cleanup();
 			}
 		}, OPERATION_TIMEOUT_MS);
+	}
+
+	private toBase64(data: Uint8Array): string {
+		let binary = '';
+		const chunkSize = 0x8000;
+		for (let i = 0; i < data.length; i += chunkSize) {
+			const chunk = data.subarray(i, i + chunkSize);
+			binary += String.fromCharCode(...chunk);
+		}
+		return btoa(binary);
+	}
+
+	private getExtension(name: string): string {
+		const parts = name.toLowerCase().split('.');
+		return parts.length > 1 ? parts[parts.length - 1] : '';
+	}
+
+	private validateScorecardFile(file: File): void {
+		if (file.size === 0) {
+			throw new Error('Scorecard file is empty');
+		}
+		if (file.size > MAX_UPLOAD_BYTES) {
+			throw new Error('Scorecard exceeds the 10MB upload limit');
+		}
+
+		const extension = this.getExtension(file.name);
+		if (!SUPPORTED_EXTENSIONS.has(extension)) {
+			throw new Error('Only .csv and .xlsx files are supported');
+		}
+	}
+
+	private validateScorecardUploadInput(
+		guildId: string,
+		userId: string,
+		roundId: string,
+		file: File | null | undefined
+	): asserts file is File {
+		if (!guildId || !userId || !roundId) {
+			throw new Error('Guild, user, and round are required');
+		}
+		if (!file) {
+			throw new Error('Scorecard file is required');
+		}
+
+		this.validateScorecardFile(file);
+	}
+
+	private async buildScorecardUploadPayload(
+		guildId: string,
+		userId: string,
+		roundId: string,
+		eventMessageId: string,
+		file: File,
+		notes: string
+	): Promise<AdminScorecardUploadPayload> {
+		const bytes = new Uint8Array(await file.arrayBuffer());
+
+		return {
+			guild_id: guildId,
+			round_id: roundId,
+			import_id: crypto.randomUUID(),
+			source: ADMIN_SCORECARD_UPLOAD_SOURCE,
+			user_id: userId,
+			channel_id: '',
+			message_id: eventMessageId,
+			file_data: this.toBase64(bytes),
+			file_name: file.name,
+			notes: notes.trim(),
+			allow_guest_players: true,
+			overwrite_existing_scores: true,
+			timestamp: new Date().toISOString()
+		};
+	}
+
+	async uploadScorecard({
+		guildId,
+		userId,
+		roundId,
+		eventMessageId = '',
+		file,
+		notes = ''
+	}: AdminScorecardUploadInput): Promise<void> {
+		this.loading = true;
+		this.successMessage = null;
+		this.errorMessage = null;
+
+		try {
+			this.validateScorecardUploadInput(guildId, userId, roundId, file);
+
+			const payload = await this.buildScorecardUploadPayload(
+				guildId,
+				userId,
+				roundId,
+				eventMessageId,
+				file,
+				notes
+			);
+
+			nats.publish(ADMIN_SCORECARD_UPLOAD_SUBJECT, payload);
+			this.successMessage = 'Scorecard upload queued. Import processing has started.';
+			this.scheduleMessageClear();
+		} catch (error) {
+			this.errorMessage = error instanceof Error ? error.message : 'Failed to upload scorecard';
+			this.scheduleMessageClear();
+		} finally {
+			this.loading = false;
+		}
 	}
 }
 

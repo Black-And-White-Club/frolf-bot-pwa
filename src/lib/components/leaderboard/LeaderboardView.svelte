@@ -63,10 +63,10 @@
 				<LeaderboardRow {entry} rank={index + 1} />
 			{/each}
 		</div>
-		
+
 		{#if hasMore}
 			<div class="mt-6 flex justify-center">
-				<button 
+				<button
 					class="bg-sage-700/50 hover:bg-sage-600 border-sage-600/30 text-guild-text rounded-md border px-4 py-2 text-sm font-medium transition-colors"
 					onclick={loadMore}
 				>

@@ -23,7 +23,8 @@
 			<a
 				href="/tos"
 				class="text-[var(--guild-text-secondary)] transition-colors hover:text-[var(--guild-text)]"
-			>Terms of Service</a>
+				>Terms of Service</a
+			>
 		</nav>
 	</div>
 </header>
@@ -57,7 +58,7 @@
 
 			<!-- Google API compliance callout -->
 			<div
-				class="mb-4 rounded-md border border-[var(--guild-border)] bg-[var(--guild-surface)] p-3 text-sm italic text-[var(--guild-text-secondary)]"
+				class="mb-4 rounded-md border border-[var(--guild-border)] bg-[var(--guild-surface)] p-3 text-sm text-[var(--guild-text-secondary)] italic"
 			>
 				Frolf Bot's use and transfer to any other app of information received from Google APIs will
 				adhere to the
@@ -65,8 +66,7 @@
 					href="https://developers.google.com/terms/api-services-user-data-policy"
 					target="_blank"
 					rel="noopener noreferrer"
-					class="text-[var(--guild-primary)] underline"
-				>Google API Services User Data Policy</a
+					class="text-[var(--guild-primary)] underline">Google API Services User Data Policy</a
 				>, including the Limited Use requirements.
 			</div>
 
@@ -115,8 +115,8 @@
 			</p>
 			<ul class="list-disc space-y-1 pl-6 text-[var(--guild-text-secondary)]">
 				<li>
-					<strong class="text-[var(--guild-text)]">Within your club:</strong> Scores, usernames, and
-					leaderboard rankings are visible to members of your Discord server.
+					<strong class="text-[var(--guild-text)]">Within your club:</strong> Scores, usernames, and leaderboard
+					rankings are visible to members of your Discord server.
 				</li>
 				<li>
 					<strong class="text-[var(--guild-text)]">Service providers:</strong> We use third-party hosting
@@ -132,7 +132,9 @@
 
 		<!-- Section 4 -->
 		<section class="mb-8 border-b border-[var(--guild-border)] pb-8">
-			<h2 class="font-display mb-4 text-xl font-bold text-[var(--guild-text)]">4. Data Retention</h2>
+			<h2 class="font-display mb-4 text-xl font-bold text-[var(--guild-text)]">
+				4. Data Retention
+			</h2>
 			<p class="text-[var(--guild-text-secondary)]">
 				We retain your game data (scores, rounds, statistics) for as long as your account is active
 				or as needed to provide the Service. If you request deletion of your account, we will remove
@@ -167,7 +169,9 @@
 	</article>
 </div>
 
-<footer class="border-t border-[var(--guild-border)] px-6 py-6 text-center text-sm text-[var(--guild-text-secondary)]">
+<footer
+	class="border-t border-[var(--guild-border)] px-6 py-6 text-center text-sm text-[var(--guild-text-secondary)]"
+>
 	<p class="mb-2">© {new Date().getFullYear()} Frolf Bot. All rights reserved.</p>
 	<nav class="flex justify-center gap-4">
 		<a href="/" class="text-[var(--guild-primary)] hover:underline">Home</a>

@@ -6,7 +6,7 @@
 		</p>
 		<a
 			href="/"
-			class="inline-block rounded bg-liquid-skobeloff px-6 py-2 text-white hover:brightness-110 transition"
+			class="bg-liquid-skobeloff inline-block rounded px-6 py-2 text-white transition hover:brightness-110"
 		>
 			Return Home
 		</a>

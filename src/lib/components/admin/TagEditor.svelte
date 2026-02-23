@@ -10,8 +10,78 @@
 		removing: boolean;
 	}
 
+	interface TagEditRow {
+		memberId: string;
+		currentTag: number | null;
+		newTagStr: string;
+		removing: boolean;
+	}
+
 	// User edits stored separately from derived data so rows can be $derived
 	const edits = new SvelteMap<string, EditState>();
+
+	function parseRequestedTag(row: TagEditRow): number | null {
+		if (row.removing || !row.newTagStr) {
+			return null;
+		}
+		const parsed = parseInt(row.newTagStr);
+		if (isNaN(parsed) || parsed <= 0) {
+			return null;
+		}
+		return parsed;
+	}
+
+	function addDuplicateTargetConflicts(
+		rows: TagEditRow[],
+		errors: SvelteMap<string, string>
+	): void {
+		const targetTags = new SvelteMap<number, string>(); // tagNumber -> memberId
+		for (const row of rows) {
+			const requestedTag = parseRequestedTag(row);
+			if (requestedTag == null) {
+				continue;
+			}
+
+			const existingOwner = targetTags.get(requestedTag);
+			if (!existingOwner) {
+				targetTags.set(requestedTag, row.memberId);
+				continue;
+			}
+
+			const message = `#${requestedTag} is already assigned to another row`;
+			errors.set(row.memberId, message);
+			errors.set(existingOwner, message);
+		}
+	}
+
+	function addUnchangedHolderConflicts(
+		rows: TagEditRow[],
+		errors: SvelteMap<string, string>
+	): void {
+		for (const row of rows) {
+			const requestedTag = parseRequestedTag(row);
+			if (requestedTag == null || errors.has(row.memberId)) {
+				continue;
+			}
+
+			const blocker = rows.find(
+				(other) =>
+					other.memberId !== row.memberId &&
+					other.currentTag === requestedTag &&
+					!other.removing &&
+					!other.newTagStr
+			);
+			if (!blocker) {
+				continue;
+			}
+
+			const blockerName = userProfiles.getDisplayName(blocker.memberId);
+			errors.set(
+				row.memberId,
+				`#${requestedTag} is currently held by ${blockerName} (reassign or remove them in this batch)`
+			);
+		}
+	}
 
 	// Derived rows from tagList + edits overlay
 	const rows = $derived(
@@ -26,46 +96,9 @@
 	// Per-row conflict errors (keyed by memberId)
 	const conflicts = $derived.by(() => {
 		const errors = new SvelteMap<string, string>();
-		const targetTags = new SvelteMap<number, string>(); // tagNumber → memberId
 
-		// Pass 1: detect duplicate target tags within the form
-		for (const row of rows) {
-			if (row.removing) continue;
-			const val = parseInt(row.newTagStr);
-			if (!row.newTagStr || isNaN(val) || val <= 0) continue;
-
-			if (targetTags.has(val)) {
-				const otherId = targetTags.get(val)!;
-				errors.set(row.memberId, `#${val} is already assigned to another row`);
-				errors.set(otherId, `#${val} is already assigned to another row`);
-			} else {
-				targetTags.set(val, row.memberId);
-			}
-		}
-
-		// Pass 2: detect conflicts with unchanged players
-		for (const row of rows) {
-			if (row.removing) continue;
-			const val = parseInt(row.newTagStr);
-			if (!row.newTagStr || isNaN(val) || val <= 0) continue;
-			if (errors.has(row.memberId)) continue;
-
-			// A conflict exists if another player holds this tag AND is not being reassigned
-			const blocker = rows.find(
-				(other) =>
-					other.memberId !== row.memberId &&
-					other.currentTag === val &&
-					!other.removing &&
-					!other.newTagStr
-			);
-			if (blocker) {
-				const blockerName = userProfiles.getDisplayName(blocker.memberId);
-				errors.set(
-					row.memberId,
-					`#${val} is currently held by ${blockerName} (reassign or remove them in this batch)`
-				);
-			}
-		}
+		addDuplicateTargetConflicts(rows, errors);
+		addUnchangedHolderConflicts(rows, errors);
 
 		return errors;
 	});
@@ -116,10 +149,12 @@
 	}
 </script>
 
-<div class="rounded-xl border border-[#007474]/20 bg-[var(--guild-surface)] px-5 py-4 space-y-4">
+<div class="space-y-4 rounded-xl border border-[#007474]/20 bg-[var(--guild-surface)] px-5 py-4">
 	<!-- Feedback banners -->
 	{#if adminStore.successMessage}
-		<div class="rounded-lg border border-[#007474]/40 bg-[#007474]/10 px-4 py-3 text-sm text-[#007474]">
+		<div
+			class="rounded-lg border border-[#007474]/40 bg-[#007474]/10 px-4 py-3 text-sm text-[#007474]"
+		>
 			{adminStore.successMessage}
 		</div>
 	{/if}
@@ -141,16 +176,24 @@
 			<table class="w-full text-sm">
 				<thead>
 					<tr class="border-b border-[#007474]/10">
-						<th class="pb-2 text-left font-['Space_Grotesk'] text-xs font-semibold text-[var(--guild-text-secondary)] uppercase tracking-wide">
+						<th
+							class="pb-2 text-left font-['Space_Grotesk'] text-xs font-semibold tracking-wide text-[var(--guild-text-secondary)] uppercase"
+						>
 							Player
 						</th>
-						<th class="pb-2 text-center font-['Space_Grotesk'] text-xs font-semibold text-[var(--guild-text-secondary)] uppercase tracking-wide">
+						<th
+							class="pb-2 text-center font-['Space_Grotesk'] text-xs font-semibold tracking-wide text-[var(--guild-text-secondary)] uppercase"
+						>
 							Current
 						</th>
-						<th class="pb-2 text-center font-['Space_Grotesk'] text-xs font-semibold text-[var(--guild-text-secondary)] uppercase tracking-wide">
+						<th
+							class="pb-2 text-center font-['Space_Grotesk'] text-xs font-semibold tracking-wide text-[var(--guild-text-secondary)] uppercase"
+						>
 							New Tag
 						</th>
-						<th class="pb-2 text-right font-['Space_Grotesk'] text-xs font-semibold text-[var(--guild-text-secondary)] uppercase tracking-wide">
+						<th
+							class="pb-2 text-right font-['Space_Grotesk'] text-xs font-semibold tracking-wide text-[var(--guild-text-secondary)] uppercase"
+						>
 							Action
 						</th>
 					</tr>
@@ -169,7 +212,7 @@
 										loading="lazy"
 										decoding="async"
 									/>
-									<span class="text-[var(--guild-text)] truncate max-w-[120px]">
+									<span class="max-w-[120px] truncate text-[var(--guild-text)]">
 										{userProfiles.getDisplayName(row.memberId)}
 									</span>
 								</div>
@@ -196,14 +239,17 @@
 											max="200"
 											placeholder="—"
 											value={row.newTagStr}
-											oninput={(e) => setNewTag(row.memberId, (e.currentTarget as HTMLInputElement).value)}
+											oninput={(e) =>
+												setNewTag(row.memberId, (e.currentTarget as HTMLInputElement).value)}
 											disabled={adminStore.loading}
-											class="w-16 rounded-lg border px-2 py-1 text-center font-['Space_Grotesk'] text-sm text-[var(--guild-text)] bg-[var(--guild-surface-elevated)] focus:outline-none focus:ring-1 focus:ring-[#007474] transition-colors {conflict
+											class="w-16 rounded-lg border bg-[var(--guild-surface-elevated)] px-2 py-1 text-center font-['Space_Grotesk'] text-sm text-[var(--guild-text)] transition-colors focus:ring-1 focus:ring-[#007474] focus:outline-none {conflict
 												? 'border-red-500/60'
 												: 'border-[#007474]/30'}"
 										/>
 										{#if conflict}
-											<span class="text-[10px] text-red-400 max-w-[120px] text-center leading-tight">
+											<span
+												class="max-w-[120px] text-center text-[10px] leading-tight text-red-400"
+											>
 												{conflict}
 											</span>
 										{/if}
@@ -218,8 +264,8 @@
 									onclick={() => handleRemove(row.memberId)}
 									disabled={adminStore.loading}
 									class={row.removing
-										? "rounded-lg border border-[#007474]/30 px-3 py-1.5 font-['Space_Grotesk'] text-xs text-[var(--guild-text-secondary)] hover:text-[var(--guild-text)] transition-colors"
-										: "rounded-lg border border-red-500/30 px-3 py-1.5 font-['Space_Grotesk'] text-xs text-red-400 hover:bg-red-500/10 transition-colors"}
+										? "rounded-lg border border-[#007474]/30 px-3 py-1.5 font-['Space_Grotesk'] text-xs text-[var(--guild-text-secondary)] transition-colors hover:text-[var(--guild-text)]"
+										: "rounded-lg border border-red-500/30 px-3 py-1.5 font-['Space_Grotesk'] text-xs text-red-400 transition-colors hover:bg-red-500/10"}
 								>
 									{row.removing ? 'Undo' : 'Remove'}
 								</button>
@@ -240,7 +286,7 @@
 					type="button"
 					onclick={resetForm}
 					disabled={adminStore.loading || changedCount === 0}
-					class="rounded-lg border border-[#007474]/30 px-3 py-1.5 font-['Space_Grotesk'] text-xs text-[var(--guild-text-secondary)] hover:text-[var(--guild-text)] transition-colors disabled:opacity-40"
+					class="rounded-lg border border-[#007474]/30 px-3 py-1.5 font-['Space_Grotesk'] text-xs text-[var(--guild-text-secondary)] transition-colors hover:text-[var(--guild-text)] disabled:opacity-40"
 				>
 					Reset
 				</button>
@@ -248,7 +294,7 @@
 					type="button"
 					onclick={handleSubmit}
 					disabled={adminStore.loading || hasConflicts || changedCount === 0}
-					class="rounded-lg bg-liquid-skobeloff px-4 py-2 font-['Space_Grotesk'] text-sm font-medium text-white hover:brightness-110 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+					class="bg-liquid-skobeloff rounded-lg px-4 py-2 font-['Space_Grotesk'] text-sm font-medium text-white transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
 				>
 					{adminStore.loading ? 'Submitting…' : 'Submit Batch'}
 				</button>

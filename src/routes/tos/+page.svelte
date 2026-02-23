@@ -23,7 +23,8 @@
 			<a
 				href="/privacy"
 				class="text-[var(--guild-text-secondary)] transition-colors hover:text-[var(--guild-text)]"
-			>Privacy Policy</a>
+				>Privacy Policy</a
+			>
 		</nav>
 	</div>
 </header>
@@ -77,7 +78,9 @@
 			</p>
 			<ul class="list-disc space-y-1 pl-6 text-[var(--guild-text-secondary)]">
 				<li>Submit false, misleading, or fraudulent scores or game data</li>
-				<li>Attempt to gain unauthorized access to any part of the Service or its infrastructure</li>
+				<li>
+					Attempt to gain unauthorized access to any part of the Service or its infrastructure
+				</li>
 				<li>Use automated tools, bots, or scripts to abuse or scrape the Service</li>
 				<li>Harass, impersonate, or harm other users</li>
 				<li>Violate Discord's Terms of Service or Community Guidelines while using Frolf Bot</li>
@@ -156,7 +159,9 @@
 	</article>
 </div>
 
-<footer class="border-t border-[var(--guild-border)] px-6 py-6 text-center text-sm text-[var(--guild-text-secondary)]">
+<footer
+	class="border-t border-[var(--guild-border)] px-6 py-6 text-center text-sm text-[var(--guild-text-secondary)]"
+>
 	<p class="mb-2">© {new Date().getFullYear()} Frolf Bot. All rights reserved.</p>
 	<nav class="flex justify-center gap-4">
 		<a href="/" class="text-[var(--guild-primary)] hover:underline">Home</a>
