@@ -25,25 +25,10 @@
 	let visibleParticipants = $derived(confirmedParticipants.slice(0, 5));
 	let overflowCount = $derived(Math.max(0, confirmedParticipants.length - 5));
 
-	function roundParTotal(): number | null {
-		if (Array.isArray(round.parValues) && round.parValues.length > 0) {
-			return round.parValues.reduce((acc, par) => acc + par, 0);
-		}
-		if (typeof round.holes === 'number' && round.holes > 0) {
-			return round.holes * 3;
-		}
-		return null;
-	}
-
 	function formatRoundScore(score: number | null): string {
 		if (score === null) return '-';
-		const parTotal = roundParTotal();
-		if (parTotal === null) {
-			return score > 0 ? `+${score}` : `${score}`;
-		}
-		const diff = score - parTotal;
-		if (diff === 0) return 'E';
-		return diff > 0 ? `+${diff}` : `${diff}`;
+		if (score === 0) return 'E';
+		return score > 0 ? `+${score}` : `${score}`;
 	}
 
 	function participantName(participant: (typeof round.participants)[number]): string {

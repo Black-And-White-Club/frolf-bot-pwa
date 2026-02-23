@@ -64,15 +64,16 @@
 
 	let showScoreGrid = $derived(round?.state === 'started' || round?.state === 'finalized');
 
-	let roundPar = $derived.by(() => {
-		if (!round?.parValues) return (round?.holes ?? 18) * 3;
-		return round.parValues.reduce((acc: number, p: number) => acc + p, 0);
-	});
-
 	function participantName(participant: { userId: string; rawName?: string } | null): string {
 		if (!participant) return '';
 		if (participant.userId) return userProfiles.getDisplayName(participant.userId);
 		return participant.rawName || 'Guest';
+	}
+
+	function formatRelativeScore(score: number | null | undefined): string {
+		if (score === null || score === undefined) return '--';
+		if (score === 0) return 'E';
+		return score > 0 ? `+${score}` : `${score}`;
 	}
 </script>
 
@@ -133,11 +134,7 @@
 						<span class="stat-value">
 							{participantName(leader)}
 							<span class="leader-score">
-								{(() => {
-									const diff = (leader?.score ?? 0) - roundPar;
-									if (diff === 0) return 'E';
-									return diff > 0 ? `+${diff}` : `${diff}`;
-								})()}
+								{formatRelativeScore(leader?.score)}
 							</span>
 						</span>
 					</div>
@@ -157,7 +154,6 @@
 							{participant}
 							position={idx + 1}
 							showScore={round.state !== 'scheduled'}
-							par={roundPar}
 						/>
 					{/each}
 				{:else}

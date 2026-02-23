@@ -16,17 +16,14 @@
 		participant: Participant;
 		position: number;
 		showScore?: boolean;
-		par?: number;
 	};
 
-	let { participant, position, showScore = true, par = 0 }: Props = $props();
+	let { participant, position, showScore = true }: Props = $props();
 
 	let scoreDisplay = $derived.by(() => {
 		if (!showScore || participant.score === null) return null;
-
-		const diff = participant.score - par;
-		if (diff === 0) return 'E';
-		return diff > 0 ? `+${diff}` : `${diff}`;
+		if (participant.score === 0) return 'E';
+		return participant.score > 0 ? `+${participant.score}` : `${participant.score}`;
 	});
 
 	let positionStyle = $derived(
@@ -41,9 +38,8 @@
 
 	let scoreColorClass = $derived.by(() => {
 		if (!showScore || participant.score === null) return '';
-		const diff = participant.score - par;
-		if (diff < 0) return 'score-under';
-		if (diff > 0) return 'score-over';
+		if (participant.score < 0) return 'score-under';
+		if (participant.score > 0) return 'score-over';
 		return 'score-even';
 	});
 
@@ -82,9 +78,6 @@
 			{#key participant.score}
 				<span class="score-value animate-scale-pulse inline-block">{scoreDisplay}</span>
 			{/key}
-			{#if participant.score !== null}
-				<span class="score-raw">({participant.score})</span>
-			{/if}
 		</div>
 	{/if}
 </div>
@@ -191,12 +184,6 @@
 	.score-value {
 		font-size: 1.125rem;
 		font-weight: 700;
-		font-family: 'Space Grotesk', monospace;
-	}
-
-	.score-raw {
-		font-size: 0.75rem;
-		color: var(--guild-text-muted, #9ca3af);
 		font-family: 'Space Grotesk', monospace;
 	}
 
