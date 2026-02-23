@@ -48,7 +48,9 @@
 	);
 
 	let displayName = $derived(
-		participant.userId ? userProfiles.getDisplayName(participant.userId) : (participant.rawName ?? 'Guest')
+		participant.userId
+			? userProfiles.getDisplayName(participant.userId)
+			: (participant.rawName ?? 'Guest')
 	);
 	// keep response available on participant object; no local alias required
 </script>

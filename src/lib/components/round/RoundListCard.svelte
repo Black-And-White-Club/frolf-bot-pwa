@@ -85,17 +85,13 @@
 					{#each sortedScores as p, i (`${p.userId || 'guest'}:${i}`)}
 						<div class="flex items-center gap-2">
 							<span class="font-secondary text-xs font-bold text-slate-400">#{i + 1}</span>
-								<ParticipantAvatar
-									userId={p.userId}
-									username={participantName(p)}
-									size={20}
-								/>
-								{#key p.score}
-									<span
-										class="font-secondary animate-scale-pulse inline-block font-bold text-[var(--guild-secondary)]"
-										>{formatRoundScore(p.score)}</span
-									>
-								{/key}
+							<ParticipantAvatar userId={p.userId} username={participantName(p)} size={20} />
+							{#key p.score}
+								<span
+									class="font-secondary animate-scale-pulse inline-block font-bold text-[var(--guild-secondary)]"
+									>{formatRoundScore(p.score)}</span
+								>
+							{/key}
 						</div>
 					{/each}
 				</div>
@@ -105,11 +101,11 @@
 		<div class="participant-avatars">
 			{#each visibleParticipants as participant, idx (`${participant.userId || 'guest'}:${idx}`)}
 				<div class="avatar-wrapper">
-						<ParticipantAvatar
-							userId={participant.userId}
-							username={participantName(participant)}
-							size={32}
-						/>
+					<ParticipantAvatar
+						userId={participant.userId}
+						username={participantName(participant)}
+						size={32}
+					/>
 				</div>
 			{/each}
 			{#if overflowCount > 0}

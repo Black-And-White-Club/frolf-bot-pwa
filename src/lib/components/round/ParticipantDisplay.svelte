@@ -84,13 +84,13 @@
 			<div class="flex items-center -space-x-1" role="group" aria-label="Participants">
 				{#each localParticipants.slice(0, 3) as participant, idx (`${participant.user_id || participant.username || 'guest'}:${idx}`)}
 					<div class="ring-guild-surface rounded-full ring-2">
-							<ParticipantAvatar
-								userId={participant.user_id}
-								avatar_url={participant.avatar_url}
-								username={participantName(participant)}
-								size={24}
-								extraClasses="border-2"
-							/>
+						<ParticipantAvatar
+							userId={participant.user_id}
+							avatar_url={participant.avatar_url}
+							username={participantName(participant)}
+							size={24}
+							extraClasses="border-2"
+						/>
 					</div>
 				{/each}
 
@@ -118,16 +118,16 @@
 		{#each displayedParticipants as participant, idx (`${participant.user_id || participant.username || 'guest'}:${idx}`)}
 			<div class="participant-row">
 				<div class="participant-info">
-						<ParticipantAvatar
-							userId={participant.user_id}
-							avatar_url={participant.avatar_url}
-							username={participantName(participant)}
-							size={24}
-							extraClasses="flex-shrink-0"
-						/>
-						<span class="participant-name" title={participantName(participant)}>
-							{participantName(participant)}
-						</span>
+					<ParticipantAvatar
+						userId={participant.user_id}
+						avatar_url={participant.avatar_url}
+						username={participantName(participant)}
+						size={24}
+						extraClasses="flex-shrink-0"
+					/>
+					<span class="participant-name" title={participantName(participant)}>
+						{participantName(participant)}
+					</span>
 				</div>
 
 				<div class="participant-status">

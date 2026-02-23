@@ -81,15 +81,15 @@
 					<tr class="participant-row-grid">
 						<td class="player-cell sticky-column">
 							<div class="player-info">
-									<ParticipantAvatar
-										userId={participant.userId}
-										avatar_url={participant.avatar_url}
-										username={participantName(participant)}
-										size={24}
-									/>
-									<span class="player-name">
-										{participantName(participant)}
-									</span>
+								<ParticipantAvatar
+									userId={participant.userId}
+									avatar_url={participant.avatar_url}
+									username={participantName(participant)}
+									size={24}
+								/>
+								<span class="player-name">
+									{participantName(participant)}
+								</span>
 							</div>
 						</td>
 						{#each holes as hole, idx (hole)}
