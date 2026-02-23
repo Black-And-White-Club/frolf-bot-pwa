@@ -290,12 +290,18 @@ class NatsService {
 			return;
 		}
 
+		const spanAttributes: Record<string, string> = {
+			'messaging.system': 'nats',
+			'messaging.destination': subject
+		};
+		const correlationId = customHeaders?.correlation_id;
+		if (correlationId) {
+			spanAttributes['messaging.correlation_id'] = correlationId;
+		}
+
 		const tracer = getTracer();
 		const span = tracer.startSpan(`nats.publish.${subject}`, {
-			attributes: {
-				'messaging.system': 'nats',
-				'messaging.destination': subject
-			}
+			attributes: spanAttributes
 		});
 
 		try {
