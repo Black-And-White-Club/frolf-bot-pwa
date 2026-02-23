@@ -8430,6 +8430,248 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       }
     },
     {
+      "subject": "round.embed.pagination.snapshot.delete.requested.v1",
+      "subject_pattern": "round.embed.pagination.snapshot.delete.requested.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Pagination Snapshot Delete Requested",
+      "description": "Discord requested deletion of a stored embed pagination snapshot.",
+      "producer": {
+        "service": "discord",
+        "module": "round"
+      },
+      "consumers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
+      "payload_type": "*roundevents.PaginationSnapshotDeleteRequestedPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "message_id": {
+            "type": "string"
+          },
+          "request_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message_id",
+          "request_id"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "round.embed.pagination.snapshot.delete.result.v1",
+      "subject_pattern": "round.embed.pagination.snapshot.delete.result.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Pagination Snapshot Delete Result",
+      "description": "Backend replied with the outcome of snapshot deletion.",
+      "producer": {
+        "service": "frolf-bot-backend",
+        "module": "round"
+      },
+      "consumers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
+      "payload_type": "*roundevents.PaginationSnapshotDeleteResultPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message_id": {
+            "type": "string"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "message_id",
+          "request_id",
+          "success"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "round.embed.pagination.snapshot.get.requested.v1",
+      "subject_pattern": "round.embed.pagination.snapshot.get.requested.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Pagination Snapshot Get Requested",
+      "description": "Discord requested a serialized embed pagination snapshot by message ID.",
+      "producer": {
+        "service": "discord",
+        "module": "round"
+      },
+      "consumers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
+      "payload_type": "*roundevents.PaginationSnapshotGetRequestedPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "message_id": {
+            "type": "string"
+          },
+          "request_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message_id",
+          "request_id"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "round.embed.pagination.snapshot.get.result.v1",
+      "subject_pattern": "round.embed.pagination.snapshot.get.result.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Pagination Snapshot Get Result",
+      "description": "Backend replied with found/not-found state and snapshot payload when present.",
+      "producer": {
+        "service": "frolf-bot-backend",
+        "module": "round"
+      },
+      "consumers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
+      "payload_type": "*roundevents.PaginationSnapshotGetResultPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "found": {
+            "type": "boolean"
+          },
+          "message_id": {
+            "type": "string"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "snapshot": {
+            "items": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "found",
+          "message_id",
+          "request_id"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "round.embed.pagination.snapshot.upsert.requested.v1",
+      "subject_pattern": "round.embed.pagination.snapshot.upsert.requested.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Pagination Snapshot Upsert Requested",
+      "description": "Discord requested persistence of a serialized embed pagination snapshot.",
+      "producer": {
+        "service": "discord",
+        "module": "round"
+      },
+      "consumers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
+      "payload_type": "*roundevents.PaginationSnapshotUpsertRequestedPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "message_id": {
+            "type": "string"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "snapshot": {
+            "items": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "ttl_seconds": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "message_id",
+          "request_id"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "round.embed.pagination.snapshot.upsert.result.v1",
+      "subject_pattern": "round.embed.pagination.snapshot.upsert.result.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Pagination Snapshot Upsert Result",
+      "description": "Backend replied with the outcome of snapshot upsert persistence.",
+      "producer": {
+        "service": "frolf-bot-backend",
+        "module": "round"
+      },
+      "consumers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
+      "payload_type": "*roundevents.PaginationSnapshotUpsertResultPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message_id": {
+            "type": "string"
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "message_id",
+          "request_id",
+          "success"
+        ],
+        "type": "object"
+      }
+    },
+    {
       "subject": "round.entity.created.v1",
       "subject_pattern": "round.entity.created.v1.{scope_id}",
       "supports_scoped_suffix": true,
@@ -9382,6 +9624,44 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         },
         "required": [
           "error",
+          "guild_id",
+          "round_id"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "round.finalize.requested.v1",
+      "subject_pattern": "round.finalize.requested.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Round Finalize Requested",
+      "description": "Finalize command requested by an integration edge.",
+      "producer": {
+        "service": "discord",
+        "module": "round"
+      },
+      "consumers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
+      "payload_type": "*roundevents.RoundFinalizeRequestedPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "guild_id": {
+            "type": "string"
+          },
+          "round_id": {
+            "items": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
           "guild_id",
           "round_id"
         ],
