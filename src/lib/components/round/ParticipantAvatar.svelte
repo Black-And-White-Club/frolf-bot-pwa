@@ -28,7 +28,7 @@
 			const size2x = targetSize * 2;
 			const supported = [16, 32, 64, 128, 256, 512, 1024];
 			const best = supported.find((s) => s >= size2x) || 1024;
-			
+
 			// Use webp for better performance
 			const optimizedUrl = url.replace(/\.(png|jpe?g)$/i, '.webp');
 			return `${optimizedUrl}?size=${best}`;

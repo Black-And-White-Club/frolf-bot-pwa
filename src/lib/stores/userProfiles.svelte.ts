@@ -87,7 +87,7 @@ class UserProfileService {
 		if (url.includes('cdn.discordapp.com')) {
 			// Convert to webp for better performance (Discord CDN supports this)
 			url = url.replace(/\.(png|jpe?g)(\?.*)?$/i, '.webp$2');
-			
+
 			if (size) {
 				const separator = url.includes('?') ? '&' : '?';
 				return `${url}${separator}size=${size}`;

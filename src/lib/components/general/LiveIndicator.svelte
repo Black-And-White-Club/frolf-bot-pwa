@@ -11,7 +11,7 @@
 				class="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--guild-secondary)] opacity-75"
 			></span>
 			<span
-				class="relative inline-flex h-2 w-2 rounded-full bg-[var(--guild-secondary)] shadow-aura"
+				class="shadow-aura relative inline-flex h-2 w-2 rounded-full bg-[var(--guild-secondary)]"
 			></span>
 		</span>
 		<span class="font-secondary tracking-wider uppercase">Live</span>

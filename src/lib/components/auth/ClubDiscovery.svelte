@@ -104,11 +104,13 @@
 		<!-- Discord guild suggestions -->
 		{#if loadingSuggestions}
 			<div class="flex justify-center py-4">
-				<div class="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white/80"></div>
+				<div
+					class="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white/80"
+				></div>
 			</div>
 		{:else if suggestions.length > 0}
 			<div class="space-y-3">
-				<h3 class="text-sm font-semibold uppercase tracking-wide text-white/60">
+				<h3 class="text-sm font-semibold tracking-wide text-white/60 uppercase">
 					Clubs on your Discord servers
 				</h3>
 				{#each suggestions as club (club.uuid)}
@@ -126,7 +128,7 @@
 								/>
 							{:else}
 								<div
-									class="flex h-10 w-10 items-center justify-center rounded-full bg-liquid-skobeloff/30 text-lg font-bold text-white"
+									class="bg-liquid-skobeloff/30 flex h-10 w-10 items-center justify-center rounded-full text-lg font-bold text-white"
 								>
 									{club.name[0]}
 								</div>
@@ -137,7 +139,7 @@
 							<button
 								onclick={() => joinClub(club.uuid)}
 								disabled={joinStatus[club.uuid] === 'loading'}
-								class="rounded-md bg-liquid-skobeloff px-4 py-1.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
+								class="bg-liquid-skobeloff rounded-md px-4 py-1.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
 							>
 								{joinStatus[club.uuid] === 'loading' ? 'Joining...' : 'Join'}
 							</button>
@@ -161,7 +163,7 @@
 
 		<!-- Invite code entry -->
 		<div class="space-y-3">
-			<h3 class="text-sm font-semibold uppercase tracking-wide text-white/60">
+			<h3 class="text-sm font-semibold tracking-wide text-white/60 uppercase">
 				Have an invite code?
 			</h3>
 			<form
@@ -175,12 +177,12 @@
 					type="text"
 					bind:value={inviteCode}
 					placeholder="Enter invite code"
-					class="flex-1 rounded-md border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/30 focus:border-[var(--guild-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--guild-primary)]"
+					class="flex-1 rounded-md border border-white/10 bg-black/20 px-4 py-2 text-white placeholder:text-white/30 focus:border-[var(--guild-primary)] focus:ring-1 focus:ring-[var(--guild-primary)] focus:outline-none"
 				/>
 				<button
 					type="submit"
 					disabled={codeStatus === 'loading' || !inviteCode.trim()}
-					class="rounded-md bg-liquid-skobeloff px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
+					class="bg-liquid-skobeloff rounded-md px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
 				>
 					{codeStatus === 'loading' ? 'Joining...' : 'Join'}
 				</button>

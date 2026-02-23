@@ -36,14 +36,14 @@
 	</div>
 
 	<!-- Player Info -->
-	<div class="flex flex-1 items-center gap-3 min-w-0">
-		<span class="font-medium truncate">{displayName}</span>
+	<div class="flex min-w-0 flex-1 items-center gap-3">
+		<span class="truncate font-medium">{displayName}</span>
 	</div>
 
 	<!-- Stats -->
 	<div class="mr-4 flex min-w-[5rem] flex-col items-end">
-		<div class="font-display text-sm font-bold text-guild-accent">{entry.totalPoints} pts</div>
-		<div class="font-secondary text-xs text-guild-text-secondary">{entry.roundsPlayed} rds</div>
+		<div class="font-display text-guild-accent text-sm font-bold">{entry.totalPoints} pts</div>
+		<div class="font-secondary text-guild-text-secondary text-xs">{entry.roundsPlayed} rds</div>
 	</div>
 
 	<!-- Movement Indicator -->

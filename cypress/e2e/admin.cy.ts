@@ -207,4 +207,40 @@ describe('Admin Dashboard', () => {
 
 		cy.contains('Only admins can adjust points').should('be.visible');
 	});
+
+	it('submits admin scorecard upload with overwrite + guest fallback flags', () => {
+		visitAdmin('admin');
+
+		const manualRoundId = '1bd0d342-19ef-4d25-b6a7-b537e523fb34';
+		cy.get('#admin-scorecard-round-id').type(manualRoundId);
+		cy.get('#admin-scorecard-notes').type('Imported from admin dashboard');
+		cy.get('#admin-scorecard-file').selectFile({
+			contents: Cypress.Buffer.from('Player,+/-\nAlec,-2\n'),
+			fileName: 'scores.csv',
+			mimeType: 'text/csv'
+		});
+		cy.contains('button', 'Upload Scorecard').click();
+
+		cy.wsAssertPublished('round.scorecard.admin.upload.requested.v1').then((entries) => {
+			const lastEntry = entries[entries.length - 1];
+			const payload = lastEntry.payload as {
+				guild_id: string;
+				round_id: string;
+				user_id: string;
+				file_name: string;
+				source: string;
+				allow_guest_players: boolean;
+				overwrite_existing_scores: boolean;
+				notes: string;
+			};
+
+			expect(payload.guild_id).to.eq(subjectId);
+			expect(payload.round_id).to.eq(manualRoundId);
+			expect(payload.file_name).to.eq('scores.csv');
+			expect(payload.source).to.eq('admin_pwa_upload');
+			expect(payload.allow_guest_players).to.eq(true);
+			expect(payload.overwrite_existing_scores).to.eq(true);
+			expect(payload.notes).to.eq('Imported from admin dashboard');
+		});
+	});
 });
