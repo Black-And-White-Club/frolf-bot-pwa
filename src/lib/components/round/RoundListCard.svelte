@@ -69,7 +69,7 @@
 				<div
 					class="flex items-center gap-4 rounded-md border border-[var(--guild-border)] bg-[var(--guild-surface-elevated)] p-2 text-sm"
 				>
-					{#each sortedScores as p, i (p.userId)}
+					{#each sortedScores as p, i (`${p.userId || 'guest'}:${i}`)}
 						<div class="flex items-center gap-2">
 							<span class="font-secondary text-xs font-bold text-slate-400">#{i + 1}</span>
 							<ParticipantAvatar
@@ -90,7 +90,7 @@
 		{/if}
 	{:else if visibleParticipants.length > 0}
 		<div class="participant-avatars">
-			{#each visibleParticipants as participant (participant.userId)}
+			{#each visibleParticipants as participant, idx (`${participant.userId || 'guest'}:${idx}`)}
 				<div class="avatar-wrapper">
 					<ParticipantAvatar
 						userId={participant.userId}

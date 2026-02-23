@@ -21,7 +21,7 @@
 			}) ?? []
 	);
 
-	let statusBadge = $derived(() => {
+	let statusBadge = $derived.by(() => {
 		if (!round) return { text: 'Unknown', class: 'status-unknown' };
 
 		switch (round.state) {
@@ -38,7 +38,7 @@
 		}
 	});
 
-	let formattedDate = $derived(() => {
+	let formattedDate = $derived.by(() => {
 		if (!round) return '';
 		return new Intl.DateTimeFormat('en-US', {
 			weekday: 'long',
@@ -50,12 +50,12 @@
 		}).format(new Date(round.startTime));
 	});
 
-	let leader = $derived(() => {
+	let leader = $derived.by(() => {
 		if (confirmedParticipants.length === 0) return null;
 		return confirmedParticipants[0];
 	});
 
-	let holesCompleted = $derived(() => {
+	let holesCompleted = $derived.by(() => {
 		if (!round || round.state === 'scheduled') return null;
 		const totalHoles = round.holes ?? 18;
 		const current = round.currentHole ?? 0;
@@ -64,7 +64,7 @@
 
 	let showScoreGrid = $derived(round?.state === 'started' || round?.state === 'finalized');
 
-	let roundPar = $derived(() => {
+	let roundPar = $derived.by(() => {
 		if (!round?.parValues) return (round?.holes ?? 18) * 3;
 		return round.parValues.reduce((acc: number, p: number) => acc + p, 0);
 	});
@@ -80,8 +80,8 @@
 		<header class="detail-header">
 			<div class="header-top">
 				<h1 class="round-title">{round.title}</h1>
-				<div class="status-badge {statusBadge().class}">
-					{statusBadge().text}
+				<div class="status-badge {statusBadge.class}">
+					{statusBadge.text}
 				</div>
 			</div>
 
@@ -95,7 +95,7 @@
 
 				<div class="meta-item">
 					<span class="meta-icon">📅</span>
-					<span class="meta-text">{formattedDate()}</span>
+					<span class="meta-text">{formattedDate}</span>
 				</div>
 			</div>
 
@@ -107,11 +107,11 @@
 		<!-- Stats Bar (for started/finalized rounds) -->
 		{#if round.state === 'started' || round.state === 'finalized'}
 			<div class="stats-bar">
-				{#if holesCompleted()}
+				{#if holesCompleted}
 					<div class="stat-item">
 						<span class="stat-label">Progress</span>
 						<span class="stat-value">
-							Hole {holesCompleted()?.current} of {holesCompleted()?.total}
+							Hole {holesCompleted.current} of {holesCompleted.total}
 						</span>
 					</div>
 				{/if}
@@ -121,14 +121,14 @@
 					<span class="stat-value">{confirmedParticipants.length}</span>
 				</div>
 
-				{#if leader() && leader()?.score !== null}
+				{#if leader && leader.score !== null}
 					<div class="stat-item">
 						<span class="stat-label">Leader</span>
 						<span class="stat-value">
-							{leader() ? userProfiles.getDisplayName(leader()!.userId) : ''}
+							{leader ? userProfiles.getDisplayName(leader.userId) : ''}
 							<span class="leader-score">
 								{(() => {
-									const diff = (leader()?.score ?? 0) - roundPar();
+									const diff = (leader?.score ?? 0) - roundPar;
 									if (diff === 0) return 'E';
 									return diff > 0 ? `+${diff}` : `${diff}`;
 								})()}
@@ -146,12 +146,12 @@
 			</h2>
 			<div class="participants-list">
 				{#if confirmedParticipants.length > 0}
-					{#each confirmedParticipants as participant, idx (participant.userId)}
+					{#each confirmedParticipants as participant, idx (`${participant.userId || 'guest'}:${idx}`)}
 						<ParticipantRow
 							{participant}
 							position={idx + 1}
 							showScore={round.state !== 'scheduled'}
-							par={roundPar()}
+							par={roundPar}
 						/>
 					{/each}
 				{:else}

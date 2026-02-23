@@ -69,7 +69,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each participants as participant (participant.userId)}
+				{#each participants as participant, idx (`${participant.userId || 'guest'}:${idx}`)}
 					<tr class="participant-row-grid">
 						<td class="player-cell sticky-column">
 							<div class="player-info">
