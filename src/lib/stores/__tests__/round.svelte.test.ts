@@ -175,6 +175,30 @@ describe('RoundService (round.svelte.ts)', () => {
 			expect(roundService.rounds[0].participants[0].score).toBe(5);
 		});
 
+		it('handleScoresSnapshot replaces participants from raw payload', () => {
+			const p = { userId: 'u1', response: 'accepted' as const, score: 0, tagNumber: 1 };
+			roundService.addParticipant('r1', p);
+
+			roundService.handleScoresSnapshot({
+				roundId: 'r1',
+				participants: [
+					{ user_id: 'u2', response: 'accepted', score: -3, tag_number: 9 },
+					{
+						user_id: '',
+						response: 'accepted',
+						score: 4,
+						tag_number: null,
+						raw_name: 'Guest Player'
+					}
+				]
+			});
+
+			expect(roundService.rounds[0].participants).toEqual([
+				{ userId: 'u2', response: 'accepted', score: -3, tagNumber: 9 },
+				{ userId: '', response: 'accepted', score: 4, tagNumber: null }
+			]);
+		});
+
 		it('removeParticipant removes participant', () => {
 			const p = { userId: 'u1', response: 'accepted' as const, score: 0, tagNumber: 1 };
 			roundService.addParticipant('r1', p);

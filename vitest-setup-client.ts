@@ -17,6 +17,63 @@ if (!(globalThis as any).cancelIdleCallback) {
 	};
 }
 
+function createMemoryStorage(): Storage {
+	const store = new Map<string, string>();
+	return {
+		get length() {
+			return store.size;
+		},
+		clear() {
+			store.clear();
+		},
+		getItem(key: string) {
+			return store.has(key) ? store.get(key)! : null;
+		},
+		key(index: number) {
+			return Array.from(store.keys())[index] ?? null;
+		},
+		removeItem(key: string) {
+			store.delete(key);
+		},
+		setItem(key: string, value: string) {
+			store.set(String(key), String(value));
+		}
+	};
+}
+
+function ensureStorage(name: 'localStorage' | 'sessionStorage'): void {
+	const g = globalThis as any;
+	const current = g[name];
+	const hasValidStorage =
+		current &&
+		typeof current.getItem === 'function' &&
+		typeof current.setItem === 'function' &&
+		typeof current.removeItem === 'function' &&
+		typeof current.clear === 'function';
+
+	if (hasValidStorage) {
+		return;
+	}
+
+	const storage = createMemoryStorage();
+	Object.defineProperty(g, name, { value: storage, configurable: true, writable: true });
+
+	if (typeof (g as any).window !== 'undefined') {
+		try {
+			Object.defineProperty((g as any).window, name, {
+				value: storage,
+				configurable: true,
+				writable: true
+			});
+		} catch {
+			(g as any).window[name] = storage;
+		}
+	}
+}
+
+ensureStorage('localStorage');
+ensureStorage('sessionStorage');
+
 // Simple IntersectionObserver mock: immediately reports intersection on observe()
 if (!(globalThis as any).IntersectionObserver) {
 	class MockIntersectionObserver {

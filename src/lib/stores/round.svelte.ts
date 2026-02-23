@@ -261,6 +261,12 @@ export class RoundService {
 		this.updateParticipant(payload.roundId, payload.userId, { score: payload.score });
 	}
 
+	handleScoresSnapshot(payload: { roundId: string; participants: ParticipantRaw[] }): void {
+		this.updateRound(payload.roundId, {
+			participants: payload.participants.map(participantFromRaw)
+		});
+	}
+
 	clear(): void {
 		this.rounds = [];
 		this.selectedRoundId = null;

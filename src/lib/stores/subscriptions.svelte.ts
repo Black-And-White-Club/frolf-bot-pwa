@@ -60,8 +60,9 @@ interface ParticipantJoinedPayloadV1 {
 
 interface ParticipantScoreUpdatedPayloadV1 {
 	round_id: string;
-	user_id: string;
-	score: number;
+	user_id?: string;
+	score?: number;
+	participants?: ParticipantRaw[];
 }
 
 interface LeaderboardTagUpdatedPayloadV1 {
@@ -167,6 +168,19 @@ class SubscriptionManager {
 		this.unsubscribers.push(
 			nats.subscribe(`round.participant.score.updated.v1.${guildId}`, (msg) => {
 				const payload = msg.data as ParticipantScoreUpdatedPayloadV1;
+				if (!payload.round_id) return;
+
+				if (Array.isArray(payload.participants) && payload.participants.length > 0) {
+					roundService.handleScoresSnapshot({
+						roundId: payload.round_id,
+						participants: payload.participants
+					});
+					return;
+				}
+
+				if (!payload.user_id || typeof payload.score !== 'number') {
+					return;
+				}
 				roundService.handleScoreUpdated({
 					roundId: payload.round_id,
 					userId: payload.user_id,
