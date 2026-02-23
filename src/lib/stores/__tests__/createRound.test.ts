@@ -77,22 +77,26 @@ describe('createRoundService', () => {
 		});
 
 		expect(result).toBe(true);
-		expect(mockPublish).toHaveBeenCalledWith('round.creation.requested.v1', {
-			guild_id: 'guild-123',
-			title: 'Weekly Round',
-			description: 'tags match',
-			start_time: '2026-02-24 18:30',
-			location: 'Pier Park',
-			user_id: 'user-123',
-			channel_id: '',
-			timezone: 'America/Chicago'
-		}, {
-			correlation_id: expect.any(String),
-			submitted_at: expect.any(String),
-			user_timezone: 'America/Chicago',
-			raw_start_time: '2026-02-24 18:30',
-			source: 'pwa'
-		});
+		expect(mockPublish).toHaveBeenCalledWith(
+			'round.creation.requested.v1',
+			{
+				guild_id: 'guild-123',
+				title: 'Weekly Round',
+				description: 'tags match',
+				start_time: '2026-02-24 18:30',
+				location: 'Pier Park',
+				user_id: 'user-123',
+				channel_id: '',
+				timezone: 'America/Chicago'
+			},
+			{
+				correlation_id: expect.any(String),
+				submitted_at: expect.any(String),
+				user_timezone: 'America/Chicago',
+				raw_start_time: '2026-02-24 18:30',
+				source: 'pwa'
+			}
+		);
 		expect(mod.createRoundService.successMessage).toContain('requested');
 	});
 
