@@ -68,6 +68,12 @@
 		if (!round?.parValues) return (round?.holes ?? 18) * 3;
 		return round.parValues.reduce((acc: number, p: number) => acc + p, 0);
 	});
+
+	function participantName(participant: { userId: string; rawName?: string } | null): string {
+		if (!participant) return '';
+		if (participant.userId) return userProfiles.getDisplayName(participant.userId);
+		return participant.rawName || 'Guest';
+	}
 </script>
 
 {#if !round}
@@ -125,7 +131,7 @@
 					<div class="stat-item">
 						<span class="stat-label">Leader</span>
 						<span class="stat-value">
-							{leader ? userProfiles.getDisplayName(leader.userId) : ''}
+							{participantName(leader)}
 							<span class="leader-score">
 								{(() => {
 									const diff = (leader?.score ?? 0) - roundPar;

@@ -52,7 +52,7 @@
 			const rel = score - parTotal;
 			return rel === 0 ? 'E' : rel > 0 ? `+${rel}` : `${rel}`;
 		}
-		return `${score}`;
+		return score > 0 ? `+${score}` : `${score}`;
 	}
 
 	// Use CSS modifier classes for status badges so they match the .score-badge
@@ -69,6 +69,13 @@
 	function toggleExpanded() {
 		expanded = !expanded;
 	}
+
+	function participantName(participant: Participant): string {
+		if (participant.user_id) {
+			return userProfiles.getDisplayName(participant.user_id);
+		}
+		return participant.username || 'Guest';
+	}
 </script>
 
 {#if compact}
@@ -77,13 +84,13 @@
 			<div class="flex items-center -space-x-1" role="group" aria-label="Participants">
 				{#each localParticipants.slice(0, 3) as participant, idx (`${participant.user_id || participant.username || 'guest'}:${idx}`)}
 					<div class="ring-guild-surface rounded-full ring-2">
-						<ParticipantAvatar
-							userId={participant.user_id}
-							avatar_url={participant.avatar_url}
-							username={userProfiles.getDisplayName(participant.user_id)}
-							size={24}
-							extraClasses="border-2"
-						/>
+							<ParticipantAvatar
+								userId={participant.user_id}
+								avatar_url={participant.avatar_url}
+								username={participantName(participant)}
+								size={24}
+								extraClasses="border-2"
+							/>
 					</div>
 				{/each}
 
@@ -111,16 +118,16 @@
 		{#each displayedParticipants as participant, idx (`${participant.user_id || participant.username || 'guest'}:${idx}`)}
 			<div class="participant-row">
 				<div class="participant-info">
-					<ParticipantAvatar
-						userId={participant.user_id}
-						avatar_url={participant.avatar_url}
-						username={userProfiles.getDisplayName(participant.user_id)}
-						size={24}
-						extraClasses="flex-shrink-0"
-					/>
-					<span class="participant-name" title={userProfiles.getDisplayName(participant.user_id)}>
-						{userProfiles.getDisplayName(participant.user_id)}
-					</span>
+						<ParticipantAvatar
+							userId={participant.user_id}
+							avatar_url={participant.avatar_url}
+							username={participantName(participant)}
+							size={24}
+							extraClasses="flex-shrink-0"
+						/>
+						<span class="participant-name" title={participantName(participant)}>
+							{participantName(participant)}
+						</span>
 				</div>
 
 				<div class="participant-status">

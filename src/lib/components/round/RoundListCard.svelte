@@ -24,6 +24,34 @@
 
 	let visibleParticipants = $derived(confirmedParticipants.slice(0, 5));
 	let overflowCount = $derived(Math.max(0, confirmedParticipants.length - 5));
+
+	function roundParTotal(): number | null {
+		if (Array.isArray(round.parValues) && round.parValues.length > 0) {
+			return round.parValues.reduce((acc, par) => acc + par, 0);
+		}
+		if (typeof round.holes === 'number' && round.holes > 0) {
+			return round.holes * 3;
+		}
+		return null;
+	}
+
+	function formatRoundScore(score: number | null): string {
+		if (score === null) return '-';
+		const parTotal = roundParTotal();
+		if (parTotal === null) {
+			return score > 0 ? `+${score}` : `${score}`;
+		}
+		const diff = score - parTotal;
+		if (diff === 0) return 'E';
+		return diff > 0 ? `+${diff}` : `${diff}`;
+	}
+
+	function participantName(participant: (typeof round.participants)[number]): string {
+		if (participant.userId) {
+			return userProfiles.getDisplayName(participant.userId);
+		}
+		return participant.rawName || 'Guest';
+	}
 </script>
 
 <button
@@ -72,17 +100,17 @@
 					{#each sortedScores as p, i (`${p.userId || 'guest'}:${i}`)}
 						<div class="flex items-center gap-2">
 							<span class="font-secondary text-xs font-bold text-slate-400">#{i + 1}</span>
-							<ParticipantAvatar
-								userId={p.userId}
-								username={userProfiles.getDisplayName(p.userId)}
-								size={20}
-							/>
-							{#key p.score}
-								<span
-									class="font-secondary animate-scale-pulse inline-block font-bold text-[var(--guild-secondary)]"
-									>{p.score}</span
-								>
-							{/key}
+								<ParticipantAvatar
+									userId={p.userId}
+									username={participantName(p)}
+									size={20}
+								/>
+								{#key p.score}
+									<span
+										class="font-secondary animate-scale-pulse inline-block font-bold text-[var(--guild-secondary)]"
+										>{formatRoundScore(p.score)}</span
+									>
+								{/key}
 						</div>
 					{/each}
 				</div>
@@ -92,11 +120,11 @@
 		<div class="participant-avatars">
 			{#each visibleParticipants as participant, idx (`${participant.userId || 'guest'}:${idx}`)}
 				<div class="avatar-wrapper">
-					<ParticipantAvatar
-						userId={participant.userId}
-						username={userProfiles.getDisplayName(participant.userId)}
-						size={32}
-					/>
+						<ParticipantAvatar
+							userId={participant.userId}
+							username={participantName(participant)}
+							size={32}
+						/>
 				</div>
 			{/each}
 			{#if overflowCount > 0}

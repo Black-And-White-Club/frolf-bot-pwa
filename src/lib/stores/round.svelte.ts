@@ -14,6 +14,7 @@ export interface Participant {
 	response: ParticipantResponse;
 	score: number | null;
 	tagNumber: number | null;
+	rawName?: string;
 }
 
 // Raw API format (snake_case - matches Go backend)
@@ -76,7 +77,8 @@ export function participantFromRaw(raw: ParticipantRaw): Participant {
 		userId: raw.user_id,
 		response: mapResponse(raw.response),
 		score: raw.score,
-		tagNumber: raw.tag_number
+		tagNumber: raw.tag_number,
+		...(raw.raw_name ? { rawName: raw.raw_name } : {})
 	};
 }
 

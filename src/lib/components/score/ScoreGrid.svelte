@@ -4,6 +4,7 @@
 
 	type Participant = {
 		userId: string;
+		rawName?: string;
 		username?: string;
 		avatar_url?: string;
 		scores?: number[];
@@ -51,6 +52,13 @@
 		return sum || participant.score;
 	}
 
+	function participantName(participant: Participant): string {
+		if (participant.userId) {
+			return userProfiles.getDisplayName(participant.userId);
+		}
+		return participant.rawName || participant.username || 'Guest';
+	}
+
 	let currentHole = $derived(round.currentHole ?? 0);
 </script>
 
@@ -73,15 +81,15 @@
 					<tr class="participant-row-grid">
 						<td class="player-cell sticky-column">
 							<div class="player-info">
-								<ParticipantAvatar
-									userId={participant.userId}
-									avatar_url={participant.avatar_url}
-									username={userProfiles.getDisplayName(participant.userId)}
-									size={24}
-								/>
-								<span class="player-name">
-									{userProfiles.getDisplayName(participant.userId)}
-								</span>
+									<ParticipantAvatar
+										userId={participant.userId}
+										avatar_url={participant.avatar_url}
+										username={participantName(participant)}
+										size={24}
+									/>
+									<span class="player-name">
+										{participantName(participant)}
+									</span>
 							</div>
 						</td>
 						{#each holes as hole, idx (hole)}

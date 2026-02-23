@@ -195,7 +195,7 @@ describe('RoundService (round.svelte.ts)', () => {
 
 			expect(roundService.rounds[0].participants).toEqual([
 				{ userId: 'u2', response: 'accepted', score: -3, tagNumber: 9 },
-				{ userId: '', response: 'accepted', score: 4, tagNumber: null }
+				{ userId: '', response: 'accepted', score: 4, tagNumber: null, rawName: 'Guest Player' }
 			]);
 		});
 

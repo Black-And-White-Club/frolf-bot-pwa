@@ -4,6 +4,7 @@
 
 	type Participant = {
 		userId: string;
+		rawName?: string;
 		response: 'accepted' | 'declined' | 'tentative';
 		score: number | null;
 		tagNumber: number | null;
@@ -20,7 +21,7 @@
 
 	let { participant, position, showScore = true, par = 0 }: Props = $props();
 
-	let scoreDisplay = $derived(() => {
+	let scoreDisplay = $derived.by(() => {
 		if (!showScore || participant.score === null) return null;
 
 		const diff = participant.score - par;
@@ -38,7 +39,7 @@
 					: 'position-default'
 	);
 
-	let scoreColorClass = $derived(() => {
+	let scoreColorClass = $derived.by(() => {
 		if (!showScore || participant.score === null) return '';
 		const diff = participant.score - par;
 		if (diff < 0) return 'score-under';
@@ -50,7 +51,9 @@
 		position === 1 ? '🥇' : position === 2 ? '🥈' : position === 3 ? '🥉' : `${position}`
 	);
 
-	let displayName = $derived(userProfiles.getDisplayName(participant.userId));
+	let displayName = $derived(
+		participant.userId ? userProfiles.getDisplayName(participant.userId) : (participant.rawName ?? 'Guest')
+	);
 	// keep response available on participant object; no local alias required
 </script>
 
@@ -74,10 +77,10 @@
 		</div>
 	</div>
 
-	{#if showScore && scoreDisplay()}
-		<div class="score {scoreColorClass()}">
+	{#if showScore && scoreDisplay}
+		<div class="score {scoreColorClass}">
 			{#key participant.score}
-				<span class="score-value animate-scale-pulse inline-block">{scoreDisplay()}</span>
+				<span class="score-value animate-scale-pulse inline-block">{scoreDisplay}</span>
 			{/key}
 			{#if participant.score !== null}
 				<span class="score-raw">({participant.score})</span>
