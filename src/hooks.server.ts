@@ -12,9 +12,9 @@ function toOrigin(value: string | undefined): string | null {
 	}
 }
 
-// Minimal security headers and CSP suitable for this app. Adjust as needed for
-// external integrations (analytics, CDNs, etc.). This runs for every request
-// and sets common security headers Lighthouse wants to see.
+// Minimal security headers suitable for this app.
+// CSP is partially handled in svelte.config.ts (nonces).
+// We dynamically append connect-src here.
 export const handle: Handle = async ({ event, resolve }) => {
 	const response = await resolve(event);
 
@@ -33,22 +33,26 @@ export const handle: Handle = async ({ event, resolve }) => {
 		connectSrc.add('ws://localhost:8080');
 	}
 
-	// SvelteKit injects an inline bootstrap script in %sveltekit.body% during SSR pages.
-	// Keep script-src strict to self + required inline bootstrap support.
-	const csp = [
-		"default-src 'self'",
-		"script-src 'self' 'unsafe-inline'",
-		"style-src 'self'",
-		"style-src-elem 'self'",
-		"style-src-attr 'unsafe-inline'",
-		"img-src 'self' data: https://images.unsplash.com https://*.githubusercontent.com https://cdn.discordapp.com",
-		"font-src 'self' data:",
-		"manifest-src 'self'",
-		`connect-src ${Array.from(connectSrc).join(' ')}`,
-		"frame-ancestors 'none'",
-		"base-uri 'self'",
-		"object-src 'none'"
-	].join('; ');
+	// Retrieve CSP if SvelteKit already set it (from svelte.config.js)
+	let csp = response.headers.get('Content-Security-Policy') || '';
+	const connectSrcPolicy = `connect-src ${Array.from(connectSrc).join(' ')}`;
+
+	if (csp) {
+		// connect-src is intentionally omitted from svelte.config.ts — managed here dynamically.
+		csp = csp.includes('connect-src')
+			? csp.replace(/connect-src[^;]*/, connectSrcPolicy)
+			: `${csp}; ${connectSrcPolicy}`;
+	} else {
+		// Fallback for non-HTML responses (API routes, etc.) where SvelteKit's nonce
+		// CSP doesn't run. Apply the full policy so these routes remain protected.
+		csp = [
+			"default-src 'self'",
+			"object-src 'none'",
+			"base-uri 'self'",
+			"frame-ancestors 'none'",
+			connectSrcPolicy
+		].join('; ');
+	}
 
 	response.headers.set('Content-Security-Policy', csp);
 	response.headers.set('X-Frame-Options', 'DENY');

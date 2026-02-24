@@ -23,6 +23,27 @@ const config = {
 			'$lib/*': 'src/lib/*',
 			$tests: 'tests',
 			'$tests/*': 'tests/*'
+		},
+		csp: {
+			mode: 'nonce',
+			directives: {
+				'default-src': ["'self'"],
+				'script-src': ["'self'"],
+				'style-src': ["'self'"],
+				'style-src-attr': ["'unsafe-inline'"],
+				'img-src': [
+					"'self'",
+					'data:',
+					'https://images.unsplash.com',
+					'https://*.githubusercontent.com',
+					'https://cdn.discordapp.com'
+				],
+				'font-src': ["'self'", 'data:'],
+				'manifest-src': ["'self'"],
+				'object-src': ["'none'"],
+				'base-uri': ["'self'"],
+				'frame-ancestors': ["'none'"]
+			}
 		}
 	},
 	extensions: ['.svelte', '.svx']
