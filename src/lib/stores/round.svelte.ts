@@ -15,6 +15,7 @@ export interface Participant {
 	score: number | null;
 	tagNumber: number | null;
 	rawName?: string;
+	scores?: number[];
 }
 
 // Raw API format (snake_case - matches Go backend)
@@ -25,6 +26,7 @@ export interface ParticipantRaw {
 	tag_number: number | null;
 	team_id?: string;
 	raw_name?: string;
+	hole_scores?: number[];
 }
 
 // Raw API response format (snake_case - matches Go backend)
@@ -41,6 +43,7 @@ export interface RoundRaw {
 	discord_event_id?: string; // Native Discord Scheduled Event ID
 	participants: ParticipantRaw[];
 	par_values?: number[];
+	par_scores?: number[];
 	holes?: number;
 	current_hole?: number;
 }
@@ -78,7 +81,8 @@ export function participantFromRaw(raw: ParticipantRaw): Participant {
 		response: mapResponse(raw.response),
 		score: raw.score,
 		tagNumber: raw.tag_number,
-		...(raw.raw_name ? { rawName: raw.raw_name } : {})
+		...(raw.raw_name ? { rawName: raw.raw_name } : {}),
+		...(raw.hole_scores?.length ? { scores: raw.hole_scores } : {})
 	};
 }
 
@@ -105,7 +109,7 @@ export function roundFromRaw(raw: RoundRaw): Round {
 		eventMessageId: raw.event_message_id || '',
 		discordEventId: raw.discord_event_id,
 		participants: (raw.participants || []).map(participantFromRaw),
-		parValues: raw.par_values,
+		parValues: raw.par_values ?? raw.par_scores,
 		holes: raw.holes,
 		currentHole: raw.current_hole
 	};

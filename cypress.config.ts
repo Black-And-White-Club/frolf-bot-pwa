@@ -2,6 +2,8 @@ import { defineConfig } from 'cypress';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
+import tailwindcss from '@tailwindcss/vite';
 import { DESKTOP_VIEWPORT } from './cypress/support/viewports';
 
 const configFilePath = fileURLToPath(import.meta.url);
@@ -47,12 +49,16 @@ export default defineConfig({
 	component: {
 		specPattern: 'cypress/component/**/*.cy.ts',
 		supportFile: 'cypress/support/component.ts',
+		viewportWidth: 1280,
+		viewportHeight: 800,
 		devServer: {
 			framework: 'svelte',
 			bundler: 'vite',
 			viteConfig: {
+				plugins: [tailwindcss(), svelte()],
 				resolve: {
 					alias: {
+						$lib: path.resolve(repoRoot, 'src/lib'),
 						'$app/state': componentStateMockPath
 					}
 				}
