@@ -10,6 +10,7 @@
  */
 
 import { nats } from './nats.svelte';
+import type { UserProfileRaw } from './userProfiles.svelte';
 
 export interface TagHistoryEntry {
 	id: number;
@@ -48,6 +49,7 @@ export interface TagListResponseRaw {
 		current_tag: number | null;
 		last_active_at?: string;
 	}>;
+	profiles?: Record<string, UserProfileRaw>;
 }
 
 function transformHistoryEntries(raw: TagHistoryResponseRaw): TagHistoryEntry[] {

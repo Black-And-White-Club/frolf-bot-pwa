@@ -171,6 +171,9 @@ class DataLoader {
 			if (response?.members) {
 				tagStore.applyTagListResponse(response);
 			}
+			if (response?.profiles) {
+				userProfiles.setProfilesFromApi(response.profiles);
+			}
 		} catch (e) {
 			// Non-fatal: tag list will be fetched on-demand from the tags page
 			log('DataLoader: Tag list snapshot request failed, will retry on-demand', e);
