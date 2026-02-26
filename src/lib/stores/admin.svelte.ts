@@ -98,55 +98,58 @@ class AdminService {
 		const successTopic = 'leaderboard.batch.tag.assigned.v1';
 		const failureTopic = 'leaderboard.batch.tag.assignment.failed.v1';
 
-		let resolved = false;
+		return new Promise((resolve) => {
+			let resolved = false;
 
-		const cleanup = () => {
-			nats.unsubscribe(successTopic);
-			nats.unsubscribe(failureTopic);
-		};
+			const cleanup = () => {
+				nats.unsubscribe(successTopic);
+				nats.unsubscribe(failureTopic);
+				resolve();
+			};
 
-		nats.subscribe(successTopic, (msg: any) => {
-			if (resolved) return;
-			// Filter by batch_id if present in response
-			if (msg.data.batch_id && msg.data.batch_id !== batchId) return;
-			resolved = true;
-			this.loading = false;
-			const count = msg.data.assignment_count ?? assignments.length;
-			this.successMessage = `Tags updated successfully (${count} assignment${count !== 1 ? 's' : ''})`;
-			this.scheduleMessageClear();
-			dataLoader.reload();
-			cleanup();
-		});
-
-		nats.subscribe(failureTopic, (msg: any) => {
-			if (resolved) return;
-			if (msg.data.batch_id && msg.data.batch_id !== batchId) return;
-			resolved = true;
-			this.loading = false;
-			this.errorMessage = msg.data.reason ?? 'Tag assignment failed';
-			this.scheduleMessageClear();
-			cleanup();
-		});
-
-		const payload: BatchTagPayload = {
-			guild_id: guildId,
-			requester_user_id: adminId,
-			batch_id: batchId,
-			assignments: assignments.map((a) => ({ user_id: a.userId, tag_number: a.tagNumber })),
-			source: 'admin_batch'
-		};
-
-		nats.publish('leaderboard.batch.tag.assignment.requested.v1', payload);
-
-		setTimeout(() => {
-			if (!resolved) {
+			nats.subscribe(successTopic, (msg: any) => {
+				if (resolved) return;
+				// Filter by batch_id if present in response
+				if (msg.data.batch_id && msg.data.batch_id !== batchId) return;
 				resolved = true;
 				this.loading = false;
-				this.errorMessage = 'Request timed out. Please verify results manually.';
+				const count = msg.data.assignment_count ?? assignments.length;
+				this.successMessage = `Tags updated successfully (${count} assignment${count !== 1 ? 's' : ''})`;
+				this.scheduleMessageClear();
+				dataLoader.reload();
+				cleanup();
+			});
+
+			nats.subscribe(failureTopic, (msg: any) => {
+				if (resolved) return;
+				if (msg.data.batch_id && msg.data.batch_id !== batchId) return;
+				resolved = true;
+				this.loading = false;
+				this.errorMessage = msg.data.reason ?? 'Tag assignment failed';
 				this.scheduleMessageClear();
 				cleanup();
-			}
-		}, OPERATION_TIMEOUT_MS);
+			});
+
+			const payload: BatchTagPayload = {
+				guild_id: guildId,
+				requester_user_id: adminId,
+				batch_id: batchId,
+				assignments: assignments.map((a) => ({ user_id: a.userId, tag_number: a.tagNumber })),
+				source: 'admin_batch'
+			};
+
+			nats.publish('leaderboard.batch.tag.assignment.requested.v1', payload);
+
+			setTimeout(() => {
+				if (!resolved) {
+					resolved = true;
+					this.loading = false;
+					this.errorMessage = 'Request timed out. Please verify results manually.';
+					this.scheduleMessageClear();
+					cleanup();
+				}
+			}, OPERATION_TIMEOUT_MS);
+		});
 	}
 
 	/**
@@ -175,51 +178,54 @@ class AdminService {
 		const successTopic = 'leaderboard.manual.point.adjustment.success.v1';
 		const failureTopic = 'leaderboard.manual.point.adjustment.failed.v1';
 
-		let resolved = false;
+		return new Promise((resolve) => {
+			let resolved = false;
 
-		const cleanup = () => {
-			nats.unsubscribe(successTopic);
-			nats.unsubscribe(failureTopic);
-		};
+			const cleanup = () => {
+				nats.unsubscribe(successTopic);
+				nats.unsubscribe(failureTopic);
+				resolve();
+			};
 
-		nats.subscribe(successTopic, (msg: any) => {
-			if (resolved) return;
-			resolved = true;
-			this.loading = false;
-			const sign = delta > 0 ? '+' : '';
-			this.successMessage = `Points adjusted: ${sign}${delta} (${msg.data.reason ?? reason})`;
-			this.scheduleMessageClear();
-			cleanup();
-		});
-
-		nats.subscribe(failureTopic, (msg: any) => {
-			if (resolved) return;
-			resolved = true;
-			this.loading = false;
-			this.errorMessage = msg.data.reason ?? 'Point adjustment failed';
-			this.scheduleMessageClear();
-			cleanup();
-		});
-
-		const payload: PointAdjustPayload = {
-			guild_id: guildId,
-			member_id: memberId,
-			points_delta: delta,
-			reason,
-			admin_id: adminId
-		};
-
-		nats.publish('leaderboard.manual.point.adjustment.v1', payload);
-
-		setTimeout(() => {
-			if (!resolved) {
+			nats.subscribe(successTopic, (msg: any) => {
+				if (resolved) return;
 				resolved = true;
 				this.loading = false;
-				this.errorMessage = 'Request timed out. Please verify results manually.';
+				const sign = delta > 0 ? '+' : '';
+				this.successMessage = `Points adjusted: ${sign}${delta} (${msg.data.reason ?? reason})`;
 				this.scheduleMessageClear();
 				cleanup();
-			}
-		}, OPERATION_TIMEOUT_MS);
+			});
+
+			nats.subscribe(failureTopic, (msg: any) => {
+				if (resolved) return;
+				resolved = true;
+				this.loading = false;
+				this.errorMessage = msg.data.reason ?? 'Point adjustment failed';
+				this.scheduleMessageClear();
+				cleanup();
+			});
+
+			const payload: PointAdjustPayload = {
+				guild_id: guildId,
+				member_id: memberId,
+				points_delta: delta,
+				reason,
+				admin_id: adminId
+			};
+
+			nats.publish('leaderboard.manual.point.adjustment.v1', payload);
+
+			setTimeout(() => {
+				if (!resolved) {
+					resolved = true;
+					this.loading = false;
+					this.errorMessage = 'Request timed out. Please verify results manually.';
+					this.scheduleMessageClear();
+					cleanup();
+				}
+			}, OPERATION_TIMEOUT_MS);
+		});
 	}
 
 	private toBase64(data: Uint8Array): string {
@@ -306,27 +312,30 @@ class AdminService {
 		this.successMessage = null;
 		this.errorMessage = null;
 
-		try {
-			this.validateScorecardUploadInput(guildId, userId, roundId, file);
+		return new Promise(async (resolve) => {
+			try {
+				this.validateScorecardUploadInput(guildId, userId, roundId, file);
 
-			const payload = await this.buildScorecardUploadPayload(
-				guildId,
-				userId,
-				roundId,
-				eventMessageId,
-				file,
-				notes
-			);
+				const payload = await this.buildScorecardUploadPayload(
+					guildId,
+					userId,
+					roundId,
+					eventMessageId,
+					file,
+					notes
+				);
 
-			nats.publish(ADMIN_SCORECARD_UPLOAD_SUBJECT, payload);
-			this.successMessage = 'Scorecard upload queued. Import processing has started.';
-			this.scheduleMessageClear();
-		} catch (error) {
-			this.errorMessage = error instanceof Error ? error.message : 'Failed to upload scorecard';
-			this.scheduleMessageClear();
-		} finally {
-			this.loading = false;
-		}
+				nats.publish(ADMIN_SCORECARD_UPLOAD_SUBJECT, payload);
+				this.successMessage = 'Scorecard upload queued. Import processing has started.';
+				this.scheduleMessageClear();
+			} catch (error) {
+				this.errorMessage = error instanceof Error ? error.message : 'Failed to upload scorecard';
+				this.scheduleMessageClear();
+			} finally {
+				this.loading = false;
+				resolve();
+			}
+		});
 	}
 }
 
