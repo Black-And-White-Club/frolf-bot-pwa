@@ -14,7 +14,7 @@ type TagAssignment = {
 
 type BatchTagPayload = {
 	guild_id: string;
-	requester_user_id: string;
+	requesting_user_id: string;
 	batch_id: string;
 	assignments: Array<{ user_id: string; tag_number: number }>;
 	source: string;
@@ -132,7 +132,7 @@ class AdminService {
 
 			const payload: BatchTagPayload = {
 				guild_id: guildId,
-				requester_user_id: adminId,
+				requesting_user_id: adminId,
 				batch_id: batchId,
 				assignments: assignments.map((a) => ({ user_id: a.userId, tag_number: a.tagNumber })),
 				source: 'admin_batch'
