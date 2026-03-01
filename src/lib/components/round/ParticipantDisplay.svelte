@@ -23,12 +23,16 @@
 		const parts = [...localParticipants];
 		if (localStatus === 'completed') {
 			parts.sort((a, b) => {
-				const hasA = a.score !== undefined && a.score !== null;
-				const hasB = b.score !== undefined && b.score !== null;
-				if (hasA && hasB) return a.score! - b.score!;
-				if (hasA) return -1;
-				if (hasB) return 1;
-				return 0;
+				const bucket = (participant: Participant) => {
+					if (participant.is_dnf) return 1;
+					if (participant.score !== undefined && participant.score !== null) return 0;
+					return 2;
+				};
+				const bucketA = bucket(a);
+				const bucketB = bucket(b);
+				if (bucketA !== bucketB) return bucketA - bucketB;
+				if (bucketA === 0) return a.score! - b.score!;
+				return participantName(a).localeCompare(participantName(b));
 			});
 		}
 		return parts;
@@ -42,10 +46,11 @@
 	const remainingCount = $derived(sortedParticipants.length - 4);
 
 	const scoredCount = $derived(
-		localParticipants.filter((p) => p.score !== undefined && p.score !== null).length
+		localParticipants.filter((p) => !p.is_dnf && p.score !== undefined && p.score !== null).length
 	);
 
-	function formatScore(score: number | undefined): string | null {
+	function formatScore(score: number | undefined, isDNF?: boolean): string | null {
+		if (isDNF) return 'DNF';
 		if (score === undefined || score === null) return null;
 		const parTotal = par_total ?? (round as any).par_total ?? (round as any).par;
 		if (typeof parTotal === 'number') {
@@ -137,10 +142,10 @@
 								{getResponseText(participant.response)}
 							</span>
 						{/if}
-					{:else if formatScore(participant.score) !== null}
-						<span class="score-badge">{formatScore(participant.score)}</span>
-					{:else if localStatus === 'completed'}
-						<span class="score-badge">DNP</span>
+						{:else if formatScore(participant.score, participant.is_dnf) !== null}
+							<span class="score-badge">{formatScore(participant.score, participant.is_dnf)}</span>
+						{:else if localStatus === 'completed'}
+							<span class="score-badge">DNP</span>
 					{:else}
 						<span class="score-badge" aria-hidden="true">-</span>
 					{/if}

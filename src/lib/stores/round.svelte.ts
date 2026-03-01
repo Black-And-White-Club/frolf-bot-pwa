@@ -16,6 +16,7 @@ export interface Participant {
 	tagNumber: number | null;
 	rawName?: string;
 	scores?: number[];
+	isDNF?: boolean;
 }
 
 // Raw API format (snake_case - matches Go backend)
@@ -27,6 +28,7 @@ export interface ParticipantRaw {
 	team_id?: string;
 	raw_name?: string;
 	hole_scores?: number[];
+	is_dnf?: boolean;
 }
 
 // Raw API response format (snake_case - matches Go backend)
@@ -82,7 +84,8 @@ export function participantFromRaw(raw: ParticipantRaw): Participant {
 		score: raw.score,
 		tagNumber: raw.tag_number,
 		...(raw.raw_name ? { rawName: raw.raw_name } : {}),
-		...(raw.hole_scores?.length ? { scores: raw.hole_scores } : {})
+		...(raw.hole_scores?.length ? { scores: raw.hole_scores } : {}),
+		...(raw.is_dnf ? { isDNF: true } : {})
 	};
 }
 

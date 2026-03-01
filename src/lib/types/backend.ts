@@ -50,6 +50,7 @@ export interface Participant {
 	tag_number?: TagNumber;
 	score?: Score;
 	joined_late?: boolean;
+	is_dnf?: boolean;
 }
 
 export interface Round {

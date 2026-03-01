@@ -97,6 +97,32 @@ describe('RoundService (round.svelte.ts)', () => {
 			expect(round.participants[1].response).toBe('tentative'); // Fallback
 			expect(round.startTime).toBeDefined(); // Fallback to now
 		});
+
+		it('maps is_dnf from raw participants', () => {
+			const rawRounds = [
+				{
+					id: 'r1',
+					guild_id: 'g1',
+					title: 'R1',
+					location: 'L1',
+					description: '',
+					start_time: null,
+					state: 'FINALIZED',
+					created_by: 'u1',
+					event_message_id: '',
+					participants: [{ user_id: 'u1', response: 'ACCEPTED', score: 4, tag_number: 7, is_dnf: true }]
+				}
+			] as unknown as RoundRaw[];
+
+			roundService.setRoundsFromApi(rawRounds);
+			expect(roundService.rounds[0].participants[0]).toEqual({
+				userId: 'u1',
+				response: 'accepted',
+				score: 4,
+				tagNumber: 7,
+				isDNF: true
+			});
+		});
 	});
 
 	describe('CRUD operations', () => {

@@ -8,6 +8,7 @@
 		response: 'accepted' | 'declined' | 'tentative';
 		score: number | null;
 		tagNumber: number | null;
+		isDNF?: boolean;
 		username?: string;
 		avatar_url?: string;
 	};
@@ -21,7 +22,9 @@
 	let { participant, position, showScore = true }: Props = $props();
 
 	let scoreDisplay = $derived.by(() => {
-		if (!showScore || participant.score === null) return null;
+		if (!showScore) return null;
+		if (participant.isDNF) return 'DNF';
+		if (participant.score === null) return null;
 		if (participant.score === 0) return 'E';
 		return participant.score > 0 ? `+${participant.score}` : `${participant.score}`;
 	});
@@ -37,7 +40,9 @@
 	);
 
 	let scoreColorClass = $derived.by(() => {
-		if (!showScore || participant.score === null) return '';
+		if (!showScore) return '';
+		if (participant.isDNF) return 'score-dnf';
+		if (participant.score === null) return '';
 		if (participant.score < 0) return 'score-under';
 		if (participant.score > 0) return 'score-over';
 		return 'score-even';
@@ -199,6 +204,10 @@
 
 	.score-even .score-value {
 		color: var(--guild-text, #e5e7eb);
+	}
+
+	.score-dnf .score-value {
+		color: var(--guild-error, #f97316);
 	}
 
 	@media (max-width: 640px) {

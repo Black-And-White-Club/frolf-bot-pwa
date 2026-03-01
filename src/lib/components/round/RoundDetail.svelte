@@ -15,9 +15,17 @@
 		round?.participants
 			.filter((p) => p.response === 'accepted')
 			.sort((a, b) => {
-				const scoreA = a.score ?? Number.MAX_SAFE_INTEGER;
-				const scoreB = b.score ?? Number.MAX_SAFE_INTEGER;
-				return scoreA - scoreB;
+				const sortBucket = (participant: { score: number | null; isDNF?: boolean }) => {
+					if (participant.isDNF) return 1;
+					if (participant.score === null) return 2;
+					return 0;
+				};
+
+				const bucketA = sortBucket(a);
+				const bucketB = sortBucket(b);
+				if (bucketA !== bucketB) return bucketA - bucketB;
+				if (bucketA === 0) return (a.score ?? 0) - (b.score ?? 0);
+				return participantName(a).localeCompare(participantName(b));
 			}) ?? []
 	);
 
@@ -70,7 +78,8 @@
 		return participant.rawName || 'Guest';
 	}
 
-	function formatRelativeScore(score: number | null | undefined): string {
+	function formatRelativeScore(score: number | null | undefined, isDNF?: boolean): string {
+		if (isDNF) return 'DNF';
 		if (score === null || score === undefined) return '--';
 		if (score === 0) return 'E';
 		return score > 0 ? `+${score}` : `${score}`;
@@ -128,13 +137,13 @@
 					<span class="stat-value">{confirmedParticipants.length}</span>
 				</div>
 
-				{#if leader && leader.score !== null}
+				{#if leader && (leader.score !== null || leader.isDNF)}
 					<div class="stat-item">
 						<span class="stat-label">Leader</span>
 						<span class="stat-value">
 							{participantName(leader)}
 							<span class="leader-score">
-								{formatRelativeScore(leader?.score)}
+								{formatRelativeScore(leader?.score, leader?.isDNF)}
 							</span>
 						</span>
 					</div>

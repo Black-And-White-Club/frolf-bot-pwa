@@ -73,10 +73,10 @@
 
 	{#if round.state === 'finalized' && confirmedParticipants.length > 0}
 		<!-- Scorecard Preview for Finalized Rounds -->
-		{@const sortedScores = confirmedParticipants
-			.filter((p) => typeof p.score === 'number')
-			.sort((a, b) => (a.score ?? 0) - (b.score ?? 0))
-			.slice(0, 3)}
+			{@const sortedScores = confirmedParticipants
+				.filter((p) => !p.isDNF && typeof p.score === 'number')
+				.sort((a, b) => (a.score ?? 0) - (b.score ?? 0))
+				.slice(0, 3)}
 		{#if sortedScores.length > 0}
 			<div class="mt-2 pl-6">
 				<div

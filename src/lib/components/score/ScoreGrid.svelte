@@ -9,6 +9,7 @@
 		avatar_url?: string;
 		scores?: number[];
 		score: number | null;
+		isDNF?: boolean;
 	};
 
 	type Round = {
@@ -32,8 +33,11 @@
 
 	let participants = $derived(
 		round.participants
-			.filter((p) => p.score !== null)
-			.sort((a, b) => (a.score ?? 0) - (b.score ?? 0))
+			.filter((p) => p.score !== null || p.isDNF)
+			.sort((a, b) => {
+				if (!!a.isDNF !== !!b.isDNF) return a.isDNF ? 1 : -1;
+				return (a.score ?? 0) - (b.score ?? 0);
+			})
 	);
 
 	function getScoreColor(score: number | undefined, par: number): string {
@@ -44,7 +48,10 @@
 		return 'score-par';
 	}
 
-	function getParticipantTotal(participant: Participant): number | null {
+	function getParticipantTotal(participant: Participant): number | string | null {
+		if (participant.isDNF) {
+			return 'DNF';
+		}
 		if (!participant.scores || participant.scores.length === 0) {
 			return participant.score;
 		}

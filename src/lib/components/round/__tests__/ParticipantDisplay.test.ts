@@ -49,7 +49,7 @@ test('shows avatars when avatar_url present and score displayed when present', (
 	});
 
 	expect(getByAltText('alice')).toBeTruthy();
-	expect(getByText('10')).toBeTruthy();
+	expect(getByText('+10')).toBeTruthy();
 	// bob has no avatar; should show initial letter
 	expect(getByText('B')).toBeTruthy();
 });
@@ -65,6 +65,28 @@ test('shows DNP when no score and round not active', () => {
 	});
 
 	expect(getByText('DNP')).toBeTruthy();
+});
+
+test('shows DNF when participant is marked as DNF', () => {
+	const round = makeRound({
+		status: 'completed',
+		participants: [
+			{
+				user_id: 'u9',
+				username: 'eli',
+				avatar_url: undefined,
+				response: 'yes',
+				score: 12,
+				is_dnf: true
+			}
+		]
+	});
+
+	const { getByText } = render(ParticipantDisplay, {
+		props: { round, compact: false, testid: 'pd-dnf' }
+	});
+
+	expect(getByText('DNF')).toBeTruthy();
 });
 
 test('shows dash when no score and round active', () => {
