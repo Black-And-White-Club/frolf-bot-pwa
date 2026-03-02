@@ -79,6 +79,7 @@ Claim a specific tag number. If the tag is held by another player, you must beat
 **Permission:** Everyone
 
 Shows the points leaderboard for the current or a past season.
+Tied finishers do not earn points for beating each other, but tied players may still have different totals when tier/provisional matchup modifiers differ.
 
 | Option | Required | Description |
 |--------|----------|-------------|

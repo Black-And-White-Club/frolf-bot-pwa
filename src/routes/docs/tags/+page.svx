@@ -42,6 +42,8 @@ The leaderboard channel in Discord also shows a summary embed that updates autom
 
 Seasons let you track competitive periods with a defined start and end. During an active season, finalized rounds award points in addition to tag changes. Off-season, tag challenges still happen but no points are awarded.
 
+During active seasons, tied finishers do not earn points for beating each other, but tied players can still end with different point totals when tier/provisional matchup modifiers differ. This rewards lower-tier players for matching or outperforming higher tiers.
+
 | Season state | Tag changes | Points |
 |--------------|-------------|--------|
 | **Active season** | Yes | Yes — see [Points System](/docs/scoring#points-system) |

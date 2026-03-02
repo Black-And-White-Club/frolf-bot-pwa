@@ -4,7 +4,49 @@
 import { render, cleanup } from '@testing-library/svelte';
 import Leaderboard from '../Leaderboard.svelte';
 import type { LeaderboardEntry } from '$lib/stores/leaderboard.svelte';
-import { test, expect } from 'vitest';
+import { test, expect, describe } from 'vitest';
+
+// ---------------------------------------------------------------------------
+// Tie-handling: when two players earned equal points (after a tied finish),
+// the leaderboard must render both rows and display the same points value.
+// ---------------------------------------------------------------------------
+describe('tied players', () => {
+	test('renders both tied-points entries', () => {
+		const entries: LeaderboardEntry[] = [
+			{ tagNumber: 3, userId: 'alice', totalPoints: 1400, roundsPlayed: 5, displayName: 'Alice' },
+			{ tagNumber: 11, userId: 'bob', totalPoints: 1400, roundsPlayed: 5, displayName: 'Bob' }
+		];
+
+		const { getByTestId, getAllByText } = render(Leaderboard, { props: { entries } });
+
+		// Both rows present
+		expect(getByTestId('leaderboard-row-alice')).toBeTruthy();
+		expect(getByTestId('leaderboard-row-bob')).toBeTruthy();
+
+		// Both display the same points text ("1400 pts")
+		const pointsEls = getAllByText('1400 pts');
+		expect(pointsEls).toHaveLength(2);
+
+		cleanup();
+	});
+
+	test('tied entries render in tag-number order (tag 3 before tag 11)', () => {
+		// Entries supplied in tag order — the component must not reorder them.
+		const entries: LeaderboardEntry[] = [
+			{ tagNumber: 3, userId: 'alice', totalPoints: 1400, roundsPlayed: 5, displayName: 'Alice' },
+			{ tagNumber: 11, userId: 'bob', totalPoints: 1400, roundsPlayed: 5, displayName: 'Bob' }
+		];
+
+		const { container } = render(Leaderboard, { props: { entries } });
+
+		const rows = container.querySelectorAll('[data-testid^="leaderboard-row-"]');
+		expect(rows).toHaveLength(2);
+		expect(rows[0].getAttribute('data-user-id')).toBe('alice');
+		expect(rows[1].getAttribute('data-user-id')).toBe('bob');
+
+		cleanup();
+	});
+});
 
 test('shows empty state when no entries', () => {
 	const { getByText } = render(Leaderboard, { props: { entries: [] } });

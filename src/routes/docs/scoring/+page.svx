@@ -75,6 +75,10 @@ Each opponent you beat earns **+100 Base Win** points. On top of that, tier matc
 
 Tiers (Gold / Silver / Bronze) are based on each player's tag ranking among active season participants.
 
+> **Tied finishes:** Players with the same finish rank do not earn points for "beating" each other. They still earn points for opponents below the tie group.
+
+> **Tie points can differ:** Tier and provisional modifiers are still applied per matchup, so tied players can finish with different point totals. This intentionally rewards lower-tier players for matching or outperforming higher-tier players.
+
 > **New players:** Participants with fewer than 3 rounds played earn Base Win only — no tier bonuses yet.
 
 > **Gold tier:** Gold players earn Base Win only — no bonuses apply when beating lower-tier opponents.
