@@ -6,7 +6,7 @@ const mockPublish = vi.fn();
 const mockAuth = {
 	isAuthenticated: false,
 	activeRole: 'viewer' as 'viewer' | 'player' | 'editor' | 'admin',
-	user: null as { guildId?: string; id?: string } | null
+	user: null as { activeClubUuid?: string; guildId?: string; id?: string } | null
 };
 
 vi.mock('../auth.svelte', () => ({
@@ -65,7 +65,7 @@ describe('createRoundService', () => {
 	it('publishes round.creation.requested.v1 payload for player role', async () => {
 		mockAuth.isAuthenticated = true;
 		mockAuth.activeRole = 'player';
-		mockAuth.user = { guildId: 'guild-123', id: 'user-123' };
+		mockAuth.user = { activeClubUuid: 'club-123', guildId: 'guild-123', id: 'user-123' };
 
 		const mod = await import('../createRound.svelte');
 		const result = await mod.createRoundService.submit({
@@ -80,7 +80,7 @@ describe('createRoundService', () => {
 		expect(mockPublish).toHaveBeenCalledWith(
 			'round.creation.requested.v1',
 			{
-				guild_id: 'guild-123',
+				guild_id: 'club-123',
 				title: 'Weekly Round',
 				description: 'tags match',
 				start_time: '2026-02-24 18:30',
@@ -98,6 +98,30 @@ describe('createRoundService', () => {
 			}
 		);
 		expect(mod.createRoundService.successMessage).toContain('requested');
+	});
+
+	it('falls back to guild id when active club uuid is unavailable', async () => {
+		mockAuth.isAuthenticated = true;
+		mockAuth.activeRole = 'player';
+		mockAuth.user = { guildId: 'guild-fallback', id: 'user-123' };
+
+		const mod = await import('../createRound.svelte');
+		const result = await mod.createRoundService.submit({
+			title: 'Fallback Round',
+			description: '',
+			startTime: '2026-02-24 18:30',
+			timezone: 'America/Chicago',
+			location: 'Pier Park'
+		});
+
+		expect(result).toBe(true);
+		expect(mockPublish).toHaveBeenCalledWith(
+			'round.creation.requested.v1',
+			expect.objectContaining({
+				guild_id: 'guild-fallback'
+			}),
+			expect.any(Object)
+		);
 	});
 
 	it('uses fallback timezone when timezone is blank', async () => {

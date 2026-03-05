@@ -143,7 +143,7 @@ describe('Account Page', () => {
 				expect(mockPublish).toHaveBeenCalledWith(
 					'user.udisc.identity.update.requested.v1',
 					{
-						guild_id: 'guild-123',
+						guild_id: 'club-123',
 						user_id: 'user-123',
 						username: 'disc-user',
 						name: 'Disc User'
@@ -156,6 +156,37 @@ describe('Account Page', () => {
 				);
 			});
 			expect(mockReload).toHaveBeenCalled();
+		});
+
+		it('falls back to guild id when active club uuid is unavailable', async () => {
+			auth.user = {
+				id: 'user-123',
+				uuid: 'uuid-123',
+				role: 'player',
+				activeClubUuid: '',
+				guildId: 'guild-fallback',
+				clubs: [],
+				linkedProviders: []
+			};
+
+			const { getByLabelText, getByRole } = render(AccountPage);
+			await fireEvent.input(getByLabelText('UDisc Username'), {
+				target: { value: 'disc-user' }
+			});
+			await fireEvent.click(getByRole('button', { name: 'Save UDisc Identity' }));
+
+			await waitFor(() => {
+				expect(mockPublish).toHaveBeenCalledWith(
+					'user.udisc.identity.update.requested.v1',
+					expect.objectContaining({
+						guild_id: 'guild-fallback',
+						user_id: 'user-123'
+					}),
+					expect.objectContaining({
+						source: 'pwa'
+					})
+				);
+			});
 		});
 	});
 

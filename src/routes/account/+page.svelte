@@ -180,7 +180,9 @@
 	}
 
 	async function updateUDiscIdentity() {
-		if (!auth.user?.guildId || !auth.user?.id) {
+		const scopeId = auth.user?.activeClubUuid?.trim() || auth.user?.guildId?.trim();
+		const userId = auth.user?.id?.trim();
+		if (!scopeId || !userId) {
 			udiscError = 'You must be signed in to update UDisc identity.';
 			return;
 		}
@@ -200,8 +202,8 @@
 			nats.publish(
 				'user.udisc.identity.update.requested.v1',
 				{
-					guild_id: auth.user.guildId,
-					user_id: auth.user.id,
+					guild_id: scopeId,
+					user_id: userId,
 					...(username ? { username } : {}),
 					...(name ? { name } : {})
 				},

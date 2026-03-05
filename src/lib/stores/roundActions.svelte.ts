@@ -81,7 +81,7 @@ class RoundActionsService {
 		return `pwa-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
 	}
 
-	private requireAuth(): { guildId: string; userId: string } | null {
+	private requireAuth(): { scopeId: string; userId: string } | null {
 		if (!auth.isAuthenticated || !auth.user) {
 			this.errorMessage = 'Sign in is required to perform this action.';
 			return null;
@@ -92,15 +92,15 @@ class RoundActionsService {
 			return null;
 		}
 
-		const guildId = auth.user.guildId?.trim();
+		const scopeId = auth.user.activeClubUuid?.trim() || auth.user.guildId?.trim();
 		const userId = auth.user.id?.trim();
 
-		if (!guildId || !userId) {
-			this.errorMessage = 'Guild identity is missing. Refresh and try again.';
+		if (!scopeId || !userId) {
+			this.errorMessage = 'Club or guild identity is missing. Refresh and try again.';
 			return null;
 		}
 
-		return { guildId, userId };
+		return { scopeId, userId };
 	}
 
 	private beginRoundAction(roundId: string, actionLabel: string): void {
@@ -138,7 +138,7 @@ class RoundActionsService {
 		this.beginRoundAction(roundId, 'rsvp');
 		try {
 			const payload: ParticipantJoinRequestedPayloadV1 = {
-				guild_id: context.guildId,
+				guild_id: context.scopeId,
 				round_id: roundId,
 				user_id: context.userId,
 				response
@@ -168,7 +168,7 @@ class RoundActionsService {
 		this.beginRoundAction(roundId, 'leave');
 		try {
 			const payload: ParticipantRemovalRequestedPayloadV1 = {
-				guild_id: context.guildId,
+				guild_id: context.scopeId,
 				round_id: roundId,
 				user_id: context.userId
 			};
@@ -202,7 +202,7 @@ class RoundActionsService {
 		this.beginRoundAction(roundId, 'score');
 		try {
 			const payload: ScoreUpdateRequestedPayloadV1 = {
-				guild_id: context.guildId,
+				guild_id: context.scopeId,
 				round_id: roundId,
 				user_id: context.userId,
 				score,
@@ -239,7 +239,7 @@ class RoundActionsService {
 		this.beginRoundAction(roundId, 'update');
 		try {
 			const payload: UpdateRoundRequestedPayloadV1 = {
-				guild_id: context.guildId,
+				guild_id: context.scopeId,
 				round_id: roundId,
 				user_id: context.userId,
 				channel_id: '',
@@ -280,7 +280,7 @@ class RoundActionsService {
 		this.beginRoundAction(roundId, 'delete');
 		try {
 			const payload: DeleteRoundRequestedPayloadV1 = {
-				guild_id: context.guildId,
+				guild_id: context.scopeId,
 				round_id: roundId,
 				requesting_user_user_id: context.userId
 			};
