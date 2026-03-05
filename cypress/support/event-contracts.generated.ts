@@ -12,6 +12,7 @@ export type EventContract = {
   summary?: string;
   description?: string;
   producer: ContractActor;
+  producers?: ContractActor[];
   consumers?: ContractActor[];
   payload_type: string;
   payload_schema: Record<string, unknown>;
@@ -37,6 +38,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "pwa"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "pwa"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -85,6 +92,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "pwa"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "pwa"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -127,6 +140,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "pwa",
         "module": "club"
       },
+      "producers": [
+        {
+          "service": "pwa",
+          "module": "club"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -157,6 +176,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "club"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
       "consumers": [
         {
           "service": "pwa",
@@ -197,6 +222,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -234,6 +265,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "club"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
       "consumers": [
         {
           "service": "pwa",
@@ -271,6 +308,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "eventbus"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "eventbus"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -321,6 +364,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "app"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "app"
+        }
+      ],
       "payload_type": "*discordevents.DMErrorPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -353,6 +402,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "app"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "app"
+        }
+      ],
       "payload_type": "*discordevents.DMSentPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -381,6 +436,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "app"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "app"
+        }
+      ],
       "payload_type": "*discordevents.TracePayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -409,6 +470,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "app"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "app"
+        }
+      ],
       "payload_type": "*discordevents.InteractionRespondedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -448,6 +515,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -509,6 +582,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -551,6 +630,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -616,6 +701,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -666,6 +757,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -716,6 +813,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -762,6 +865,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -808,6 +917,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -854,6 +969,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -904,6 +1025,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -954,6 +1081,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1000,6 +1133,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1046,6 +1185,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1106,6 +1251,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1144,6 +1295,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1194,6 +1351,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1240,6 +1403,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1286,6 +1455,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1344,6 +1519,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1393,6 +1574,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1443,6 +1630,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1497,6 +1690,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1553,6 +1752,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1607,6 +1812,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1662,6 +1873,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1727,6 +1944,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1791,6 +2014,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1851,6 +2080,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1889,6 +2124,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "score"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "score"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -1977,6 +2218,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "score"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "score"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2041,6 +2288,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "score"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "score"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2095,6 +2348,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "score"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "score"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2152,6 +2411,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "score"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "score"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2206,6 +2471,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "app"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "app"
+        }
+      ],
       "payload_type": "*discordevents.SendDMPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -2238,6 +2509,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2261,6 +2538,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2284,6 +2567,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2326,6 +2615,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2380,6 +2675,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2414,6 +2715,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2437,6 +2744,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2471,6 +2784,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2505,6 +2824,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2551,6 +2876,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2596,6 +2927,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2619,6 +2956,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2657,6 +3000,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2691,6 +3040,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2729,6 +3084,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2770,6 +3131,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2815,6 +3182,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2853,6 +3226,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2876,6 +3255,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2899,6 +3284,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2922,6 +3313,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2945,6 +3342,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -2980,6 +3383,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -3022,6 +3431,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "guild"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "guild"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -3158,6 +3573,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "guild"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "guild"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -3192,6 +3613,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "guild"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "guild"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -3262,6 +3689,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "guild"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "guild"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -3341,6 +3774,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "guild"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "guild"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -3375,6 +3814,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "guild"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "guild"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -3405,6 +3850,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "guild"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "guild"
+        }
+      ],
       "payload_type": "*guildevents.GuildConfigDeletionResultsPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -3500,6 +3951,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "guild"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "guild"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -3534,6 +3991,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "guild"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "guild"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -3564,6 +4027,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "guild"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "guild"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -3696,6 +4165,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "guild"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "guild"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -3730,6 +4205,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "guild"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "guild"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -3791,6 +4272,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "guild"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "guild"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -3929,6 +4416,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "guild"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "guild"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -4006,6 +4499,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -4107,6 +4606,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -4149,6 +4654,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "score"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "score"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -4175,6 +4686,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "finish_rank": {
+                  "type": "integer"
+                },
                 "tag_number": {
                   "type": "integer"
                 },
@@ -4225,6 +4739,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -4259,6 +4779,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -4293,6 +4819,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -4326,6 +4858,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -4412,6 +4950,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -4446,6 +4990,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -4502,15 +5052,21 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       }
     },
     {
-      "subject": "leaderboard.get.season.standings.v1",
-      "subject_pattern": "leaderboard.get.season.standings.v1.{scope_id}",
-      "supports_scoped_suffix": true,
+      "subject": "leaderboard.get.season.standings.v1.>",
+      "subject_pattern": "leaderboard.get.season.standings.v1.>",
+      "supports_scoped_suffix": false,
       "summary": "Get Season Standings",
       "description": "Request season standings.",
       "producer": {
         "service": "discord",
         "module": "admin"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "admin"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -4545,6 +5101,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -4579,6 +5141,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -4612,15 +5180,21 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       }
     },
     {
-      "subject": "leaderboard.manual.point.adjustment.v1",
-      "subject_pattern": "leaderboard.manual.point.adjustment.v1.{scope_id}",
-      "supports_scoped_suffix": true,
+      "subject": "leaderboard.manual.point.adjustment.v1.>",
+      "subject_pattern": "leaderboard.manual.point.adjustment.v1.>",
+      "supports_scoped_suffix": false,
       "summary": "Manual Point Adjustment",
       "description": "Request manual point adjustment.",
       "producer": {
         "service": "discord",
         "module": "admin"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "admin"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -4667,6 +5241,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -4692,15 +5272,21 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       }
     },
     {
-      "subject": "leaderboard.point.history.requested.v1",
-      "subject_pattern": "leaderboard.point.history.requested.v1.{scope_id}",
-      "supports_scoped_suffix": true,
+      "subject": "leaderboard.point.history.requested.v1.>",
+      "subject_pattern": "leaderboard.point.history.requested.v1.>",
+      "supports_scoped_suffix": false,
       "summary": "Point History Requested",
       "description": "Request point history for a member.",
       "producer": {
         "service": "discord",
         "module": "admin"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "admin"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -4738,6 +5324,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -4815,6 +5407,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -4849,6 +5447,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -4884,15 +5488,21 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       }
     },
     {
-      "subject": "leaderboard.recalculate.round.v1",
-      "subject_pattern": "leaderboard.recalculate.round.v1.{scope_id}",
-      "supports_scoped_suffix": true,
+      "subject": "leaderboard.recalculate.round.v1.>",
+      "subject_pattern": "leaderboard.recalculate.round.v1.>",
+      "supports_scoped_suffix": false,
       "summary": "Recalculate Round",
       "description": "Request round recalculation.",
       "producer": {
         "service": "discord",
         "module": "admin"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "admin"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -4931,6 +5541,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -4975,6 +5591,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -5017,6 +5639,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "pwa",
@@ -5051,6 +5679,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "pwa",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "pwa",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -5085,6 +5719,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "pwa",
@@ -5154,6 +5794,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "pwa",
@@ -5188,6 +5834,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "pwa",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "pwa",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -5218,6 +5870,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "pwa",
@@ -5278,6 +5936,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -5312,6 +5976,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -5341,15 +6011,21 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       }
     },
     {
-      "subject": "leaderboard.start.new.season.v1",
-      "subject_pattern": "leaderboard.start.new.season.v1.{scope_id}",
-      "supports_scoped_suffix": true,
+      "subject": "leaderboard.start.new.season.v1.>",
+      "subject_pattern": "leaderboard.start.new.season.v1.>",
+      "supports_scoped_suffix": false,
       "summary": "Start New Season",
       "description": "Request to start a new season.",
       "producer": {
         "service": "discord",
         "module": "admin"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "admin"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -5388,6 +6064,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -5441,6 +6123,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -5530,6 +6218,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -5583,6 +6277,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -5624,6 +6324,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -5639,6 +6345,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
           },
           "tag_number": {
             "type": "integer"
+          },
+          "udisc_name": {
+            "type": "string"
+          },
+          "udisc_username": {
+            "type": "string"
           },
           "user_id": {
             "type": "string"
@@ -5661,6 +6373,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -5703,6 +6421,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -5741,6 +6465,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -5794,6 +6524,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -5832,6 +6568,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -5866,6 +6608,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -5907,6 +6655,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -5945,6 +6699,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -5984,6 +6744,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -6055,6 +6821,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "pwa",
@@ -6089,6 +6861,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "pwa",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "pwa",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -6122,6 +6900,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "pwa",
@@ -6156,6 +6940,35 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
               "type": "object"
             },
             "type": "array"
+          },
+          "profiles": {
+            "additionalProperties": {
+              "additionalProperties": false,
+              "properties": {
+                "avatar_url": {
+                  "type": "string"
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "udisc_name": {
+                  "type": "string"
+                },
+                "udisc_username": {
+                  "type": "string"
+                },
+                "user_id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "avatar_url",
+                "display_name",
+                "user_id"
+              ],
+              "type": "object"
+            },
+            "type": "object"
           }
         },
         "required": [
@@ -6174,6 +6987,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -6229,6 +7048,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -6287,6 +7112,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -6334,6 +7165,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -6392,6 +7229,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -6454,6 +7297,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -6496,6 +7345,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -6534,9 +7389,19 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
+          "module": "leaderboard"
+        },
+        {
+          "service": "pwa",
           "module": "leaderboard"
         }
       ],
@@ -6608,6 +7473,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -6646,6 +7517,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -6653,6 +7530,10 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         },
         {
           "service": "discord",
+          "module": "leaderboard"
+        },
+        {
+          "service": "pwa",
           "module": "leaderboard"
         }
       ],
@@ -6694,6 +7575,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "payload_type": "*sharedevents.TracePayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -6728,6 +7615,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "payload_type": "*leaderboardevents.LeaderboardUpdateFailedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -6764,6 +7657,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -6835,6 +7734,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -6843,6 +7748,10 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         {
           "service": "frolf-bot-backend",
           "module": "round"
+        },
+        {
+          "service": "pwa",
+          "module": "leaderboard"
         }
       ],
       "payload_type": "*leaderboardevents.LeaderboardUpdatedPayloadV1",
@@ -6923,6 +7832,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -6979,6 +7894,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "points": {
                   "type": "integer"
                 },
@@ -7085,10 +8009,25 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
               "location": {
                 "type": "string"
               },
+              "par_scores": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
               "participants": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
+                    "hole_scores": {
+                      "items": {
+                        "type": "integer"
+                      },
+                      "type": "array"
+                    },
+                    "is_dnf": {
+                      "type": "boolean"
+                    },
                     "points": {
                       "type": "integer"
                     },
@@ -7276,6 +8215,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -7336,6 +8281,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "points": {
                   "type": "integer"
                 },
@@ -7442,10 +8396,25 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
               "location": {
                 "type": "string"
               },
+              "par_scores": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
               "participants": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
+                    "hole_scores": {
+                      "items": {
+                        "type": "integer"
+                      },
+                      "type": "array"
+                    },
+                    "is_dnf": {
+                      "type": "boolean"
+                    },
                     "points": {
                       "type": "integer"
                     },
@@ -7633,6 +8602,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundCompletedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -7748,10 +8723,25 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
               "location": {
                 "type": "string"
               },
+              "par_scores": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
               "participants": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
+                    "hole_scores": {
+                      "items": {
+                        "type": "integer"
+                      },
+                      "type": "array"
+                    },
+                    "is_dnf": {
+                      "type": "boolean"
+                    },
                     "points": {
                       "type": "integer"
                     },
@@ -7887,9 +8877,19 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
+          "module": "round"
+        },
+        {
+          "service": "pwa",
           "module": "round"
         }
       ],
@@ -7988,6 +8988,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -8030,6 +9036,16 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        },
+        {
+          "service": "pwa",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -8087,6 +9103,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -8170,6 +9192,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundDeleteAuthorizedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -8202,6 +9230,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundDeleteErrorPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -8254,6 +9288,16 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        },
+        {
+          "service": "pwa",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -8296,6 +9340,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -8342,6 +9392,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundDeleteValidatedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -8391,9 +9447,19 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
+          "module": "round"
+        },
+        {
+          "service": "pwa",
           "module": "round"
         }
       ],
@@ -8439,6 +9505,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -8473,6 +9545,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -8514,6 +9592,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -8548,6 +9632,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -8596,6 +9686,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -8640,6 +9736,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -8681,6 +9783,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundEntityCreatedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -8802,10 +9910,25 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
               "location": {
                 "type": "string"
               },
+              "par_scores": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
               "participants": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
+                    "hole_scores": {
+                      "items": {
+                        "type": "integer"
+                      },
+                      "type": "array"
+                    },
+                    "is_dnf": {
+                      "type": "boolean"
+                    },
                     "points": {
                       "type": "integer"
                     },
@@ -8935,6 +10058,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -9020,10 +10149,25 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
               "location": {
                 "type": "string"
               },
+              "par_scores": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
               "participants": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
+                    "hole_scores": {
+                      "items": {
+                        "type": "integer"
+                      },
+                      "type": "array"
+                    },
+                    "is_dnf": {
+                      "type": "boolean"
+                    },
                     "points": {
                       "type": "integer"
                     },
@@ -9151,6 +10295,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -9193,6 +10343,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -9231,34 +10387,102 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
-      "consumers": [
+      "producers": [
         {
-          "service": "discord",
+          "service": "frolf-bot-backend",
           "module": "round"
         }
       ],
-      "payload_type": "*roundevents.RoundEventCreatedPayloadV1",
+      "consumers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
+      "payload_type": "*roundevents.RoundScheduledPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
         "properties": {
+          "BaseRoundPayload": {
+            "additionalProperties": false,
+            "properties": {
+              "description": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string"
+              },
+              "round_id": {
+                "items": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              "start_time": {
+                "additionalProperties": false,
+                "properties": {},
+                "type": "object"
+              },
+              "title": {
+                "type": "string"
+              },
+              "user_id": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "channel_id": {
+            "type": "string"
+          },
+          "config_fragment": {
+            "additionalProperties": false,
+            "properties": {
+              "admin_role_id": {
+                "type": "string"
+              },
+              "editor_role_id": {
+                "type": "string"
+              },
+              "event_channel_id": {
+                "type": "string"
+              },
+              "guild_id": {
+                "type": "string"
+              },
+              "leaderboard_channel_id": {
+                "type": "string"
+              },
+              "signup_channel_id": {
+                "type": "string"
+              },
+              "signup_emoji": {
+                "type": "string"
+              },
+              "signup_message_id": {
+                "type": "string"
+              },
+              "user_role_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "guild_id"
+            ],
+            "type": "object"
+          },
           "discord_message_id": {
             "type": "string"
           },
           "guild_id": {
             "type": "string"
-          },
-          "round_id": {
-            "items": {
-              "minimum": 0,
-              "type": "integer"
-            },
-            "type": "array"
           }
         },
         "required": [
+          "BaseRoundPayload",
           "discord_message_id",
-          "guild_id",
-          "round_id"
+          "guild_id"
         ],
         "type": "object"
       }
@@ -9273,6 +10497,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "eventbus"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "eventbus"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -9310,6 +10540,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -9395,10 +10631,25 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
               "location": {
                 "type": "string"
               },
+              "par_scores": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
               "participants": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
+                    "hole_scores": {
+                      "items": {
+                        "type": "integer"
+                      },
+                      "type": "array"
+                    },
+                    "is_dnf": {
+                      "type": "boolean"
+                    },
                     "points": {
                       "type": "integer"
                     },
@@ -9568,6 +10819,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundFinalizationErrorPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -9604,6 +10861,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundFinalizationFailedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -9640,6 +10903,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -9678,6 +10947,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -9710,6 +10985,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "points": {
                   "type": "integer"
                 },
@@ -9826,6 +11110,18 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "pwa",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundFinalizedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -9941,10 +11237,25 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
               "location": {
                 "type": "string"
               },
+              "par_scores": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
               "participants": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
+                    "hole_scores": {
+                      "items": {
+                        "type": "integer"
+                      },
+                      "type": "array"
+                    },
+                    "is_dnf": {
+                      "type": "boolean"
+                    },
                     "points": {
                       "type": "integer"
                     },
@@ -10080,6 +11391,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -10126,10 +11443,19 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.ImportCompletedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
         "properties": {
+          "allow_guest_players": {
+            "type": "boolean"
+          },
           "auto_added_user_ids": {
             "items": {
               "type": "string"
@@ -10174,6 +11500,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             },
             "type": "array"
           },
+          "overwrite_existing_scores": {
+            "type": "boolean"
+          },
+          "par_scores": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
           "players_auto_added": {
             "type": "integer"
           },
@@ -10191,6 +11526,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "raw_name": {
                   "type": "string"
                 },
@@ -10227,6 +11571,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
               "type": "string"
             },
             "type": "array"
+          },
+          "source": {
+            "type": "string"
           },
           "timestamp": {
             "format": "date-time",
@@ -10265,6 +11612,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -10323,6 +11676,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -10390,6 +11749,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -10444,6 +11809,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -10496,6 +11867,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -10548,6 +11925,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.NativeEventCreateFailedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -10584,6 +11967,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -10626,6 +12015,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -10660,6 +12055,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -10710,6 +12111,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.NativeEventUpdateFailedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -10750,6 +12157,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.NativeEventUpdatedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -10786,6 +12199,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundParticipantAutoAddedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -10839,6 +12258,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.ParticipantDeclinedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -10915,6 +12340,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundParticipantJoinErrorPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -11017,6 +12448,16 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        },
+        {
+          "service": "pwa",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -11105,6 +12546,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -11206,6 +12653,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.ParticipantJoinValidationRequestPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -11246,9 +12699,19 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
+          "module": "round"
+        },
+        {
+          "service": "pwa",
           "module": "round"
         }
       ],
@@ -11260,6 +12723,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "points": {
                   "type": "integer"
                 },
@@ -11334,6 +12806,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "points": {
                   "type": "integer"
                 },
@@ -11388,6 +12869,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "points": {
                   "type": "integer"
                 },
@@ -11441,6 +12931,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.ParticipantRemovalErrorPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -11481,6 +12977,16 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        },
+        {
+          "service": "pwa",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -11523,9 +13029,19 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
+          "module": "round"
+        },
+        {
+          "service": "pwa",
           "module": "round"
         }
       ],
@@ -11537,6 +13053,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "points": {
                   "type": "integer"
                 },
@@ -11611,6 +13136,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "points": {
                   "type": "integer"
                 },
@@ -11662,6 +13196,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "points": {
                   "type": "integer"
                 },
@@ -11719,6 +13262,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -11726,6 +13275,10 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         },
         {
           "service": "discord",
+          "module": "round"
+        },
+        {
+          "service": "pwa",
           "module": "round"
         }
       ],
@@ -11782,6 +13335,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "points": {
                   "type": "integer"
                 },
@@ -11851,6 +13413,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.ParticipantStatusCheckErrorPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -11891,6 +13459,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.ParticipantUpdateErrorPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -11931,6 +13505,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -11977,6 +13557,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -12019,6 +13605,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -12065,6 +13657,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundParticipantsUpdatedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -12165,10 +13763,25 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
               "location": {
                 "type": "string"
               },
+              "par_scores": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
               "participants": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
+                    "hole_scores": {
+                      "items": {
+                        "type": "integer"
+                      },
+                      "type": "array"
+                    },
+                    "is_dnf": {
+                      "type": "boolean"
+                    },
                     "points": {
                       "type": "integer"
                     },
@@ -12305,6 +13918,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -12331,6 +13950,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "points": {
                   "type": "integer"
                 },
@@ -12451,6 +14079,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundReminderFailedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -12487,6 +14121,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.DiscordReminderPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -12552,6 +14192,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -12623,6 +14269,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundRetrievalFailedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -12659,6 +14311,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -12741,10 +14399,25 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
               "location": {
                 "type": "string"
               },
+              "par_scores": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
               "participants": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
+                    "hole_scores": {
+                      "items": {
+                        "type": "integer"
+                      },
+                      "type": "array"
+                    },
+                    "is_dnf": {
+                      "type": "boolean"
+                    },
                     "points": {
                       "type": "integer"
                     },
@@ -12871,6 +14544,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -12914,6 +14593,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundScheduleFailedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -12950,6 +14635,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundScheduleUpdatePayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -12995,6 +14686,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -13067,6 +14764,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                   "items": {
                     "additionalProperties": false,
                     "properties": {
+                      "hole_scores": {
+                        "items": {
+                          "type": "integer"
+                        },
+                        "type": "array"
+                      },
+                      "is_dnf": {
+                        "type": "boolean"
+                      },
                       "points": {
                         "type": "integer"
                       },
@@ -13132,6 +14838,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -13240,6 +14952,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "score"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "score"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -13324,6 +15042,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -13393,6 +15117,16 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        },
+        {
+          "service": "pwa",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -13446,6 +15180,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -13503,6 +15243,99 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       }
     },
     {
+      "subject": "round.scorecard.admin.upload.requested.v1",
+      "subject_pattern": "round.scorecard.admin.upload.requested.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Admin Scorecard Upload Requested",
+      "description": "Admin uploaded a scorecard file with overwrite semantics.",
+      "producer": {
+        "service": "pwa",
+        "module": "round"
+      },
+      "producers": [
+        {
+          "service": "pwa",
+          "module": "round"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
+      "payload_type": "*roundevents.ScorecardUploadedPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "allow_guest_players": {
+            "type": "boolean"
+          },
+          "channel_id": {
+            "type": "string"
+          },
+          "file_data": {
+            "items": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "file_name": {
+            "type": "string"
+          },
+          "file_url": {
+            "type": "string"
+          },
+          "guild_id": {
+            "type": "string"
+          },
+          "import_id": {
+            "type": "string"
+          },
+          "message_id": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "overwrite_existing_scores": {
+            "type": "boolean"
+          },
+          "round_id": {
+            "items": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "source": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "udisc_url": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "channel_id",
+          "guild_id",
+          "import_id",
+          "message_id",
+          "round_id",
+          "timestamp",
+          "user_id"
+        ],
+        "type": "object"
+      }
+    },
+    {
       "subject": "round.scorecard.normalized.v1",
       "subject_pattern": "round.scorecard.normalized.v1.{scope_id}",
       "supports_scoped_suffix": true,
@@ -13512,6 +15345,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -13522,6 +15361,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       "payload_schema": {
         "additionalProperties": false,
         "properties": {
+          "allow_guest_players": {
+            "type": "boolean"
+          },
           "channel_id": {
             "type": "string"
           },
@@ -13571,6 +15413,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                         "type": "integer"
                       },
                       "type": "array"
+                    },
+                    "is_dnf": {
+                      "type": "boolean"
                     },
                     "total": {
                       "type": "integer"
@@ -13649,12 +15494,18 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             ],
             "type": "object"
           },
+          "overwrite_existing_scores": {
+            "type": "boolean"
+          },
           "round_id": {
             "items": {
               "minimum": 0,
               "type": "integer"
             },
             "type": "array"
+          },
+          "source": {
+            "type": "string"
           },
           "timestamp": {
             "format": "date-time",
@@ -13687,6 +15538,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.ScorecardParseFailedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -13744,10 +15601,19 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.ScorecardUploadedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
         "properties": {
+          "allow_guest_players": {
+            "type": "boolean"
+          },
           "channel_id": {
             "type": "string"
           },
@@ -13776,12 +15642,18 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
           "notes": {
             "type": "string"
           },
+          "overwrite_existing_scores": {
+            "type": "boolean"
+          },
           "round_id": {
             "items": {
               "minimum": 0,
               "type": "integer"
             },
             "type": "array"
+          },
+          "source": {
+            "type": "string"
           },
           "timestamp": {
             "format": "date-time",
@@ -13816,6 +15688,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -13826,6 +15704,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       "payload_schema": {
         "additionalProperties": false,
         "properties": {
+          "allow_guest_players": {
+            "type": "boolean"
+          },
           "channel_id": {
             "type": "string"
           },
@@ -13837,6 +15718,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
           },
           "import_id": {
             "type": "string"
+          },
+          "overwrite_existing_scores": {
+            "type": "boolean"
           },
           "parsed_data": {
             "additionalProperties": false,
@@ -13869,6 +15753,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                         "type": "integer"
                       },
                       "type": "array"
+                    },
+                    "is_dnf": {
+                      "type": "boolean"
                     },
                     "is_team": {
                       "type": "boolean"
@@ -13920,6 +15807,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
               "type": "integer"
             },
             "type": "array"
+          },
+          "source": {
+            "type": "string"
           },
           "timestamp": {
             "format": "date-time",
@@ -13951,10 +15841,19 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.ParsedScorecardPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
         "properties": {
+          "allow_guest_players": {
+            "type": "boolean"
+          },
           "channel_id": {
             "type": "string"
           },
@@ -13966,6 +15865,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
           },
           "import_id": {
             "type": "string"
+          },
+          "overwrite_existing_scores": {
+            "type": "boolean"
           },
           "parsed_data": {
             "additionalProperties": false,
@@ -13998,6 +15900,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                         "type": "integer"
                       },
                       "type": "array"
+                    },
+                    "is_dnf": {
+                      "type": "boolean"
                     },
                     "is_team": {
                       "type": "boolean"
@@ -14049,6 +15954,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
               "type": "integer"
             },
             "type": "array"
+          },
+          "source": {
+            "type": "string"
           },
           "timestamp": {
             "format": "date-time",
@@ -14080,10 +15988,19 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.ParsedScorecardPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
         "properties": {
+          "allow_guest_players": {
+            "type": "boolean"
+          },
           "channel_id": {
             "type": "string"
           },
@@ -14095,6 +16012,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
           },
           "import_id": {
             "type": "string"
+          },
+          "overwrite_existing_scores": {
+            "type": "boolean"
           },
           "parsed_data": {
             "additionalProperties": false,
@@ -14127,6 +16047,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                         "type": "integer"
                       },
                       "type": "array"
+                    },
+                    "is_dnf": {
+                      "type": "boolean"
                     },
                     "is_team": {
                       "type": "boolean"
@@ -14179,6 +16102,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             },
             "type": "array"
           },
+          "source": {
+            "type": "string"
+          },
           "timestamp": {
             "format": "date-time",
             "type": "string"
@@ -14209,6 +16135,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -14219,6 +16151,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       "payload_schema": {
         "additionalProperties": false,
         "properties": {
+          "allow_guest_players": {
+            "type": "boolean"
+          },
           "channel_id": {
             "type": "string"
           },
@@ -14247,12 +16182,18 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
           "notes": {
             "type": "string"
           },
+          "overwrite_existing_scores": {
+            "type": "boolean"
+          },
           "round_id": {
             "items": {
               "minimum": 0,
               "type": "integer"
             },
             "type": "array"
+          },
+          "source": {
+            "type": "string"
           },
           "timestamp": {
             "format": "date-time",
@@ -14287,6 +16228,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -14353,6 +16300,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -14376,6 +16329,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "points": {
                   "type": "integer"
                 },
@@ -14437,6 +16399,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -14460,6 +16428,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "points": {
                   "type": "integer"
                 },
@@ -14505,6 +16482,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "raw_name": {
                   "type": "string"
                 },
@@ -14558,6 +16544,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -14617,6 +16609,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -14684,6 +16682,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -14704,6 +16708,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "points": {
                   "type": "integer"
                 },
@@ -14848,6 +16861,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundStartFailedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -14884,6 +16903,16 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        },
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundStartRequestedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -14916,6 +16945,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -15045,6 +17080,18 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "pwa",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundStartedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -15130,6 +17177,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -15172,6 +17225,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -15293,10 +17352,25 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
               "location": {
                 "type": "string"
               },
+              "par_scores": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
               "participants": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
+                    "hole_scores": {
+                      "items": {
+                        "type": "integer"
+                      },
+                      "type": "array"
+                    },
+                    "is_dnf": {
+                      "type": "boolean"
+                    },
                     "points": {
                       "type": "integer"
                     },
@@ -15424,6 +17498,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -15479,6 +17559,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -15547,6 +17633,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -15615,6 +17707,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -15668,6 +17766,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -15712,6 +17816,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -15732,6 +17842,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "points": {
                   "type": "integer"
                 },
@@ -15837,6 +17956,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundToDeleteFetchedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -15916,10 +18041,25 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
               "location": {
                 "type": "string"
               },
+              "par_scores": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
               "participants": {
                 "items": {
                   "additionalProperties": false,
                   "properties": {
+                    "hole_scores": {
+                      "items": {
+                        "type": "integer"
+                      },
+                      "type": "array"
+                    },
+                    "is_dnf": {
+                      "type": "boolean"
+                    },
                     "points": {
                       "type": "integer"
                     },
@@ -16072,6 +18212,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*sharedevents.TracePayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -16106,6 +18252,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -16181,6 +18333,16 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "round"
+        },
+        {
+          "service": "pwa",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -16246,6 +18408,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -16297,6 +18465,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -16335,6 +18509,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*roundevents.RoundUpdateValidatedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -16401,9 +18581,19 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
+          "module": "round"
+        },
+        {
+          "service": "pwa",
           "module": "round"
         }
       ],
@@ -16439,6 +18629,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -16485,6 +18681,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -16527,6 +18729,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -16576,6 +18784,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -16616,6 +18830,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -16686,6 +18906,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "score"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "score"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -16758,6 +18984,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "score"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "score"
+        }
+      ],
       "payload_type": "*sharedevents.ScoreBulkUpdatedPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -16808,6 +19040,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "payload_type": "*sharedevents.ScoreModuleNotificationErrorPayloadV1",
       "payload_schema": {
         "additionalProperties": false,
@@ -16844,6 +19082,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "score"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "score"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -16886,6 +19130,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -16906,6 +19156,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "points": {
                   "type": "integer"
                 },
@@ -16954,6 +19213,15 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "items": {
               "additionalProperties": false,
               "properties": {
+                "hole_scores": {
+                  "items": {
+                    "type": "integer"
+                  },
+                  "type": "array"
+                },
+                "is_dnf": {
+                  "type": "boolean"
+                },
                 "raw_name": {
                   "type": "string"
                 },
@@ -17001,6 +19269,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "score"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "score"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -17058,6 +19332,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "score"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "score"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -17104,6 +19384,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "score"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "score"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -17153,6 +19439,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "score"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "score"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -17203,6 +19495,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -17244,6 +19542,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -17285,6 +19589,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -17328,6 +19638,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -17366,6 +19682,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -17400,6 +19722,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -17450,6 +19778,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -17496,6 +19830,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "round"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "round"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -17538,6 +19878,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -17584,6 +19930,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -17644,6 +19996,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -17682,6 +20040,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -17716,6 +20080,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -17754,6 +20124,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -17796,6 +20172,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -17838,6 +20220,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -17876,6 +20264,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -17910,6 +20304,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -17959,6 +20359,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -17996,6 +20402,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -18033,6 +20445,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -18075,6 +20493,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -18113,6 +20537,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -18128,6 +20558,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
           },
           "tag_number": {
             "type": "integer"
+          },
+          "udisc_name": {
+            "type": "string"
+          },
+          "udisc_username": {
+            "type": "string"
           },
           "user_id": {
             "type": "string"
@@ -18151,6 +20587,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "leaderboard"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "leaderboard"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -18193,6 +20635,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -18231,6 +20679,16 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "discord",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "user"
+        },
+        {
+          "service": "pwa",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
@@ -18271,6 +20729,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -18311,6 +20775,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "discord",
@@ -18372,6 +20842,12 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
         "service": "frolf-bot-backend",
         "module": "user"
       },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "user"
+        }
+      ],
       "consumers": [
         {
           "service": "frolf-bot-backend",
