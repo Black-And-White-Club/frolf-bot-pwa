@@ -6,6 +6,12 @@ import { auth } from '$lib/stores/auth.svelte';
 import { page } from '$app/state';
 import { goto } from '$app/navigation';
 
+const { mockPublish, mockReload, mockGetProfile } = vi.hoisted(() => ({
+	mockPublish: vi.fn(),
+	mockReload: vi.fn(async () => {}),
+	mockGetProfile: vi.fn(() => undefined)
+}));
+
 // Mock stores and modules
 vi.mock('$app/state', () => ({
 	page: {
@@ -41,12 +47,35 @@ vi.mock('$lib/stores/club.svelte', () => ({
 	}
 }));
 
+vi.mock('$lib/stores/nats.svelte', () => ({
+	nats: {
+		publish: mockPublish
+	}
+}));
+
+vi.mock('$lib/stores/dataLoader.svelte', () => ({
+	dataLoader: {
+		reload: mockReload
+	}
+}));
+
+vi.mock('$lib/stores/userProfiles.svelte', () => ({
+	userProfiles: {
+		getProfile: mockGetProfile
+	}
+}));
+
 // Mock fetch
 global.fetch = vi.fn();
 
 describe('Account Page', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		(global.fetch as any).mockResolvedValue({
+			ok: true,
+			status: 200,
+			json: async () => []
+		});
 		// Reset auth state
 		auth.isAuthenticated = true;
 		auth.canEdit = false;
@@ -95,6 +124,38 @@ describe('Account Page', () => {
 			const { queryByText } = render(AccountPage);
 			expect(queryByText(/Provider linked successfully/)).toBeNull();
 			expect(queryByText(/Failed to link provider/)).toBeNull();
+		});
+	});
+
+	describe('UDisc Identity', () => {
+		it('publishes UDisc identity update request', async () => {
+			const { getByLabelText, getByRole } = render(AccountPage);
+
+			await fireEvent.input(getByLabelText('UDisc Username'), {
+				target: { value: 'disc-user' }
+			});
+			await fireEvent.input(getByLabelText('UDisc Display Name'), {
+				target: { value: 'Disc User' }
+			});
+			await fireEvent.click(getByRole('button', { name: 'Save UDisc Identity' }));
+
+			await waitFor(() => {
+				expect(mockPublish).toHaveBeenCalledWith(
+					'user.udisc.identity.update.requested.v1',
+					{
+						guild_id: 'guild-123',
+						user_id: 'user-123',
+						username: 'disc-user',
+						name: 'Disc User'
+					},
+					expect.objectContaining({
+						correlation_id: expect.any(String),
+						submitted_at: expect.any(String),
+						source: 'pwa'
+					})
+				);
+			});
+			expect(mockReload).toHaveBeenCalled();
 		});
 	});
 

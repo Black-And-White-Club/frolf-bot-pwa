@@ -58,6 +58,8 @@ interface ParticipantJoinedPayloadV1 {
 	tentative_participants?: RoundParticipantPayload[];
 }
 
+type ParticipantRemovedPayloadV1 = ParticipantJoinedPayloadV1;
+
 interface ParticipantScoreUpdatedPayloadV1 {
 	round_id: string;
 	user_id?: string;
@@ -157,6 +159,18 @@ class SubscriptionManager {
 				const participants = flattenParticipants(payload);
 				if (participants.length === 0) return;
 
+				roundService.handleRoundUpdated({
+					roundId: payload.round_id,
+					update: { participants }
+				});
+			})
+		);
+
+		// Participant removed
+		this.unsubscribers.push(
+			nats.subscribe(`round.participant.removed.v1.${guildId}`, (msg) => {
+				const payload = msg.data as ParticipantRemovedPayloadV1;
+				const participants = flattenParticipants(payload);
 				roundService.handleRoundUpdated({
 					roundId: payload.round_id,
 					update: { participants }

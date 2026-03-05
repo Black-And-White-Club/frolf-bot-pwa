@@ -3,15 +3,18 @@
 	import { goto } from '$app/navigation';
 	import { auth } from '$lib/stores/auth.svelte';
 	import { clubService } from '$lib/stores/club.svelte';
+	import { dataLoader } from '$lib/stores/dataLoader.svelte';
+	import { nats } from '$lib/stores/nats.svelte';
+	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 
-	interface Invite {
+	type Invite = {
 		code: string;
 		role: string;
 		use_count: number;
 		max_uses: number | null;
 		expires_at: string | null;
 		created_at: string;
-	}
+	};
 
 	// --- State ---
 	let invites = $state<Invite[]>([]);
@@ -27,6 +30,11 @@
 	let copyFeedback = $state<Record<string, boolean>>({});
 	let unlinkingProvider = $state<string | null>(null);
 	let unlinkError = $state<string | null>(null);
+	let udiscUsername = $state('');
+	let udiscName = $state('');
+	let udiscSubmitting = $state(false);
+	let udiscError = $state<string | null>(null);
+	let udiscSuccess = $state<string | null>(null);
 
 	// Success message from link callback
 	const linkSuccess = $derived(page.url.searchParams.get('success') === 'linked');
@@ -36,6 +44,7 @@
 	const isGoogleLinked = $derived(auth.user?.linkedProviders.includes('google') ?? false);
 
 	const canManageInvites = $derived(auth.canEdit);
+	const currentUserProfile = $derived(auth.user?.id ? userProfiles.getProfile(auth.user.id) : undefined);
 
 	// --- Redirect if not authenticated ---
 	$effect(() => {
@@ -49,6 +58,14 @@
 		if (auth.isAuthenticated && canManageInvites && auth.user?.activeClubUuid) {
 			loadInvites();
 		}
+	});
+
+	$effect(() => {
+		if (!currentUserProfile) {
+			return;
+		}
+		udiscUsername = currentUserProfile.udiscUsername ?? '';
+		udiscName = currentUserProfile.udiscName ?? '';
 	});
 
 	async function loadInvites() {
@@ -153,6 +170,54 @@
 		if (role === 'admin') return 'bg-[#B89B5E]/20 text-[#B89B5E]';
 		if (role === 'editor') return 'bg-[#8B7BB8]/20 text-[#8B7BB8]';
 		return 'bg-[#007474]/20 text-[#007474]';
+	}
+
+	function createCorrelationId(): string {
+		if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+			return crypto.randomUUID();
+		}
+		return `pwa-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
+	}
+
+	async function updateUDiscIdentity() {
+		if (!auth.user?.guildId || !auth.user?.id) {
+			udiscError = 'You must be signed in to update UDisc identity.';
+			return;
+		}
+
+		const username = udiscUsername.trim();
+		const name = udiscName.trim();
+		if (!username && !name) {
+			udiscError = 'Provide at least a UDisc username or display name.';
+			return;
+		}
+
+		udiscSubmitting = true;
+		udiscError = null;
+		udiscSuccess = null;
+
+		try {
+			nats.publish(
+				'user.udisc.identity.update.requested.v1',
+				{
+					guild_id: auth.user.guildId,
+					user_id: auth.user.id,
+					...(username ? { username } : {}),
+					...(name ? { name } : {})
+				},
+				{
+					correlation_id: createCorrelationId(),
+					submitted_at: new Date().toISOString(),
+					source: 'pwa'
+				}
+			);
+			udiscSuccess = 'UDisc identity update requested.';
+			await dataLoader.reload();
+		} catch (error) {
+			udiscError = error instanceof Error ? error.message : 'Failed to request UDisc update.';
+		} finally {
+			udiscSubmitting = false;
+		}
 	}
 </script>
 
@@ -293,6 +358,72 @@
 						</a>
 					{/if}
 				</div>
+			</div>
+		</section>
+
+		<section>
+			<h2
+				class="mb-4 font-['Fraunces'] text-xl font-bold text-[var(--guild-text)]"
+				style="font-variation-settings: 'SOFT' 0, 'WONK' 0"
+			>
+				UDisc Identity
+			</h2>
+
+			<div class="space-y-3 rounded-xl border border-[#007474]/20 bg-[var(--guild-surface)] px-5 py-5">
+				<p class="font-['Space_Grotesk'] text-sm text-[var(--guild-text-secondary)]">
+					Used for automatic scorecard matching in PWA and Discord workflows.
+				</p>
+
+				<div class="grid gap-3 sm:grid-cols-2">
+					<div class="flex flex-col gap-1">
+						<label
+							for="udisc-username"
+							class="font-['Space_Grotesk'] text-xs text-[var(--guild-text-secondary)]"
+						>
+							UDisc Username
+						</label>
+						<input
+							id="udisc-username"
+							type="text"
+							placeholder="@janedoe"
+							bind:value={udiscUsername}
+							class="rounded-lg border border-[#007474]/30 bg-[var(--guild-surface-elevated)] px-3 py-2 font-['Space_Grotesk'] text-sm text-[var(--guild-text)] placeholder:text-[var(--guild-text-muted)] focus:ring-1 focus:ring-[#007474] focus:outline-none"
+						/>
+					</div>
+
+					<div class="flex flex-col gap-1">
+						<label
+							for="udisc-name"
+							class="font-['Space_Grotesk'] text-xs text-[var(--guild-text-secondary)]"
+						>
+							UDisc Display Name
+						</label>
+						<input
+							id="udisc-name"
+							type="text"
+							placeholder="Jane Doe"
+							bind:value={udiscName}
+							class="rounded-lg border border-[#007474]/30 bg-[var(--guild-surface-elevated)] px-3 py-2 font-['Space_Grotesk'] text-sm text-[var(--guild-text)] placeholder:text-[var(--guild-text-muted)] focus:ring-1 focus:ring-[#007474] focus:outline-none"
+						/>
+					</div>
+				</div>
+
+				<div class="flex items-center gap-3">
+					<button
+						onclick={updateUDiscIdentity}
+						disabled={udiscSubmitting}
+						class="bg-liquid-skobeloff rounded-lg px-5 py-2 font-['Space_Grotesk'] text-sm font-medium text-white transition-all hover:brightness-110 disabled:opacity-50"
+					>
+						{udiscSubmitting ? 'Saving…' : 'Save UDisc Identity'}
+					</button>
+					{#if udiscSuccess}
+						<span class="font-['Space_Grotesk'] text-sm text-[#4dd0d0]">{udiscSuccess}</span>
+					{/if}
+				</div>
+
+				{#if udiscError}
+					<p class="font-['Space_Grotesk'] text-sm text-red-400">{udiscError}</p>
+				{/if}
 			</div>
 		</section>
 
