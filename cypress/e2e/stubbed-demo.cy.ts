@@ -61,7 +61,7 @@ describe('Dashboard Snapshot + Live Events', () => {
 		cy.arrangeAuth({ clubUuid: subjectId, guildId: subjectId });
 		cy.wsConnect();
 		cy.expectDashboardLoaded();
-		cy.wsAssertPublished(`round.list.request.v1.${subjectId}`);
+		cy.wsAssertPublished(`round.list.request.v2.${subjectId}`);
 	});
 
 	it('renders snapshot data without waiting for full end-to-end flow', () => {

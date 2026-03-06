@@ -3,7 +3,7 @@
 	"steps": [
 		{
 			"action": "emit",
-			"subject": "round.started.v1.{scope_id}",
+			"subject": "round.started.v2.{scope_id}",
 			"payload": {
 				"guild_id": "guild-123",
 				"channel_id": "channel-123",

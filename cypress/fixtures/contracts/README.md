@@ -10,7 +10,7 @@ These fixtures are validated against `contracts/events.v1.json` (generated from 
 	"steps": [
 		{
 			"action": "emit",
-			"subject": "round.created.v1.{scope_id}",
+			"subject": "round.created.v2.{scope_id}",
 			"payload": {}
 		}
 	]
@@ -25,7 +25,7 @@ Contract-driven step (preferred for drift protection):
 	"steps": [
 		{
 			"action": "emit",
-			"contract_subject": "leaderboard.tag.updated.v1",
+			"contract_subject": "leaderboard.tag.updated.v2",
 			"payload_overrides": {
 				"guild_id": "guild-123",
 				"reason": "test",

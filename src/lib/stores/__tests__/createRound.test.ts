@@ -62,7 +62,7 @@ describe('createRoundService', () => {
 		expect(mod.createRoundService.errorMessage).toContain('Player role');
 	});
 
-	it('publishes round.creation.requested.v1 payload for player role', async () => {
+	it('publishes round.creation.requested.v2 payload for player role', async () => {
 		mockAuth.isAuthenticated = true;
 		mockAuth.activeRole = 'player';
 		mockAuth.user = { activeClubUuid: 'club-123', guildId: 'guild-123', id: 'user-123' };
@@ -78,7 +78,7 @@ describe('createRoundService', () => {
 
 		expect(result).toBe(true);
 		expect(mockPublish).toHaveBeenCalledWith(
-			'round.creation.requested.v1',
+			'round.creation.requested.v2',
 			{
 				guild_id: 'club-123',
 				title: 'Weekly Round',
@@ -116,7 +116,7 @@ describe('createRoundService', () => {
 
 		expect(result).toBe(true);
 		expect(mockPublish).toHaveBeenCalledWith(
-			'round.creation.requested.v1',
+			'round.creation.requested.v2',
 			expect.objectContaining({
 				guild_id: 'guild-fallback'
 			}),
@@ -139,7 +139,7 @@ describe('createRoundService', () => {
 		});
 
 		expect(mockPublish).toHaveBeenCalledWith(
-			'round.creation.requested.v1',
+			'round.creation.requested.v2',
 			expect.objectContaining({
 				timezone: 'America/Chicago'
 			}),

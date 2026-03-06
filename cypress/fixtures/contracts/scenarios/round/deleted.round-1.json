@@ -3,7 +3,7 @@
 	"steps": [
 		{
 			"action": "emit",
-			"subject": "round.deleted.v1.{scope_id}",
+			"subject": "round.deleted.v2.{scope_id}",
 			"payload": {
 				"guild_id": "guild-123",
 				"discord_message_id": "msg-1",

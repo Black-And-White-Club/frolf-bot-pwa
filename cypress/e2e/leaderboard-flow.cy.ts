@@ -30,7 +30,7 @@ describe('Leaderboard Flow', () => {
 		cy.arrangeAuth({ clubUuid: subjectId, guildId: subjectId });
 		cy.wsConnect();
 		cy.expectDashboardLoaded();
-		cy.wsAssertPublished(`leaderboard.snapshot.request.v1.${subjectId}`);
+		cy.wsAssertPublished(`leaderboard.snapshot.request.v2.${subjectId}`);
 	});
 
 	it('displays leaderboard rows from snapshot', () => {
@@ -101,7 +101,7 @@ describe('Leaderboard Flow', () => {
 		leaderboardScreen.expectRowCount(3);
 
 		cy.wsStubRequest(
-			`leaderboard.snapshot.request.v1.${subjectId}`,
+			`leaderboard.snapshot.request.v2.${subjectId}`,
 			buildLeaderboardSnapshot({
 				guild_id: subjectId,
 				leaderboard: [

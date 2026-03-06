@@ -3,7 +3,7 @@
 	"steps": [
 		{
 			"action": "emit",
-			"subject": "round.participant.score.updated.v1.{scope_id}",
+			"subject": "round.participant.score.updated.v2.{scope_id}",
 			"payload": {
 				"guild_id": "guild-123",
 				"channel_id": "channel-123",

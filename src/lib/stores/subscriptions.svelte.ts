@@ -142,14 +142,14 @@ class SubscriptionManager {
 	private subscribeRoundEvents(guildId: string): void {
 		// Round created
 		this.unsubscribers.push(
-			nats.subscribe(`round.created.v1.${guildId}`, (msg) => {
+			nats.subscribe(`round.created.v2.${guildId}`, (msg) => {
 				roundService.handleRoundCreated(toRoundRaw(msg.data as RoundCreatedPayloadV1 | RoundRaw));
 			})
 		);
 
 		// Round updated
 		this.unsubscribers.push(
-			nats.subscribe(`round.updated.v1.${guildId}`, (msg) => {
+			nats.subscribe(`round.updated.v2.${guildId}`, (msg) => {
 				const payload = msg.data as RoundUpdatedPayload;
 				const roundId = payload.roundId || payload.round_id;
 				if (!roundId || !payload.update) return;
@@ -159,7 +159,7 @@ class SubscriptionManager {
 
 		// Round deleted
 		this.unsubscribers.push(
-			nats.subscribe(`round.deleted.v1.${guildId}`, (msg) => {
+			nats.subscribe(`round.deleted.v2.${guildId}`, (msg) => {
 				const payload = msg.data as RoundDeletedPayloadV1;
 				const roundId = roundIdFromWire(payload.round_id);
 				if (!roundId) return;
@@ -169,7 +169,7 @@ class SubscriptionManager {
 
 		// Round started
 		this.unsubscribers.push(
-			nats.subscribe(`round.started.v1.${guildId}`, (msg) => {
+			nats.subscribe(`round.started.v2.${guildId}`, (msg) => {
 				const payload = msg.data as RoundStartedPayloadV1;
 				const roundId = roundIdFromWire(payload.round_id);
 				if (!roundId) return;
@@ -189,7 +189,7 @@ class SubscriptionManager {
 
 		// Round finalized
 		this.unsubscribers.push(
-			nats.subscribe(`round.finalized.v1.${guildId}`, (msg) => {
+			nats.subscribe(`round.finalized.v2.${guildId}`, (msg) => {
 				const payload = msg.data as RoundFinalizedPayloadV1;
 				const roundId = roundIdFromWire(payload.round_id);
 				if (!roundId) return;
@@ -225,7 +225,7 @@ class SubscriptionManager {
 
 		// Participant joined
 		this.unsubscribers.push(
-			nats.subscribe(`round.participant.joined.v1.${guildId}`, (msg) => {
+			nats.subscribe(`round.participant.joined.v2.${guildId}`, (msg) => {
 				const payload = msg.data as ParticipantJoinedPayloadV1;
 				const roundId = roundIdFromWire(payload.round_id);
 				if (!roundId) return;
@@ -242,7 +242,7 @@ class SubscriptionManager {
 
 		// Participant removed
 		this.unsubscribers.push(
-			nats.subscribe(`round.participant.removed.v1.${guildId}`, (msg) => {
+			nats.subscribe(`round.participant.removed.v2.${guildId}`, (msg) => {
 				const payload = msg.data as ParticipantRemovedPayloadV1;
 				const roundId = roundIdFromWire(payload.round_id);
 				if (!roundId) return;
@@ -257,7 +257,7 @@ class SubscriptionManager {
 
 		// Score updated
 		this.unsubscribers.push(
-			nats.subscribe(`round.participant.score.updated.v1.${guildId}`, (msg) => {
+			nats.subscribe(`round.participant.score.updated.v2.${guildId}`, (msg) => {
 				const payload = msg.data as ParticipantScoreUpdatedPayloadV1;
 				const roundId = roundIdFromWire(payload.round_id);
 				if (!roundId) return;
@@ -288,14 +288,14 @@ class SubscriptionManager {
 	private subscribeLeaderboardEvents(guildId: string): void {
 		// Full leaderboard update
 		this.unsubscribers.push(
-			nats.subscribe(`leaderboard.updated.v1.${guildId}`, () => {
+			nats.subscribe(`leaderboard.updated.v2.${guildId}`, () => {
 				dataLoader.reload();
 			})
 		);
 
 		// Tag updated (single entry change)
 		this.unsubscribers.push(
-			nats.subscribe(`leaderboard.tag.updated.v1.${guildId}`, (msg) => {
+			nats.subscribe(`leaderboard.tag.updated.v2.${guildId}`, (msg) => {
 				const payload = msg.data as LeaderboardTagUpdatedPayloadV1;
 				leaderboardService.applyPatch({
 					op: 'upsert_entry',
@@ -314,7 +314,7 @@ class SubscriptionManager {
 
 		// Tag swap processed
 		this.unsubscribers.push(
-			nats.subscribe(`leaderboard.tag.swap.processed.v1.${guildId}`, (msg) => {
+			nats.subscribe(`leaderboard.tag.swap.processed.v2.${guildId}`, (msg) => {
 				const payload = msg.data as TagSwapProcessedPayloadV1;
 				leaderboardService.applyPatch({
 					op: 'swap_tags',

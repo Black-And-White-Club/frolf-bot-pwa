@@ -57,7 +57,7 @@ const OPERATION_TIMEOUT_MS = 10_000;
 const MESSAGE_CLEAR_MS = 5_000;
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const SUPPORTED_EXTENSIONS = new Set(['csv', 'xlsx']);
-const ADMIN_SCORECARD_UPLOAD_SUBJECT = 'round.scorecard.admin.upload.requested.v1';
+const ADMIN_SCORECARD_UPLOAD_SUBJECT = 'round.scorecard.admin.upload.requested.v2';
 const ADMIN_SCORECARD_UPLOAD_SOURCE = 'admin_pwa_upload';
 
 class AdminService {
@@ -77,7 +77,7 @@ class AdminService {
 
 	/**
 	 * Submit a batch of tag assignments.
-	 * Publishes to leaderboard.batch.tag.assignment.requested.v1 (no guildId suffix — backend subscribes without it)
+	 * Publishes to leaderboard.batch.tag.assignment.requested.v2 (no guildId suffix — backend subscribes without it)
 	 * and subscribes for success/failure feedback.
 	 *
 	 * @param guildId - Club UUID or Discord Guild ID (used only in the payload guild_id field, not the subject)
@@ -95,8 +95,8 @@ class AdminService {
 
 		const batchId = crypto.randomUUID();
 		// Backend publishes success/failure without guildId suffix — filter by batch_id instead
-		const successTopic = 'leaderboard.batch.tag.assigned.v1';
-		const failureTopic = 'leaderboard.batch.tag.assignment.failed.v1';
+		const successTopic = 'leaderboard.batch.tag.assigned.v2';
+		const failureTopic = 'leaderboard.batch.tag.assignment.failed.v2';
 
 		return new Promise((resolve) => {
 			let resolved = false;
@@ -138,7 +138,7 @@ class AdminService {
 				source: 'admin_batch'
 			};
 
-			nats.publish('leaderboard.batch.tag.assignment.requested.v1', payload);
+			nats.publish('leaderboard.batch.tag.assignment.requested.v2', payload);
 
 			setTimeout(() => {
 				if (!resolved) {
@@ -154,7 +154,7 @@ class AdminService {
 
 	/**
 	 * Submit a manual point adjustment for a player.
-	 * Publishes to leaderboard.manual.point.adjustment.v1 (no guildId suffix — backend subscribes without it)
+	 * Publishes to leaderboard.manual.point.adjustment.v2 (no guildId suffix — backend subscribes without it)
 	 * and subscribes for success/failure feedback.
 	 *
 	 * @param guildId - Club UUID or Discord Guild ID
@@ -175,8 +175,8 @@ class AdminService {
 		this.errorMessage = null;
 
 		// Backend publishes without guildId suffix — guild is scoped by payload.guild_id
-		const successTopic = 'leaderboard.manual.point.adjustment.success.v1';
-		const failureTopic = 'leaderboard.manual.point.adjustment.failed.v1';
+		const successTopic = 'leaderboard.manual.point.adjustment.success.v2';
+		const failureTopic = 'leaderboard.manual.point.adjustment.failed.v2';
 
 		return new Promise((resolve) => {
 			let resolved = false;
@@ -214,7 +214,7 @@ class AdminService {
 				admin_id: adminId
 			};
 
-			nats.publish('leaderboard.manual.point.adjustment.v1', payload);
+			nats.publish('leaderboard.manual.point.adjustment.v2', payload);
 
 			setTimeout(() => {
 				if (!resolved) {

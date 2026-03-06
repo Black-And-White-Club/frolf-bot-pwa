@@ -283,16 +283,16 @@ Cypress.Commands.add('arrangeSnapshot', (options: ArrangeSnapshotOptions = {}) =
 	const subjectId = options.subjectId ?? 'guild-123';
 
 	const roundsPayload = buildRoundSnapshotPayload(options);
-	stub(`round.list.request.v1.${subjectId}`, roundsPayload, { validate: false });
+	stub(`round.list.request.v2.${subjectId}`, roundsPayload, { validate: false });
 
 	const leaderboardPayload = buildLeaderboardSnapshotPayload(options, subjectId);
-	stub(`leaderboard.snapshot.request.v1.${subjectId}`, leaderboardPayload, { validate: false });
+	stub(`leaderboard.snapshot.request.v2.${subjectId}`, leaderboardPayload, { validate: false });
 
 	const tagsPayload = buildTagSnapshotPayload(options, subjectId);
 	stub(`leaderboard.tag.list.requested.v1.${subjectId}`, tagsPayload, { validate: false });
 
 	const clubInfoPayload = buildClubInfoSnapshotPayload(options, subjectId);
-	stub(`club.info.request.v1.${subjectId}`, clubInfoPayload, { validate: false });
+	stub(`club.info.request.v2.${subjectId}`, clubInfoPayload, { validate: false });
 
 	return wrapVoid();
 });
@@ -300,7 +300,7 @@ Cypress.Commands.add('arrangeSnapshot', (options: ArrangeSnapshotOptions = {}) =
 Cypress.Commands.add(
 	'emitRoundCreated',
 	(subjectId: string, payload: Partial<RoundCreatedEventPayload> = {}) => {
-		emit(`round.created.v1.${subjectId}`, buildRoundCreated({ guild_id: subjectId, ...payload }), {
+		emit(`round.created.v2.${subjectId}`, buildRoundCreated({ guild_id: subjectId, ...payload }), {
 			validate: false
 		});
 		return wrapVoid();
@@ -310,7 +310,7 @@ Cypress.Commands.add(
 Cypress.Commands.add(
 	'emitRoundStarted',
 	(subjectId: string, payload: Partial<RoundStartedEventPayload> = {}) => {
-		emit(`round.started.v1.${subjectId}`, buildRoundStarted(payload), { validate: false });
+		emit(`round.started.v2.${subjectId}`, buildRoundStarted(payload), { validate: false });
 		return wrapVoid();
 	}
 );
@@ -318,7 +318,7 @@ Cypress.Commands.add(
 Cypress.Commands.add(
 	'emitRoundParticipantJoined',
 	(subjectId: string, payload: Partial<RoundParticipantJoinedEventPayload> = {}) => {
-		emit(`round.participant.joined.v1.${subjectId}`, buildRoundParticipantJoined(payload), {
+		emit(`round.participant.joined.v2.${subjectId}`, buildRoundParticipantJoined(payload), {
 			validate: false
 		});
 		return wrapVoid();
@@ -329,7 +329,7 @@ Cypress.Commands.add(
 	'emitRoundParticipantScoreUpdated',
 	(subjectId: string, payload: Partial<RoundParticipantScoreUpdatedEventPayload> = {}) => {
 		emit(
-			`round.participant.score.updated.v1.${subjectId}`,
+			`round.participant.score.updated.v2.${subjectId}`,
 			buildRoundParticipantScoreUpdated(payload),
 			{
 				validate: false
@@ -342,7 +342,7 @@ Cypress.Commands.add(
 Cypress.Commands.add(
 	'emitRoundDeleted',
 	(subjectId: string, payload: Partial<RoundDeletedEventPayload> = {}) => {
-		emit(`round.deleted.v1.${subjectId}`, buildRoundDeleted(payload), { validate: false });
+		emit(`round.deleted.v2.${subjectId}`, buildRoundDeleted(payload), { validate: false });
 		return wrapVoid();
 	}
 );
@@ -351,7 +351,7 @@ Cypress.Commands.add(
 	'emitLeaderboardUpdated',
 	(subjectId: string, payload: Partial<LeaderboardUpdatedEventPayload> = {}) => {
 		emit(
-			`leaderboard.updated.v1.${subjectId}`,
+			`leaderboard.updated.v2.${subjectId}`,
 			buildLeaderboardUpdated({ guild_id: subjectId, ...payload }),
 			{
 				validate: false
@@ -364,7 +364,7 @@ Cypress.Commands.add(
 Cypress.Commands.add(
 	'emitLeaderboardTagUpdated',
 	(subjectId: string, payload: Partial<LeaderboardTagUpdatedEventPayload> = {}) => {
-		emit(`leaderboard.tag.updated.v1.${subjectId}`, buildLeaderboardTagUpdated(payload), {
+		emit(`leaderboard.tag.updated.v2.${subjectId}`, buildLeaderboardTagUpdated(payload), {
 			validate: false
 		});
 		return wrapVoid();
@@ -375,7 +375,7 @@ Cypress.Commands.add(
 	'emitLeaderboardTagSwapProcessed',
 	(subjectId: string, payload: Partial<LeaderboardTagSwapProcessedEventPayload> = {}) => {
 		emit(
-			`leaderboard.tag.swap.processed.v1.${subjectId}`,
+			`leaderboard.tag.swap.processed.v2.${subjectId}`,
 			buildLeaderboardTagSwapProcessed(payload),
 			{
 				validate: false

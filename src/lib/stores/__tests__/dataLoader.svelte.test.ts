@@ -116,14 +116,14 @@ describe('DataLoader (dataLoader.svelte.ts)', () => {
 
 			// Verify round request
 			expect(mockNatsRequest).toHaveBeenCalledWith(
-				'round.list.request.v1.club-123',
+				'round.list.request.v2.club-123',
 				{ guild_id: 'guild-456', club_uuid: 'club-123' },
 				{ timeout: 5000 }
 			);
 
 			// Verify leaderboard request
 			expect(mockNatsRequest).toHaveBeenCalledWith(
-				'leaderboard.snapshot.request.v1.club-123',
+				'leaderboard.snapshot.request.v2.club-123',
 				{ guild_id: 'guild-456', club_uuid: 'club-123' },
 				{ timeout: 5000 }
 			);
@@ -179,7 +179,7 @@ describe('DataLoader (dataLoader.svelte.ts)', () => {
 			await dataLoader.loadInitialData();
 
 			expect(mockNatsRequest).toHaveBeenCalledWith(
-				'round.list.request.v1.guild-only',
+				'round.list.request.v2.guild-only',
 				expect.any(Object),
 				expect.any(Object)
 			);

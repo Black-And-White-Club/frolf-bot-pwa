@@ -20,7 +20,7 @@ type CreateRoundRequestedPayloadV1 = {
 	timezone: string;
 };
 
-const CREATE_ROUND_SUBJECT = 'round.creation.requested.v1';
+const CREATE_ROUND_SUBJECT = 'round.creation.requested.v2';
 const FALLBACK_TIMEZONE = 'America/Chicago';
 const ROUND_REQUEST_SOURCE = 'pwa';
 

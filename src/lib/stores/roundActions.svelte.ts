@@ -52,11 +52,11 @@ type DeleteRoundRequestedPayloadV1 = {
 	requesting_user_user_id: string;
 };
 
-const PARTICIPANT_JOIN_SUBJECT = 'round.participant.join.requested.v1';
-const PARTICIPANT_REMOVAL_SUBJECT = 'round.participant.removal.requested.v1';
-const SCORE_UPDATE_SUBJECT = 'round.score.update.requested.v1';
-const ROUND_UPDATE_SUBJECT = 'round.update.requested.v1';
-const ROUND_DELETE_SUBJECT = 'round.delete.requested.v1';
+const PARTICIPANT_JOIN_SUBJECT = 'round.participant.join.requested.v2';
+const PARTICIPANT_REMOVAL_SUBJECT = 'round.participant.removal.requested.v2';
+const SCORE_UPDATE_SUBJECT = 'round.score.update.requested.v2';
+const ROUND_UPDATE_SUBJECT = 'round.update.requested.v2';
+const ROUND_DELETE_SUBJECT = 'round.delete.requested.v2';
 const ROUND_REQUEST_SOURCE = 'pwa';
 const FALLBACK_TIMEZONE = 'America/Chicago';
 

@@ -40,7 +40,7 @@ describe('roundActionsService', () => {
 
 		expect(success).toBe(true);
 		expect(mockPublish).toHaveBeenCalledWith(
-			'round.participant.join.requested.v1',
+			'round.participant.join.requested.v2',
 			{
 				guild_id: 'club-123',
 				round_id: 'round-1',
@@ -65,7 +65,7 @@ describe('roundActionsService', () => {
 
 		expect(success).toBe(true);
 		expect(mockPublish).toHaveBeenCalledWith(
-			'round.score.update.requested.v1',
+			'round.score.update.requested.v2',
 			expect.objectContaining({
 				guild_id: 'guild-fallback'
 			}),
@@ -83,7 +83,7 @@ describe('roundActionsService', () => {
 
 		expect(success).toBe(true);
 		expect(mockPublish).toHaveBeenCalledWith(
-			'round.score.update.requested.v1',
+			'round.score.update.requested.v2',
 			{
 				guild_id: 'guild-123',
 				round_id: 'round-1',
@@ -131,7 +131,7 @@ describe('roundActionsService', () => {
 
 		expect(success).toBe(true);
 		expect(mockPublish).toHaveBeenCalledWith(
-			'round.delete.requested.v1',
+			'round.delete.requested.v2',
 			{
 				guild_id: 'guild-123',
 				round_id: 'round-1',

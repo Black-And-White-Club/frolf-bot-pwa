@@ -100,7 +100,7 @@ class DataLoader {
 				{ guild_id: string; club_uuid: string },
 				RoundListResponseRaw
 			>(
-				`round.list.request.v1.${subjectId}`,
+				`round.list.request.v2.${subjectId}`,
 				{ guild_id: guildId, club_uuid: clubUuid },
 				{ timeout: 5000 }
 			);
@@ -134,7 +134,7 @@ class DataLoader {
 				{ guild_id: string; club_uuid: string },
 				LeaderboardResponseRaw
 			>(
-				`leaderboard.snapshot.request.v1.${subjectId}`,
+				`leaderboard.snapshot.request.v2.${subjectId}`,
 				{ guild_id: guildId, club_uuid: clubUuid },
 				{ timeout: 5000 }
 			);

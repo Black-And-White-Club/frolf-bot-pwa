@@ -63,7 +63,7 @@ describe('adminStore.uploadScorecard', () => {
 		expect(adminStore.errorMessage).toBeNull();
 		expect(mockPublish).toHaveBeenCalledTimes(1);
 		expect(mockPublish).toHaveBeenCalledWith(
-			'round.scorecard.admin.upload.requested.v1',
+			'round.scorecard.admin.upload.requested.v2',
 			expect.objectContaining({
 				guild_id: 'guild-123',
 				user_id: 'admin-123',
