@@ -19,6 +19,7 @@ describe('Round Flow', () => {
 			requiredSubjects: [
 				`round.created.v1.${subjectId}`,
 				`round.started.v1.${subjectId}`,
+				`round.finalized.v1.${subjectId}`,
 				`round.participant.joined.v1.${subjectId}`,
 				`round.participant.score.updated.v1.${subjectId}`,
 				`round.deleted.v1.${subjectId}`

@@ -322,9 +322,15 @@ function validateSchema(schema, value, pathLabel, errors) {
 	const schemaType = typeof schema.type === 'string' ? schema.type : undefined;
 	switch (schemaType) {
 		case 'object':
+			if (typeof value === 'string' && allowsStringForGeneratedObjectSchema(schema, pathLabel)) {
+				return;
+			}
 			validateObjectSchema(schema, value, pathLabel, errors);
 			break;
 		case 'array':
+			if (typeof value === 'string' && allowsStringForGeneratedIDArraySchema(schema, pathLabel)) {
+				return;
+			}
 			validateArraySchema(schema, value, pathLabel, errors);
 			break;
 		case 'string':
@@ -418,4 +424,41 @@ function isObject(value) {
  */
 function isNonEmptyString(value) {
 	return typeof value === 'string' && value.trim().length > 0;
+}
+
+/**
+ * Contract schema generation from Go types may represent `time.Time` as an
+ * empty object schema. Accept string timestamps for these fields.
+ *
+ * @param {Record<string, unknown>} schema
+ * @param {string} pathLabel
+ * @returns {boolean}
+ */
+function allowsStringForGeneratedObjectSchema(schema, pathLabel) {
+	const properties = isObject(schema.properties) ? schema.properties : null;
+	const hasNoProperties = properties !== null && Object.keys(properties).length === 0;
+	if (!hasNoProperties) {
+		return false;
+	}
+
+	const normalizedPath = pathLabel.toLowerCase();
+	return normalizedPath.includes('time') || normalizedPath.includes('date');
+}
+
+/**
+ * Contract schema generation from Go UUID types may represent IDs as integer
+ * byte arrays. Accept string IDs for known ID-like fields.
+ *
+ * @param {Record<string, unknown>} schema
+ * @param {string} pathLabel
+ * @returns {boolean}
+ */
+function allowsStringForGeneratedIDArraySchema(schema, pathLabel) {
+	const itemSchema = isObject(schema.items) ? schema.items : null;
+	if (!itemSchema || itemSchema.type !== 'integer') {
+		return false;
+	}
+
+	const normalizedPath = pathLabel.toLowerCase();
+	return normalizedPath.includes('id');
 }
