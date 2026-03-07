@@ -6,10 +6,18 @@ import { auth } from '$lib/stores/auth.svelte';
 import { page } from '$app/state';
 import { goto } from '$app/navigation';
 
+type MockProfile = {
+	userId: string;
+	displayName: string;
+	avatarUrl: string;
+	udiscUsername?: string;
+	udiscName?: string;
+};
+
 const { mockPublish, mockReload, mockGetProfile } = vi.hoisted(() => ({
 	mockPublish: vi.fn(),
 	mockReload: vi.fn(async () => {}),
-	mockGetProfile: vi.fn(() => undefined)
+	mockGetProfile: vi.fn<(userId: string) => MockProfile | undefined>(() => undefined)
 }));
 
 // Mock stores and modules
@@ -76,6 +84,8 @@ describe('Account Page', () => {
 			status: 200,
 			json: async () => []
 		});
+		mockGetProfile.mockReset();
+		mockGetProfile.mockReturnValue(undefined);
 		// Reset auth state
 		auth.isAuthenticated = true;
 		auth.canEdit = false;
@@ -128,6 +138,27 @@ describe('Account Page', () => {
 	});
 
 	describe('UDisc Identity', () => {
+		it('hydrates the form from profiles cached under the internal user uuid', () => {
+			mockGetProfile.mockImplementation((userId: string) =>
+				userId === 'uuid-123'
+					? {
+							userId,
+							displayName: 'Disc User',
+							avatarUrl: '',
+							udiscUsername: 'disc-user',
+							udiscName: 'Disc User'
+						}
+					: undefined
+			);
+
+			const { getByLabelText } = render(AccountPage);
+
+			expect((getByLabelText('UDisc Username') as HTMLInputElement).value).toBe('disc-user');
+			expect((getByLabelText('UDisc Display Name') as HTMLInputElement).value).toBe(
+				'Disc User'
+			);
+		});
+
 		it('publishes UDisc identity update request', async () => {
 			const { getByLabelText, getByRole } = render(AccountPage);
 

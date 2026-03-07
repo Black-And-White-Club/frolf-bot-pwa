@@ -90,7 +90,18 @@ interface ParticipantJoinedPayloadV1 {
 	tentative_participants?: RoundParticipantPayload[];
 }
 
-type ParticipantRemovedPayloadV1 = ParticipantJoinedPayloadV1;
+type ParticipantSnapshotPayload = {
+	accepted_participants?: RoundParticipantPayload[];
+	declined_participants?: RoundParticipantPayload[];
+	tentative_participants?: RoundParticipantPayload[];
+};
+
+type ParticipantRemovedPayloadV1 = ParticipantSnapshotPayload & {
+	round_id: WireRoundID;
+	guild_id: string;
+	discord_message_id: string;
+	user_id: string;
+};
 
 interface ParticipantScoreUpdatedPayloadV1 {
 	round_id: WireRoundID;
@@ -247,11 +258,16 @@ class SubscriptionManager {
 				const roundId = roundIdFromWire(payload.round_id);
 				if (!roundId) return;
 
-				const participants = flattenParticipants(payload);
-				roundService.handleRoundUpdated({
-					roundId,
-					update: { participants }
-				});
+				if (hasParticipantSnapshot(payload)) {
+					const participants = flattenParticipants(payload);
+					roundService.handleRoundUpdated({
+						roundId,
+						update: { participants }
+					});
+					return;
+				}
+
+				roundService.removeParticipant(roundId, payload.user_id);
 			})
 		);
 
@@ -353,7 +369,15 @@ function toOptionalNumber(value: number | null | undefined): number | undefined 
 	return typeof value === 'number' ? value : undefined;
 }
 
-function flattenParticipants(payload: ParticipantJoinedPayloadV1) {
+function hasParticipantSnapshot(payload: ParticipantSnapshotPayload): boolean {
+	return (
+		Array.isArray(payload.accepted_participants) ||
+		Array.isArray(payload.declined_participants) ||
+		Array.isArray(payload.tentative_participants)
+	);
+}
+
+function flattenParticipants(payload: ParticipantJoinedPayloadV1 | ParticipantSnapshotPayload) {
 	const accepted = (payload.accepted_participants || []).map((participant) =>
 		toParticipant(participant, 'accepted')
 	);

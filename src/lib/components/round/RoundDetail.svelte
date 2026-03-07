@@ -97,7 +97,10 @@
 			(round?.state === 'scheduled' || round?.state === 'started')
 	);
 	let canSubmitScore = $derived(
-		auth.isAuthenticated && auth.activeRole !== 'viewer' && round?.state === 'started'
+		auth.isAuthenticated &&
+			auth.activeRole !== 'viewer' &&
+			round?.state === 'started' &&
+			currentParticipant?.response === 'accepted'
 	);
 	let canEditRound = $derived(auth.canEdit && round?.state === 'scheduled');
 	let canDeleteRound = $derived(
@@ -183,6 +186,10 @@
 	async function handleScoreSubmit(event: SubmitEvent): Promise<void> {
 		event.preventDefault();
 		if (!round) return;
+		if (currentParticipant?.response !== 'accepted') {
+			roundActionsService.errorMessage = 'Join the round before submitting a score.';
+			return;
+		}
 
 		const score = Number.parseInt(scoreInput, 10);
 		if (!Number.isFinite(score)) {

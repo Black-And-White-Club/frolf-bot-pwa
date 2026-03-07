@@ -86,6 +86,8 @@ describe('RoundDetail', () => {
 		mockRoundActionsService.setParticipantResponse.mockResolvedValue(true);
 		mockRoundActionsService.leaveRound.mockReset();
 		mockRoundActionsService.leaveRound.mockResolvedValue(true);
+		mockRoundActionsService.submitScore.mockReset();
+		mockRoundActionsService.submitScore.mockResolvedValue(true);
 		mockRoundActionsService.updateRound.mockReset();
 		mockRoundActionsService.updateRound.mockResolvedValue(true);
 		mockRoundActionsService.deleteRound.mockReset();
@@ -131,6 +133,45 @@ describe('RoundDetail', () => {
 		await fireEvent.click(getByRole('button', { name: 'Leave' }));
 
 		expect(mockRoundActionsService.leaveRound).toHaveBeenCalledWith('123');
+	});
+
+	it('hides score submission until the current user has joined the started round', () => {
+		mockAuth.isAuthenticated = true;
+		mockAuth.activeRole = 'player';
+		mockAuth.user = { id: 'player-1', guildId: 'guild-1' };
+		mockRoundService.rounds = [
+			{
+				...structuredClone(baseRound),
+				state: 'started'
+			}
+		];
+
+		const { queryByLabelText, queryByRole } = render(RoundDetail, { props: { roundId: '123' } });
+
+		expect(queryByLabelText('Submit score')).toBeNull();
+		expect(queryByRole('button', { name: 'Save' })).toBeNull();
+	});
+
+	it('allows accepted participants to submit scores for started rounds', async () => {
+		mockAuth.isAuthenticated = true;
+		mockAuth.activeRole = 'player';
+		mockAuth.user = { id: 'player-1', guildId: 'guild-1' };
+		mockRoundService.rounds = [
+			{
+				...structuredClone(baseRound),
+				state: 'started',
+				participants: [{ userId: 'player-1', response: 'accepted', score: null }]
+			}
+		];
+
+		const { getByLabelText, getByRole } = render(RoundDetail, { props: { roundId: '123' } });
+
+		await fireEvent.input(getByLabelText('Submit score'), {
+			target: { value: '-4' }
+		});
+		await fireEvent.click(getByRole('button', { name: 'Save' }));
+
+		expect(mockRoundActionsService.submitScore).toHaveBeenCalledWith('123', -4);
 	});
 
 	it('allows round owner editor to request update and delete', async () => {

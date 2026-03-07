@@ -44,7 +44,13 @@
 	const isGoogleLinked = $derived(auth.user?.linkedProviders.includes('google') ?? false);
 
 	const canManageInvites = $derived(auth.canEdit);
-	const currentUserProfile = $derived(auth.user?.id ? userProfiles.getProfile(auth.user.id) : undefined);
+	const currentUserProfile = $derived.by(() => {
+		if (!auth.user) {
+			return undefined;
+		}
+
+		return userProfiles.getProfile(auth.user.uuid) ?? userProfiles.getProfile(auth.user.id);
+	});
 
 	// --- Redirect if not authenticated ---
 	$effect(() => {
