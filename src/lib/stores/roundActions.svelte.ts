@@ -1,5 +1,6 @@
 import { auth } from './auth.svelte';
 import { nats } from './nats.svelte';
+import { roundService } from './round.svelte';
 
 type ParticipantResponse = 'ACCEPT' | 'DECLINE' | 'TENTATIVE';
 
@@ -124,6 +125,24 @@ class RoundActionsService {
 		});
 	}
 
+	private canManageRound(roundId: string, userId: string): boolean {
+		if (auth.canEdit) {
+			return true;
+		}
+
+		const round = roundService.rounds.find((entry) => entry.id === roundId);
+		return round?.createdBy === userId;
+	}
+
+	private requireRoundManager(roundId: string, userId: string, action: 'edit' | 'delete'): boolean {
+		if (this.canManageRound(roundId, userId)) {
+			return true;
+		}
+
+		this.errorMessage = `Round creator, editor, or admin role is required to ${action} rounds.`;
+		return false;
+	}
+
 	async setParticipantResponse(roundId: string, response: ParticipantResponse): Promise<boolean> {
 		if (this.isPending(roundId)) {
 			return false;
@@ -231,8 +250,7 @@ class RoundActionsService {
 			return false;
 		}
 
-		if (!auth.canEdit) {
-			this.errorMessage = 'Editor or admin role is required to edit rounds.';
+		if (!this.requireRoundManager(roundId, context.userId, 'edit')) {
 			return false;
 		}
 
@@ -272,8 +290,7 @@ class RoundActionsService {
 			return false;
 		}
 
-		if (!auth.canEdit) {
-			this.errorMessage = 'Editor or admin role is required to delete rounds.';
+		if (!this.requireRoundManager(roundId, context.userId, 'delete')) {
 			return false;
 		}
 

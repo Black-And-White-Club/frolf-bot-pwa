@@ -32,11 +32,11 @@ interface RoundCreatedPayloadV1 {
 	BaseRoundPayload: BaseRoundPayloadV1;
 }
 
-interface RoundUpdatedPayload {
-	round_id?: string;
+type RoundUpdatedPayload = {
+	round_id?: WireRoundID;
 	roundId?: string;
 	update?: Partial<Round>;
-}
+};
 
 interface RoundDeletedPayloadV1 {
 	round_id: WireRoundID;
@@ -162,8 +162,12 @@ class SubscriptionManager {
 		this.unsubscribers.push(
 			nats.subscribe(`round.updated.v2.${guildId}`, (msg) => {
 				const payload = msg.data as RoundUpdatedPayload;
-				const roundId = payload.roundId || payload.round_id;
-				if (!roundId || !payload.update) return;
+				const roundId = payload.roundId || roundIdFromWire(payload.round_id);
+				if (!roundId) return;
+				if (!payload.update) {
+					void dataLoader.reload();
+					return;
+				}
 				roundService.handleRoundUpdated({ roundId, update: payload.update });
 			})
 		);
@@ -264,6 +268,10 @@ class SubscriptionManager {
 						roundId,
 						update: { participants }
 					});
+					return;
+				}
+
+				if (!payload.user_id) {
 					return;
 				}
 
@@ -377,7 +385,7 @@ function hasParticipantSnapshot(payload: ParticipantSnapshotPayload): boolean {
 	);
 }
 
-function flattenParticipants(payload: ParticipantJoinedPayloadV1 | ParticipantSnapshotPayload) {
+function flattenParticipants(payload: ParticipantSnapshotPayload) {
 	const accepted = (payload.accepted_participants || []).map((participant) =>
 		toParticipant(participant, 'accepted')
 	);

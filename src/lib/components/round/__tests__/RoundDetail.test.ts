@@ -174,10 +174,10 @@ describe('RoundDetail', () => {
 		expect(mockRoundActionsService.submitScore).toHaveBeenCalledWith('123', -4);
 	});
 
-	it('allows round owner editor to request update and delete', async () => {
+	it('allows round creators to request update and delete without editor access', async () => {
 		mockAuth.isAuthenticated = true;
-		mockAuth.activeRole = 'editor';
-		mockAuth.canEdit = true;
+		mockAuth.activeRole = 'player';
+		mockAuth.canEdit = false;
 		mockAuth.user = { id: 'owner-1', guildId: 'guild-1' };
 
 		const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
@@ -201,6 +201,23 @@ describe('RoundDetail', () => {
 		await waitFor(() => {
 			expect(mockGoto).toHaveBeenCalledWith('/rounds');
 		});
+
+		confirmSpy.mockRestore();
+	});
+
+	it('allows editors to delete rounds they did not create', async () => {
+		mockAuth.isAuthenticated = true;
+		mockAuth.activeRole = 'editor';
+		mockAuth.canEdit = true;
+		mockAuth.user = { id: 'editor-2', guildId: 'guild-1' };
+
+		const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+		const { getByRole } = render(RoundDetail, { props: { roundId: '123' } });
+
+		await fireEvent.click(getByRole('button', { name: 'Delete round' }));
+		expect(confirmSpy).toHaveBeenCalledWith('Delete this round? This cannot be undone.');
+		expect(mockRoundActionsService.deleteRound).toHaveBeenCalledWith('123');
 
 		confirmSpy.mockRestore();
 	});

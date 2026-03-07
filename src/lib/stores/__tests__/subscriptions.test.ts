@@ -115,6 +115,34 @@ describe('subscriptionManager', () => {
 		subscriptionManager.start('guild-1');
 	});
 
+	it('reloads round data when round.updated.v2 only includes round identity', () => {
+		emit('round.updated.v2.guild-1', {
+			guild_id: 'guild-1',
+			round_id: wireRoundId
+		});
+
+		expect(mockDataLoader.reload).toHaveBeenCalledTimes(1);
+		expect(mockRoundService.handleRoundUpdated).not.toHaveBeenCalled();
+	});
+
+	it('normalizes round.updated.v2 round ids when an inline update is present', () => {
+		emit('round.updated.v2.guild-1', {
+			guild_id: 'guild-1',
+			round_id: wireRoundId,
+			update: {
+				title: 'Updated title'
+			}
+		});
+
+		expect(mockRoundService.handleRoundUpdated).toHaveBeenCalledWith({
+			roundId: normalizedRoundId,
+			update: {
+				title: 'Updated title'
+			}
+		});
+		expect(mockDataLoader.reload).not.toHaveBeenCalled();
+	});
+
 	it('removes a single participant when round.participant.removed.v2 omits snapshots', () => {
 		emit('round.participant.removed.v2.guild-1', {
 			guild_id: 'guild-1',

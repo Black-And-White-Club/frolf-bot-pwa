@@ -102,10 +102,16 @@
 			round?.state === 'started' &&
 			currentParticipant?.response === 'accepted'
 	);
-	let canEditRound = $derived(auth.canEdit && round?.state === 'scheduled');
-	let canDeleteRound = $derived(
-		canEditRound && Boolean(round && currentUserId && round.createdBy === currentUserId)
+	let canManageRound = $derived(
+		Boolean(
+			auth.isAuthenticated &&
+				round?.state === 'scheduled' &&
+				currentUserId &&
+				(auth.canEdit || round.createdBy === currentUserId)
+		)
 	);
+	let canEditRound = $derived(canManageRound);
+	let canDeleteRound = $derived(canManageRound);
 	let isRoundActionPending = $derived(round ? roundActionsService.isPending(round.id) : false);
 
 	let showEditForm = $state(false);

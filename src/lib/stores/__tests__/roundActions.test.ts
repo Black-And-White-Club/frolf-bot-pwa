@@ -10,8 +10,16 @@ const mockAuth = {
 	user: null as { activeClubUuid?: string; guildId?: string; id?: string } | null
 };
 
+const mockRoundService = {
+	rounds: [] as Array<{ id: string; createdBy: string }>
+};
+
 vi.mock('../auth.svelte', () => ({
 	auth: mockAuth
+}));
+
+vi.mock('../round.svelte', () => ({
+	roundService: mockRoundService
 }));
 
 vi.mock('../nats.svelte', () => ({
@@ -28,6 +36,7 @@ describe('roundActionsService', () => {
 		mockAuth.canEdit = false;
 		mockAuth.activeRole = 'viewer';
 		mockAuth.user = null;
+		mockRoundService.rounds = [];
 	});
 
 	it('publishes participant RSVP updates for players', async () => {
@@ -100,11 +109,12 @@ describe('roundActionsService', () => {
 		);
 	});
 
-	it('requires editor permissions to update rounds', async () => {
+	it('requires creator, editor, or admin permissions to update rounds', async () => {
 		mockAuth.isAuthenticated = true;
 		mockAuth.activeRole = 'player';
 		mockAuth.canEdit = false;
 		mockAuth.user = { guildId: 'guild-123', id: 'user-123' };
+		mockRoundService.rounds = [{ id: 'round-1', createdBy: 'owner-456' }];
 
 		const mod = await import('../roundActions.svelte');
 		const success = await mod.roundActionsService.updateRound('round-1', {
@@ -116,8 +126,73 @@ describe('roundActionsService', () => {
 		});
 
 		expect(success).toBe(false);
-		expect(mod.roundActionsService.errorMessage).toContain('Editor or admin');
+		expect(mod.roundActionsService.errorMessage).toContain('Round creator, editor, or admin');
 		expect(mockPublish).not.toHaveBeenCalled();
+	});
+
+	it('allows round creators to update rounds without editor access', async () => {
+		mockAuth.isAuthenticated = true;
+		mockAuth.activeRole = 'player';
+		mockAuth.canEdit = false;
+		mockAuth.user = { guildId: 'guild-123', id: 'user-123' };
+		mockRoundService.rounds = [{ id: 'round-1', createdBy: 'user-123' }];
+
+		const mod = await import('../roundActions.svelte');
+		const success = await mod.roundActionsService.updateRound('round-1', {
+			title: 'Updated',
+			description: 'New description',
+			startTime: '2026-03-05T18:30',
+			timezone: 'America/New_York',
+			location: 'Pier Park'
+		});
+
+		expect(success).toBe(true);
+		expect(mockPublish).toHaveBeenCalledWith(
+			'round.update.requested.v2',
+			{
+				guild_id: 'guild-123',
+				round_id: 'round-1',
+				user_id: 'user-123',
+				channel_id: '',
+				message_id: '',
+				title: 'Updated',
+				description: 'New description',
+				start_time: '2026-03-05T18:30',
+				timezone: 'America/New_York',
+				location: 'Pier Park'
+			},
+			expect.objectContaining({
+				correlation_id: expect.any(String),
+				submitted_at: expect.any(String),
+				source: 'pwa'
+			})
+		);
+	});
+
+	it('allows round creators to delete rounds without editor access', async () => {
+		mockAuth.isAuthenticated = true;
+		mockAuth.activeRole = 'player';
+		mockAuth.canEdit = false;
+		mockAuth.user = { guildId: 'guild-123', id: 'user-123' };
+		mockRoundService.rounds = [{ id: 'round-1', createdBy: 'user-123' }];
+
+		const mod = await import('../roundActions.svelte');
+		const success = await mod.roundActionsService.deleteRound('round-1');
+
+		expect(success).toBe(true);
+		expect(mockPublish).toHaveBeenCalledWith(
+			'round.delete.requested.v2',
+			{
+				guild_id: 'guild-123',
+				round_id: 'round-1',
+				requesting_user_user_id: 'user-123'
+			},
+			expect.objectContaining({
+				correlation_id: expect.any(String),
+				submitted_at: expect.any(String),
+				source: 'pwa'
+			})
+		);
 	});
 
 	it('publishes round delete for editors', async () => {

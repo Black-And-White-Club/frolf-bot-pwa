@@ -5052,9 +5052,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       }
     },
     {
-      "subject": "leaderboard.get.season.standings.v1.>",
-      "subject_pattern": "leaderboard.get.season.standings.v1.>",
-      "supports_scoped_suffix": false,
+      "subject": "leaderboard.get.season.standings.v1",
+      "subject_pattern": "leaderboard.get.season.standings.v1.{scope_id}",
+      "supports_scoped_suffix": true,
       "summary": "Get Season Standings",
       "description": "Request season standings.",
       "producer": {
@@ -5180,9 +5180,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       }
     },
     {
-      "subject": "leaderboard.manual.point.adjustment.v2.>",
-      "subject_pattern": "leaderboard.manual.point.adjustment.v2.>",
-      "supports_scoped_suffix": false,
+      "subject": "leaderboard.manual.point.adjustment.v2",
+      "subject_pattern": "leaderboard.manual.point.adjustment.v2.{scope_id}",
+      "supports_scoped_suffix": true,
       "summary": "Manual Point Adjustment",
       "description": "Request manual point adjustment.",
       "producer": {
@@ -5272,9 +5272,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       }
     },
     {
-      "subject": "leaderboard.point.history.requested.v1.>",
-      "subject_pattern": "leaderboard.point.history.requested.v1.>",
-      "supports_scoped_suffix": false,
+      "subject": "leaderboard.point.history.requested.v1",
+      "subject_pattern": "leaderboard.point.history.requested.v1.{scope_id}",
+      "supports_scoped_suffix": true,
       "summary": "Point History Requested",
       "description": "Request point history for a member.",
       "producer": {
@@ -5488,9 +5488,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       }
     },
     {
-      "subject": "leaderboard.recalculate.round.v1.>",
-      "subject_pattern": "leaderboard.recalculate.round.v1.>",
-      "supports_scoped_suffix": false,
+      "subject": "leaderboard.recalculate.round.v1",
+      "subject_pattern": "leaderboard.recalculate.round.v1.{scope_id}",
+      "supports_scoped_suffix": true,
       "summary": "Recalculate Round",
       "description": "Request round recalculation.",
       "producer": {
@@ -6011,9 +6011,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       }
     },
     {
-      "subject": "leaderboard.start.new.season.v1.>",
-      "subject_pattern": "leaderboard.start.new.season.v1.>",
-      "supports_scoped_suffix": false,
+      "subject": "leaderboard.start.new.season.v1",
+      "subject_pattern": "leaderboard.start.new.season.v1.{scope_id}",
+      "supports_scoped_suffix": true,
       "summary": "Start New Season",
       "description": "Request to start a new season.",
       "producer": {
@@ -9068,6 +9068,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
           "location": {
             "type": "string"
           },
+          "request_source": {
+            "type": "string"
+          },
           "start_time": {
             "type": "string"
           },
@@ -9838,6 +9841,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
           "guild_id": {
             "type": "string"
           },
+          "request_source": {
+            "type": "string"
+          },
           "round": {
             "additionalProperties": false,
             "properties": {
@@ -10362,6 +10368,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
           "guild_id": {
             "type": "string"
           },
+          "native_event_planned": {
+            "type": "boolean"
+          },
           "round_id": {
             "items": {
               "minimum": 0,
@@ -10477,6 +10486,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
           },
           "guild_id": {
             "type": "string"
+          },
+          "native_event_planned": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -14932,6 +14944,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
           },
           "guild_id": {
             "type": "string"
+          },
+          "native_event_planned": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -18862,6 +18877,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                 "type": "string"
               },
               "location": {
+                "type": "string"
+              },
+              "request_source": {
                 "type": "string"
               },
               "start_time": {
