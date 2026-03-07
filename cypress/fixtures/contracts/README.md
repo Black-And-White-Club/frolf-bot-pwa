@@ -1,6 +1,6 @@
 # Contract Scenario Fixtures
 
-These fixtures are validated against `contracts/events.v1.json` (generated from `frolf-bot-shared`) to prevent topic/payload drift.
+These fixtures are validated against `contracts/events.contracts.json` (generated from `frolf-bot-shared`) to prevent topic/payload drift.
 
 ## Format
 

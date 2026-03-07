@@ -87,7 +87,8 @@ describe('createRoundService', () => {
 				location: 'Pier Park',
 				user_id: 'user-123',
 				channel_id: '',
-				timezone: 'America/Chicago'
+				timezone: 'America/Chicago',
+				request_source: 'pwa'
 			},
 			{
 				correlation_id: expect.any(String),

@@ -94,4 +94,34 @@ describe('adminStore.uploadScorecard', () => {
 		expect(mockPublish).not.toHaveBeenCalled();
 		expect(adminStore.errorMessage).toBe('Only .csv and .xlsx files are supported');
 	});
+
+	it('publishes manual point adjustments to the exact unscoped subject', async () => {
+		let successHandler: ((msg: any) => void) | undefined;
+		mockSubscribe.mockImplementation((topic: string, handler: (msg: any) => void) => {
+			if (topic === 'leaderboard.manual.point.adjustment.success.v2') {
+				successHandler = handler;
+			}
+		});
+
+		const { adminStore } = await import('../admin.svelte');
+		const pending = adminStore.adjustPoints('guild-123', 'admin-123', 'member-456', 5, 'Bonus points');
+
+		expect(mockPublish).toHaveBeenCalledWith('leaderboard.manual.point.adjustment.v2', {
+			guild_id: 'guild-123',
+			member_id: 'member-456',
+			points_delta: 5,
+			reason: 'Bonus points',
+			admin_id: 'admin-123'
+		});
+		expect(mockPublish).not.toHaveBeenCalledWith(
+			expect.stringMatching(/^leaderboard\.manual\.point\.adjustment\.v2\./),
+			expect.anything()
+		);
+
+		successHandler?.({ data: { reason: 'Bonus points' } });
+		await pending;
+
+		expect(adminStore.errorMessage).toBeNull();
+		expect(adminStore.successMessage).toContain('+5');
+	});
 });
