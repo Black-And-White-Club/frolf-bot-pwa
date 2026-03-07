@@ -18,6 +18,7 @@ type CreateRoundRequestedPayloadV1 = {
 	user_id: string;
 	channel_id: string;
 	timezone: string;
+	request_source: string;
 };
 
 const CREATE_ROUND_SUBJECT = 'round.creation.requested.v2';
@@ -62,7 +63,8 @@ class CreateRoundService {
 			location: input.location.trim(),
 			user_id: context.userId,
 			channel_id: '',
-			timezone: this.normalizeTimezone(input.timezone)
+			timezone: this.normalizeTimezone(input.timezone),
+			request_source: ROUND_REQUEST_SOURCE
 		};
 
 		const description = input.description.trim();
