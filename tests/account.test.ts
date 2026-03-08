@@ -184,7 +184,7 @@ describe('Account Page', () => {
 					})
 				);
 			});
-			expect(mockReload).toHaveBeenCalled();
+			expect(mockReload).not.toHaveBeenCalled();
 		});
 
 		it('falls back to guild id when active club uuid is unavailable', async () => {

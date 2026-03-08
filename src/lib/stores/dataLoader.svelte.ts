@@ -1,6 +1,7 @@
 import { nats } from './nats.svelte';
 import { roundService, type RoundRaw } from './round.svelte';
 import { leaderboardService, type LeaderboardResponseRaw } from './leaderboard.svelte';
+import { roundActionsService } from './roundActions.svelte';
 import { tagStore, type TagListResponseRaw } from './tags.svelte';
 import { auth } from './auth.svelte';
 import { userProfiles, type UserProfileRaw } from './userProfiles.svelte';
@@ -107,6 +108,7 @@ class DataLoader {
 
 			if (response?.rounds) {
 				roundService.setRoundsFromApi(response.rounds);
+				roundActionsService.reconcileAllFromSnapshot();
 			}
 			// Store profiles if included
 			if (response?.profiles) {

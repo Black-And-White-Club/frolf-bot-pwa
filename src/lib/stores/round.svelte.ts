@@ -134,7 +134,7 @@ export class RoundService {
 	// State
 	rounds = $state<Round[]>([]);
 	selectedRoundId = $state<string | null>(null);
-	isLoading = $state(false);
+	isLoading = $state(true);
 	lastError = $state<string | null>(null);
 
 	// Derived

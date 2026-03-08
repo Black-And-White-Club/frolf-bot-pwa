@@ -12,6 +12,7 @@ import {
 	type RoundRaw
 } from './round.svelte';
 import { leaderboardService } from './leaderboard.svelte';
+import { roundActionsService } from './roundActions.svelte';
 import { tagStore } from './tags.svelte';
 import { dataLoader } from './dataLoader.svelte';
 
@@ -165,10 +166,12 @@ class SubscriptionManager {
 				const roundId = payload.roundId || roundIdFromWire(payload.round_id);
 				if (!roundId) return;
 				if (!payload.update) {
+					roundActionsService.reconcileRound(roundId, 'round-updated');
 					void dataLoader.reload();
 					return;
 				}
 				roundService.handleRoundUpdated({ roundId, update: payload.update });
+				roundActionsService.reconcileRound(roundId, 'round-updated');
 			})
 		);
 
@@ -179,6 +182,7 @@ class SubscriptionManager {
 				const roundId = roundIdFromWire(payload.round_id);
 				if (!roundId) return;
 				roundService.handleRoundDeleted({ roundId });
+				roundActionsService.reconcileRound(roundId, 'round-deleted');
 			})
 		);
 
@@ -199,6 +203,7 @@ class SubscriptionManager {
 					roundId,
 					update
 				});
+				roundActionsService.reconcileRound(roundId, 'round-updated');
 			})
 		);
 
@@ -218,6 +223,7 @@ class SubscriptionManager {
 					roundId,
 					update: buildFinalizedRoundUpdate(payload)
 				});
+				roundActionsService.reconcileRound(roundId, 'round-updated');
 			})
 		);
 
@@ -235,6 +241,7 @@ class SubscriptionManager {
 					roundId,
 					update: { participants }
 				});
+				roundActionsService.reconcileRound(roundId, 'participant-updated');
 			})
 		);
 
@@ -251,6 +258,7 @@ class SubscriptionManager {
 						roundId,
 						update: { participants }
 					});
+					roundActionsService.reconcileRound(roundId, 'participant-updated');
 					return;
 				}
 
@@ -259,6 +267,7 @@ class SubscriptionManager {
 				}
 
 				roundService.removeParticipant(roundId, payload.user_id);
+				roundActionsService.reconcileRound(roundId, 'participant-updated');
 			})
 		);
 
@@ -274,6 +283,7 @@ class SubscriptionManager {
 						roundId,
 						participants: payload.participants.map(toParticipantRaw)
 					});
+					roundActionsService.reconcileRound(roundId, 'score-updated');
 					return;
 				}
 
@@ -285,6 +295,7 @@ class SubscriptionManager {
 					userId: payload.user_id,
 					score: payload.score
 				});
+				roundActionsService.reconcileRound(roundId, 'score-updated');
 			})
 		);
 	}

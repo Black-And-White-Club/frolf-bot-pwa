@@ -35,6 +35,9 @@ async function main() {
 		const raw = await fs.readFile(REPORT, 'utf-8');
 		const json = JSON.parse(raw);
 
+		console.log(`Report URL: ${json.finalDisplayedUrl || json.requestedUrl || 'n/a'}`);
+		console.log(`Captured: ${json.fetchTime || 'n/a'}`);
+
 		const categories = json.categories || {};
 		console.log('\nLighthouse summary:');
 		for (const [key, cat] of Object.entries(categories)) {

@@ -3,7 +3,6 @@
 	import { goto } from '$app/navigation';
 	import { auth } from '$lib/stores/auth.svelte';
 	import { clubService } from '$lib/stores/club.svelte';
-	import { dataLoader } from '$lib/stores/dataLoader.svelte';
 	import { nats } from '$lib/stores/nats.svelte';
 	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 
@@ -14,6 +13,11 @@
 		max_uses: number | null;
 		expires_at: string | null;
 		created_at: string;
+	};
+
+	type PendingUdiscIdentity = {
+		username?: string;
+		name?: string;
 	};
 
 	// --- State ---
@@ -35,6 +39,7 @@
 	let udiscSubmitting = $state(false);
 	let udiscError = $state<string | null>(null);
 	let udiscSuccess = $state<string | null>(null);
+	let pendingUdiscIdentity = $state<PendingUdiscIdentity | null>(null);
 
 	// Success message from link callback
 	const linkSuccess = $derived(page.url.searchParams.get('success') === 'linked');
@@ -70,8 +75,32 @@
 		if (!currentUserProfile) {
 			return;
 		}
-		udiscUsername = currentUserProfile.udiscUsername ?? '';
-		udiscName = currentUserProfile.udiscName ?? '';
+
+		const nextUsername = currentUserProfile.udiscUsername ?? '';
+		const nextName = currentUserProfile.udiscName ?? '';
+
+		if (pendingUdiscIdentity) {
+			const usernameSettled =
+				pendingUdiscIdentity.username === undefined ||
+				nextUsername === pendingUdiscIdentity.username;
+			const nameSettled =
+				pendingUdiscIdentity.name === undefined || nextName === pendingUdiscIdentity.name;
+
+			if (usernameSettled && nameSettled) {
+				pendingUdiscIdentity = null;
+			} else {
+				if (pendingUdiscIdentity.username === undefined) {
+					udiscUsername = nextUsername;
+				}
+				if (pendingUdiscIdentity.name === undefined) {
+					udiscName = nextName;
+				}
+				return;
+			}
+		}
+
+		udiscUsername = nextUsername;
+		udiscName = nextName;
 	});
 
 	async function loadInvites() {
@@ -210,6 +239,10 @@
 		udiscSubmitting = true;
 		udiscError = null;
 		udiscSuccess = null;
+		pendingUdiscIdentity = {
+			...(username ? { username } : {}),
+			...(name ? { name } : {})
+		};
 
 		try {
 			nats.publish(
@@ -227,8 +260,8 @@
 				}
 			);
 			udiscSuccess = 'UDisc identity update requested.';
-			await dataLoader.reload();
 		} catch (error) {
+			pendingUdiscIdentity = null;
 			udiscError = error instanceof Error ? error.message : 'Failed to request UDisc update.';
 		} finally {
 			udiscSubmitting = false;

@@ -11,7 +11,19 @@ const mockAuth = {
 };
 
 const mockRoundService = {
-	rounds: [] as Array<{ id: string; createdBy: string }>
+	rounds: [] as Array<{
+		id: string;
+		createdBy: string;
+		title?: string;
+		description?: string;
+		location?: string;
+		participants?: Array<{
+			userId: string;
+			response: 'accepted' | 'declined' | 'tentative';
+			score: number | null;
+			tagNumber: number | null;
+		}>;
+	}>
 };
 
 vi.mock('../auth.svelte', () => ({
@@ -62,6 +74,60 @@ describe('roundActionsService', () => {
 				source: 'pwa'
 			})
 		);
+	});
+
+	it('keeps RSVP requests pending until the round state reflects the change', async () => {
+		mockAuth.isAuthenticated = true;
+		mockAuth.activeRole = 'player';
+		mockAuth.user = { activeClubUuid: 'club-123', guildId: 'guild-123', id: 'user-123' };
+		mockRoundService.rounds = [{ id: 'round-1', createdBy: 'owner-456', participants: [] }];
+
+		const mod = await import('../roundActions.svelte');
+		const success = await mod.roundActionsService.setParticipantResponse('round-1', 'ACCEPT');
+
+		expect(success).toBe(true);
+		expect(mod.roundActionsService.isPending('round-1')).toBe(true);
+
+		mockRoundService.rounds = [
+			{
+				id: 'round-1',
+				createdBy: 'owner-456',
+				participants: [
+					{
+						userId: 'user-123',
+						response: 'accepted',
+						score: null,
+						tagNumber: null
+					}
+				]
+			}
+		];
+
+		mod.roundActionsService.reconcileRound('round-1', 'participant-updated');
+
+		expect(mod.roundActionsService.isPending('round-1')).toBe(false);
+	});
+
+	it('clears stuck pending requests after the timeout fallback', async () => {
+		vi.useFakeTimers();
+		mockAuth.isAuthenticated = true;
+		mockAuth.activeRole = 'player';
+		mockAuth.user = { activeClubUuid: 'club-123', guildId: 'guild-123', id: 'user-123' };
+		mockRoundService.rounds = [{ id: 'round-1', createdBy: 'owner-456', participants: [] }];
+
+		try {
+			const mod = await import('../roundActions.svelte');
+			await mod.roundActionsService.setParticipantResponse('round-1', 'ACCEPT');
+
+			expect(mod.roundActionsService.isPending('round-1')).toBe(true);
+
+			await vi.advanceTimersByTimeAsync(15_000);
+
+			expect(mod.roundActionsService.isPending('round-1')).toBe(false);
+			expect(mod.roundActionsService.errorMessage).toContain('Still waiting');
+		} finally {
+			vi.useRealTimers();
+		}
 	});
 
 	it('falls back to guild id when active club uuid is unavailable', async () => {

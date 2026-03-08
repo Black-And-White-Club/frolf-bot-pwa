@@ -15,7 +15,7 @@
 
 	// computed class strings for the track and knob to keep markup clean
 	const trackClasses = $derived(
-		`relative inline-block rounded-full bg-[var(--guild-border)] border border-[var(--guild-text-secondary)]/30 transition-colors duration-200 ${
+		`relative inline-block rounded-full bg-[var(--guild-border)] border border-[var(--guild-text-secondary)]/30 transition-[background-color] duration-200 ${
 			size === 'sm' ? 'h-5 w-10' : 'h-6 w-12'
 		}`
 	);

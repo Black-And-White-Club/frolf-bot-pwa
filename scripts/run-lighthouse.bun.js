@@ -6,8 +6,18 @@ import fs from 'fs';
 import path from 'path';
 
 const __dirname = new URL('.', import.meta.url).pathname;
-const HOST = process.env.LH_HOST || 'http://localhost:5173';
+const HOST = process.env.LH_HOST || 'http://127.0.0.1:4173';
 const TIMEOUT = Number(process.env.LH_TIMEOUT || 45000);
+const PREVIEW_URL = new URL(HOST);
+const PREVIEW_HOST = PREVIEW_URL.hostname;
+const PREVIEW_PORT = PREVIEW_URL.port || (PREVIEW_URL.protocol === 'https:' ? '443' : '80');
+const VITE_BIN = path.resolve(
+	__dirname,
+	'..',
+	'node_modules',
+	'.bin',
+	process.platform === 'win32' ? 'vite.cmd' : 'vite'
+);
 
 function sleep(ms) {
 	return new Promise((r) => setTimeout(r, ms));
@@ -94,16 +104,15 @@ async function main() {
 
 	console.log('2) Starting preview server');
 	const preview = Bun.spawn({
-		cmd: ['bun', 'run', 'preview', '--', '--port', '5173'],
+		cmd: [VITE_BIN, 'preview', '--host', PREVIEW_HOST, '--port', PREVIEW_PORT],
 		env: {
 			...process.env,
+			PRIVATE_API_URL: process.env.PRIVATE_API_URL || 'http://localhost:8080',
 			PUBLIC_ALLOW_MOCK_PROD: 'true'
 		},
 		stdout: 'inherit',
 		stderr: 'inherit',
-		stdin: 'pipe',
-		// run detached so its exit code doesn't automatically bubble and cause bun to report an error
-		detached: true
+		stdin: 'pipe'
 	});
 
 	// ensure preview is killed on exit
@@ -131,7 +140,9 @@ async function main() {
 			// ignore
 		}
 
-		const htmlPath = path.resolve(distDir, 'lighthouse.html');
+		const reportBasePath = path.resolve(distDir, 'lighthouse');
+		const htmlReportPath = path.resolve(distDir, 'lighthouse.report.html');
+		const finalHtmlPath = path.resolve(distDir, 'lighthouse.html');
 		const jsonPath = path.resolve(distDir, 'lighthouse.report.json');
 
 		// Run via bunx
@@ -143,23 +154,18 @@ async function main() {
 			targetUrl,
 			'--output',
 			'html',
-			'--output-path',
-			htmlPath,
-			'--chrome-flags=--headless'
-		]);
-		await run('bunx', [
-			'lighthouse',
-			targetUrl,
 			'--output',
 			'json',
 			'--output-path',
-			jsonPath,
+			reportBasePath,
 			'--chrome-flags=--headless'
 		]);
 
+		fs.copyFileSync(htmlReportPath, finalHtmlPath);
+
 		console.log('Lighthouse finished. Reports:');
-		console.log(' -', path.resolve(__dirname, '..', 'dist', 'lighthouse.html'));
-		console.log(' -', path.resolve(__dirname, '..', 'dist', 'lighthouse.report.json'));
+		console.log(' -', finalHtmlPath);
+		console.log(' -', jsonPath);
 	} finally {
 		try {
 			// kill and await exit, but swallow non-zero exit codes
@@ -172,12 +178,6 @@ async function main() {
 				await preview.exited;
 			} catch {
 				// ignore exit errors from preview (e.g. 143)
-			}
-			// ensure our script exits successfully if we reached here
-			try {
-				process.exit(0);
-			} catch {
-				// ignore
 			}
 		} catch {
 			// ignore

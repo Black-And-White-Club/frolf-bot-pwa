@@ -6,13 +6,7 @@
 
 import { browser } from '$app/environment';
 import { auth, type AuthInitializeResult } from './auth.svelte';
-import { nats } from './nats.svelte';
-import { subscriptionManager } from './subscriptions.svelte';
-import { dataLoader } from './dataLoader.svelte';
-import { initTracing } from '$lib/otel/tracing';
 import { env } from '$env/dynamic/public';
-// import { mockDataProvider } from '$lib/mocks/mockDataProvider.svelte';
-import { clubService } from './club.svelte';
 
 type InitStatus = 'idle' | 'initializing' | 'ready' | 'error';
 type InitMode = 'live' | 'mock' | 'disconnected';
@@ -27,6 +21,14 @@ class AppInitializer {
 	private connectAndLoadPromise: Promise<void> | null = null;
 	private reconnectUnsubscribe: (() => void) | null = null;
 	private reconnectReloadTimer: ReturnType<typeof setTimeout> | null = null;
+	// Lazily-loaded live-mode singletons — null until first live connection
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	private liveModules: {
+		nats: any;
+		subscriptionManager: any;
+		dataLoader: any;
+		clubService: any;
+	} | null = null;
 
 	isReady = $derived(this.status === 'ready');
 	isLoading = $derived(this.status === 'initializing');
@@ -63,6 +65,7 @@ class AppInitializer {
 			return;
 		}
 
+		const { initTracing } = await import('$lib/otel/tracing');
 		await initTracing();
 		const authResult = await this.authenticateAndLoadGuild(opts);
 		await this.completeAuthenticatedInitialization(authResult);
@@ -83,11 +86,26 @@ class AppInitializer {
 
 		this.needsClub = false;
 
+		// Load live-mode modules before any connection or reconnect-recovery setup.
+		// This must happen even when switchedClubWithDataLoad skips connectAndLoad().
+		await this.ensureLiveModules();
+
 		if (!authResult.switchedClubWithDataLoad) {
 			await this.connectAndLoad();
 		}
 		this.ensureReconnectRecovery();
 		this.setLiveReady();
+	}
+
+	private async ensureLiveModules(): Promise<void> {
+		if (this.liveModules) return;
+		const [{ nats }, { subscriptionManager }, { dataLoader }, { clubService }] = await Promise.all([
+			import('./nats.svelte'),
+			import('./subscriptions.svelte'),
+			import('./dataLoader.svelte'),
+			import('./club.svelte')
+		]);
+		this.liveModules = { nats, subscriptionManager, dataLoader, clubService };
 	}
 
 	private setDisconnectedReady(): void {
@@ -222,6 +240,9 @@ class AppInitializer {
 	}
 
 	private async doConnectAndLoad(): Promise<void> {
+		await this.ensureLiveModules();
+		const { nats, subscriptionManager, dataLoader, clubService } = this.liveModules!;
+
 		// Connect to NATS with retry
 		let connected = false;
 		let attempts = 0;
@@ -240,7 +261,7 @@ class AppInitializer {
 		this.ensureReconnectRecovery();
 
 		// Start loading club info right away once connected.
-		const clubLoadPromise = clubService.loadClubInfo().catch((e) => {
+		const clubLoadPromise = clubService.loadClubInfo().catch((e: unknown) => {
 			console.warn('[AppInit] Failed to load club info:', e);
 		});
 
@@ -256,7 +277,9 @@ class AppInitializer {
 	}
 
 	private ensureReconnectRecovery(): void {
-		if (this.reconnectUnsubscribe) return;
+		if (this.reconnectUnsubscribe || !this.liveModules) return;
+
+		const { nats, subscriptionManager, dataLoader } = this.liveModules;
 
 		this.reconnectUnsubscribe = nats.onReconnect(() => {
 			if (this.reconnectReloadTimer) {
@@ -287,7 +310,9 @@ class AppInitializer {
 		if (this.mode === 'mock') {
 			const { mockDataProvider } = await import('$lib/mocks/mockDataProvider.svelte');
 			mockDataProvider.stop();
-		} else if (this.mode === 'live') {
+		} else if (this.mode === 'live' && this.liveModules) {
+			const { nats, subscriptionManager, clubService } = this.liveModules;
+
 			// Stop subscriptions
 			subscriptionManager.stop();
 

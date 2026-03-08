@@ -96,8 +96,8 @@ describe('Dashboard', () => {
 	});
 
 	it('renders dashboard with leaderboard', async () => {
-		const { getByText } = render(Dashboard);
-		expect(getByText('Points Leaderboard')).toBeTruthy();
+		const { findByText } = render(Dashboard);
+		expect(await findByText('Points Leaderboard')).toBeTruthy();
 	});
 
 	it('shows live rounds when present', async () => {
@@ -112,17 +112,17 @@ describe('Dashboard', () => {
 			}
 		] as any;
 
-		const { getByText } = render(Dashboard);
-		expect(getByText('Live Rounds')).toBeTruthy();
-		expect(getByText('Round 1')).toBeTruthy();
+		const { findByText } = render(Dashboard);
+		expect(await findByText('Live Rounds')).toBeTruthy();
+		expect(await findByText('Round 1')).toBeTruthy();
 	});
 
 	it('shows empty state when no rounds', async () => {
 		mockRoundService.startedRounds = [];
 		mockRoundService.recentCompletedRounds = [];
 
-		const { getByText } = render(Dashboard);
-		expect(getByText('No rounds found')).toBeTruthy();
+		const { findByText } = render(Dashboard);
+		expect(await findByText('No rounds found')).toBeTruthy();
 	});
 
 	it('shows loading skeleton when loading rounds', async () => {

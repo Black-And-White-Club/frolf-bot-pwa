@@ -52,6 +52,10 @@ const mockDataLoader = {
 	reload: vi.fn(async () => {})
 };
 
+const mockRoundActionsService = {
+	reconcileRound: vi.fn()
+};
+
 vi.mock('../nats.svelte', () => ({
 	nats: mockNats
 }));
@@ -71,6 +75,10 @@ vi.mock('../tags.svelte', () => ({
 
 vi.mock('../dataLoader.svelte', () => ({
 	dataLoader: mockDataLoader
+}));
+
+vi.mock('../roundActions.svelte', () => ({
+	roundActionsService: mockRoundActionsService
 }));
 
 function emit(subject: string, data: unknown): void {
@@ -111,6 +119,7 @@ describe('subscriptionManager', () => {
 		mockTagStore.swapTagMembers.mockReset();
 		mockDataLoader.reload.mockReset();
 		mockDataLoader.reload.mockResolvedValue(undefined);
+		mockRoundActionsService.reconcileRound.mockReset();
 
 		subscriptionManager.start('guild-1');
 	});
@@ -122,6 +131,10 @@ describe('subscriptionManager', () => {
 		});
 
 		expect(mockDataLoader.reload).toHaveBeenCalledTimes(1);
+		expect(mockRoundActionsService.reconcileRound).toHaveBeenCalledWith(
+			normalizedRoundId,
+			'round-updated'
+		);
 		expect(mockRoundService.handleRoundUpdated).not.toHaveBeenCalled();
 	});
 
@@ -140,6 +153,10 @@ describe('subscriptionManager', () => {
 				title: 'Updated title'
 			}
 		});
+		expect(mockRoundActionsService.reconcileRound).toHaveBeenCalledWith(
+			normalizedRoundId,
+			'round-updated'
+		);
 		expect(mockDataLoader.reload).not.toHaveBeenCalled();
 	});
 
@@ -152,6 +169,10 @@ describe('subscriptionManager', () => {
 		});
 
 		expect(mockRoundService.removeParticipant).toHaveBeenCalledWith(normalizedRoundId, 'user-123');
+		expect(mockRoundActionsService.reconcileRound).toHaveBeenCalledWith(
+			normalizedRoundId,
+			'participant-updated'
+		);
 		expect(mockRoundService.handleRoundUpdated).not.toHaveBeenCalled();
 	});
 
