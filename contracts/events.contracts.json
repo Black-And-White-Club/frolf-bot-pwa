@@ -1150,72 +1150,6 @@
       }
     },
     {
-      "subject": "discord.round.created.v2",
-      "subject_pattern": "discord.round.created.v2.{scope_id}",
-      "supports_scoped_suffix": true,
-      "summary": "Round Created (Discord)",
-      "description": "Notification that a round was created; used to post embeds in Discord.",
-      "producer": {
-        "service": "discord",
-        "module": "round"
-      },
-      "producers": [
-        {
-          "service": "discord",
-          "module": "round"
-        }
-      ],
-      "consumers": [
-        {
-          "service": "discord",
-          "module": "round"
-        }
-      ],
-      "payload_type": "*discordroundevents.RoundCreatedDiscordPayloadV1",
-      "payload_schema": {
-        "additionalProperties": false,
-        "properties": {
-          "channel_id": {
-            "type": "string"
-          },
-          "guild_id": {
-            "type": "string"
-          },
-          "location": {
-            "type": "string"
-          },
-          "requester_id": {
-            "type": "string"
-          },
-          "round_id": {
-            "items": {
-              "minimum": 0,
-              "type": "integer"
-            },
-            "type": "array"
-          },
-          "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
-          },
-          "title": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "channel_id",
-          "guild_id",
-          "location",
-          "requester_id",
-          "round_id",
-          "start_time",
-          "title"
-        ],
-        "type": "object"
-      }
-    },
-    {
       "subject": "discord.round.creation.failed.v1",
       "subject_pattern": "discord.round.creation.failed.v1.{scope_id}",
       "supports_scoped_suffix": true,
@@ -1772,67 +1706,6 @@
           "round_id",
           "score",
           "user_id"
-        ],
-        "type": "object"
-      }
-    },
-    {
-      "subject": "discord.round.started.v2",
-      "subject_pattern": "discord.round.started.v2.{scope_id}",
-      "supports_scoped_suffix": true,
-      "summary": "Round Started (Discord)",
-      "description": "Notify Discord that the round has started so embeds can be updated.",
-      "producer": {
-        "service": "discord",
-        "module": "round"
-      },
-      "producers": [
-        {
-          "service": "discord",
-          "module": "round"
-        }
-      ],
-      "consumers": [
-        {
-          "service": "discord",
-          "module": "round"
-        }
-      ],
-      "payload_type": "*discordroundevents.RoundStartedDiscordPayloadV1",
-      "payload_schema": {
-        "additionalProperties": false,
-        "properties": {
-          "channel_id": {
-            "type": "string"
-          },
-          "guild_id": {
-            "type": "string"
-          },
-          "location": {
-            "type": "string"
-          },
-          "round_id": {
-            "items": {
-              "minimum": 0,
-              "type": "integer"
-            },
-            "type": "array"
-          },
-          "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
-          },
-          "title": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "channel_id",
-          "guild_id",
-          "location",
-          "round_id",
-          "title"
         ],
         "type": "object"
       }
@@ -7498,14 +7371,6 @@
         }
       ],
       "consumers": [
-        {
-          "service": "frolf-bot-backend",
-          "module": "round"
-        },
-        {
-          "service": "discord",
-          "module": "leaderboard"
-        },
         {
           "service": "pwa",
           "module": "leaderboard"

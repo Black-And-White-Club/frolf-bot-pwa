@@ -105,9 +105,9 @@
 	let canManageRound = $derived(
 		Boolean(
 			auth.isAuthenticated &&
-				round?.state === 'scheduled' &&
-				currentUserId &&
-				(auth.canEdit || round.createdBy === currentUserId)
+			round?.state === 'scheduled' &&
+			currentUserId &&
+			(auth.canEdit || round.createdBy === currentUserId)
 		)
 	);
 	let canEditRound = $derived(canManageRound);
@@ -393,8 +393,10 @@
 											disabled={isRoundActionPending}
 										/>
 										<div class="button-row">
-											<button type="submit" class="action-button primary" disabled={isRoundActionPending}
-												>Save changes</button
+											<button
+												type="submit"
+												class="action-button primary"
+												disabled={isRoundActionPending}>Save changes</button
 											>
 											<button
 												type="button"
@@ -471,7 +473,11 @@
 			<div class="participants-list">
 				{#if confirmedParticipants.length > 0}
 					{#each confirmedParticipants as participant, idx (`${participant.userId || 'guest'}:${idx}`)}
-						<ParticipantRow {participant} position={idx + 1} showScore={round.state !== 'scheduled'} />
+						<ParticipantRow
+							{participant}
+							position={idx + 1}
+							showScore={round.state !== 'scheduled'}
+						/>
 					{/each}
 				{:else}
 					<div class="empty-participants">
@@ -655,7 +661,9 @@
 		font-weight: 600;
 		padding: 0.55rem 0.8rem;
 		cursor: pointer;
-		transition: background 0.2s ease, border-color 0.2s ease;
+		transition:
+			background 0.2s ease,
+			border-color 0.2s ease;
 	}
 
 	.action-button:hover {

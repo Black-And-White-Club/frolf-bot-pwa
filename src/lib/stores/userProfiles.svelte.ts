@@ -85,8 +85,10 @@ class UserProfileService {
 
 		// If it's a Discord URL, we can append size and optimize format
 		if (url.includes('cdn.discordapp.com')) {
-			// Convert to webp for better performance (Discord CDN supports this)
-			url = url.replace(/\.(png|jpe?g)(\?.*)?$/i, '.webp$2');
+			// Default avatar URLs (embed/avatars/) only exist as .png — skip webp conversion
+			if (!url.includes('/embed/avatars/')) {
+				url = url.replace(/\.(png|jpe?g)(\?.*)?$/i, '.webp$2');
+			}
 
 			if (size) {
 				const separator = url.includes('?') ? '&' : '?';

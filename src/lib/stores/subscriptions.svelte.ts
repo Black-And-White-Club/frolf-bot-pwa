@@ -214,26 +214,9 @@ class SubscriptionManager {
 					roundService.handleRoundCreated(finalizedRoundRaw);
 				}
 
-				const update: Partial<Round> = { state: 'finalized' };
-				if (payload.round_data?.participants) {
-					update.participants = payload.round_data.participants.map((participant) =>
-						toParticipant(participant, 'tentative')
-					);
-				}
-				if (payload.round_data?.title) update.title = payload.round_data.title;
-				if (payload.round_data?.location) update.location = payload.round_data.location;
-				if (payload.round_data?.description !== undefined) {
-					update.description = payload.round_data.description;
-				}
-				const startTime = normalizeStartTime(payload.round_data?.start_time);
-				if (startTime) update.startTime = startTime;
-				if (payload.round_data?.event_message_id) {
-					update.eventMessageId = payload.round_data.event_message_id;
-				}
-
 				roundService.handleRoundUpdated({
 					roundId,
-					update
+					update: buildFinalizedRoundUpdate(payload)
 				});
 			})
 		);
@@ -415,7 +398,9 @@ function toParticipant(
 	participant: RoundParticipantPayload,
 	fallbackResponse: ParticipantRaw['response']
 ) {
-	return participantFromRaw(toParticipantRaw({ ...participant, response: participant.response || fallbackResponse }));
+	return participantFromRaw(
+		toParticipantRaw({ ...participant, response: participant.response || fallbackResponse })
+	);
 }
 
 function normalizeResponse(
@@ -450,27 +435,51 @@ function roundIdFromWire(value: WireRoundID | undefined): string {
 	return '';
 }
 
+function buildFinalizedRoundUpdate(payload: RoundFinalizedPayloadV1): Partial<Round> {
+	const update: Partial<Round> = { state: 'finalized' };
+	const data = payload.round_data;
+	if (!data) return update;
+
+	if (data.participants) {
+		update.participants = data.participants.map((p) => toParticipant(p, 'tentative'));
+	}
+	if (data.title) update.title = data.title;
+	if (data.location) update.location = data.location;
+	if (data.description !== undefined) update.description = data.description;
+	const startTime = normalizeStartTime(data.start_time);
+	if (startTime) update.startTime = startTime;
+	if (data.event_message_id) update.eventMessageId = data.event_message_id;
+	return update;
+}
+
 function toRoundRawFromFinalizedPayload(payload: RoundFinalizedPayloadV1): RoundRaw | null {
-	if (!payload.round_data) {
-		return null;
-	}
+	const data = payload.round_data;
+	if (!data) return null;
 
-	const roundID = roundIdFromWire(payload.round_data.id) || roundIdFromWire(payload.round_id);
-	if (!roundID) {
-		return null;
-	}
+	const roundID = roundIdFromWire(data.id) || roundIdFromWire(payload.round_id);
+	if (!roundID) return null;
 
+	const {
+		guild_id,
+		title,
+		location,
+		description,
+		start_time,
+		created_by,
+		event_message_id,
+		participants = []
+	} = data;
 	return {
 		id: roundID,
-		guild_id: payload.round_data.guild_id || payload.guild_id,
-		title: payload.round_data.title || '',
-		location: payload.round_data.location || '',
-		description: payload.round_data.description || '',
-		start_time: normalizeStartTime(payload.round_data.start_time),
+		guild_id: guild_id || payload.guild_id,
+		title,
+		location,
+		description,
+		start_time: normalizeStartTime(start_time),
 		state: 'finalized',
-		created_by: payload.round_data.created_by || '',
-		event_message_id: payload.round_data.event_message_id || '',
-		participants: (payload.round_data.participants || []).map(toParticipantRaw)
+		created_by,
+		event_message_id,
+		participants: participants.map(toParticipantRaw)
 	};
 }
 

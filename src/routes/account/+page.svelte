@@ -185,13 +185,20 @@
 		return `pwa-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
 	}
 
+	function getUDiscUpdatePayload(): { scopeId: string; userId: string } | null {
+		const user = auth.user;
+		const scopeId = user?.activeClubUuid?.trim() || user?.guildId?.trim();
+		const userId = user?.id?.trim();
+		return scopeId && userId ? { scopeId, userId } : null;
+	}
+
 	async function updateUDiscIdentity() {
-		const scopeId = auth.user?.activeClubUuid?.trim() || auth.user?.guildId?.trim();
-		const userId = auth.user?.id?.trim();
-		if (!scopeId || !userId) {
+		const ctx = getUDiscUpdatePayload();
+		if (!ctx) {
 			udiscError = 'You must be signed in to update UDisc identity.';
 			return;
 		}
+		const { scopeId, userId } = ctx;
 
 		const username = udiscUsername.trim();
 		const name = udiscName.trim();
@@ -377,7 +384,9 @@
 				UDisc Identity
 			</h2>
 
-			<div class="space-y-3 rounded-xl border border-[#007474]/20 bg-[var(--guild-surface)] px-5 py-5">
+			<div
+				class="space-y-3 rounded-xl border border-[#007474]/20 bg-[var(--guild-surface)] px-5 py-5"
+			>
 				<p class="font-['Space_Grotesk'] text-sm text-[var(--guild-text-secondary)]">
 					Used for automatic scorecard matching in PWA and Discord workflows.
 				</p>

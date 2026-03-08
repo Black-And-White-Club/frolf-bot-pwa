@@ -151,10 +151,7 @@ describe('subscriptionManager', () => {
 			discord_message_id: 'message-1'
 		});
 
-		expect(mockRoundService.removeParticipant).toHaveBeenCalledWith(
-			normalizedRoundId,
-			'user-123'
-		);
+		expect(mockRoundService.removeParticipant).toHaveBeenCalledWith(normalizedRoundId, 'user-123');
 		expect(mockRoundService.handleRoundUpdated).not.toHaveBeenCalled();
 	});
 

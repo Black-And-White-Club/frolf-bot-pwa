@@ -74,7 +74,7 @@
 		></button>
 	{/if}
 
-	<div class="player-content" aria-hidden={!!onclick}>
+	<div class="player-content" aria-hidden={!!onclick} inert={!!onclick}>
 		<div class="left">
 			<div class="avatar" aria-hidden="true" class:has-image={!!avatarUrl}>
 				{#if avatarUrl}

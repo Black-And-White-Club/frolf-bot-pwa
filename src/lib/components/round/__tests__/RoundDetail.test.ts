@@ -3,39 +3,34 @@ import { fireEvent, render, waitFor } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import RoundDetail from '../RoundDetail.svelte';
 
-const {
-	mockRoundService,
-	mockAuth,
-	mockRoundActionsService,
-	mockUserProfiles,
-	mockGoto
-} = vi.hoisted(() => ({
-	mockRoundService: {
-		rounds: [] as any[],
-		isLoading: false
-	},
-	mockAuth: {
-		isAuthenticated: false,
-		canEdit: false,
-		activeRole: 'viewer' as 'viewer' | 'player' | 'editor' | 'admin',
-		user: null as null | { id?: string; guildId?: string }
-	},
-	mockRoundActionsService: {
-		errorMessage: null as string | null,
-		successMessage: null as string | null,
-		isPending: vi.fn(() => false),
-		setParticipantResponse: vi.fn(async () => true),
-		leaveRound: vi.fn(async () => true),
-		submitScore: vi.fn(async () => true),
-		updateRound: vi.fn(async () => true),
-		deleteRound: vi.fn(async () => true)
-	},
-	mockUserProfiles: {
-		getDisplayName: () => 'Test User',
-		getAvatarUrl: () => ''
-	},
-	mockGoto: vi.fn(async () => {})
-}));
+const { mockRoundService, mockAuth, mockRoundActionsService, mockUserProfiles, mockGoto } =
+	vi.hoisted(() => ({
+		mockRoundService: {
+			rounds: [] as any[],
+			isLoading: false
+		},
+		mockAuth: {
+			isAuthenticated: false,
+			canEdit: false,
+			activeRole: 'viewer' as 'viewer' | 'player' | 'editor' | 'admin',
+			user: null as null | { id?: string; guildId?: string }
+		},
+		mockRoundActionsService: {
+			errorMessage: null as string | null,
+			successMessage: null as string | null,
+			isPending: vi.fn(() => false),
+			setParticipantResponse: vi.fn(async () => true),
+			leaveRound: vi.fn(async () => true),
+			submitScore: vi.fn(async () => true),
+			updateRound: vi.fn(async () => true),
+			deleteRound: vi.fn(async () => true)
+		},
+		mockUserProfiles: {
+			getDisplayName: () => 'Test User',
+			getAvatarUrl: () => ''
+		},
+		mockGoto: vi.fn(async () => {})
+	}));
 
 vi.mock('$app/navigation', () => ({
 	goto: mockGoto

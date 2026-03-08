@@ -110,7 +110,9 @@ describe('RoundService (round.svelte.ts)', () => {
 					state: 'FINALIZED',
 					created_by: 'u1',
 					event_message_id: '',
-					participants: [{ user_id: 'u1', response: 'ACCEPTED', score: 4, tag_number: 7, is_dnf: true }]
+					participants: [
+						{ user_id: 'u1', response: 'ACCEPTED', score: 4, tag_number: 7, is_dnf: true }
+					]
 				}
 			] as unknown as RoundRaw[];
 

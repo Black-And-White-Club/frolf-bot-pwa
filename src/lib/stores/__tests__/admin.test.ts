@@ -104,7 +104,13 @@ describe('adminStore.uploadScorecard', () => {
 		});
 
 		const { adminStore } = await import('../admin.svelte');
-		const pending = adminStore.adjustPoints('guild-123', 'admin-123', 'member-456', 5, 'Bonus points');
+		const pending = adminStore.adjustPoints(
+			'guild-123',
+			'admin-123',
+			'member-456',
+			5,
+			'Bonus points'
+		);
 
 		expect(mockPublish).toHaveBeenCalledWith('leaderboard.manual.point.adjustment.v2', {
 			guild_id: 'guild-123',

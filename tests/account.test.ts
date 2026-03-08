@@ -154,9 +154,7 @@ describe('Account Page', () => {
 			const { getByLabelText } = render(AccountPage);
 
 			expect((getByLabelText('UDisc Username') as HTMLInputElement).value).toBe('disc-user');
-			expect((getByLabelText('UDisc Display Name') as HTMLInputElement).value).toBe(
-				'Disc User'
-			);
+			expect((getByLabelText('UDisc Display Name') as HTMLInputElement).value).toBe('Disc User');
 		});
 
 		it('publishes UDisc identity update request', async () => {
