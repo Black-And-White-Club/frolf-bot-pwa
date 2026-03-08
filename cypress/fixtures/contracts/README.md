@@ -2,6 +2,13 @@
 
 These fixtures are validated against `contracts/events.contracts.json` (generated from `frolf-bot-shared`) to prevent topic/payload drift.
 
+Keep fixture subjects and payload keys aligned with the generated contract catalog, even when the shape looks odd at first glance.
+Current examples:
+
+- `leaderboard.tag.list.requested.v1` is still the only published contract subject for tag-list requests. Do not bump it to `v2` locally until the shared catalog changes.
+- `BaseRoundPayload` is an upstream wire key in the generated round contracts. Preserve that exact key in fixtures until the shared contract source renames it.
+- `round.participant.joined.v2` accepts an optional integer `score`, but not `score: null`. Omit `score` when no value is available so fixtures keep validating against the current schema.
+
 ## Format
 
 ```json

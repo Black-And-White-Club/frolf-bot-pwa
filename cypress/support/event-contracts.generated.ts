@@ -11,7 +11,13 @@ export type EventContract = {
 	supports_scoped_suffix: boolean;
 	summary?: string;
 	description?: string;
+	/**
+	 * @deprecated Prefer `producers`. Retained for backwards compatibility with older catalog consumers.
+	 */
 	producer: ContractActor;
+	/**
+	 * Authoritative producer list when the catalog includes multi-producer metadata.
+	 */
 	producers?: ContractActor[];
 	consumers?: ContractActor[];
 	payload_type: string;

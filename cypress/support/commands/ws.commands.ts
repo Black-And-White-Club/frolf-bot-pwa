@@ -289,6 +289,8 @@ Cypress.Commands.add('arrangeSnapshot', (options: ArrangeSnapshotOptions = {}) =
 	stub(`leaderboard.snapshot.request.v2.${subjectId}`, leaderboardPayload, { validate: false });
 
 	const tagsPayload = buildTagSnapshotPayload(options, subjectId);
+	// The current contract catalog still exposes this request subject as v1 only.
+	// Keep the stub pinned until the shared contracts publish a v2 counterpart.
 	stub(`leaderboard.tag.list.requested.v1.${subjectId}`, tagsPayload, { validate: false });
 
 	const clubInfoPayload = buildClubInfoSnapshotPayload(options, subjectId);
