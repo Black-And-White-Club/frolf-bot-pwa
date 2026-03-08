@@ -98,7 +98,7 @@ describe('Admin Dashboard', () => {
 			const lastEntry = entries[entries.length - 1];
 			const payload = lastEntry.payload as {
 				batch_id: string;
-				requester_user_id: string;
+				requesting_user_id: string;
 				guild_id: string;
 			};
 
@@ -106,7 +106,7 @@ describe('Admin Dashboard', () => {
 				assignment_count: 1,
 				batch_id: payload.batch_id,
 				guild_id: payload.guild_id,
-				requesting_user_id: payload.requester_user_id,
+				requesting_user_id: payload.requesting_user_id,
 				assignments: [
 					{
 						guild_id: payload.guild_id,
@@ -130,14 +130,14 @@ describe('Admin Dashboard', () => {
 			const lastEntry = entries[entries.length - 1];
 			const payload = lastEntry.payload as {
 				batch_id: string;
-				requester_user_id: string;
+				requesting_user_id: string;
 				guild_id: string;
 			};
 
 			cy.wsEmit('leaderboard.batch.tag.assignment.failed.v2', {
 				batch_id: payload.batch_id,
 				guild_id: payload.guild_id,
-				requesting_user_id: payload.requester_user_id,
+				requesting_user_id: payload.requesting_user_id,
 				reason: 'Tag number reserved'
 			});
 		});
