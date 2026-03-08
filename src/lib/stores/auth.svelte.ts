@@ -1,13 +1,13 @@
 // src/lib/stores/auth.svelte.ts
 
-interface ClubRole {
+export interface ClubRole {
 	club_uuid: string;
 	role: 'viewer' | 'player' | 'editor' | 'admin';
 	display_name?: string;
 	avatar_url?: string;
 }
 
-interface AuthUser {
+export interface AuthUser {
 	id: string; // Discord ID (legacy)
 	uuid: string; // Internal User UUID
 	activeClubUuid: string; // Internal Club UUID
@@ -17,7 +17,7 @@ interface AuthUser {
 	linkedProviders: string[]; // OAuth providers linked to this account e.g. ['discord', 'google']
 }
 
-interface TokenClaims {
+export interface TokenClaims {
 	sub: string; // Discord ID
 	user_uuid: string;
 	active_club_uuid: string;
@@ -64,36 +64,55 @@ export class AuthService {
 	extractTokenFromUrl(): string | null {
 		if (typeof window === 'undefined') return null;
 
-		// Prefer hash token first (#t=...) to avoid URL query leakage.
-		const search = window.location.search || '';
-		const hash = window.location.hash || '';
-		const pathname = window.location.pathname || '/';
-
+		const { pathname, search, hash } = window.location;
 		/* eslint-disable svelte/prefer-svelte-reactivity */
 		const queryParams = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
-		const rawHash = hash.startsWith('#') ? hash.slice(1) : hash;
-		const hashLooksLikeParams = rawHash.includes('=') || rawHash.includes('&');
-		const hashParams = hashLooksLikeParams ? new URLSearchParams(rawHash) : null;
-		const hashToken = hashParams?.get('t') || null;
-		const queryToken = queryParams.get('t');
 		/* eslint-enable svelte/prefer-svelte-reactivity */
+		const { rawHash, hashParams, hashToken } = this.parseHashToken(hash || '');
+		const queryToken = queryParams.get('t');
 		const token = hashToken || queryToken;
 
 		if (token) {
-			// Remove token from URL using history.replaceState for security
-			if (hashToken && hashParams) {
-				hashParams.delete('t');
-			}
-			if (queryToken) {
-				queryParams.delete('t');
-			}
-			const newSearch = queryParams.toString();
-			const newHash = hashToken && hashParams ? hashParams.toString() : rawHash;
-			const newUrl = `${pathname}${newSearch ? `?${newSearch}` : ''}${newHash ? `#${newHash}` : ''}`;
-			window.history.replaceState({}, '', newUrl);
+			const cleanUrl = this.buildCleanUrl(
+				pathname || '/',
+				queryParams,
+				rawHash,
+				hashToken,
+				hashParams,
+				queryToken
+			);
+			window.history.replaceState({}, '', cleanUrl);
 		}
 
 		return token;
+	}
+
+	private parseHashToken(hash: string): {
+		rawHash: string;
+		hashParams: URLSearchParams | null;
+		hashToken: string | null;
+	} {
+		const rawHash = hash.startsWith('#') ? hash.slice(1) : hash;
+		/* eslint-disable svelte/prefer-svelte-reactivity */
+		const looksLikeParams = rawHash.includes('=') || rawHash.includes('&');
+		const hashParams = looksLikeParams ? new URLSearchParams(rawHash) : null;
+		/* eslint-enable svelte/prefer-svelte-reactivity */
+		return { rawHash, hashParams, hashToken: hashParams?.get('t') ?? null };
+	}
+
+	private buildCleanUrl(
+		pathname: string,
+		queryParams: URLSearchParams,
+		rawHash: string,
+		hashToken: string | null,
+		hashParams: URLSearchParams | null,
+		queryToken: string | null
+	): string {
+		if (hashToken && hashParams) hashParams.delete('t');
+		if (queryToken) queryParams.delete('t');
+		const newSearch = queryParams.toString();
+		const newHash = hashToken && hashParams ? hashParams.toString() : rawHash;
+		return `${pathname}${newSearch ? `?${newSearch}` : ''}${newHash ? `#${newHash}` : ''}`;
 	}
 
 	/**
@@ -211,36 +230,39 @@ export class AuthService {
 		try {
 			const res = await fetch('/api/auth/ticket', { method: 'POST' });
 			if (!res.ok) {
-				if (res.status === 401 || res.status === 403) {
-					if (this.status === 'authenticated') {
-						this.signOut();
-					}
-				} else {
-					this.error = 'Session refresh failed';
-				}
+				this.handleTicketError(res.status);
 				return null;
 			}
 
 			const { ticket } = await res.json();
-			const claims = this.parseJWT(ticket);
-
 			this.token = ticket;
-			this.user = {
-				id: claims.sub?.replace('user:', '') || '',
-				uuid: claims.user_uuid,
-				activeClubUuid: claims.active_club_uuid,
-				guildId: claims.guild || '',
-				role: (claims.role || 'viewer') as AuthUser['role'],
-				clubs: claims.clubs || [],
-				linkedProviders: claims.linked_providers || []
-			};
-
+			this.user = this.userFromClaims(this.parseJWT(ticket));
 			this.status = 'authenticated';
 			return ticket;
 		} catch (e) {
 			console.error('Failed to refresh session:', e);
 			return null;
 		}
+	}
+
+	private handleTicketError(status: number): void {
+		if (status === 401 || status === 403) {
+			if (this.status === 'authenticated') this.signOut();
+		} else {
+			this.error = 'Session refresh failed';
+		}
+	}
+
+	private userFromClaims(claims: ReturnType<AuthService['parseJWT']>): AuthUser {
+		return {
+			id: claims.sub?.replace('user:', '') || '',
+			uuid: claims.user_uuid,
+			activeClubUuid: claims.active_club_uuid,
+			guildId: claims.guild || '',
+			role: (claims.role || 'viewer') as AuthUser['role'],
+			clubs: claims.clubs || [],
+			linkedProviders: claims.linked_providers || []
+		};
 	}
 
 	/**
@@ -291,45 +313,17 @@ export class AuthService {
 	private async performSwitchClub(clubUuid: string, reloadData: boolean): Promise<boolean> {
 		if (!this.user) return false;
 
-		// Verify membership
 		const membership = this.user.clubs.find((c) => c.club_uuid === clubUuid);
 		if (!membership) {
 			console.warn(`User is not a member of club ${clubUuid}`);
 			return false;
 		}
 
-		// 1. Inform backend of the switch and get a new ticket with updated activeClubUuid
-		// We send JSON body data to avoid token/cookie state changes over GET links.
 		try {
-			const res = await fetch('/api/auth/ticket', {
-				method: 'POST',
-				headers: { 'content-type': 'application/json' },
-				body: JSON.stringify({ activeClub: clubUuid })
-			});
-			if (!res.ok) {
-				this.error = `Club switch failed (${res.status})`;
-				return false;
-			}
-
-			const { ticket } = await res.json();
-			if (!ticket || typeof ticket !== 'string') {
-				this.error = 'Club switch failed (invalid backend response)';
-				return false;
-			}
-
+			const ticket = await this.fetchTicketForClub(clubUuid);
+			if (!ticket) return false;
 			this.token = ticket;
-			const claims = this.parseJWT(ticket);
-
-			// Update local user state from authoritative backend claims
-			this.user = {
-				id: claims.sub?.replace('user:', '') || '',
-				uuid: claims.user_uuid,
-				activeClubUuid: claims.active_club_uuid,
-				guildId: claims.guild || '',
-				role: (claims.role || 'viewer') as AuthUser['role'],
-				clubs: claims.clubs || [],
-				linkedProviders: claims.linked_providers || []
-			};
+			this.user = this.userFromClaims(this.parseJWT(ticket));
 		} catch (e) {
 			console.error('Failed to switch club on backend:', e);
 			this.error = 'Club switch failed';
@@ -338,34 +332,55 @@ export class AuthService {
 
 		localStorage.setItem('frolf_preferred_club', clubUuid);
 
-		if (!reloadData) {
-			return true;
-		}
+		if (!reloadData) return true;
 
-		if (!this.token) {
-			this.error = 'Club switch failed (missing session token)';
-			return false;
-		}
+		await this.reloadAfterClubSwitch(clubUuid);
+		return true;
+	}
 
-		// 2. Reconnect NATS with the NEW token (critical for permissions/filtering)
+	private async fetchTicketForClub(clubUuid: string): Promise<string | null> {
+		const res = await fetch('/api/auth/ticket', {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({ activeClub: clubUuid })
+		});
+		if (!res.ok) {
+			this.error = `Club switch failed (${res.status})`;
+			return null;
+		}
+		const { ticket } = await res.json();
+		if (!ticket || typeof ticket !== 'string') {
+			this.error = 'Club switch failed (invalid backend response)';
+			return null;
+		}
+		return ticket;
+	}
+
+	private async reloadAfterClubSwitch(clubUuid: string): Promise<void> {
 		const { nats } = await import('./nats.svelte');
 		await nats.disconnect();
 		await nats.connect(this.token as string);
 
-		// 3. Reload app data
 		const { subscriptionManager } = await import('./subscriptions.svelte');
 		const { dataLoader } = await import('./dataLoader.svelte');
 		const { clubService } = await import('./club.svelte');
 
 		subscriptionManager.start(clubUuid);
-		// Clear old club-specific data
 		dataLoader.clearData();
 		await Promise.all([
 			clubService.loadClubInfo(), // Uses auth.user.activeClubUuid
 			dataLoader.loadInitialData()
 		]);
+	}
 
-		return true;
+	/**
+	 * Hydrate auth state from server-provided SSR data.
+	 * Skips network calls — use ticket directly instead of refreshSession().
+	 */
+	hydrateFromServer(user: AuthUser, ticket: string): void {
+		this.user = user;
+		this.token = ticket;
+		this.status = 'authenticated';
 	}
 
 	/**

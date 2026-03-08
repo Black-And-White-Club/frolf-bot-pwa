@@ -40,11 +40,19 @@ declare module '*.svelte' {
 
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
+import type { AuthUser } from '$lib/stores/auth.svelte';
+
 declare global {
 	namespace App {
 		// interface Error {}
-		// interface Locals {}
-		// interface PageData {}
+		interface Locals {
+			user?: AuthUser;
+			ticket?: string;
+		}
+		interface PageData {
+			user?: AuthUser | null;
+			ticket?: string | null;
+		}
 		// interface PageState {}
 		// interface Platform {}
 	}

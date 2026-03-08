@@ -31,11 +31,11 @@ class AppInitializer {
 	isReady = $derived(this.status === 'ready');
 	isLoading = $derived(this.status === 'initializing');
 
-	async initialize(): Promise<void> {
+	async initialize(opts?: { serverTicket?: string | null }): Promise<void> {
 		if (!browser || this.status === 'ready') return;
 		if (this.initPromise) return this.initPromise;
 
-		this.initPromise = this.doInitialize();
+		this.initPromise = this.doInitialize(opts);
 		try {
 			await this.initPromise;
 		} finally {
@@ -45,26 +45,26 @@ class AppInitializer {
 		}
 	}
 
-	private async doInitialize(): Promise<void> {
+	private async doInitialize(opts?: { serverTicket?: string | null }): Promise<void> {
 		this.status = 'initializing';
 		this.error = null;
 
 		try {
-			await this.initializeByMode();
+			await this.initializeByMode(opts);
 		} catch (err) {
 			this.handleInitializationError(err);
 			console.error('[AppInit] Failed:', err);
 		}
 	}
 
-	private async initializeByMode(): Promise<void> {
+	private async initializeByMode(opts?: { serverTicket?: string | null }): Promise<void> {
 		if (this.isMockMode()) {
 			await this.startMockMode();
 			return;
 		}
 
 		await initTracing();
-		const authResult = await this.authenticateAndLoadGuild();
+		const authResult = await this.authenticateAndLoadGuild(opts);
 		await this.completeAuthenticatedInitialization(authResult);
 	}
 
@@ -190,8 +190,16 @@ class AppInitializer {
 		}, 0);
 	}
 
-	private async authenticateAndLoadGuild(): Promise<AuthInitializeResult> {
-		// Initialize auth (extracts token, validates)
+	private async authenticateAndLoadGuild(opts?: {
+		serverTicket?: string | null;
+	}): Promise<AuthInitializeResult> {
+		// If a server-provided ticket is available and auth is already hydrated, skip the
+		// redundant ticket fetch (saves one network round-trip on every page load).
+		if (opts?.serverTicket && auth.isAuthenticated) {
+			return { authenticated: true, switchedClubWithDataLoad: false };
+		}
+
+		// Initialize auth (extracts URL token or calls refreshSession)
 		const result = await auth.initialize();
 
 		return {

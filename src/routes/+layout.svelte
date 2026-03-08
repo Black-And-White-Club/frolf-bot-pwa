@@ -23,7 +23,7 @@
 		isLoading: boolean;
 		error: string | null;
 		needsClub: boolean;
-		initialize: () => Promise<void>;
+		initialize: (opts?: { serverTicket?: string | null }) => Promise<void>;
 		teardown: () => Promise<void>;
 	};
 
@@ -52,6 +52,11 @@
 	onMount(async () => {
 		try {
 			const { auth: loadedAuth } = await import('$lib/stores/auth.svelte');
+			// Hydrate from server data before swapping in the real store so the
+			// reactive auth state is correct from the very first client frame.
+			if (page.data.user && page.data.ticket) {
+				loadedAuth.hydrateFromServer(page.data.user, page.data.ticket);
+			}
 			auth = loadedAuth;
 		} catch (err) {
 			console.warn('failed to load auth store', err);
@@ -141,7 +146,7 @@
 				const { appInit: loadedAppInit } = await import('$lib/stores/init.svelte');
 				appInit = loadedAppInit;
 				hasLoadedAppInit = true;
-				await loadedAppInit.initialize();
+				await loadedAppInit.initialize({ serverTicket: page.data.ticket });
 			} catch (err) {
 				console.warn('deferred app init failed', err);
 			}
@@ -169,7 +174,7 @@
 </script>
 
 <svelte:head>
-	{#if auth.isAuthenticated}
+	{#if auth.isAuthenticated || !!page.data.user}
 		<link rel="preconnect" href="https://cdn.discordapp.com" crossorigin="anonymous" />
 	{/if}
 </svelte:head>
@@ -187,7 +192,7 @@
 	{#if UpdateSnackbarClient}
 		<UpdateSnackbarClient />
 	{/if}
-	{#if appInit.isLoading}
+	{#if appInit.isLoading && !page.data.user}
 		<div class="flex min-h-screen items-center justify-center bg-[#081212]">
 			<div class="text-center">
 				<div
@@ -209,7 +214,7 @@
 				</button>
 			</div>
 		</div>
-	{:else if auth.isAuthenticated}
+	{:else if auth.isAuthenticated || !!page.data.user}
 		{#if appInit.needsClub && !page.url.pathname.startsWith('/join') && !page.url.pathname.startsWith('/auth')}
 			<!-- Authenticated but not yet a club member — show discovery flow -->
 			{#if ClubDiscovery}

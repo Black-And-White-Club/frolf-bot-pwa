@@ -1,5 +1,9 @@
+import { sequence } from '@sveltejs/kit/hooks';
 import type { Handle } from '@sveltejs/kit';
 import { env } from '$env/dynamic/public';
+import { serverConfig } from '$lib/server/config';
+import { forwardSetCookieHeaders } from '$lib/server/http';
+import type { AuthUser, TokenClaims } from '$lib/stores/auth.svelte';
 
 const isDev = import.meta.env.DEV;
 
@@ -12,10 +16,72 @@ function toOrigin(value: string | undefined): string | null {
 	}
 }
 
+function parseJwtServer(token: string): TokenClaims | null {
+	try {
+		const payload = token.split('.')[1];
+		const decoded = Buffer.from(payload.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString(
+			'utf8'
+		);
+		const claims = JSON.parse(decoded) as TokenClaims;
+		if (claims.exp <= Math.floor(Date.now() / 1000)) return null;
+		return claims;
+	} catch {
+		return null;
+	}
+}
+
+function claimsToUser(claims: TokenClaims): AuthUser {
+	return {
+		id: claims.sub?.replace('user:', '') || '',
+		uuid: claims.user_uuid,
+		activeClubUuid: claims.active_club_uuid,
+		guildId: claims.guild || '',
+		role: (claims.role || 'viewer') as AuthUser['role'],
+		clubs: claims.clubs || [],
+		linkedProviders: claims.linked_providers || []
+	};
+}
+
+const authHandle: Handle = async ({ event, resolve }) => {
+	// Skip API routes — they handle auth themselves
+	if (event.url.pathname.startsWith('/api/')) return resolve(event);
+
+	const refreshToken = event.cookies.get('refresh_token');
+	if (!refreshToken) return resolve(event);
+
+	try {
+		const res = await fetch(`${serverConfig.backendUrl}/api/auth/ticket`, {
+			method: 'GET',
+			headers: { cookie: `refresh_token=${refreshToken}` }
+		});
+
+		if (res.ok) {
+			const { ticket } = (await res.json()) as { ticket?: string };
+			if (ticket) {
+				const claims = parseJwtServer(ticket);
+				if (claims) {
+					event.locals.user = claimsToUser(claims);
+					event.locals.ticket = ticket;
+				}
+				// Forward rotated refresh_token cookie from backend response
+				const rotatedHeaders = new Headers();
+				forwardSetCookieHeaders(res.headers, rotatedHeaders);
+				const response = await resolve(event);
+				rotatedHeaders.forEach((value, key) => response.headers.append(key, value));
+				return response;
+			}
+		}
+	} catch {
+		// Silent — treat as unauthenticated
+	}
+
+	return resolve(event);
+};
+
 // Minimal security headers suitable for this app.
 // CSP is partially handled in svelte.config.ts (nonces).
 // We dynamically append connect-src here.
-export const handle: Handle = async ({ event, resolve }) => {
+const cspHandle: Handle = async ({ event, resolve }) => {
 	const response = await resolve(event);
 
 	const connectSrc = new Set<string>(["'self'", 'https://api.github.com']);
@@ -63,3 +129,5 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	return response;
 };
+
+export const handle = sequence(authHandle, cspHandle);
