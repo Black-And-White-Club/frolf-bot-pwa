@@ -3,7 +3,7 @@
 	"steps": [
 		{
 			"action": "emit",
-			"contract_subject": "leaderboard.updated.v1",
+			"contract_subject": "leaderboard.updated.v2",
 			"payload_overrides": {
 				"guild_id": "guild-123",
 				"leaderboard_id": 1,

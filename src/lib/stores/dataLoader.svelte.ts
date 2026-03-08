@@ -1,6 +1,7 @@
 import { nats } from './nats.svelte';
 import { roundService, type RoundRaw } from './round.svelte';
 import { leaderboardService, type LeaderboardResponseRaw } from './leaderboard.svelte';
+import { roundActionsService } from './roundActions.svelte';
 import { tagStore, type TagListResponseRaw } from './tags.svelte';
 import { auth } from './auth.svelte';
 import { userProfiles, type UserProfileRaw } from './userProfiles.svelte';
@@ -100,13 +101,14 @@ class DataLoader {
 				{ guild_id: string; club_uuid: string },
 				RoundListResponseRaw
 			>(
-				`round.list.request.v1.${subjectId}`,
+				`round.list.request.v2.${subjectId}`,
 				{ guild_id: guildId, club_uuid: clubUuid },
 				{ timeout: 5000 }
 			);
 
 			if (response?.rounds) {
 				roundService.setRoundsFromApi(response.rounds);
+				roundActionsService.reconcileAllFromSnapshot();
 			}
 			// Store profiles if included
 			if (response?.profiles) {
@@ -134,7 +136,7 @@ class DataLoader {
 				{ guild_id: string; club_uuid: string },
 				LeaderboardResponseRaw
 			>(
-				`leaderboard.snapshot.request.v1.${subjectId}`,
+				`leaderboard.snapshot.request.v2.${subjectId}`,
 				{ guild_id: guildId, club_uuid: clubUuid },
 				{ timeout: 5000 }
 			);

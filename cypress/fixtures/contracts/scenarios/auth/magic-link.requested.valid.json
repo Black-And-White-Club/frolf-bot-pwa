@@ -3,7 +3,7 @@
 	"steps": [
 		{
 			"action": "emit",
-			"contract_subject": "auth.magic-link.requested.v1",
+			"contract_subject": "auth.magic-link.requested.v2",
 			"payload_overrides": {
 				"correlation_id": "corr-123",
 				"guild_id": "guild-123",

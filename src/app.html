@@ -34,7 +34,7 @@
 		  the user's OS preference. This enables Tailwind's class-based dark
 		  mode and ensures colors are correct on first render (avoids flash).
 		-->
-		<script>
+		<script nonce="%sveltekit.nonce%">
 			(function () {
 				try {
 					const prefers = localStorage.getItem('frolf:prefers_dark');
@@ -67,7 +67,7 @@
 	</head>
 	<body data-sveltekit-preload-data="tap">
 		<div class="svelte-root">%sveltekit.body%</div>
-		<script>
+		<script nonce="%sveltekit.nonce%">
 			function updateMetaThemeColor() {
 				try {
 					const meta = document.querySelector('meta[name="theme-color"]');

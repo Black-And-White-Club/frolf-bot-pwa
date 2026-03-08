@@ -12,36 +12,64 @@ import {
 	type RoundRaw
 } from './round.svelte';
 import { leaderboardService } from './leaderboard.svelte';
+import { roundActionsService } from './roundActions.svelte';
 import { tagStore } from './tags.svelte';
 import { dataLoader } from './dataLoader.svelte';
 
-interface RoundCreatedPayloadV1 {
-	guild_id: string;
-	round_id: string;
+type WireRoundID = string | number[];
+
+interface BaseRoundPayloadV1 {
+	round_id: WireRoundID;
 	title: string;
 	description?: string;
 	location?: string;
-	start_time?: string | null;
+	start_time?: string | null | Record<string, unknown>;
 	user_id?: string;
-	discord_message_id?: string;
 }
 
-interface RoundUpdatedPayload {
-	round_id?: string;
+interface RoundCreatedPayloadV1 {
+	guild_id: string;
+	channel_id: string;
+	BaseRoundPayload: BaseRoundPayloadV1;
+}
+
+type RoundUpdatedPayload = {
+	round_id?: WireRoundID;
 	roundId?: string;
 	update?: Partial<Round>;
-}
+};
 
 interface RoundDeletedPayloadV1 {
-	round_id: string;
+	round_id: WireRoundID;
+	guild_id: string;
+	discord_message_id: string;
+	channel_id?: string;
 }
 
 interface RoundStartedPayloadV1 {
-	round_id: string;
+	round_id: WireRoundID;
+	guild_id: string;
+	channel_id: string;
+	title: string;
+	location: string;
+	start_time?: string | null | Record<string, unknown>;
 }
 
 interface RoundFinalizedPayloadV1 {
-	round_id: string;
+	round_id: WireRoundID;
+	guild_id: string;
+	round_data?: {
+		id: WireRoundID;
+		title: string;
+		description: string;
+		location: string;
+		start_time?: string | null | Record<string, unknown>;
+		state: string;
+		created_by: string;
+		event_message_id: string;
+		guild_id: string;
+		participants?: RoundParticipantPayload[];
+	};
 }
 
 interface RoundParticipantPayload {
@@ -49,20 +77,41 @@ interface RoundParticipantPayload {
 	response: string;
 	score?: number | null;
 	tag_number?: number | null;
+	raw_name?: string;
+	hole_scores?: number[];
+	is_dnf?: boolean;
 }
 
 interface ParticipantJoinedPayloadV1 {
-	round_id: string;
+	round_id: WireRoundID;
+	guild_id: string;
+	discord_message_id: string;
 	accepted_participants?: RoundParticipantPayload[];
 	declined_participants?: RoundParticipantPayload[];
 	tentative_participants?: RoundParticipantPayload[];
 }
 
+type ParticipantSnapshotPayload = {
+	accepted_participants?: RoundParticipantPayload[];
+	declined_participants?: RoundParticipantPayload[];
+	tentative_participants?: RoundParticipantPayload[];
+};
+
+type ParticipantRemovedPayloadV1 = ParticipantSnapshotPayload & {
+	round_id: WireRoundID;
+	guild_id: string;
+	discord_message_id: string;
+	user_id: string;
+};
+
 interface ParticipantScoreUpdatedPayloadV1 {
-	round_id: string;
+	round_id: WireRoundID;
+	guild_id: string;
+	channel_id: string;
+	discord_message_id: string;
 	user_id?: string;
 	score?: number;
-	participants?: ParticipantRaw[];
+	participants?: RoundParticipantPayload[] | ParticipantRaw[];
 }
 
 interface LeaderboardTagUpdatedPayloadV1 {
@@ -105,76 +154,136 @@ class SubscriptionManager {
 	private subscribeRoundEvents(guildId: string): void {
 		// Round created
 		this.unsubscribers.push(
-			nats.subscribe(`round.created.v1.${guildId}`, (msg) => {
+			nats.subscribe(`round.created.v2.${guildId}`, (msg) => {
 				roundService.handleRoundCreated(toRoundRaw(msg.data as RoundCreatedPayloadV1 | RoundRaw));
 			})
 		);
 
 		// Round updated
 		this.unsubscribers.push(
-			nats.subscribe(`round.updated.v1.${guildId}`, (msg) => {
+			nats.subscribe(`round.updated.v2.${guildId}`, (msg) => {
 				const payload = msg.data as RoundUpdatedPayload;
-				const roundId = payload.roundId || payload.round_id;
-				if (!roundId || !payload.update) return;
+				const roundId = payload.roundId || roundIdFromWire(payload.round_id);
+				if (!roundId) return;
+				if (!payload.update) {
+					roundActionsService.reconcileRound(roundId, 'round-updated');
+					void dataLoader.reload();
+					return;
+				}
 				roundService.handleRoundUpdated({ roundId, update: payload.update });
+				roundActionsService.reconcileRound(roundId, 'round-updated');
 			})
 		);
 
 		// Round deleted
 		this.unsubscribers.push(
-			nats.subscribe(`round.deleted.v1.${guildId}`, (msg) => {
+			nats.subscribe(`round.deleted.v2.${guildId}`, (msg) => {
 				const payload = msg.data as RoundDeletedPayloadV1;
-				roundService.handleRoundDeleted({ roundId: payload.round_id });
+				const roundId = roundIdFromWire(payload.round_id);
+				if (!roundId) return;
+				roundService.handleRoundDeleted({ roundId });
+				roundActionsService.reconcileRound(roundId, 'round-deleted');
 			})
 		);
 
 		// Round started
 		this.unsubscribers.push(
-			nats.subscribe(`round.started.v1.${guildId}`, (msg) => {
+			nats.subscribe(`round.started.v2.${guildId}`, (msg) => {
 				const payload = msg.data as RoundStartedPayloadV1;
+				const roundId = roundIdFromWire(payload.round_id);
+				if (!roundId) return;
+
+				const update: Partial<Round> = { state: 'started' };
+				if (payload.title) update.title = payload.title;
+				if (payload.location) update.location = payload.location;
+				const startTime = normalizeStartTime(payload.start_time);
+				if (startTime) update.startTime = startTime;
+
 				roundService.handleRoundUpdated({
-					roundId: payload.round_id,
-					update: { state: 'started' }
+					roundId,
+					update
 				});
+				roundActionsService.reconcileRound(roundId, 'round-updated');
 			})
 		);
 
 		// Round finalized
 		this.unsubscribers.push(
-			nats.subscribe(`round.finalized.v1.${guildId}`, (msg) => {
+			nats.subscribe(`round.finalized.v2.${guildId}`, (msg) => {
 				const payload = msg.data as RoundFinalizedPayloadV1;
+				const roundId = roundIdFromWire(payload.round_id);
+				if (!roundId) return;
+
+				const finalizedRoundRaw = toRoundRawFromFinalizedPayload(payload);
+				if (finalizedRoundRaw) {
+					roundService.handleRoundCreated(finalizedRoundRaw);
+				}
+
 				roundService.handleRoundUpdated({
-					roundId: payload.round_id,
-					update: { state: 'finalized' }
+					roundId,
+					update: buildFinalizedRoundUpdate(payload)
 				});
+				roundActionsService.reconcileRound(roundId, 'round-updated');
 			})
 		);
 
 		// Participant joined
 		this.unsubscribers.push(
-			nats.subscribe(`round.participant.joined.v1.${guildId}`, (msg) => {
+			nats.subscribe(`round.participant.joined.v2.${guildId}`, (msg) => {
 				const payload = msg.data as ParticipantJoinedPayloadV1;
+				const roundId = roundIdFromWire(payload.round_id);
+				if (!roundId) return;
+
 				const participants = flattenParticipants(payload);
 				if (participants.length === 0) return;
 
 				roundService.handleRoundUpdated({
-					roundId: payload.round_id,
+					roundId,
 					update: { participants }
 				});
+				roundActionsService.reconcileRound(roundId, 'participant-updated');
+			})
+		);
+
+		// Participant removed
+		this.unsubscribers.push(
+			nats.subscribe(`round.participant.removed.v2.${guildId}`, (msg) => {
+				const payload = msg.data as ParticipantRemovedPayloadV1;
+				const roundId = roundIdFromWire(payload.round_id);
+				if (!roundId) return;
+
+				if (hasParticipantSnapshot(payload)) {
+					const participants = flattenParticipants(payload);
+					roundService.handleRoundUpdated({
+						roundId,
+						update: { participants }
+					});
+					roundActionsService.reconcileRound(roundId, 'participant-updated');
+					return;
+				}
+
+				if (!payload.user_id) {
+					return;
+				}
+
+				roundService.removeParticipant(roundId, payload.user_id);
+				roundActionsService.reconcileRound(roundId, 'participant-updated');
 			})
 		);
 
 		// Score updated
 		this.unsubscribers.push(
-			nats.subscribe(`round.participant.score.updated.v1.${guildId}`, (msg) => {
+			nats.subscribe(`round.participant.score.updated.v2.${guildId}`, (msg) => {
 				const payload = msg.data as ParticipantScoreUpdatedPayloadV1;
-				if (!payload.round_id) return;
+				const roundId = roundIdFromWire(payload.round_id);
+				if (!roundId) return;
 
 				if (Array.isArray(payload.participants) && payload.participants.length > 0) {
 					roundService.handleScoresSnapshot({
-						roundId: payload.round_id,
-						participants: payload.participants
+						roundId,
+						participants: payload.participants.map(toParticipantRaw)
 					});
+					roundActionsService.reconcileRound(roundId, 'score-updated');
 					return;
 				}
 
@@ -182,10 +291,11 @@ class SubscriptionManager {
 					return;
 				}
 				roundService.handleScoreUpdated({
-					roundId: payload.round_id,
+					roundId,
 					userId: payload.user_id,
 					score: payload.score
 				});
+				roundActionsService.reconcileRound(roundId, 'score-updated');
 			})
 		);
 	}
@@ -196,14 +306,14 @@ class SubscriptionManager {
 	private subscribeLeaderboardEvents(guildId: string): void {
 		// Full leaderboard update
 		this.unsubscribers.push(
-			nats.subscribe(`leaderboard.updated.v1.${guildId}`, () => {
+			nats.subscribe(`leaderboard.updated.v2.${guildId}`, () => {
 				dataLoader.reload();
 			})
 		);
 
 		// Tag updated (single entry change)
 		this.unsubscribers.push(
-			nats.subscribe(`leaderboard.tag.updated.v1.${guildId}`, (msg) => {
+			nats.subscribe(`leaderboard.tag.updated.v2.${guildId}`, (msg) => {
 				const payload = msg.data as LeaderboardTagUpdatedPayloadV1;
 				leaderboardService.applyPatch({
 					op: 'upsert_entry',
@@ -222,7 +332,7 @@ class SubscriptionManager {
 
 		// Tag swap processed
 		this.unsubscribers.push(
-			nats.subscribe(`leaderboard.tag.swap.processed.v1.${guildId}`, (msg) => {
+			nats.subscribe(`leaderboard.tag.swap.processed.v2.${guildId}`, (msg) => {
 				const payload = msg.data as TagSwapProcessedPayloadV1;
 				leaderboardService.applyPatch({
 					op: 'swap_tags',
@@ -240,16 +350,19 @@ function toRoundRaw(payload: RoundCreatedPayloadV1 | RoundRaw): RoundRaw {
 		return payload;
 	}
 
+	const basePayload = payload.BaseRoundPayload;
+	const roundID = roundIdFromWire(basePayload.round_id);
+
 	return {
-		id: payload.round_id,
+		id: roundID,
 		guild_id: payload.guild_id,
-		title: payload.title,
-		location: payload.location || '',
-		description: payload.description || '',
-		start_time: payload.start_time || null,
+		title: basePayload.title || '',
+		location: basePayload.location || '',
+		description: basePayload.description || '',
+		start_time: normalizeStartTime(basePayload.start_time),
 		state: 'scheduled',
-		created_by: payload.user_id || '',
-		event_message_id: payload.discord_message_id || '',
+		created_by: basePayload.user_id || '',
+		event_message_id: payload.channel_id || '',
 		participants: []
 	};
 }
@@ -258,7 +371,15 @@ function toOptionalNumber(value: number | null | undefined): number | undefined 
 	return typeof value === 'number' ? value : undefined;
 }
 
-function flattenParticipants(payload: ParticipantJoinedPayloadV1) {
+function hasParticipantSnapshot(payload: ParticipantSnapshotPayload): boolean {
+	return (
+		Array.isArray(payload.accepted_participants) ||
+		Array.isArray(payload.declined_participants) ||
+		Array.isArray(payload.tentative_participants)
+	);
+}
+
+function flattenParticipants(payload: ParticipantSnapshotPayload) {
 	const accepted = (payload.accepted_participants || []).map((participant) =>
 		toParticipant(participant, 'accepted')
 	);
@@ -272,16 +393,25 @@ function flattenParticipants(payload: ParticipantJoinedPayloadV1) {
 	return [...accepted, ...declined, ...tentative];
 }
 
+function toParticipantRaw(participant: RoundParticipantPayload | ParticipantRaw): ParticipantRaw {
+	return {
+		user_id: participant.user_id,
+		response: normalizeResponse(participant.response, 'tentative'),
+		score: typeof participant.score === 'number' ? participant.score : null,
+		tag_number: typeof participant.tag_number === 'number' ? participant.tag_number : null,
+		raw_name: participant.raw_name,
+		hole_scores: Array.isArray(participant.hole_scores) ? participant.hole_scores : undefined,
+		is_dnf: participant.is_dnf === true ? true : undefined
+	};
+}
+
 function toParticipant(
 	participant: RoundParticipantPayload,
 	fallbackResponse: ParticipantRaw['response']
 ) {
-	return participantFromRaw({
-		user_id: participant.user_id,
-		response: normalizeResponse(participant.response, fallbackResponse),
-		score: participant.score ?? null,
-		tag_number: participant.tag_number ?? null
-	});
+	return participantFromRaw(
+		toParticipantRaw({ ...participant, response: participant.response || fallbackResponse })
+	);
 }
 
 function normalizeResponse(
@@ -293,6 +423,75 @@ function normalizeResponse(
 	if (normalized === 'decline' || normalized === 'declined') return 'declined';
 	if (normalized === 'tentative') return 'tentative';
 	return fallback;
+}
+
+function normalizeStartTime(value: unknown): string | null {
+	return typeof value === 'string' && value.length > 0 ? value : null;
+}
+
+function roundIdFromWire(value: WireRoundID | undefined): string {
+	if (typeof value === 'string') {
+		return value;
+	}
+
+	if (Array.isArray(value)) {
+		const bytes = value.filter((entry): entry is number => Number.isInteger(entry) && entry >= 0);
+		if (bytes.length === 16 && bytes.every((entry) => entry <= 255)) {
+			const hex = bytes.map((entry) => entry.toString(16).padStart(2, '0')).join('');
+			return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
+		}
+		return bytes.map(String).join('-');
+	}
+
+	return '';
+}
+
+function buildFinalizedRoundUpdate(payload: RoundFinalizedPayloadV1): Partial<Round> {
+	const update: Partial<Round> = { state: 'finalized' };
+	const data = payload.round_data;
+	if (!data) return update;
+
+	if (data.participants) {
+		update.participants = data.participants.map((p) => toParticipant(p, 'tentative'));
+	}
+	if (data.title) update.title = data.title;
+	if (data.location) update.location = data.location;
+	if (data.description !== undefined) update.description = data.description;
+	const startTime = normalizeStartTime(data.start_time);
+	if (startTime) update.startTime = startTime;
+	if (data.event_message_id) update.eventMessageId = data.event_message_id;
+	return update;
+}
+
+function toRoundRawFromFinalizedPayload(payload: RoundFinalizedPayloadV1): RoundRaw | null {
+	const data = payload.round_data;
+	if (!data) return null;
+
+	const roundID = roundIdFromWire(data.id) || roundIdFromWire(payload.round_id);
+	if (!roundID) return null;
+
+	const {
+		guild_id,
+		title,
+		location,
+		description,
+		start_time,
+		created_by,
+		event_message_id,
+		participants = []
+	} = data;
+	return {
+		id: roundID,
+		guild_id: guild_id || payload.guild_id,
+		title,
+		location,
+		description,
+		start_time: normalizeStartTime(start_time),
+		state: 'finalized',
+		created_by,
+		event_message_id,
+		participants: participants.map(toParticipantRaw)
+	};
 }
 
 export const subscriptionManager = new SubscriptionManager();

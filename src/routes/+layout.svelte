@@ -1,29 +1,20 @@
 <script lang="ts">
 	import '../styles/app.css';
+	import { browser } from '$app/environment';
 	import { page } from '$app/state';
 	import OfflineIndicator from '$lib/components/pwa/OfflineIndicator.svelte';
+	import { auth } from '$lib/stores/auth.svelte';
 	import ThemeProvider from '$lib/components/general/ThemeProvider.svelte';
 	import ThemeToggle from '$lib/components/general/ThemeToggle.svelte';
+	import Navbar from '$lib/components/general/Navbar.svelte';
 	import { modalOpen } from '$lib/stores/overlay';
 	import { onMount, onDestroy } from 'svelte';
-	import { browser } from '$app/environment';
-	import Navbar from '$lib/components/general/Navbar.svelte';
-
-	type AuthLike = {
-		isAuthenticated: boolean;
-	};
-
-	const noopAuth: AuthLike = {
-		isAuthenticated: false
-	};
-
-	let auth = $state<AuthLike>(noopAuth);
 
 	type AppInitLike = {
 		isLoading: boolean;
 		error: string | null;
 		needsClub: boolean;
-		initialize: () => Promise<void>;
+		initialize: (opts?: { serverTicket?: string | null }) => Promise<void>;
 		teardown: () => Promise<void>;
 	};
 
@@ -42,21 +33,20 @@
 	// initial bundle smaller. Use Svelte 5 `$state` so updates are reactive.
 	let LiveAnnouncer = $state<any>(null);
 	let UpdateSnackbarClient = $state<any>(null);
-	let ClubDiscovery = $state<any>(null);
 	let InstallPrompt = $state<any>(null);
-	// Defer importing PWA helpers so they don't bloat the initial layout chunk.
-	// We'll dynamically import them after the app is idle.
+	let ClubDiscovery = $state<any>(null);
 
 	let swListener: (ev: Event) => void;
+	const serverUser = page.data.user;
+	const serverTicket = page.data.ticket;
+	const hasServerAuth = Boolean(serverUser && serverTicket);
+	const isAuthenticatedView = $derived(browser ? auth.isAuthenticated : hasServerAuth);
+
+	if (browser && serverUser && serverTicket && auth.status === 'idle') {
+		auth.hydrateFromServer(serverUser, serverTicket);
+	}
 
 	onMount(async () => {
-		try {
-			const { auth: loadedAuth } = await import('$lib/stores/auth.svelte');
-			auth = loadedAuth;
-		} catch (err) {
-			console.warn('failed to load auth store', err);
-		}
-
 		// In development, force unregister any existing service workers to prevent stale caching
 		if (import.meta.env.DEV && 'serviceWorker' in navigator) {
 			const registrations = await navigator.serviceWorker.getRegistrations();
@@ -111,16 +101,16 @@
 		// Lazy-load a11y and update UI components after hydration so they don't
 		// inflate the initial JS payload.
 		try {
-			const [live, upd, discovery, prompt] = await Promise.all([
+			const [live, upd, prompt, club] = await Promise.all([
 				import('$lib/components/general/LiveAnnouncer.svelte'),
 				import('$lib/components/general/UpdateSnackbar.client.svelte'),
-				import('$lib/components/auth/ClubDiscovery.svelte'),
-				import('$lib/components/pwa/InstallPrompt.svelte')
+				import('$lib/components/pwa/InstallPrompt.svelte'),
+				import('$lib/components/auth/ClubDiscovery.svelte')
 			]);
 			LiveAnnouncer = live.default;
 			UpdateSnackbarClient = upd.default;
-			ClubDiscovery = discovery.default;
 			InstallPrompt = prompt.default;
+			ClubDiscovery = club.default;
 		} catch (err) {
 			// best-effort, keep app usable without these features
 
@@ -141,7 +131,7 @@
 				const { appInit: loadedAppInit } = await import('$lib/stores/init.svelte');
 				appInit = loadedAppInit;
 				hasLoadedAppInit = true;
-				await loadedAppInit.initialize();
+				await loadedAppInit.initialize({ serverTicket: page.data.ticket });
 			} catch (err) {
 				console.warn('deferred app init failed', err);
 			}
@@ -169,7 +159,7 @@
 </script>
 
 <svelte:head>
-	{#if auth.isAuthenticated}
+	{#if isAuthenticatedView}
 		<link rel="preconnect" href="https://cdn.discordapp.com" crossorigin="anonymous" />
 	{/if}
 </svelte:head>
@@ -187,7 +177,7 @@
 	{#if UpdateSnackbarClient}
 		<UpdateSnackbarClient />
 	{/if}
-	{#if appInit.isLoading}
+	{#if appInit.isLoading && !isAuthenticatedView}
 		<div class="flex min-h-screen items-center justify-center bg-[#081212]">
 			<div class="text-center">
 				<div
@@ -209,7 +199,7 @@
 				</button>
 			</div>
 		</div>
-	{:else if auth.isAuthenticated}
+	{:else if isAuthenticatedView}
 		{#if appInit.needsClub && !page.url.pathname.startsWith('/join') && !page.url.pathname.startsWith('/auth')}
 			<!-- Authenticated but not yet a club member — show discovery flow -->
 			{#if ClubDiscovery}

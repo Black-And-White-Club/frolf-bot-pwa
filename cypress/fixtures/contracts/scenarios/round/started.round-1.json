@@ -3,10 +3,14 @@
 	"steps": [
 		{
 			"action": "emit",
-			"subject": "round.started.v1.{scope_id}",
-			"validate": false,
+			"subject": "round.started.v2.{scope_id}",
 			"payload": {
-				"round_id": "round-1"
+				"guild_id": "guild-123",
+				"channel_id": "channel-123",
+				"round_id": "round-1",
+				"title": "Weekly Tag Round",
+				"location": "Pier Park",
+				"start_time": "2026-01-25T10:00:00Z"
 			}
 		}
 	]

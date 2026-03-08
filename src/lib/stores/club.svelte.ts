@@ -143,7 +143,7 @@ class ClubService {
 
 			// Request club info via NATS
 			const response = await nats.request<any, any>(
-				`club.info.request.v1.${id}`,
+				`club.info.request.v2.${id}`,
 				{ club_uuid: id },
 				{ timeout: 3000 }
 			);

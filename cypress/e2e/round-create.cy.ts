@@ -25,7 +25,7 @@ describe('Round Create Route', () => {
 
 	it('allows player to submit create-round request and returns to rounds route', () => {
 		arrangeRoundCreateSession('player', '/rounds');
-		cy.wsAssertPublished(`round.list.request.v1.${subjectId}`);
+		cy.wsAssertPublished(`round.list.request.v2.${subjectId}`);
 
 		createRoundScreen.createRouteButton().should('be.visible').click();
 		cy.location('pathname').should('eq', '/rounds/create');
@@ -40,7 +40,7 @@ describe('Round Create Route', () => {
 		});
 		createRoundScreen.submit();
 
-		cy.wsAssertPublished('round.creation.requested.v1', (entry) => {
+		cy.wsAssertPublished('round.creation.requested.v2', (entry) => {
 			const payload = entry.payload as Record<string, string>;
 			return (
 				payload.guild_id === subjectId &&

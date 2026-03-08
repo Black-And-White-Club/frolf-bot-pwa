@@ -1,21 +1,34 @@
 #!/usr/bin/env node
 // scripts/run-lighthouse.js
-// Build, start preview, wait for server, run Lighthouse, then stop preview.
+// Node-compatible runner kept in sync with the Bun version for manual/debug usage.
 
 import { spawn } from 'child_process';
-import http from 'http';
-import process from 'process';
 import fs from 'fs';
 import path from 'path';
+import process from 'process';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-const HOST = process.env.LH_HOST || 'http://localhost:5173';
+const HOST = process.env.LH_HOST || 'http://127.0.0.1:4173';
 const TIMEOUT = Number(process.env.LH_TIMEOUT || 45000);
+const PREVIEW_URL = new URL(HOST);
+const PREVIEW_HOST = PREVIEW_URL.hostname;
+const PREVIEW_PORT = PREVIEW_URL.port || (PREVIEW_URL.protocol === 'https:' ? '443' : '80');
+const VITE_BIN = path.resolve(
+	__dirname,
+	'..',
+	'node_modules',
+	'.bin',
+	process.platform === 'win32' ? 'vite.cmd' : 'vite'
+);
+
+function sleep(ms) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 function run(cmd, args, opts = {}) {
+	console.log(`> ${cmd} ${args.join(' ')}`);
 	return new Promise((resolve, reject) => {
 		const child = spawn(cmd, args, { stdio: 'inherit', shell: false, ...opts });
 		child.on('error', (err) => reject(err));
@@ -25,46 +38,49 @@ function run(cmd, args, opts = {}) {
 	});
 }
 
-function waitForUrl(url, timeout = TIMEOUT, interval = 500) {
+async function waitForUrl(url, timeout = TIMEOUT, interval = 500) {
 	const deadline = Date.now() + timeout;
-	return new Promise((resolve, reject) => {
-		const tick = () => {
-			const req = http.request(url, { method: 'GET', timeout: 2000 }, (res) => {
-				res.resume();
-				resolve();
-			});
-			req.on('error', () => {
-				if (Date.now() > deadline) reject(new Error('Timeout waiting for ' + url));
-				else setTimeout(tick, interval);
-			});
-			req.on('timeout', () => req.destroy());
-			req.end();
-		};
-		tick();
-	});
+	while (Date.now() < deadline) {
+		try {
+			const res = await fetch(url, { method: 'GET' });
+			if (res.ok) return;
+		} catch {
+			// ignore
+		}
+		await sleep(interval);
+	}
+	throw new Error(`Timeout waiting for ${url}`);
 }
 
 // eslint-disable-next-line complexity, sonarjs/cognitive-complexity
 async function main() {
-	const usingBun = !!process.env.BUN_VERSION;
-	const buildCmd = usingBun ? 'bun' : process.platform === 'win32' ? 'npm.cmd' : 'npm';
-	const buildArgs = usingBun ? ['run', 'build'] : ['run', 'build'];
-
 	console.log('1) Building (this may take a moment)...');
-	await run(buildCmd, buildArgs);
+	await run(
+		process.execPath,
+		[path.resolve(__dirname, '..', 'node_modules', 'vite', 'bin', 'vite.js'), 'build'],
+		{
+			env: {
+				...process.env,
+				PRIVATE_API_URL: process.env.PRIVATE_API_URL || 'http://localhost:8080',
+				PUBLIC_ALLOW_MOCK_PROD: 'true'
+			}
+		}
+	);
 
 	console.log('2) Starting preview server');
-	// spawn preview in background
-	const previewCmd = usingBun ? 'bun' : process.platform === 'win32' ? 'npm.cmd' : 'npm';
-	const previewArgs = usingBun
-		? ['run', 'preview', '--', '--port', '5173']
-		: ['run', 'preview', '--', '--port', '5173'];
-	const preview = spawn(previewCmd, previewArgs, { stdio: 'inherit', shell: false });
+	const preview = spawn(VITE_BIN, ['preview', '--host', PREVIEW_HOST, '--port', PREVIEW_PORT], {
+		stdio: 'inherit',
+		shell: false,
+		env: {
+			...process.env,
+			PRIVATE_API_URL: process.env.PRIVATE_API_URL || 'http://localhost:8080',
+			PUBLIC_ALLOW_MOCK_PROD: 'true'
+		}
+	});
 
-	// ensure preview is killed on exit
-	const cleanup = () => {
+	const cleanup = async () => {
 		try {
-			if (preview && !preview.killed) preview.kill();
+			if (!preview.killed) preview.kill();
 		} catch {
 			// ignore
 		}
@@ -78,64 +94,54 @@ async function main() {
 		await waitForUrl(HOST);
 
 		console.log('4) Running Lighthouse (HTML + JSON)');
-		// Ensure dist exists
 		const distDir = path.resolve(__dirname, '..', 'dist');
-		try {
-			fs.mkdirSync(distDir, { recursive: true });
-		} catch {
-			// ignore
-		}
+		fs.mkdirSync(distDir, { recursive: true });
 
-		// Prefer bunx then npx. We'll try each runner until one succeeds.
-		const runners = usingBun ? ['bunx', 'npx'] : ['bunx', 'npx'];
-		let ran = false;
-		const htmlPath = path.resolve(distDir, 'lighthouse.html');
+		const reportBasePath = path.resolve(distDir, 'lighthouse');
+		const htmlReportPath = path.resolve(distDir, 'lighthouse.report.html');
+		const finalHtmlPath = path.resolve(distDir, 'lighthouse.html');
 		const jsonPath = path.resolve(distDir, 'lighthouse.report.json');
+		const targetUrl = `${HOST}/?mock=true`;
+		const runners = [
+			['bunx', ['lighthouse']],
+			[process.platform === 'win32' ? 'npx.cmd' : 'npx', ['lighthouse']]
+		];
 
-		for (const runner of runners) {
+		let lastError = null;
+		for (const [runner, baseArgs] of runners) {
 			try {
-				// Run HTML output
-				console.log(`Running ${runner} lighthouse -> html`);
 				await run(runner, [
-					'lighthouse',
-					HOST,
+					...baseArgs,
+					targetUrl,
 					'--output',
 					'html',
-					'--output-path',
-					htmlPath,
-					'--chrome-flags=--headless'
-				]);
-
-				// Run JSON output
-				console.log(`Running ${runner} lighthouse -> json`);
-				await run(runner, [
-					'lighthouse',
-					HOST,
 					'--output',
 					'json',
 					'--output-path',
-					jsonPath,
+					reportBasePath,
 					'--chrome-flags=--headless'
 				]);
-
-				ran = true;
+				lastError = null;
 				break;
 			} catch (err) {
+				lastError = err;
 				console.warn(`${runner} failed: ${err && err.message ? err.message : err}`);
-				// try next runner
 			}
 		}
 
-		if (!ran)
+		if (lastError) {
 			throw new Error(
 				'Could not run lighthouse with bunx or npx. Please install lighthouse or run it manually.'
 			);
+		}
+
+		fs.copyFileSync(htmlReportPath, finalHtmlPath);
 
 		console.log('Lighthouse finished. Reports:');
-		console.log(' -', path.resolve(__dirname, '..', 'dist', 'lighthouse.html'));
-		console.log(' -', path.resolve(__dirname, '..', 'dist', 'lighthouse.report.json'));
+		console.log(' -', finalHtmlPath);
+		console.log(' -', jsonPath);
 	} finally {
-		cleanup();
+		await cleanup();
 	}
 }
 

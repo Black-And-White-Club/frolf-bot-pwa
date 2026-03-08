@@ -17,15 +17,16 @@ describe('Round Flow', () => {
 		cy.arrangeAuth({ clubUuid: subjectId, guildId: subjectId });
 		cy.wsConnect({
 			requiredSubjects: [
-				`round.created.v1.${subjectId}`,
-				`round.started.v1.${subjectId}`,
-				`round.participant.joined.v1.${subjectId}`,
-				`round.participant.score.updated.v1.${subjectId}`,
-				`round.deleted.v1.${subjectId}`
+				`round.created.v2.${subjectId}`,
+				`round.started.v2.${subjectId}`,
+				`round.finalized.v2.${subjectId}`,
+				`round.participant.joined.v2.${subjectId}`,
+				`round.participant.score.updated.v2.${subjectId}`,
+				`round.deleted.v2.${subjectId}`
 			]
 		});
 		cy.expectDashboardLoaded();
-		cy.wsAssertPublished(`round.list.request.v1.${subjectId}`);
+		cy.wsAssertPublished(`round.list.request.v2.${subjectId}`);
 	});
 
 	it('displays a new round when round.created is received', () => {

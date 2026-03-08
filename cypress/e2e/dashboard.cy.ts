@@ -37,7 +37,7 @@ describe('Dashboard', () => {
 			cy.wsConnect();
 			cy.expectDashboardLoaded();
 			leaderboardScreen.setMode('points');
-			cy.wsAssertPublished(`round.list.request.v1.${subjectId}`);
+			cy.wsAssertPublished(`round.list.request.v2.${subjectId}`);
 		});
 
 		it('renders newly created round from event stream', () => {

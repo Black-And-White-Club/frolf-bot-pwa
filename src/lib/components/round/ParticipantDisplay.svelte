@@ -142,10 +142,10 @@
 								{getResponseText(participant.response)}
 							</span>
 						{/if}
-						{:else if formatScore(participant.score, participant.is_dnf) !== null}
-							<span class="score-badge">{formatScore(participant.score, participant.is_dnf)}</span>
-						{:else if localStatus === 'completed'}
-							<span class="score-badge">DNP</span>
+					{:else if formatScore(participant.score, participant.is_dnf) !== null}
+						<span class="score-badge">{formatScore(participant.score, participant.is_dnf)}</span>
+					{:else if localStatus === 'completed'}
+						<span class="score-badge">DNP</span>
 					{:else}
 						<span class="score-badge" aria-hidden="true">-</span>
 					{/if}

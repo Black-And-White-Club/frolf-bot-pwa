@@ -6,13 +6,13 @@ export default {
 	sync: {
 		sourcePath:
 			process.env.EVENT_CONTRACTS_SOURCE ??
-			'../frolf-bot-shared/artifacts/contracts/events.v1.json',
-		outJsonPath: 'contracts/events.v1.json',
+			'../frolf-bot-shared/artifacts/contracts/events.contracts.json',
+		outJsonPath: 'contracts/events.contracts.json',
 		outTsPath: 'cypress/support/event-contracts.generated.ts',
 		sourceName: 'scripts/sync-event-contracts.mjs'
 	},
 	fixtures: {
-		contractsPath: 'contracts/events.v1.json',
+		contractsPath: 'contracts/events.contracts.json',
 		fixturesRoot: 'cypress/fixtures/contracts',
 		allowlistPath: 'contracts/contract-fixture-exceptions.json',
 		placeholders: ['{scope_id}', '{scope}']

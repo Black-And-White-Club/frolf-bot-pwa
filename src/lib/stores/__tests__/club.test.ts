@@ -122,7 +122,7 @@ describe('ClubService (club.svelte.ts)', () => {
 			await clubService.loadClubInfo();
 
 			expect(nats.request).toHaveBeenCalledWith(
-				'club.info.request.v1.club-new',
+				'club.info.request.v2.club-new',
 				{ club_uuid: 'club-new' },
 				expect.any(Object)
 			);

@@ -24,6 +24,11 @@
 		if (!url) return undefined;
 		// Only optimize Discord CDN URLs that don't already have query params
 		if (url.includes('cdn.discordapp.com') && !url.includes('?')) {
+			// Default avatar URLs (embed/avatars/) only exist as .png — skip webp conversion
+			if (url.includes('/embed/avatars/')) {
+				return url;
+			}
+
 			// multi-resolution support: request 2x size for high-DPI
 			const size2x = targetSize * 2;
 			const supported = [16, 32, 64, 128, 256, 512, 1024];

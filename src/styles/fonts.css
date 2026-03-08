@@ -4,7 +4,7 @@
 		src: url('../lib/assets/fonts/inter-v20-latin-regular.woff2') format('woff2');
 		font-weight: 400;
 		font-style: normal;
-		font-display: swap;
+		font-display: optional;
 	}
 
 	@font-face {
@@ -12,7 +12,7 @@
 		src: url('../lib/assets/fonts/inter-v20-latin-500.woff2') format('woff2');
 		font-weight: 500;
 		font-style: normal;
-		font-display: swap;
+		font-display: optional;
 	}
 
 	@font-face {
@@ -20,7 +20,7 @@
 		src: url('../lib/assets/fonts/inter-v20-latin-600.woff2') format('woff2');
 		font-weight: 600;
 		font-style: normal;
-		font-display: swap;
+		font-display: optional;
 	}
 
 	@font-face {
@@ -28,7 +28,7 @@
 		src: url('../lib/assets/fonts/inter-v20-latin-700.woff2') format('woff2');
 		font-weight: 700;
 		font-style: normal;
-		font-display: swap;
+		font-display: optional;
 	}
 
 	@font-face {
@@ -36,7 +36,7 @@
 		src: url('../lib/assets/fonts/space-grotesk-v22-latin-regular.woff2') format('woff2');
 		font-weight: 400;
 		font-style: normal;
-		font-display: swap;
+		font-display: optional;
 	}
 
 	@font-face {
@@ -44,7 +44,7 @@
 		src: url('../lib/assets/fonts/space-grotesk-v22-latin-500.woff2') format('woff2');
 		font-weight: 500;
 		font-style: normal;
-		font-display: swap;
+		font-display: optional;
 	}
 
 	@font-face {
@@ -52,7 +52,7 @@
 		src: url('../lib/assets/fonts/space-grotesk-v22-latin-600.woff2') format('woff2');
 		font-weight: 600;
 		font-style: normal;
-		font-display: swap;
+		font-display: optional;
 	}
 
 	@font-face {
@@ -60,7 +60,7 @@
 		src: url('../lib/assets/fonts/space-grotesk-v22-latin-700.woff2') format('woff2');
 		font-weight: 700;
 		font-style: normal;
-		font-display: swap;
+		font-display: optional;
 	}
 
 	@font-face {

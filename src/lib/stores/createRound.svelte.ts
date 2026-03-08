@@ -18,9 +18,10 @@ type CreateRoundRequestedPayloadV1 = {
 	user_id: string;
 	channel_id: string;
 	timezone: string;
+	request_source: string;
 };
 
-const CREATE_ROUND_SUBJECT = 'round.creation.requested.v1';
+const CREATE_ROUND_SUBJECT = 'round.creation.requested.v2';
 const FALLBACK_TIMEZONE = 'America/Chicago';
 const ROUND_REQUEST_SOURCE = 'pwa';
 
@@ -29,7 +30,7 @@ class CreateRoundService {
 	successMessage = $state<string | null>(null);
 	errorMessage = $state<string | null>(null);
 
-	private getSubmissionContext(): { guildId: string; userId: string } | null {
+	private getSubmissionContext(): { scopeId: string; userId: string } | null {
 		if (!auth.isAuthenticated || !auth.user) {
 			this.errorMessage = 'Sign in is required to create rounds.';
 			return null;
@@ -40,29 +41,30 @@ class CreateRoundService {
 			return null;
 		}
 
-		const guildId = auth.user.guildId?.trim();
+		const scopeId = auth.user.activeClubUuid?.trim() || auth.user.guildId?.trim();
 		const userId = auth.user.id?.trim();
 
-		if (!guildId || !userId) {
-			this.errorMessage = 'Guild identity is missing. Refresh and try again.';
+		if (!scopeId || !userId) {
+			this.errorMessage = 'Club or guild identity is missing. Refresh and try again.';
 			return null;
 		}
 
-		return { guildId, userId };
+		return { scopeId, userId };
 	}
 
 	private buildPayload(
 		input: CreateRoundInput,
-		context: { guildId: string; userId: string }
+		context: { scopeId: string; userId: string }
 	): CreateRoundRequestedPayloadV1 {
 		const payload: CreateRoundRequestedPayloadV1 = {
-			guild_id: context.guildId,
+			guild_id: context.scopeId,
 			title: input.title.trim(),
 			start_time: input.startTime.trim(),
 			location: input.location.trim(),
 			user_id: context.userId,
 			channel_id: '',
-			timezone: this.normalizeTimezone(input.timezone)
+			timezone: this.normalizeTimezone(input.timezone),
+			request_source: ROUND_REQUEST_SOURCE
 		};
 
 		const description = input.description.trim();

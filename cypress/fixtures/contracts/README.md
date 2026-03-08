@@ -1,6 +1,13 @@
 # Contract Scenario Fixtures
 
-These fixtures are validated against `contracts/events.v1.json` (generated from `frolf-bot-shared`) to prevent topic/payload drift.
+These fixtures are validated against `contracts/events.contracts.json` (generated from `frolf-bot-shared`) to prevent topic/payload drift.
+
+Keep fixture subjects and payload keys aligned with the generated contract catalog, even when the shape looks odd at first glance.
+Current examples:
+
+- `leaderboard.tag.list.requested.v1` is still the only published contract subject for tag-list requests. Do not bump it to `v2` locally until the shared catalog changes.
+- `BaseRoundPayload` is an upstream wire key in the generated round contracts. Preserve that exact key in fixtures until the shared contract source renames it.
+- `round.participant.joined.v2` accepts an optional integer `score`, but not `score: null`. Omit `score` when no value is available so fixtures keep validating against the current schema.
 
 ## Format
 
@@ -10,7 +17,7 @@ These fixtures are validated against `contracts/events.v1.json` (generated from 
 	"steps": [
 		{
 			"action": "emit",
-			"subject": "round.created.v1.{scope_id}",
+			"subject": "round.created.v2.{scope_id}",
 			"payload": {}
 		}
 	]
@@ -25,7 +32,7 @@ Contract-driven step (preferred for drift protection):
 	"steps": [
 		{
 			"action": "emit",
-			"contract_subject": "leaderboard.tag.updated.v1",
+			"contract_subject": "leaderboard.tag.updated.v2",
 			"payload_overrides": {
 				"guild_id": "guild-123",
 				"reason": "test",

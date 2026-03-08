@@ -94,19 +94,19 @@ describe('Admin Dashboard', () => {
 		adminScreen.setTagForPlayer('Player One', '3');
 		adminScreen.submitBatchButton().click();
 
-		cy.wsAssertPublished('leaderboard.batch.tag.assignment.requested.v1').then((entries) => {
+		cy.wsAssertPublished('leaderboard.batch.tag.assignment.requested.v2').then((entries) => {
 			const lastEntry = entries[entries.length - 1];
 			const payload = lastEntry.payload as {
 				batch_id: string;
-				requester_user_id: string;
+				requesting_user_id: string;
 				guild_id: string;
 			};
 
-			cy.wsEmit('leaderboard.batch.tag.assigned.v1', {
+			cy.wsEmit('leaderboard.batch.tag.assigned.v2', {
 				assignment_count: 1,
 				batch_id: payload.batch_id,
 				guild_id: payload.guild_id,
-				requesting_user_id: payload.requester_user_id,
+				requesting_user_id: payload.requesting_user_id,
 				assignments: [
 					{
 						guild_id: payload.guild_id,
@@ -126,18 +126,18 @@ describe('Admin Dashboard', () => {
 		adminScreen.setTagForPlayer('Player Two', '4');
 		adminScreen.submitBatchButton().click();
 
-		cy.wsAssertPublished('leaderboard.batch.tag.assignment.requested.v1').then((entries) => {
+		cy.wsAssertPublished('leaderboard.batch.tag.assignment.requested.v2').then((entries) => {
 			const lastEntry = entries[entries.length - 1];
 			const payload = lastEntry.payload as {
 				batch_id: string;
-				requester_user_id: string;
+				requesting_user_id: string;
 				guild_id: string;
 			};
 
-			cy.wsEmit('leaderboard.batch.tag.assignment.failed.v1', {
+			cy.wsEmit('leaderboard.batch.tag.assignment.failed.v2', {
 				batch_id: payload.batch_id,
 				guild_id: payload.guild_id,
-				requesting_user_id: payload.requester_user_id,
+				requesting_user_id: payload.requesting_user_id,
 				reason: 'Tag number reserved'
 			});
 		});
@@ -167,7 +167,7 @@ describe('Admin Dashboard', () => {
 		adminScreen.pointReasonInput().type('Bonus points');
 		adminScreen.adjustPointsButton().click();
 
-		cy.wsAssertPublished('leaderboard.manual.point.adjustment.v1').then((entries) => {
+		cy.wsAssertPublished('leaderboard.manual.point.adjustment.v2').then((entries) => {
 			const lastEntry = entries[entries.length - 1];
 			const payload = lastEntry.payload as {
 				guild_id: string;
@@ -176,7 +176,7 @@ describe('Admin Dashboard', () => {
 				reason: string;
 			};
 
-			cy.wsEmit('leaderboard.manual.point.adjustment.success.v1', {
+			cy.wsEmit('leaderboard.manual.point.adjustment.success.v2', {
 				guild_id: payload.guild_id,
 				member_id: payload.member_id,
 				points_delta: payload.points_delta,
@@ -195,11 +195,11 @@ describe('Admin Dashboard', () => {
 		adminScreen.pointReasonInput().type('Penalty');
 		adminScreen.adjustPointsButton().click();
 
-		cy.wsAssertPublished('leaderboard.manual.point.adjustment.v1').then((entries) => {
+		cy.wsAssertPublished('leaderboard.manual.point.adjustment.v2').then((entries) => {
 			const lastEntry = entries[entries.length - 1];
 			const payload = lastEntry.payload as { guild_id: string };
 
-			cy.wsEmit('leaderboard.manual.point.adjustment.failed.v1', {
+			cy.wsEmit('leaderboard.manual.point.adjustment.failed.v2', {
 				guild_id: payload.guild_id,
 				reason: 'Only admins can adjust points'
 			});
@@ -221,7 +221,7 @@ describe('Admin Dashboard', () => {
 		});
 		cy.contains('button', 'Upload Scorecard').click();
 
-		cy.wsAssertPublished('round.scorecard.admin.upload.requested.v1').then((entries) => {
+		cy.wsAssertPublished('round.scorecard.admin.upload.requested.v2').then((entries) => {
 			const lastEntry = entries[entries.length - 1];
 			const payload = lastEntry.payload as {
 				guild_id: string;
