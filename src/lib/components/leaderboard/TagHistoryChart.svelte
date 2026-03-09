@@ -25,6 +25,21 @@
 				tag: e.tagNumber
 			}))
 	);
+
+	// Always label the player's actual tag range so a flat line is still readable.
+	// e.g. a player stuck at #1 gets a "#1" label rather than unlabeled space above "#20".
+	const yTicks = $derived.by(() => {
+		if (chartData.length === 0) return 3;
+		const tags = chartData.map((d) => d.tag);
+		const best = Math.min(...tags);
+		const worst = Math.max(...tags);
+		const raw = [
+			-best,
+			...(worst !== best ? [-worst] : []),
+			...(totalTags && totalTags !== worst ? [-totalTags] : [])
+		];
+		return [...new Set(raw)].sort((a, b) => b - a);
+	});
 </script>
 
 <div class="chart-outer">
@@ -66,11 +81,11 @@
 						</filter>
 					</defs>
 
-					<!-- Y axis: convert negated values back to tag numbers -->
+					<!-- Y axis: labels at the player's actual tag range so flat lines are readable -->
 					<Axis
 						placement="left"
 						format={(v) => `#${Math.abs(v)}`}
-						ticks={3}
+						ticks={yTicks}
 						tickSize={0}
 						class="text-xs text-[var(--guild-text-secondary,#94a3b8)]"
 					/>
