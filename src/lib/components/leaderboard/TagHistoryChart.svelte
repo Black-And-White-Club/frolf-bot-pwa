@@ -7,15 +7,17 @@
 	interface Props {
 		history: TagHistoryEntry[];
 		memberId: string;
+		totalTags?: number;
 	}
 
-	let { history, memberId }: Props = $props();
+	let { history, memberId, totalTags }: Props = $props();
 
 	// Negate tagNumber so lower tag (better rank) appears higher on chart.
 	// LayerChart/layer-cake maps higher data values to the top of the chart.
+	// Exclude 'restore' entries — they're admin/system events, not real swaps.
 	const chartData = $derived(
 		history
-			.filter((e) => e.newMemberId === memberId)
+			.filter((e) => e.newMemberId === memberId && e.reason !== 'restore')
 			.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
 			.map((e) => ({
 				date: new Date(e.createdAt),
@@ -36,6 +38,7 @@
 				xScale={scaleTime()}
 				y="value"
 				yScale={scaleLinear()}
+				yDomain={totalTags ? [-totalTags, -1] : undefined}
 				yNice={false}
 				padding={{ top: 24, right: 20, bottom: 8, left: 8 }}
 			>
@@ -50,7 +53,11 @@
 						<!-- Amethyst aura glow — matches --guild-glow-aura token -->
 						<filter id="lc-glow" x="-20%" y="-40%" width="140%" height="180%">
 							<feGaussianBlur stdDeviation="3" result="blur" />
-							<feFlood flood-color="var(--guild-secondary, #8b7bb8)" flood-opacity="0.5" result="color" />
+							<feFlood
+								flood-color="var(--guild-secondary, #8b7bb8)"
+								flood-opacity="0.5"
+								result="color"
+							/>
 							<feComposite in="color" in2="blur" operator="in" result="coloredBlur" />
 							<feMerge>
 								<feMergeNode in="coloredBlur" />

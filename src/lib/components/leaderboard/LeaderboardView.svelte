@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
-	import LeaderboardRow from './LeaderboardRow.svelte';
-	import TagBadge from './TagBadge.svelte';
+	import { userProfiles } from '$lib/stores/userProfiles.svelte';
+	import { auth } from '$lib/stores/auth.svelte';
+	import PlayerRow from './PlayerRow.svelte';
+	import MovementIndicator from './MovementIndicator.svelte';
 	import ViewToggle from './ViewToggle.svelte';
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	let { guildId: _unusedGuildId }: { guildId?: string } = $props();
 
 	let sortedEntries = $derived(leaderboardService.currentView);
-	let topThree = $derived(sortedEntries.slice(0, 3));
 
 	let limit = $state(50);
 	const displayEntries = $derived(sortedEntries.slice(0, limit));
@@ -45,34 +46,33 @@
 		</div>
 	</div>
 
-	<!-- Top 3 Highlight -->
-	{#if topThree.length > 0}
-		<div
-			class="bg-liquid-skobeloff border-sage-600/20 flex justify-center gap-8 rounded-lg border p-6"
-		>
-			{#each topThree as entry, index (index)}
-				<TagBadge tag={entry} rank={index + 1} size="lg" />
-			{/each}
+	<!-- Full Rankings -->
+	<div class="space-y-2">
+		{#each displayEntries as entry, index (index)}
+			{@const displayName = userProfiles.getDisplayName(entry.userId)}
+			{@const movement = leaderboardService.getMovementIndicator(entry)}
+			<PlayerRow
+				userId={entry.userId}
+				name={displayName ?? entry.displayName ?? `Player #${entry.tagNumber}`}
+				rank={index + 1}
+				avatarUrl={userProfiles.getAvatarUrl(entry.userId)}
+				totalPoints={entry.totalPoints}
+				roundsPlayed={entry.roundsPlayed}
+				isCurrentUser={auth.user?.id === entry.userId}
+			>
+				<MovementIndicator {entry} {movement} />
+			</PlayerRow>
+		{/each}
+	</div>
+
+	{#if hasMore}
+		<div class="mt-6 flex justify-center">
+			<button
+				class="bg-sage-700/50 hover:bg-sage-600 border-sage-600/30 text-guild-text rounded-md border px-4 py-2 text-sm font-medium transition-colors"
+				onclick={loadMore}
+			>
+				Load More
+			</button>
 		</div>
 	{/if}
-
-	<!-- Full Rankings Table -->
-	<div class="bg-liquid-skobeloff border-sage-600/20 rounded-lg border p-4">
-		<div class="space-y-2">
-			{#each displayEntries as entry, index (index)}
-				<LeaderboardRow {entry} rank={index + 1} />
-			{/each}
-		</div>
-
-		{#if hasMore}
-			<div class="mt-6 flex justify-center">
-				<button
-					class="bg-sage-700/50 hover:bg-sage-600 border-sage-600/30 text-guild-text rounded-md border px-4 py-2 text-sm font-medium transition-colors"
-					onclick={loadMore}
-				>
-					Load More
-				</button>
-			</div>
-		{/if}
-	</div>
 </div>

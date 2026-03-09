@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { cn } from '$lib/utils';
+	import { clsx } from 'clsx';
 
 	type Props = {
 		userId: string;
@@ -63,7 +63,7 @@
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
-	class={cn(
+	class={clsx(
 		'player-row',
 		compact && 'compact',
 		isFirstPlace && 'first-place',
@@ -93,21 +93,21 @@
 			{/if}
 
 			<div class="meta">
-				<div class={cn('name', compact && 'small')}>{name}</div>
+				<div class={clsx('name', compact && 'small')}>{name}</div>
 				{#if isCurrentUser}
 					<div class="you-badge">(You)</div>
 				{/if}
 			</div>
 		</div>
 
-			<div class="right">
-				{@render statsSection()}
-				{#if children}
-					<!-- Nested actions stop propagation so the row click handler does not fire. -->
-					<div class="actions">
-						{@render children()}
-					</div>
-				{/if}
+		<div class="right">
+			{@render statsSection()}
+			{#if children}
+				<!-- Nested actions stop propagation so the row click handler does not fire. -->
+				<div class="actions">
+					{@render children()}
+				</div>
+			{/if}
 		</div>
 	</div>
 

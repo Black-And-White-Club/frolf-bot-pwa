@@ -17,6 +17,7 @@
 	let { memberId }: Props = $props();
 
 	const memberHistory = $derived(tagStore.selectedMemberHistory);
+	const visibleHistory = $derived(memberHistory.filter((e) => e.reason !== 'restore'));
 
 	function getDirection(entry: TagHistoryEntry, viewingId: string): 'got' | 'gave' | 'involved' {
 		if (entry.newMemberId === viewingId) return 'got';
@@ -48,19 +49,23 @@
 </script>
 
 <div class="tag-detail-inline" transition:slide={{ duration: 200 }}>
-	{#if memberHistory.length >= 2 && TagHistoryChart}
+	{#if TagHistoryChart}
 		<div class="chart-wrapper">
-			<TagHistoryChart history={memberHistory} {memberId} />
+			<TagHistoryChart
+				history={memberHistory}
+				{memberId}
+				totalTags={tagStore.maxTagNumber ?? undefined}
+			/>
 		</div>
 	{/if}
 
 	<div class="history-list">
 		{#if tagStore.historyLoading}
 			<p class="empty-state">Loading history...</p>
-		{:else if memberHistory.length === 0}
+		{:else if visibleHistory.length === 0}
 			<p class="empty-state">No tag history available.</p>
 		{:else}
-			{#each memberHistory as entry (entry.id)}
+			{#each visibleHistory as entry (entry.id)}
 				{@const direction = getDirection(entry, memberId)}
 				{@const counterparty = getCounterparty(entry, memberId)}
 				<div class="history-entry">
@@ -74,7 +79,9 @@
 						{/if}
 						<div class="entry-meta">
 							<span class="entry-reason reason-{entry.reason}">{reasonLabel(entry.reason)}</span>
-							<time class="entry-time" datetime={entry.createdAt}>{formatDate(entry.createdAt)}</time>
+							<time class="entry-time" datetime={entry.createdAt}
+								>{formatDate(entry.createdAt)}</time
+							>
 						</div>
 					</div>
 				</div>

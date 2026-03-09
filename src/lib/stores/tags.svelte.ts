@@ -198,45 +198,52 @@ export class TagService {
 	 */
 	async fetchTagHistory(guildId: string, memberId?: string, limit = 100): Promise<void> {
 		if (memberId) {
-			// Skip if already cached for this member
-			if (this.historyCache[memberId]) return;
-
-			this.historyLoading = true;
-			this.error = null;
-
-			try {
-				const payload: TagHistoryRequestPayload = { guild_id: guildId, member_id: memberId, limit };
-				const response = await nats.request<TagHistoryRequestPayload, TagHistoryResponseRaw>(
-					`leaderboard.tag.history.requested.v1.${guildId}`,
-					payload,
-					{ timeout: 5000 }
-				);
-				if (response) {
-					this.applyMemberHistoryResponse(memberId, response);
-				}
-			} catch (e) {
-				const msg = e instanceof Error ? e.message : 'Failed to load tag history';
-				this.historyLoading = false;
-				this.setError(msg);
-			}
+			await this.#fetchMemberHistory(guildId, memberId, limit);
 		} else {
-			this.loading = true;
-			this.error = null;
+			await this.#fetchGuildHistory(guildId, limit);
+		}
+	}
 
-			try {
-				const payload: TagHistoryRequestPayload = { guild_id: guildId, limit };
-				const response = await nats.request<TagHistoryRequestPayload, TagHistoryResponseRaw>(
-					`leaderboard.tag.history.requested.v1.${guildId}`,
-					payload,
-					{ timeout: 5000 }
-				);
-				if (response) {
-					this.applyHistoryResponse(response);
-				}
-			} catch (e) {
-				const msg = e instanceof Error ? e.message : 'Failed to load tag history';
-				this.setError(msg);
+	async #fetchMemberHistory(guildId: string, memberId: string, limit: number): Promise<void> {
+		if (this.historyCache[memberId]) return;
+
+		this.historyLoading = true;
+		this.error = null;
+
+		try {
+			const payload: TagHistoryRequestPayload = { guild_id: guildId, member_id: memberId, limit };
+			const response = await nats.request<TagHistoryRequestPayload, TagHistoryResponseRaw>(
+				`leaderboard.tag.history.requested.v1.${guildId}`,
+				payload,
+				{ timeout: 5000 }
+			);
+			if (response) {
+				this.applyMemberHistoryResponse(memberId, response);
 			}
+		} catch (e) {
+			const msg = e instanceof Error ? e.message : 'Failed to load tag history';
+			this.historyLoading = false;
+			this.setError(msg);
+		}
+	}
+
+	async #fetchGuildHistory(guildId: string, limit: number): Promise<void> {
+		this.loading = true;
+		this.error = null;
+
+		try {
+			const payload: TagHistoryRequestPayload = { guild_id: guildId, limit };
+			const response = await nats.request<TagHistoryRequestPayload, TagHistoryResponseRaw>(
+				`leaderboard.tag.history.requested.v1.${guildId}`,
+				payload,
+				{ timeout: 5000 }
+			);
+			if (response) {
+				this.applyHistoryResponse(response);
+			}
+		} catch (e) {
+			const msg = e instanceof Error ? e.message : 'Failed to load tag history';
+			this.setError(msg);
 		}
 	}
 
@@ -265,6 +272,12 @@ export class TagService {
 			const msg = e instanceof Error ? e.message : 'Failed to load tag list';
 			this.setError(msg);
 		}
+	}
+
+	get maxTagNumber(): number | null {
+		const active = this.tagList.filter((m) => m.currentTag !== null);
+		if (active.length === 0) return null;
+		return Math.max(...active.map((m) => m.currentTag!));
 	}
 
 	get sortedTagList() {
