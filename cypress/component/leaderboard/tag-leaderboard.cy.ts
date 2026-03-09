@@ -62,7 +62,9 @@ describe('TagLeaderboard row expansion', () => {
 		tagLeaderboardComponentScreen.historyBtn('member-1').click();
 
 		tagLeaderboardComponentScreen.expandedPanel().should('be.visible');
-		tagLeaderboardComponentScreen.historyBtn('member-1').should('have.attr', 'aria-expanded', 'true');
+		tagLeaderboardComponentScreen
+			.historyBtn('member-1')
+			.should('have.attr', 'aria-expanded', 'true');
 	});
 
 	it('clicking the same history button again collapses the panel', () => {
@@ -73,7 +75,9 @@ describe('TagLeaderboard row expansion', () => {
 
 		tagLeaderboardComponentScreen.historyBtn('member-1').click();
 		tagLeaderboardComponentScreen.expandedPanel().should('not.exist');
-		tagLeaderboardComponentScreen.historyBtn('member-1').should('have.attr', 'aria-expanded', 'false');
+		tagLeaderboardComponentScreen
+			.historyBtn('member-1')
+			.should('have.attr', 'aria-expanded', 'false');
 	});
 
 	it('switching to a different row collapses the first and expands the second', () => {
@@ -86,8 +90,12 @@ describe('TagLeaderboard row expansion', () => {
 
 		// Only one panel open at a time
 		tagLeaderboardComponentScreen.expandedPanel().should('have.length', 1);
-		tagLeaderboardComponentScreen.historyBtn('member-1').should('have.attr', 'aria-expanded', 'false');
-		tagLeaderboardComponentScreen.historyBtn('member-2').should('have.attr', 'aria-expanded', 'true');
+		tagLeaderboardComponentScreen
+			.historyBtn('member-1')
+			.should('have.attr', 'aria-expanded', 'false');
+		tagLeaderboardComponentScreen
+			.historyBtn('member-2')
+			.should('have.attr', 'aria-expanded', 'true');
 	});
 
 	it('pressing Escape collapses the open panel', () => {

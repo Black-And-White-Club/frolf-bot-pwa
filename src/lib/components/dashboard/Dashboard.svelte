@@ -67,10 +67,7 @@
 
 			<div class="leaderboard-section" data-testid="leaderboard-panel">
 				{#if leaderboardService.viewMode === 'tags'}
-					<TagLeaderboard
-						members={tagMembers}
-						onViewAll={() => goto('/leaderboard')}
-					/>
+					<TagLeaderboard members={tagMembers} onViewAll={() => goto('/leaderboard')} />
 				{:else}
 					<Leaderboard
 						entries={leaderboardService.currentView}

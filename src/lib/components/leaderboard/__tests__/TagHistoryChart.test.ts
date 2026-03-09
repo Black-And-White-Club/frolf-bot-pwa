@@ -131,8 +131,22 @@ describe('data transformation', () => {
 	test('handles identical timestamps (edge case) without crashing', () => {
 		const iso = new Date().toISOString();
 		const history: TagHistoryEntry[] = [
-			{ id: 1, tagNumber: 10, newMemberId: ME, oldMemberId: 'x', reason: 'round_swap', createdAt: iso },
-			{ id: 2, tagNumber: 8, newMemberId: ME, oldMemberId: 'y', reason: 'round_swap', createdAt: iso }
+			{
+				id: 1,
+				tagNumber: 10,
+				newMemberId: ME,
+				oldMemberId: 'x',
+				reason: 'round_swap',
+				createdAt: iso
+			},
+			{
+				id: 2,
+				tagNumber: 8,
+				newMemberId: ME,
+				oldMemberId: 'y',
+				reason: 'round_swap',
+				createdAt: iso
+			}
 		];
 		const { container } = render(TagHistoryChart, { props: { history, memberId: ME } });
 		expect(container.querySelector('.chart-wrap')).toBeTruthy();
@@ -145,9 +159,7 @@ describe('data transformation', () => {
 	});
 
 	test('handles large number of entries', () => {
-		const history = Array.from({ length: 50 }, (_, i) =>
-			makeEntry(i + 1, 50 - i, i * 2, ME)
-		);
+		const history = Array.from({ length: 50 }, (_, i) => makeEntry(i + 1, 50 - i, i * 2, ME));
 		const { container } = render(TagHistoryChart, { props: { history, memberId: ME } });
 		expect(container.querySelector('.chart-wrap')).toBeTruthy();
 	});

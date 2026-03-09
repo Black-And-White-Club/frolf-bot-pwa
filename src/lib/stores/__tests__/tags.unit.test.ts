@@ -48,9 +48,27 @@ describe('TagService', () => {
 			service.applyMemberHistoryResponse(
 				'member-1',
 				makeRaw([
-					{ id: 1, tag_number: 7, new_member_id: 'member-1', reason: 'won', created_at: '2025-01-01T00:00:00Z' },
-					{ id: 2, tag_number: 9, new_member_id: 'member-1', reason: 'challenge', created_at: '2025-01-03T00:00:00Z' },
-					{ id: 3, tag_number: 8, new_member_id: 'member-1', reason: 'lost', created_at: '2025-01-02T00:00:00Z' }
+					{
+						id: 1,
+						tag_number: 7,
+						new_member_id: 'member-1',
+						reason: 'won',
+						created_at: '2025-01-01T00:00:00Z'
+					},
+					{
+						id: 2,
+						tag_number: 9,
+						new_member_id: 'member-1',
+						reason: 'challenge',
+						created_at: '2025-01-03T00:00:00Z'
+					},
+					{
+						id: 3,
+						tag_number: 8,
+						new_member_id: 'member-1',
+						reason: 'lost',
+						created_at: '2025-01-02T00:00:00Z'
+					}
 				])
 			);
 
@@ -64,7 +82,15 @@ describe('TagService', () => {
 		it('does not return entries from a different member cache slot', () => {
 			service.applyMemberHistoryResponse(
 				'member-2',
-				makeRaw([{ id: 99, tag_number: 5, new_member_id: 'member-2', reason: 'won', created_at: '2025-01-01T00:00:00Z' }])
+				makeRaw([
+					{
+						id: 99,
+						tag_number: 5,
+						new_member_id: 'member-2',
+						reason: 'won',
+						created_at: '2025-01-01T00:00:00Z'
+					}
+				])
 			);
 			service.selectMember('member-1');
 			expect(service.selectedMemberHistory).toEqual([]);
@@ -73,11 +99,27 @@ describe('TagService', () => {
 		it('preserves entries from multiple members independently in the cache', () => {
 			service.applyMemberHistoryResponse(
 				'member-1',
-				makeRaw([{ id: 1, tag_number: 7, new_member_id: 'member-1', reason: 'won', created_at: '2025-01-01T00:00:00Z' }])
+				makeRaw([
+					{
+						id: 1,
+						tag_number: 7,
+						new_member_id: 'member-1',
+						reason: 'won',
+						created_at: '2025-01-01T00:00:00Z'
+					}
+				])
 			);
 			service.applyMemberHistoryResponse(
 				'member-2',
-				makeRaw([{ id: 2, tag_number: 3, new_member_id: 'member-2', reason: 'challenge', created_at: '2025-01-02T00:00:00Z' }])
+				makeRaw([
+					{
+						id: 2,
+						tag_number: 3,
+						new_member_id: 'member-2',
+						reason: 'challenge',
+						created_at: '2025-01-02T00:00:00Z'
+					}
+				])
 			);
 
 			service.selectMember('member-1');
@@ -130,11 +172,27 @@ describe('TagService', () => {
 
 			// Pre-populate guild-wide history
 			service.applyHistoryResponse(
-				makeRaw([{ id: 99, tag_number: 1, new_member_id: 'member-X', reason: 'challenge', created_at: '2025-01-01T00:00:00Z' }])
+				makeRaw([
+					{
+						id: 99,
+						tag_number: 1,
+						new_member_id: 'member-X',
+						reason: 'challenge',
+						created_at: '2025-01-01T00:00:00Z'
+					}
+				])
 			);
 
 			(nats.request as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-				makeRaw([{ id: 1, tag_number: 7, new_member_id: 'member-1', reason: 'won', created_at: '2025-01-01T00:00:00Z' }])
+				makeRaw([
+					{
+						id: 1,
+						tag_number: 7,
+						new_member_id: 'member-1',
+						reason: 'won',
+						created_at: '2025-01-01T00:00:00Z'
+					}
+				])
 			);
 
 			await service.fetchTagHistory('guild-1', 'member-1');
@@ -154,11 +212,19 @@ describe('TagService', () => {
 
 			service.applyMemberHistoryResponse(
 				'member-1',
-				makeRaw([{ id: 1, tag_number: 7, new_member_id: 'member-1', reason: 'won', created_at: '2025-01-01T00:00:00Z' }])
+				makeRaw([
+					{
+						id: 1,
+						tag_number: 7,
+						new_member_id: 'member-1',
+						reason: 'won',
+						created_at: '2025-01-01T00:00:00Z'
+					}
+				])
 			);
 
 			await service.fetchTagHistory('guild-1', 'member-1');
-			expect((nats.request as ReturnType<typeof vi.fn>)).not.toHaveBeenCalled();
+			expect(nats.request as ReturnType<typeof vi.fn>).not.toHaveBeenCalled();
 		});
 	});
 
@@ -185,7 +251,15 @@ describe('TagService', () => {
 		it('stores results in history array, not historyCache', async () => {
 			const { nats } = await import('../nats.svelte');
 			(nats.request as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-				makeRaw([{ id: 5, tag_number: 3, new_member_id: 'member-A', reason: 'won', created_at: '2025-01-01T00:00:00Z' }])
+				makeRaw([
+					{
+						id: 5,
+						tag_number: 3,
+						new_member_id: 'member-A',
+						reason: 'won',
+						created_at: '2025-01-01T00:00:00Z'
+					}
+				])
 			);
 
 			await service.fetchTagHistory('guild-1');
