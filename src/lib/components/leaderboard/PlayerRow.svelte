@@ -38,6 +38,13 @@
 		onclick?.(userId);
 	}
 
+	function handleKeydown(event: KeyboardEvent) {
+		if (!onclick) return;
+		if (event.key !== 'Enter' && event.key !== ' ') return;
+		event.preventDefault();
+		handleClick();
+	}
+
 	function getAvatarInitial(n: string) {
 		return n ? n.charAt(0).toUpperCase() : '?';
 	}
@@ -54,6 +61,7 @@
 	{/if}
 {/snippet}
 
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
 	class={cn(
 		'player-row',
@@ -64,17 +72,13 @@
 	)}
 	data-testid={testid}
 	data-user-id={userId}
+	role={onclick ? 'button' : undefined}
+	tabindex={onclick ? 0 : undefined}
+	aria-label={onclick ? `Select ${name}` : undefined}
+	onclick={handleClick}
+	onkeydown={handleKeydown}
 >
-	{#if onclick}
-		<button
-			type="button"
-			class="row-action-overlay"
-			onclick={handleClick}
-			aria-label={`Select ${name}`}
-		></button>
-	{/if}
-
-	<div class="player-content" aria-hidden={!!onclick} inert={!!onclick}>
+	<div class="player-content">
 		<div class="left">
 			<div class="avatar" aria-hidden="true" class:has-image={!!avatarUrl}>
 				{#if avatarUrl}
@@ -96,14 +100,14 @@
 			</div>
 		</div>
 
-		<div class="right">
-			{@render statsSection()}
-			{#if children}
-				<!-- actions container sits above the overlay -->
-				<div class="actions">
-					{@render children()}
-				</div>
-			{/if}
+			<div class="right">
+				{@render statsSection()}
+				{#if children}
+					<!-- Nested actions stop propagation so the row click handler does not fire. -->
+					<div class="actions">
+						{@render children()}
+					</div>
+				{/if}
 		</div>
 	</div>
 
@@ -130,28 +134,12 @@
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	}
 
-	.row-action-overlay {
-		position: absolute;
-		inset: 0;
-		width: 100%;
-		height: 100%;
-		background: transparent;
-		border: none;
-		cursor: pointer;
-		z-index: 2; /* Above content (z1), below actions (z3) */
-		padding: 0;
-		margin: 0;
-	}
-
 	.player-content {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		width: 100%;
 		gap: 0.75rem;
-		position: relative;
-		z-index: 1;
-		pointer-events: none; /* Let clicks pass through to overlay */
 	}
 
 	.left {
@@ -169,9 +157,6 @@
 	}
 
 	.actions {
-		position: relative;
-		z-index: 3; /* Above overlay */
-		pointer-events: auto; /* Re-enable clicks for buttons */
 		display: flex;
 		align-items: center;
 	}

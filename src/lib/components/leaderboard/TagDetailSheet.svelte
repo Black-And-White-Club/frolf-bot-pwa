@@ -1,42 +1,21 @@
 <script lang="ts">
-	import type { TagHistoryEntry } from '$lib/stores/tags.svelte';
+	import { tagStore } from '$lib/stores/tags.svelte';
+	import { slide } from 'svelte/transition';
 
 	interface Props {
 		memberId: string;
-		history: TagHistoryEntry[];
-		onClose?: () => void;
 	}
 
-	let { memberId, history, onClose }: Props = $props();
+	let { memberId }: Props = $props();
 
-	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === 'Escape') {
-			onClose?.();
-		}
-	}
-
-	const memberHistory = $derived(
-		history
-			.filter((e) => e.newMemberId === memberId || e.oldMemberId === memberId)
-			.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-	);
+	const memberHistory = $derived(tagStore.selectedMemberHistory);
 </script>
 
-<div
-	class="tag-detail-sheet"
-	role="dialog"
-	aria-label="Tag History for {memberId}"
-	tabindex="-1"
-	onkeydown={handleKeydown}
->
-	<div class="sheet-header">
-		<h3>Tag History</h3>
-		<button class="close-btn" onclick={() => onClose?.()} type="button" aria-label="Close">✕</button
-		>
-	</div>
-
+<div class="tag-detail-inline" transition:slide={{ duration: 200 }}>
 	<div class="history-list">
-		{#if memberHistory.length === 0}
+		{#if tagStore.historyLoading}
+			<p class="empty-state">Loading history...</p>
+		{:else if memberHistory.length === 0}
 			<p class="empty-state">No tag history available.</p>
 		{:else}
 			{#each memberHistory as entry (entry.id)}
@@ -55,45 +34,21 @@
 </div>
 
 <style>
-	.tag-detail-sheet {
+	.tag-detail-inline {
 		display: flex;
 		flex-direction: column;
-		background: var(--guild-surface);
+		background: var(--guild-surface-elevated, rgba(255, 255, 255, 0.05));
 		border: 1px solid var(--guild-border);
-		border-radius: var(--radius-lg, 0.75rem);
-		overflow: hidden;
-		max-height: 24rem;
-	}
-
-	.sheet-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: var(--space-md, 1rem);
-		border-bottom: 1px solid var(--guild-border);
-	}
-
-	.sheet-header h3 {
-		margin: 0;
-		color: var(--guild-text);
-	}
-
-	.close-btn {
-		background: none;
-		border: none;
-		color: var(--guild-text-secondary);
-		cursor: pointer;
-		font-size: 1.25rem;
-		padding: 0.25rem;
-		line-height: 1;
-	}
-
-	.close-btn:hover {
-		color: var(--guild-text);
+		border-top: none;
+		border-bottom-left-radius: var(--radius-md, 0.5rem);
+		border-bottom-right-radius: var(--radius-md, 0.5rem);
+		position: relative;
+		z-index: 0;
 	}
 
 	.history-list {
 		overflow-y: auto;
+		max-height: 24rem;
 		padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
 		display: flex;
 		flex-direction: column;

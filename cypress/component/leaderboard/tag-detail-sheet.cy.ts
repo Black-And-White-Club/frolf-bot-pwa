@@ -1,74 +1,88 @@
 /// <reference types="cypress" />
 
 import TagDetailSheet from '$lib/components/leaderboard/TagDetailSheet.svelte';
+import { tagStore } from '$lib/stores/tags.svelte';
 import { tagDetailSheetComponentScreen } from '../../screens/tag-detail-sheet.component.screen';
 
-describe('TagDetailSheet (Component)', () => {
-	const history = [
+const rawHistory = {
+	guild_id: 'test-guild',
+	entries: [
 		{
 			id: 1,
-			tagNumber: 7,
-			oldMemberId: 'member-2',
-			newMemberId: 'member-1',
+			tag_number: 7,
+			old_member_id: 'member-2',
+			new_member_id: 'member-1',
 			reason: 'won',
-			createdAt: '2025-01-01T10:00:00.000Z'
+			created_at: '2025-01-01T10:00:00.000Z'
 		},
 		{
 			id: 2,
-			tagNumber: 8,
-			oldMemberId: 'member-1',
-			newMemberId: 'member-3',
+			tag_number: 8,
+			old_member_id: 'member-1',
+			new_member_id: 'member-3',
 			reason: 'lost',
-			createdAt: '2025-01-02T10:00:00.000Z'
+			created_at: '2025-01-02T10:00:00.000Z'
 		},
 		{
 			id: 3,
-			tagNumber: 9,
-			oldMemberId: 'member-4',
-			newMemberId: 'member-1',
+			tag_number: 9,
+			old_member_id: 'member-4',
+			new_member_id: 'member-1',
 			reason: 'challenge',
-			createdAt: '2025-01-03T10:00:00.000Z'
-		},
-		{
-			id: 4,
-			tagNumber: 10,
-			oldMemberId: 'member-5',
-			newMemberId: 'member-6',
-			reason: 'unrelated',
-			createdAt: '2025-01-04T10:00:00.000Z'
+			created_at: '2025-01-03T10:00:00.000Z'
 		}
-	];
+	]
+};
 
-	it('filters to selected member and sorts by most recent first', () => {
-		cy.mountComponent(TagDetailSheet, {
-			props: {
-				memberId: 'member-1',
-				history
-			}
-		});
+describe('TagDetailSheet (Component)', () => {
+	beforeEach(() => {
+		tagStore.selectMember(null);
+		tagStore.historyLoading = false;
+	});
 
-		tagDetailSheetComponentScreen.dialog().should('be.visible');
+	it('shows loading state when historyLoading is true', () => {
+		tagStore.selectMember('member-1');
+		tagStore.historyLoading = true;
+
+		cy.mountComponent(TagDetailSheet, { props: { memberId: 'member-1' } });
+
+		tagDetailSheetComponentScreen.loadingState().should('be.visible');
+		tagDetailSheetComponentScreen.historyEntries().should('not.exist');
+	});
+
+	it('shows empty state when member has no cached history', () => {
+		tagStore.selectMember('member-1');
+
+		cy.mountComponent(TagDetailSheet, { props: { memberId: 'member-1' } });
+
+		tagDetailSheetComponentScreen.emptyState().should('be.visible');
+		tagDetailSheetComponentScreen.historyEntries().should('not.exist');
+	});
+
+	it('shows history entries from the store cache sorted most-recent-first', () => {
+		tagStore.selectMember('member-1');
+		tagStore.applyMemberHistoryResponse('member-1', rawHistory);
+
+		cy.mountComponent(TagDetailSheet, { props: { memberId: 'member-1' } });
+
+		// 3 entries (id 1 + 3 involve member-1; id 2 returned by backend but less recent)
 		tagDetailSheetComponentScreen.historyEntries().should('have.length', 3);
+
+		// most recent first (id 3, created_at 2025-01-03)
 		tagDetailSheetComponentScreen.entryTag(0).should('have.text', '#9');
 		tagDetailSheetComponentScreen.entryReason(0).should('have.text', 'challenge');
+
 		tagDetailSheetComponentScreen.entryTag(1).should('have.text', '#8');
 		tagDetailSheetComponentScreen.entryTag(2).should('have.text', '#7');
 	});
 
-	it('calls onClose on Escape key and close button click', () => {
-		const onClose = cy.stub().as('onClose');
-		cy.mountComponent(TagDetailSheet, {
-			props: {
-				memberId: 'member-1',
-				history,
-				onClose
-			}
-		});
+	it('renders the inline panel (not a dialog)', () => {
+		tagStore.selectMember('member-1');
 
-		tagDetailSheetComponentScreen.dialog().focus().trigger('keydown', { key: 'Escape' });
-		cy.get('@onClose').should('have.been.calledOnce');
+		cy.mountComponent(TagDetailSheet, { props: { memberId: 'member-1' } });
 
-		tagDetailSheetComponentScreen.closeButton().click();
-		cy.get('@onClose').should('have.been.calledTwice');
+		tagDetailSheetComponentScreen.container().should('exist');
+		// Confirm no dialog role (it's an inline expansion, not a modal)
+		cy.get('[role="dialog"]').should('not.exist');
 	});
 });

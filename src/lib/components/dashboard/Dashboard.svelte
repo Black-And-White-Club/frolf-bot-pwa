@@ -1,22 +1,16 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { tagStore } from '$lib/stores/tags.svelte';
 	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
 	import Leaderboard from '$lib/components/leaderboard/Leaderboard.svelte';
 	import LeaderboardCompact from '$lib/components/leaderboard/LeaderboardCompact.svelte';
-	import RoundList from '$lib/components/round/RoundList.svelte';
 	import TagLeaderboard from '$lib/components/leaderboard/TagLeaderboard.svelte';
-	import TagDetailSheet from '$lib/components/leaderboard/TagDetailSheet.svelte';
+	import RoundList from '$lib/components/round/RoundList.svelte';
 
 	interface Props {
 		mode?: 'default' | 'tv' | 'compact';
 	}
 
 	let { mode = 'default' }: Props = $props();
-
-	function handleMemberSelect(memberId: string) {
-		tagStore.selectMember(memberId);
-	}
 
 	function handleRoundSelect(roundId: string) {
 		goto(`/rounds/${roundId}`);
@@ -49,15 +43,7 @@
 			<div class="tv-layout">
 				<div class="tv-column leaderboard-column">
 					{#if leaderboardService.viewMode === 'tags'}
-						<TagLeaderboard members={tagMembers} onSelectMember={handleMemberSelect} />
-
-						{#if tagStore.selectedMemberId}
-							<TagDetailSheet
-								memberId={tagStore.selectedMemberId}
-								history={tagStore.selectedMemberHistory}
-								onClose={() => tagStore.selectMember(null)}
-							/>
-						{/if}
+						<TagLeaderboard members={tagMembers} />
 					{:else}
 						<Leaderboard
 							entries={leaderboardService.currentView}
@@ -83,17 +69,8 @@
 				{#if leaderboardService.viewMode === 'tags'}
 					<TagLeaderboard
 						members={tagMembers}
-						onSelectMember={handleMemberSelect}
 						onViewAll={() => goto('/leaderboard')}
 					/>
-
-					{#if tagStore.selectedMemberId}
-						<TagDetailSheet
-							memberId={tagStore.selectedMemberId}
-							history={tagStore.selectedMemberHistory}
-							onClose={() => tagStore.selectMember(null)}
-						/>
-					{/if}
 				{:else}
 					<Leaderboard
 						entries={leaderboardService.currentView}

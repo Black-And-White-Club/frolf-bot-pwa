@@ -13,11 +13,18 @@ Rounds are the core of Frolf Bot. Use `/createround` to schedule a round, then p
 
 **Requires:** Player role
 
+You can create a round either from Discord or directly on the web dashboard:
+
+**Option 1: Discord Command**
 ```
 /createround
 ```
+Running this command opens a modal in Discord.
 
-Running this command opens a modal with the following fields:
+**Option 2: Web Dashboard**
+Navigate to the [Rounds](/rounds) page and click **Create Round** to open the creation form.
+
+Both methods require the same fields:
 
 | Field | Required | Description |
 |-------|----------|-------------|
@@ -33,11 +40,13 @@ After submitting, Frolf Bot creates a native Discord event and posts a round emb
 
 ## RSVPing
 
-Once a round is scheduled, Frolf Bot will create a native Discord scheduled event along with an embedded event message.
+Once a round is scheduled, Frolf Bot will create a native Discord scheduled event along with an embedded event message. It will also appear on the [Rounds](/rounds) page in the web dashboard.
 
-To RSVP, navigate to the natively created Discord event and click the **Interested** button. Since we use the native Discord event scheduler, this is the only way to RSVP to a round before it begins.
+You can RSVP in two ways:
+1. **Discord:** Navigate to the natively created Discord event and click the **Interested** button.
+2. **Web Dashboard:** Open the round details in the web dashboard and click the **Join** or **Decline** buttons.
 
-Players who didn't RSVP can still join a round after it starts using the **Join** button on the round embed, if the round creator or an editor allows late additions.
+Players who didn't RSVP can still join a round after it starts using the **Join** button on the round embed in Discord or the dashboard, if the round creator or an editor allows late additions.
 
 ---
 
@@ -45,7 +54,7 @@ Players who didn't RSVP can still join a round after it starts using the **Join*
 
 **Requires:** Round creator, Editor, or Admin role
 
-Use the **Edit** button on the round embed to open the update modal. All fields are optional — only fill in what you want to change:
+To edit a round, use the **Edit** button on the round embed in Discord, or click **Edit** on the Round details page in the web dashboard. All fields are optional — only fill in what you want to change:
 
 - Title
 - Description
@@ -59,7 +68,7 @@ Use the **Edit** button on the round embed to open the update modal. All fields 
 
 **Requires:** Round creator, Editor, or Admin role
 
-Use the **Delete** button on the round embed. This permanently removes the round and its associated data.
+Use the **Delete** button on the Discord round embed, or the **Delete Round** button on the web dashboard. This permanently removes the round and its associated data.
 
 ---
 

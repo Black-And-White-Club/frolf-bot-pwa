@@ -1,12 +1,15 @@
 export const tagDetailSheetComponentScreen = {
-	dialog() {
-		return cy.get('[role="dialog"][aria-label^="Tag History"]');
-	},
-	closeButton() {
-		return this.dialog().find('button[aria-label="Close"]');
+	container() {
+		return cy.get('.tag-detail-inline');
 	},
 	historyEntries() {
-		return this.dialog().find('.history-entry');
+		return cy.get('.history-entry');
+	},
+	loadingState() {
+		return cy.contains('.empty-state', 'Loading history...');
+	},
+	emptyState() {
+		return cy.contains('.empty-state', 'No tag history available.');
 	},
 	entryTag(index: number) {
 		return this.historyEntries().eq(index).find('.entry-tag');

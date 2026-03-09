@@ -88,8 +88,10 @@ export class TagService {
 	history = $state<TagHistoryEntry[]>([]);
 	tagList = $state<TagListMember[]>([]);
 	loading = $state(false);
+	historyLoading = $state(false);
 	error = $state<string | null>(null);
 	selectedMemberId = $state<string | null>(null);
+	historyCache = $state<Record<string, TagHistoryEntry[]>>({});
 
 	selectMember(id: string | null) {
 		this.selectedMemberId = id;
@@ -99,15 +101,25 @@ export class TagService {
 		return this.tagList;
 	}
 
-	get selectedMemberHistory() {
+	get selectedMemberHistory(): TagHistoryEntry[] {
 		if (!this.selectedMemberId) return [];
-		return this.history.filter((h) => h.newMemberId === this.selectedMemberId);
+		const cached = this.historyCache[this.selectedMemberId];
+		if (!cached) return [];
+		return [...cached].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
 	}
 
 	applyHistoryResponse(raw: TagHistoryResponseRaw) {
 		this.history = transformHistoryEntries(raw);
 		this.loading = false;
 		this.error = null;
+	}
+
+	applyMemberHistoryResponse(memberId: string, raw: TagHistoryResponseRaw) {
+		this.historyCache = {
+			...this.historyCache,
+			[memberId]: transformHistoryEntries(raw)
+		};
+		this.historyLoading = false;
 	}
 
 	applyTagListResponse(raw: TagListResponseRaw) {
@@ -179,28 +191,52 @@ export class TagService {
 	/**
 	 * Fetch tag history for a member (or guild-wide if memberId omitted).
 	 * Called on-demand from the tags page, not on startup.
+	 *
+	 * When memberId is provided: uses a per-member historyCache so guild-wide
+	 * history is never overwritten, and historyLoading tracks this fetch.
+	 * When no memberId: fetches guild-wide into `history`, uses `loading`.
 	 */
 	async fetchTagHistory(guildId: string, memberId?: string, limit = 100): Promise<void> {
-		this.loading = true;
-		this.error = null;
+		if (memberId) {
+			// Skip if already cached for this member
+			if (this.historyCache[memberId]) return;
 
-		try {
-			const payload: TagHistoryRequestPayload = {
-				guild_id: guildId,
-				...(memberId ? { member_id: memberId } : {}),
-				limit
-			};
-			const response = await nats.request<TagHistoryRequestPayload, TagHistoryResponseRaw>(
-				`leaderboard.tag.history.requested.v1.${guildId}`,
-				payload,
-				{ timeout: 5000 }
-			);
-			if (response) {
-				this.applyHistoryResponse(response);
+			this.historyLoading = true;
+			this.error = null;
+
+			try {
+				const payload: TagHistoryRequestPayload = { guild_id: guildId, member_id: memberId, limit };
+				const response = await nats.request<TagHistoryRequestPayload, TagHistoryResponseRaw>(
+					`leaderboard.tag.history.requested.v1.${guildId}`,
+					payload,
+					{ timeout: 5000 }
+				);
+				if (response) {
+					this.applyMemberHistoryResponse(memberId, response);
+				}
+			} catch (e) {
+				const msg = e instanceof Error ? e.message : 'Failed to load tag history';
+				this.historyLoading = false;
+				this.setError(msg);
 			}
-		} catch (e) {
-			const msg = e instanceof Error ? e.message : 'Failed to load tag history';
-			this.setError(msg);
+		} else {
+			this.loading = true;
+			this.error = null;
+
+			try {
+				const payload: TagHistoryRequestPayload = { guild_id: guildId, limit };
+				const response = await nats.request<TagHistoryRequestPayload, TagHistoryResponseRaw>(
+					`leaderboard.tag.history.requested.v1.${guildId}`,
+					payload,
+					{ timeout: 5000 }
+				);
+				if (response) {
+					this.applyHistoryResponse(response);
+				}
+			} catch (e) {
+				const msg = e instanceof Error ? e.message : 'Failed to load tag history';
+				this.setError(msg);
+			}
 		}
 	}
 

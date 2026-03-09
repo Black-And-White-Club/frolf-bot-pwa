@@ -37,7 +37,7 @@ All fields are optional. You can update them later with [`/set-udisc-name`](/doc
 
 Once your signup is processed, you'll receive the **Player role** and can:
 
-- Create and RSVP to rounds with `/createround`
+- Create and RSVP to rounds via the `/createround` command or the PWA dashboard
 - Claim or challenge tags with `/claimtag`
 - Submit scores during active rounds
 - View your history with `/history`

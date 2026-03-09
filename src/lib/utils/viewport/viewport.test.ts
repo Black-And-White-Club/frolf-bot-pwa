@@ -19,11 +19,13 @@ describe('observeOnce', () => {
 
 	it('uses IntersectionObserver and calls callback on intersect', async () => {
 		const observeCalls: Element[] = [];
+		let observerInstance: MockIO | undefined;
 
 		class MockIO {
 			cb: (entries: IntersectionObserverEntry[]) => void;
 			constructor(cb: (entries: IntersectionObserverEntry[]) => void) {
 				this.cb = cb;
+				observerInstance = this;
 			}
 			observe(el: Element) {
 				observeCalls.push(el);
@@ -36,9 +38,8 @@ describe('observeOnce', () => {
 			}
 		}
 
-		const mockIOCtor = vi.fn((cb) => new MockIO(cb));
 		(globalThis as unknown as { IntersectionObserver?: unknown }).IntersectionObserver =
-			mockIOCtor as unknown as typeof IntersectionObserver;
+			MockIO as unknown as typeof IntersectionObserver;
 
 		const el = document.createElement('div');
 		const cb = vi.fn();
@@ -48,9 +49,7 @@ describe('observeOnce', () => {
 		expect(observeCalls.length).toBe(1);
 
 		// trigger intersection
-		const inst = (mockIOCtor as unknown as { mock: { results: { value: MockIO }[] } }).mock
-			.results[0].value;
-		inst.trigger({
+		observerInstance?.trigger({
 			target: el,
 			isIntersecting: true,
 			time: Date.now(),

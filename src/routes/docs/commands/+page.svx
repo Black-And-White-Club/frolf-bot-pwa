@@ -32,6 +32,7 @@ Posts an ephemeral link to the web dashboard's [account page](/docs/account#mana
 **Permission:** Player
 
 Opens a modal to schedule a new disc golf round. After submitting, Frolf Bot posts a round embed in the events channel with RSVP buttons.
+*(Note: Rounds can also be created directly from the [Rounds](/rounds) page in the web dashboard.)*
 
 | Option | Required | Description |
 |--------|----------|-------------|

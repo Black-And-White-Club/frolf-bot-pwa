@@ -9,6 +9,7 @@ import { DESKTOP_VIEWPORT } from './cypress/support/viewports';
 const configFilePath = fileURLToPath(import.meta.url);
 const repoRoot = path.dirname(configFilePath);
 const componentStateMockPath = path.resolve(repoRoot, 'cypress/support/mocks/app-state.ts');
+const publicEnvMockPath = path.resolve(repoRoot, 'cypress/support/mocks/public-env.ts');
 
 function runContractGuards(): void {
 	const mode = process.env.CYPRESS_CONTRACT_SYNC_MODE ?? 'sync';
@@ -59,7 +60,8 @@ export default defineConfig({
 				resolve: {
 					alias: {
 						$lib: path.resolve(repoRoot, 'src/lib'),
-						'$app/state': componentStateMockPath
+						'$app/state': componentStateMockPath,
+						'$env/dynamic/public': publicEnvMockPath
 					}
 				}
 			}

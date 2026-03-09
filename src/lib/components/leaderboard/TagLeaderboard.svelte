@@ -1,19 +1,20 @@
 <script lang="ts">
 	import { tagStore, type TagListMember } from '$lib/stores/tags.svelte';
+	import { clubService } from '$lib/stores/club.svelte';
 	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
 	import ViewToggle from './ViewToggle.svelte';
 	import ChevronCollapse from '$lib/components/general/ChevronCollapse.svelte';
 	import PlayerRow from './PlayerRow.svelte';
+	import TagDetailSheet from './TagDetailSheet.svelte';
 	import { isMobile } from '$lib/stores/theme';
 
 	interface Props {
 		members?: TagListMember[];
-		onSelectMember?: (memberId: string) => void;
 		onViewAll?: () => void;
 	}
 
-	let { members, onSelectMember, onViewAll }: Props = $props();
+	let { members, onViewAll }: Props = $props();
 
 	let collapsed = $state(false);
 
@@ -36,7 +37,27 @@
 	function handleViewAllClick() {
 		onViewAll?.();
 	}
+
+	function handleRowClick(memberId: string) {
+		if (tagStore.selectedMemberId === memberId) {
+			tagStore.selectMember(null);
+		} else {
+			tagStore.selectMember(memberId);
+			const guildId = clubService.id;
+			if (guildId) {
+				tagStore.fetchTagHistory(guildId, memberId);
+			}
+		}
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape' && tagStore.selectedMemberId) {
+			tagStore.selectMember(null);
+		}
+	}
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 <div class="leaderboard-container">
 	<div class="leaderboard-header">
@@ -81,17 +102,23 @@
 						highlightFirst={true}
 						isCurrentUser={false}
 						testid={`leaderboard-row-${member.memberId}`}
-						onclick={() => onSelectMember?.(member.memberId)}
+						onclick={() => handleRowClick(member.memberId)}
 					>
 						<button
 							class="history-btn"
-							title="View Tag History"
+							title={tagStore.selectedMemberId === member.memberId
+								? 'Hide Tag History'
+								: 'View Tag History'}
 							type="button"
+							class:active={tagStore.selectedMemberId === member.memberId}
+							aria-label={tagStore.selectedMemberId === member.memberId
+								? 'Hide Tag History'
+								: 'View Tag History'}
+							aria-expanded={tagStore.selectedMemberId === member.memberId}
 							onclick={(e) => {
 								e.stopPropagation();
-								onSelectMember?.(member.memberId);
+								handleRowClick(member.memberId);
 							}}
-							aria-label="View Tag History"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -110,6 +137,11 @@
 							</svg>
 						</button>
 					</PlayerRow>
+					{#if tagStore.selectedMemberId === member.memberId}
+						<div class="row-expansion">
+							<TagDetailSheet memberId={member.memberId} />
+						</div>
+					{/if}
 				{/each}
 			{/if}
 		</div>
@@ -217,8 +249,15 @@
 			background 0.2s;
 	}
 
-	.history-btn:hover {
+	.history-btn:hover,
+	.history-btn.active {
 		color: var(--guild-primary);
 		background: rgba(var(--guild-primary-rgb), 0.1);
+	}
+
+	.row-expansion {
+		margin-top: -0.5rem; /* tuck under the PlayerRow */
+		margin-bottom: 0.5rem;
+		padding: 0 0.5rem;
 	}
 </style>

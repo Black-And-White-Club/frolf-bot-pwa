@@ -13,9 +13,13 @@ Once a round is active, players submit their scores through Discord. Scores can 
 
 **Requires:** Player role, round must be active
 
-When a round goes active, the round embed shows a **Score** button. Click it to open the score submission form. Enter your score relative to par (e.g. `-3` for three under, `+2` for two over, `0` for even).
+When a round goes active, you can submit your score through Discord or the web dashboard:
+- **Discord:** Click the **Score** button on the round embed to open the score submission form.
+- **Web Dashboard:** Open the round details and enter your score in the input next to your name.
 
-Your response is visible only to you (ephemeral) until scores are finalized.
+Enter your score relative to par (e.g. `-3` for three under, `+2` for two over, `0` for even).
+
+In Discord, your response is visible only to you (ephemeral) until scores are finalized. On the dashboard, your submitted score will update immediately.
 
 ---
 
