@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { TagHistoryEntry } from '$lib/stores/tags.svelte';
-	import { Chart, Svg, Area, Spline } from 'layerchart';
+	import { Chart, Svg, Area, Spline, Axis } from 'layerchart';
 	import { scaleTime, scaleLinear } from 'd3-scale';
 	import { curveMonotoneX } from 'd3-shape';
 
@@ -40,7 +40,7 @@
 				yScale={scaleLinear()}
 				yDomain={totalTags ? [-totalTags, -1] : undefined}
 				yNice={false}
-				padding={{ top: 24, right: 20, bottom: 8, left: 8 }}
+				padding={{ top: 24, right: 20, bottom: 8, left: 32 }}
 			>
 				<Svg>
 					<defs>
@@ -65,6 +65,15 @@
 							</feMerge>
 						</filter>
 					</defs>
+
+					<!-- Y axis: convert negated values back to tag numbers -->
+					<Axis
+						placement="left"
+						format={(v) => `#${Math.abs(v)}`}
+						ticks={3}
+						tickSize={0}
+						class="text-xs text-[var(--guild-text-secondary,#94a3b8)]"
+					/>
 
 					<!-- Area fill with brand gradient -->
 					<Area fill="url(#lc-tag-grad)" curve={curveMonotoneX} tweened={{ duration: 600 }} />

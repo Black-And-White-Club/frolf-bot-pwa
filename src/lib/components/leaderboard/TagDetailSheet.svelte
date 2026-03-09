@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tagStore, type TagHistoryEntry } from '$lib/stores/tags.svelte';
+	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
 	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 	import { slide } from 'svelte/transition';
 
@@ -54,7 +55,9 @@
 			<TagHistoryChart
 				history={memberHistory}
 				{memberId}
-				totalTags={tagStore.maxTagNumber ?? undefined}
+				totalTags={leaderboardService.entries.length > 0
+					? Math.max(...leaderboardService.entries.map((e) => e.tagNumber))
+					: (tagStore.maxTagNumber ?? undefined)}
 			/>
 		</div>
 	{/if}

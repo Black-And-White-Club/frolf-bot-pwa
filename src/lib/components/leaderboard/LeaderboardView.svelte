@@ -1,13 +1,23 @@
 <script lang="ts">
 	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
+	import { tagStore } from '$lib/stores/tags.svelte';
 	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 	import { auth } from '$lib/stores/auth.svelte';
 	import PlayerRow from './PlayerRow.svelte';
 	import MovementIndicator from './MovementIndicator.svelte';
 	import ViewToggle from './ViewToggle.svelte';
+	import TagDetailSheet from './TagDetailSheet.svelte';
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	let { guildId: _unusedGuildId }: { guildId?: string } = $props();
+	let { guildId }: { guildId?: string } = $props();
+
+	function handleRowClick(userId: string) {
+		if (tagStore.selectedMemberId === userId) {
+			tagStore.selectMember(null);
+		} else {
+			tagStore.selectMember(userId);
+			if (guildId) tagStore.fetchTagHistory(guildId, userId);
+		}
+	}
 
 	let sortedEntries = $derived(leaderboardService.currentView);
 
@@ -28,6 +38,12 @@
 			: null
 	);
 </script>
+
+<svelte:window
+	onkeydown={(e) => {
+		if (e.key === 'Escape') tagStore.selectMember(null);
+	}}
+/>
 
 <div class="space-y-6">
 	<!-- Header -->
@@ -59,9 +75,15 @@
 				totalPoints={entry.totalPoints}
 				roundsPlayed={entry.roundsPlayed}
 				isCurrentUser={auth.user?.id === entry.userId}
+				onclick={() => handleRowClick(entry.userId)}
 			>
 				<MovementIndicator {entry} {movement} />
 			</PlayerRow>
+			{#if tagStore.selectedMemberId === entry.userId}
+				<div class="row-expansion">
+					<TagDetailSheet memberId={entry.userId} />
+				</div>
+			{/if}
 		{/each}
 	</div>
 
@@ -76,3 +98,11 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	.row-expansion {
+		margin-top: -0.5rem;
+		margin-bottom: 0.5rem;
+		padding: 0 0.5rem;
+	}
+</style>
