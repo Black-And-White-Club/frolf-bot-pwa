@@ -124,4 +124,13 @@ describe('TagLeaderboard row expansion', () => {
 
 		cy.wrap(tagStore.fetchTagHistory).should('have.been.called');
 	});
+
+	it('fetchTagHistory is called with Discord guild ID, not club UUID', () => {
+		cy.mountComponent(TagLeaderboard, { props: { members } });
+
+		tagLeaderboardComponentScreen.historyBtn('member-1').click();
+
+		// Should use auth.user.guildId ('legacy-guild') not activeClubUuid ('test-guild')
+		cy.wrap(tagStore.fetchTagHistory).should('have.been.calledWith', 'legacy-guild', 'member-1');
+	});
 });

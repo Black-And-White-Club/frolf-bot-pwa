@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { tagStore, type TagListMember } from '$lib/stores/tags.svelte';
 	import { clubService } from '$lib/stores/club.svelte';
+	import { auth } from '$lib/stores/auth.svelte';
 	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
 	import ViewToggle from './ViewToggle.svelte';
@@ -43,7 +44,7 @@
 			tagStore.selectMember(null);
 		} else {
 			tagStore.selectMember(memberId);
-			const guildId = clubService.id;
+			const guildId = auth.user?.guildId || clubService.id;
 			if (guildId) {
 				tagStore.fetchTagHistory(guildId, memberId);
 			}
