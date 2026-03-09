@@ -1,5 +1,3 @@
-// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
-// import storybook from 'eslint-plugin-storybook';
 
 import prettier from 'eslint-config-prettier';
 import { fileURLToPath } from 'node:url';
@@ -76,7 +74,7 @@ export default defineConfig(
 			'**/__tests__/**',
 			'**/*.spec.{ts,js}',
 			'**/*.test.{ts,js}',
-			'**/*.stories.{ts,js}'
+			'**/*.story.svelte'
 		],
 		rules: {
 			'@typescript-eslint/no-explicit-any': 'off',

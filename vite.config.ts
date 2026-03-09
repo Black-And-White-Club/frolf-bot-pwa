@@ -119,7 +119,7 @@ export default defineConfig({
 				'src/lib/**/stubs/**',
 				'src/lib/components/**/stubs/**',
 				'src/lib/**/__tests__/stubs/**',
-				'src/lib/**/*.stories.*',
+				'src/lib/**/*.story.*',
 				'src/lib/data/**',
 				'src/lib/mocks/**',
 				'src/lib/server/**',

@@ -1,5 +1,8 @@
 <script lang="ts">
 	import type { TagHistoryEntry } from '$lib/stores/tags.svelte';
+	import { Chart, Svg, Area, Spline } from 'layerchart';
+	import { scaleTime, scaleLinear } from 'd3-scale';
+	import { curveMonotoneX } from 'd3-shape';
 
 	interface Props {
 		history: TagHistoryEntry[];
@@ -8,110 +11,85 @@
 
 	let { history, memberId }: Props = $props();
 
-	// Filter and sort entries for this member
-	const memberEntries = $derived(
+	// Negate tagNumber so lower tag (better rank) appears higher on chart.
+	// LayerChart/layer-cake maps higher data values to the top of the chart.
+	const chartData = $derived(
 		history
 			.filter((e) => e.newMemberId === memberId)
 			.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-	);
-
-	// Build chart data points
-	const chartPoints = $derived(
-		memberEntries.map((e, i) => ({
-			x: i,
-			y: e.tagNumber,
-			label: new Date(e.createdAt).toLocaleDateString()
-		}))
-	);
-
-	// SVG dimensions
-	const width = 600;
-	const height = 200;
-	const padding = { top: 20, right: 20, bottom: 30, left: 40 };
-
-	const innerWidth = width - padding.left - padding.right;
-	const innerHeight = height - padding.top - padding.bottom;
-
-	const chartBounds = $derived.by(() => {
-		if (chartPoints.length === 0) {
-			return { minTag: 0, range: 1 };
-		}
-
-		let minTag = chartPoints[0].y;
-		let maxTag = chartPoints[0].y;
-		for (const point of chartPoints) {
-			if (point.y < minTag) minTag = point.y;
-			if (point.y > maxTag) maxTag = point.y;
-		}
-		return { minTag, range: maxTag - minTag || 1 };
-	});
-
-	// Scale functions
-	function scaleX(i: number): number {
-		if (chartPoints.length <= 1) return padding.left + innerWidth / 2;
-		return padding.left + (i / (chartPoints.length - 1)) * innerWidth;
-	}
-
-	function scaleY(tag: number): number {
-		if (chartPoints.length === 0) return padding.top + innerHeight / 2;
-		// Invert: lower tag = higher on chart (better)
-		return padding.top + ((tag - chartBounds.minTag) / chartBounds.range) * innerHeight;
-	}
-
-	// Build SVG path
-	const pathD = $derived(
-		chartPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${scaleX(p.x)} ${scaleY(p.y)}`).join(' ')
+			.map((e) => ({
+				date: new Date(e.createdAt),
+				value: -e.tagNumber,
+				tag: e.tagNumber
+			}))
 	);
 </script>
 
-<div class="tag-history-chart">
-	{#if chartPoints.length < 2}
-		<p class="chart-empty">Not enough data to display a chart.</p>
+<div class="chart-outer">
+	{#if chartData.length < 2}
+		<p class="empty">Not enough history yet.</p>
 	{:else}
-		<svg viewBox="0 0 {width} {height}" class="chart-svg">
-			<!-- Grid lines -->
-			{#each Array.from({ length: 5 }, (_, i) => i) as i (i)}
-				<line
-					x1={padding.left}
-					y1={padding.top + (i / 4) * innerHeight}
-					x2={padding.left + innerWidth}
-					y2={padding.top + (i / 4) * innerHeight}
-					stroke="var(--color-border, rgba(148, 163, 184, 0.1))"
-					stroke-width="1"
-				/>
-			{/each}
+		<div class="chart-wrap">
+			<Chart
+				data={chartData}
+				x="date"
+				xScale={scaleTime()}
+				y="value"
+				yScale={scaleLinear()}
+				yNice={false}
+				padding={{ top: 24, right: 20, bottom: 8, left: 8 }}
+			>
+				<Svg>
+					<defs>
+						<!-- Gold-to-teal area gradient — brand colors -->
+						<linearGradient id="lc-tag-grad" x1="0" y1="0" x2="0" y2="1">
+							<stop offset="0%" stop-color="var(--guild-accent, #b89b5e)" stop-opacity="0.45" />
+							<stop offset="55%" stop-color="var(--guild-primary, #007474)" stop-opacity="0.1" />
+							<stop offset="100%" stop-color="var(--guild-primary, #007474)" stop-opacity="0" />
+						</linearGradient>
+						<!-- Amethyst aura glow — matches --guild-glow-aura token -->
+						<filter id="lc-glow" x="-20%" y="-40%" width="140%" height="180%">
+							<feGaussianBlur stdDeviation="3" result="blur" />
+							<feFlood flood-color="var(--guild-secondary, #8b7bb8)" flood-opacity="0.5" result="color" />
+							<feComposite in="color" in2="blur" operator="in" result="coloredBlur" />
+							<feMerge>
+								<feMergeNode in="coloredBlur" />
+								<feMergeNode in="SourceGraphic" />
+							</feMerge>
+						</filter>
+					</defs>
 
-			<!-- Data line -->
-			<path d={pathD} fill="none" stroke="var(--color-gold-accent, #c5a04e)" stroke-width="2" />
+					<!-- Area fill with brand gradient -->
+					<Area fill="url(#lc-tag-grad)" curve={curveMonotoneX} tweened={{ duration: 600 }} />
 
-			<!-- Data points -->
-			{#each chartPoints as point (point.x)}
-				<circle
-					cx={scaleX(point.x)}
-					cy={scaleY(point.y)}
-					r="3"
-					fill="var(--color-gold-accent, #c5a04e)"
-				/>
-			{/each}
-		</svg>
+					<!-- Data line: gold with amethyst glow, draws on mount -->
+					<Spline
+						stroke="var(--guild-accent, #b89b5e)"
+						strokeWidth={2.5}
+						curve={curveMonotoneX}
+						filter="url(#lc-glow)"
+						draw={{ duration: 1200 }}
+					/>
+				</Svg>
+			</Chart>
+		</div>
 	{/if}
 </div>
 
 <style>
-	.tag-history-chart {
+	.chart-outer {
 		width: 100%;
-		padding: var(--space-md, 1rem);
 	}
 
-	.chart-svg {
+	.chart-wrap {
+		height: 160px;
 		width: 100%;
-		height: auto;
 	}
 
-	.chart-empty {
+	.empty {
 		text-align: center;
-		color: var(--color-text-muted, #94a3b8);
-		padding: var(--space-lg, 1.5rem) 0;
-		font-size: var(--font-sm, 0.875rem);
+		color: var(--guild-text-muted, rgb(148 163 184));
+		padding: 1.5rem 0;
+		font-size: 0.875rem;
 	}
 </style>

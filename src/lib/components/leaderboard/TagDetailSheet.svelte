@@ -3,6 +3,13 @@
 	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 	import { slide } from 'svelte/transition';
 
+	// Lazy-load the chart so layerchart/d3 don't land in the SSR bundle or
+	// the initial client chunk — the sheet is only opened on interaction.
+	let TagHistoryChart = $state<any>(null);
+	$effect(() => {
+		import('./TagHistoryChart.svelte').then((m) => (TagHistoryChart = m.default));
+	});
+
 	interface Props {
 		memberId: string;
 	}
@@ -38,69 +45,12 @@
 		if (reason === 'round_swap') return 'round swap';
 		return reason;
 	}
-
-	// Sparkline SVG constants
-	const SPARK_VW = 300;
-	const SPARK_VH = 60;
-	const SPARK_PAD = 10;
-	const SPARK_W = SPARK_VW - SPARK_PAD * 2;
-	const SPARK_H = SPARK_VH - SPARK_PAD * 2;
-
-	const sparkData = $derived.by(() => {
-		if (memberHistory.length < 2) return null;
-
-		const sorted = [...memberHistory].sort(
-			(a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt)
-		);
-
-		const tags = sorted.map((e) => e.tagNumber);
-		const times = sorted.map((e) => Date.parse(e.createdAt));
-
-		const minTag = Math.min(...tags);
-		const maxTag = Math.max(...tags);
-		const minTime = times[0];
-		const maxTime = times[times.length - 1];
-		const tagRange = maxTag - minTag || 1;
-		const timeRange = maxTime - minTime || 1;
-
-		const points = sorted.map((entry, i) => ({
-			x: SPARK_PAD + ((times[i] - minTime) / timeRange) * SPARK_W,
-			// Inverted: lower tag number = higher on chart
-			y: SPARK_PAD + ((maxTag - tags[i]) / tagRange) * SPARK_H,
-			tag: tags[i]
-		}));
-
-		return {
-			points,
-			polyline: points.map((p) => `${p.x},${p.y}`).join(' ')
-		};
-	});
 </script>
 
 <div class="tag-detail-inline" transition:slide={{ duration: 200 }}>
-	{#if sparkData}
-		<div class="sparkline-wrapper">
-			<svg viewBox="0 0 {SPARK_VW} {SPARK_VH}" class="sparkline" aria-hidden="true">
-				<polyline
-					points={sparkData.polyline}
-					fill="none"
-					stroke="var(--guild-accent, #b89b5e)"
-					stroke-width="2"
-					stroke-linejoin="round"
-					stroke-linecap="round"
-				/>
-				{#each sparkData.points as point, i (i)}
-					<circle cx={point.x} cy={point.y} r="4" fill="var(--guild-accent, #b89b5e)" />
-					{#if i === 0 || i === sparkData.points.length - 1}
-						<text
-							x={point.x}
-							y={point.y <= SPARK_PAD + 12 ? point.y + 16 : point.y - 8}
-							text-anchor={i === 0 ? 'start' : 'end'}
-							class="spark-label"
-						>#{point.tag}</text>
-					{/if}
-				{/each}
-			</svg>
+	{#if memberHistory.length >= 2 && TagHistoryChart}
+		<div class="chart-wrapper">
+			<TagHistoryChart history={memberHistory} {memberId} />
 		</div>
 	{/if}
 
@@ -146,21 +96,9 @@
 		z-index: 0;
 	}
 
-	.sparkline-wrapper {
+	.chart-wrapper {
 		padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
 		border-bottom: 1px solid var(--guild-border);
-	}
-
-	.sparkline {
-		width: 100%;
-		height: auto;
-		display: block;
-	}
-
-	.spark-label {
-		font-size: 9px;
-		fill: var(--guild-text-secondary);
-		font-family: inherit;
 	}
 
 	.history-list {

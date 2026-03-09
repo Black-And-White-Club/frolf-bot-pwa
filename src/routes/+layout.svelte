@@ -252,6 +252,11 @@
 		<main id="main-content" class="min-h-screen bg-[var(--guild-background)]">
 			{@render children?.()}
 		</main>
+	{:else if import.meta.env.DEV && page.url.pathname.startsWith('/dev')}
+		<!-- Dev-only component preview — no auth required, never ships to prod -->
+		<main id="main-content" class="min-h-screen bg-[var(--guild-background)]">
+			{@render children?.()}
+		</main>
 	{:else}
 		<!-- User is not signed in -->
 		<div class="flex min-h-screen items-center justify-center bg-[var(--guild-background)]">
