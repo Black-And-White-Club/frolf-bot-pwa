@@ -152,8 +152,8 @@
 			<strong>Tag ordering warning:</strong>
 			{checkResult.subsequent_round_count} round{checkResult.subsequent_round_count !== 1
 				? 's were'
-				: ' was'} finalized after this date ({checkResult.round_titles.join(', ')}). Tag numbers
-			for those rounds may not reflect the backfill round. You can still proceed.
+				: ' was'} finalized after this date ({checkResult.round_titles.join(', ')}). Tag numbers for
+			those rounds may not reflect the backfill round. You can still proceed.
 		</div>
 	{/if}
 
