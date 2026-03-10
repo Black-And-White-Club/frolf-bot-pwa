@@ -6,12 +6,13 @@
 	import AdminBackfillRoundUploader from '$lib/components/admin/AdminBackfillRoundUploader.svelte';
 	import { auth } from '$lib/stores/auth.svelte';
 	import { tagStore } from '$lib/stores/tags.svelte';
+	import { resolveRequestIdentity } from '$lib/utils/requestIdentity';
 
 	onMount(async () => {
 		// Fetch tag list if not already loaded (may already be populated from startup)
-		if (tagStore.tagList.length === 0 && auth.user) {
-			const guildId = auth.user.activeClubUuid || auth.user.guildId;
-			await tagStore.fetchTagList(guildId);
+		const identity = resolveRequestIdentity(auth.user);
+		if (tagStore.tagList.length === 0 && identity) {
+			await tagStore.fetchTagList(identity.requestSubjectId);
 		}
 	});
 </script>

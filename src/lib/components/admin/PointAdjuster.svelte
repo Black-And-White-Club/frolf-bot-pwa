@@ -3,15 +3,23 @@
 	import { adminStore } from '$lib/stores/admin.svelte';
 	import { auth } from '$lib/stores/auth.svelte';
 	import { userProfiles } from '$lib/stores/userProfiles.svelte';
+	import { resolveRequestIdentity } from '$lib/utils/requestIdentity';
 
 	let selectedMemberId = $state('');
 	let deltaStr = $state('');
 	let reason = $state('');
+	let validationError = $state<string | null>(null);
 
 	const delta = $derived(parseInt(deltaStr));
 	const isValidDelta = $derived(!isNaN(delta) && delta !== 0 && deltaStr !== '');
+	const identity = $derived(resolveRequestIdentity(auth.user));
+	const requestSubjectId = $derived(identity?.requestSubjectId ?? null);
 	const canSubmit = $derived(
-		selectedMemberId !== '' && isValidDelta && reason.trim() !== '' && !adminStore.loading
+		selectedMemberId !== '' &&
+			isValidDelta &&
+			reason.trim() !== '' &&
+			!adminStore.loading &&
+			!!requestSubjectId
 	);
 
 	// Sorted list for the select dropdown
@@ -27,15 +35,29 @@
 		selectedMemberId = '';
 		deltaStr = '';
 		reason = '';
+		validationError = null;
 	}
 
 	async function handleSubmit() {
-		if (!auth.user || !canSubmit) return;
+		validationError = null;
+		if (!auth.user) return;
 
-		const guildId = auth.user.activeClubUuid || auth.user.guildId;
+		if (!requestSubjectId) {
+			validationError = 'Club or Discord guild identity is missing.';
+			return;
+		}
+
+		if (!canSubmit) return;
+
 		const adminId = auth.user.id;
 
-		await adminStore.adjustPoints(guildId, adminId, selectedMemberId, delta, reason.trim());
+		await adminStore.adjustPoints(
+			requestSubjectId,
+			adminId,
+			selectedMemberId,
+			delta,
+			reason.trim()
+		);
 
 		if (adminStore.successMessage) {
 			resetForm();
@@ -55,6 +77,11 @@
 	{#if adminStore.errorMessage}
 		<div class="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-400">
 			{adminStore.errorMessage}
+		</div>
+	{/if}
+	{#if validationError}
+		<div class="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+			{validationError}
 		</div>
 	{/if}
 

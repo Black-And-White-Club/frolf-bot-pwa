@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { adminStore, type AdminBackfillCheckResult } from '$lib/stores/admin.svelte';
 	import { auth } from '$lib/stores/auth.svelte';
+	import { resolveRequestIdentity } from '$lib/utils/requestIdentity';
 
 	const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 	const SUPPORTED_EXTENSIONS = new Set(['csv', 'xlsx']);
@@ -59,7 +60,8 @@
 	}
 
 	async function runBackfillCheck() {
-		if (!auth.user || !dateValue) {
+		const identity = resolveRequestIdentity(auth.user);
+		if (!auth.user || !identity?.guildId || !dateValue) {
 			checkResult = null;
 			return;
 		}
@@ -67,8 +69,7 @@
 		try {
 			const dt = new Date(dateValue);
 			if (isNaN(dt.getTime())) return;
-			const guildId = auth.user.activeClubUuid || auth.user.guildId;
-			checkResult = await adminStore.backfillCheck(guildId, auth.user.id, dt);
+			checkResult = await adminStore.backfillCheck(identity.guildId, auth.user.id, dt);
 		} finally {
 			checkLoading = false;
 		}
@@ -93,25 +94,49 @@
 		fileInputKey += 1;
 	}
 
-	async function handleSubmit() {
-		validationError = null;
-		if (!auth.user || !selectedFile) return;
-		if (!title.trim() || !location.trim() || !dateValue) {
-			validationError = 'Title, location, and date are required.';
-			return;
+	function hasRequiredSubmitFields(): boolean {
+		if (title.trim() && location.trim() && dateValue) {
+			return true;
 		}
 
+		validationError = 'Title, location, and date are required.';
+		return false;
+	}
+
+	function parseSubmitDate(): Date | null {
 		const dt = new Date(dateValue);
 		if (isNaN(dt.getTime())) {
 			validationError = 'Invalid date.';
-			return;
+			return null;
 		}
 		if (dt >= new Date()) {
 			validationError = 'Backfill date must be in the past.';
-			return;
+			return null;
 		}
 
-		const guildId = auth.user.activeClubUuid || auth.user.guildId;
+		return dt;
+	}
+
+	function resolveSubmitGuildId(): string | null {
+		const identity = resolveRequestIdentity(auth.user);
+		if (identity?.guildId) {
+			return identity.guildId;
+		}
+
+		validationError = 'Discord guild identity is missing.';
+		return null;
+	}
+
+	async function handleSubmit() {
+		validationError = null;
+		if (!auth.user || !selectedFile) return;
+		if (!hasRequiredSubmitFields()) {
+			return;
+		}
+		const dt = parseSubmitDate();
+		if (!dt) return;
+		const guildId = resolveSubmitGuildId();
+		if (!guildId) return;
 
 		await adminStore.backfillRound({
 			guildId,
