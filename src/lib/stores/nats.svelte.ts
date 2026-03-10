@@ -290,40 +290,19 @@ class NatsService {
 			return;
 		}
 
+		const correlationId = customHeaders?.correlation_id;
 		const spanAttributes: Record<string, string> = {
 			'messaging.system': 'nats',
 			'messaging.destination': subject
 		};
-		const correlationId = customHeaders?.correlation_id;
-		if (correlationId) {
-			spanAttributes['messaging.correlation_id'] = correlationId;
-		}
+		if (correlationId) spanAttributes['messaging.correlation_id'] = correlationId;
 
 		const tracer = getTracer();
-		const span = tracer.startSpan(`nats.publish.${subject}`, {
-			attributes: spanAttributes
-		});
+		const span = tracer.startSpan(`nats.publish.${subject}`, { attributes: spanAttributes });
 
 		try {
 			const payload = this.codec.encode(JSON.stringify(data));
-			const natsHeaders = this.natsLib.headers();
-
-			// Inject traceparent
-			const traceHeaders: Record<string, string> = {};
-			injectTraceContext(traceHeaders);
-
-			// Add trace headers
-			for (const [key, value] of Object.entries(traceHeaders)) {
-				natsHeaders.append(key, value);
-			}
-
-			// Add custom headers
-			if (customHeaders) {
-				for (const [key, value] of Object.entries(customHeaders)) {
-					natsHeaders.append(key, value);
-				}
-			}
-
+			const natsHeaders = this.buildPublishHeaders(customHeaders);
 			this.connection.publish(subject, payload, { headers: natsHeaders });
 			span.end();
 		} catch (err) {
@@ -331,6 +310,23 @@ class NatsService {
 			span.end();
 			throw err;
 		}
+	}
+
+	private buildPublishHeaders(
+		customHeaders?: Record<string, string>
+	): ReturnType<NatsLib['headers']> {
+		const natsHeaders = this.natsLib!.headers();
+		const traceHeaders: Record<string, string> = {};
+		injectTraceContext(traceHeaders);
+		for (const [key, value] of Object.entries(traceHeaders)) {
+			natsHeaders.append(key, value);
+		}
+		if (customHeaders) {
+			for (const [key, value] of Object.entries(customHeaders)) {
+				natsHeaders.append(key, value);
+			}
+		}
+		return natsHeaders;
 	}
 
 	/**

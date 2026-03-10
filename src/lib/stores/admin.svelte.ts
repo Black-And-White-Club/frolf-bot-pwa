@@ -344,7 +344,8 @@ class AdminService {
 
 	/**
 	 * Submit a backfill round creation + import.
-	 * Fire-and-forget — the existing import pipeline handles the rest.
+	 * Uses request-reply so backend receipt is confirmed before showing success.
+	 * The import pipeline runs asynchronously after the ack.
 	 */
 	async backfillRound({
 		guildId,
@@ -360,37 +361,43 @@ class AdminService {
 		this.successMessage = null;
 		this.errorMessage = null;
 
-		return new Promise(async (resolve) => {
-			try {
-				this.validateScorecardFile(file);
+		try {
+			this.validateScorecardFile(file);
 
-				const bytes = new Uint8Array(await file.arrayBuffer());
-				const payload = {
-					guild_id: guildId,
-					admin_id: adminId,
-					title,
-					location,
-					start_time: startTime.toISOString(),
-					mode,
-					file_data: this.toBase64(bytes),
-					file_name: file.name,
-					notes: notes.trim(),
-					import_id: crypto.randomUUID()
-				};
+			const bytes = new Uint8Array(await file.arrayBuffer());
+			const payload = {
+				guild_id: guildId,
+				admin_id: adminId,
+				title,
+				location,
+				start_time: startTime.toISOString(),
+				mode,
+				file_data: this.toBase64(bytes),
+				file_name: file.name,
+				notes: notes.trim(),
+				import_id: crypto.randomUUID()
+			};
 
-				nats.publish(ADMIN_BACKFILL_REQUESTED_SUBJECT, payload);
-				this.successMessage =
-					'Backfill round queued. Import is processing — check Discord for the finalized embed.';
-				this.scheduleMessageClear();
-			} catch (error) {
-				this.errorMessage =
-					error instanceof Error ? error.message : 'Failed to submit backfill round';
-				this.scheduleMessageClear();
-			} finally {
-				this.loading = false;
-				resolve();
+			const response = await nats.request<typeof payload, { round_id: string; error?: string }>(
+				ADMIN_BACKFILL_REQUESTED_SUBJECT,
+				payload,
+				{ timeout: OPERATION_TIMEOUT_MS }
+			);
+
+			if (response?.error) {
+				throw new Error(response.error);
 			}
-		});
+
+			this.successMessage =
+				'Backfill round received. Import is processing — check Discord for the finalized embed.';
+			this.scheduleMessageClear();
+		} catch (error) {
+			this.errorMessage =
+				error instanceof Error ? error.message : 'Failed to submit backfill round';
+			this.scheduleMessageClear();
+		} finally {
+			this.loading = false;
+		}
 	}
 
 	async uploadScorecard({
@@ -405,30 +412,27 @@ class AdminService {
 		this.successMessage = null;
 		this.errorMessage = null;
 
-		return new Promise(async (resolve) => {
-			try {
-				this.validateScorecardUploadInput(guildId, userId, roundId, file);
+		try {
+			this.validateScorecardUploadInput(guildId, userId, roundId, file);
 
-				const payload = await this.buildScorecardUploadPayload(
-					guildId,
-					userId,
-					roundId,
-					eventMessageId,
-					file,
-					notes
-				);
+			const payload = await this.buildScorecardUploadPayload(
+				guildId,
+				userId,
+				roundId,
+				eventMessageId,
+				file,
+				notes
+			);
 
-				nats.publish(ADMIN_SCORECARD_UPLOAD_SUBJECT, payload);
-				this.successMessage = 'Scorecard upload queued. Import processing has started.';
-				this.scheduleMessageClear();
-			} catch (error) {
-				this.errorMessage = error instanceof Error ? error.message : 'Failed to upload scorecard';
-				this.scheduleMessageClear();
-			} finally {
-				this.loading = false;
-				resolve();
-			}
-		});
+			nats.publish(ADMIN_SCORECARD_UPLOAD_SUBJECT, payload);
+			this.successMessage = 'Scorecard upload queued. Import processing has started.';
+			this.scheduleMessageClear();
+		} catch (error) {
+			this.errorMessage = error instanceof Error ? error.message : 'Failed to upload scorecard';
+			this.scheduleMessageClear();
+		} finally {
+			this.loading = false;
+		}
 	}
 }
 
