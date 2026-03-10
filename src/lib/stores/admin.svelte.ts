@@ -37,6 +37,22 @@ type AdminScorecardUploadInput = {
 	notes?: string;
 };
 
+export type AdminBackfillCheckResult = {
+	subsequent_round_count: number;
+	round_titles: string[];
+};
+
+export type AdminBackfillRoundInput = {
+	guildId: string;
+	adminId: string;
+	title: string;
+	location: string;
+	startTime: Date;
+	mode: string;
+	file: File;
+	notes?: string;
+};
+
 type AdminScorecardUploadPayload = {
 	guild_id: string;
 	round_id: string;
@@ -59,6 +75,8 @@ const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const SUPPORTED_EXTENSIONS = new Set(['csv', 'xlsx']);
 const ADMIN_SCORECARD_UPLOAD_SUBJECT = 'round.scorecard.admin.upload.requested.v2';
 const ADMIN_SCORECARD_UPLOAD_SOURCE = 'admin_pwa_upload';
+const ADMIN_BACKFILL_CHECK_SUBJECT = 'round.admin.backfill.check.v1';
+const ADMIN_BACKFILL_REQUESTED_SUBJECT = 'round.admin.backfill.requested.v1';
 
 class AdminService {
 	loading = $state(false);
@@ -298,6 +316,81 @@ class AdminService {
 			overwrite_existing_scores: true,
 			timestamp: new Date().toISOString()
 		};
+	}
+
+	/**
+	 * Pre-check: returns count and titles of finalized rounds after the given date.
+	 * Uses NATS request-reply.
+	 */
+	async backfillCheck(
+		guildId: string,
+		adminId: string,
+		startTime: Date
+	): Promise<AdminBackfillCheckResult | null> {
+		try {
+			const result = await nats.request<
+				{ guild_id: string; admin_id: string; start_time: string },
+				AdminBackfillCheckResult
+			>(
+				ADMIN_BACKFILL_CHECK_SUBJECT,
+				{ guild_id: guildId, admin_id: adminId, start_time: startTime.toISOString() },
+				{ timeout: OPERATION_TIMEOUT_MS }
+			);
+			return result;
+		} catch {
+			return null;
+		}
+	}
+
+	/**
+	 * Submit a backfill round creation + import.
+	 * Fire-and-forget — the existing import pipeline handles the rest.
+	 */
+	async backfillRound({
+		guildId,
+		adminId,
+		title,
+		location,
+		startTime,
+		mode,
+		file,
+		notes = ''
+	}: AdminBackfillRoundInput): Promise<void> {
+		this.loading = true;
+		this.successMessage = null;
+		this.errorMessage = null;
+
+		return new Promise(async (resolve) => {
+			try {
+				this.validateScorecardFile(file);
+
+				const bytes = new Uint8Array(await file.arrayBuffer());
+				const payload = {
+					guild_id: guildId,
+					admin_id: adminId,
+					title,
+					location,
+					start_time: startTime.toISOString(),
+					mode,
+					file_data: this.toBase64(bytes),
+					file_name: file.name,
+					notes: notes.trim(),
+					import_id: crypto.randomUUID()
+				};
+
+				nats.publish(ADMIN_BACKFILL_REQUESTED_SUBJECT, payload);
+				this.successMessage =
+					'Backfill round queued. Import is processing — check Discord for the finalized embed.';
+				this.scheduleMessageClear();
+			} catch (error) {
+				this.errorMessage =
+					error instanceof Error ? error.message : 'Failed to submit backfill round';
+				this.scheduleMessageClear();
+			} finally {
+				this.loading = false;
+				resolve();
+			}
+		});
 	}
 
 	async uploadScorecard({

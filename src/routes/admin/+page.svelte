@@ -3,6 +3,7 @@
 	import TagEditor from '$lib/components/admin/TagEditor.svelte';
 	import PointAdjuster from '$lib/components/admin/PointAdjuster.svelte';
 	import AdminScorecardUploader from '$lib/components/admin/AdminScorecardUploader.svelte';
+	import AdminBackfillRoundUploader from '$lib/components/admin/AdminBackfillRoundUploader.svelte';
 	import { auth } from '$lib/stores/auth.svelte';
 	import { tagStore } from '$lib/stores/tags.svelte';
 
@@ -61,6 +62,15 @@
 				Manual Scorecard Upload
 			</h2>
 			<AdminScorecardUploader />
+		</section>
+
+		<section class="space-y-3">
+			<h2
+				class="font-['Space_Grotesk'] text-sm font-semibold tracking-wide text-[var(--guild-text-secondary)] uppercase"
+			>
+				Backfill Past Round
+			</h2>
+			<AdminBackfillRoundUploader />
 		</section>
 	</div>
 </div>
