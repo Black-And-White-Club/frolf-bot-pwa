@@ -17,6 +17,7 @@ vi.mock('../club.svelte', () => ({
 describe('AuthService HTTP methods (auth.svelte.ts)', () => {
 	let auth: any;
 	let fetchMock: ReturnType<typeof vi.fn>;
+	let originalFetch: typeof fetch;
 	let originalLocation: Location;
 
 	beforeEach(async () => {
@@ -24,12 +25,14 @@ describe('AuthService HTTP methods (auth.svelte.ts)', () => {
 		localStorage.clear();
 		sessionStorage.clear();
 
+		originalFetch = global.fetch;
+
 		// Save original location
 		originalLocation = window.location;
 
 		// Mock fetch with proper promise handling
 		fetchMock = vi.fn().mockImplementation(() => Promise.resolve({ ok: false, status: 404 }));
-		global.fetch = fetchMock;
+		global.fetch = fetchMock as typeof fetch;
 
 		const mod = await import('../auth.svelte');
 		auth = mod.auth;
@@ -37,6 +40,7 @@ describe('AuthService HTTP methods (auth.svelte.ts)', () => {
 
 	afterEach(() => {
 		vi.restoreAllMocks();
+		global.fetch = originalFetch;
 		// Restore location
 		if (originalLocation) {
 			Object.defineProperty(window, 'location', {

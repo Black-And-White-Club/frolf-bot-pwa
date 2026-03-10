@@ -5,6 +5,7 @@
 	import { auth } from '$lib/stores/auth.svelte';
 	import PlayerRow from './PlayerRow.svelte';
 	import MovementIndicator from './MovementIndicator.svelte';
+	import TagBadge from './TagBadge.svelte';
 	import ViewToggle from './ViewToggle.svelte';
 	import TagDetailSheet from './TagDetailSheet.svelte';
 
@@ -14,12 +15,16 @@
 		if (tagStore.selectedMemberId === userId) {
 			tagStore.selectMember(null);
 		} else {
-			tagStore.selectMember(userId);
-			if (guildId) tagStore.fetchTagHistory(guildId, userId);
+			if (!guildId) {
+				return;
+			}
+			tagStore.selectMember(userId, guildId);
+			tagStore.fetchTagHistory(guildId, userId);
 		}
 	}
 
 	let sortedEntries = $derived(leaderboardService.currentView);
+	let topThree = $derived(sortedEntries.slice(0, 3));
 
 	let limit = $state(50);
 	const displayEntries = $derived(sortedEntries.slice(0, limit));
@@ -62,9 +67,20 @@
 		</div>
 	</div>
 
+	{#if topThree.length > 0}
+		<div
+			class="bg-liquid-skobeloff border-sage-600/20 flex justify-center gap-8 rounded-lg border p-6"
+			data-testid="leaderboard-top-three"
+		>
+			{#each topThree as entry, index (entry.userId)}
+				<TagBadge tag={entry} rank={index + 1} size="lg" />
+			{/each}
+		</div>
+	{/if}
+
 	<!-- Full Rankings -->
 	<div class="space-y-2">
-		{#each displayEntries as entry, index (index)}
+		{#each displayEntries as entry, index (entry.userId)}
 			{@const displayName = userProfiles.getDisplayName(entry.userId)}
 			{@const movement = leaderboardService.getMovementIndicator(entry)}
 			<PlayerRow
@@ -75,6 +91,7 @@
 				totalPoints={entry.totalPoints}
 				roundsPlayed={entry.roundsPlayed}
 				isCurrentUser={auth.user?.id === entry.userId}
+				testid={`leaderboard-row-${entry.userId}`}
 				onclick={() => handleRowClick(entry.userId)}
 			>
 				<MovementIndicator {entry} {movement} />

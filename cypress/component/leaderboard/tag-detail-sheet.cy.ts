@@ -41,7 +41,7 @@ describe('TagDetailSheet (Component)', () => {
 	});
 
 	it('shows loading state when historyLoading is true', () => {
-		tagStore.selectMember('member-1');
+		tagStore.selectMember('member-1', 'test-guild');
 		tagStore.historyLoading = true;
 
 		cy.mountComponent(TagDetailSheet, { props: { memberId: 'member-1' } });
@@ -51,7 +51,7 @@ describe('TagDetailSheet (Component)', () => {
 	});
 
 	it('shows empty state when member has no cached history', () => {
-		tagStore.selectMember('member-1');
+		tagStore.selectMember('member-1', 'test-guild');
 
 		cy.mountComponent(TagDetailSheet, { props: { memberId: 'member-1' } });
 
@@ -60,8 +60,8 @@ describe('TagDetailSheet (Component)', () => {
 	});
 
 	it('shows history entries from the store cache sorted most-recent-first', () => {
-		tagStore.selectMember('member-1');
-		tagStore.applyMemberHistoryResponse('member-1', rawHistory);
+		tagStore.selectMember('member-1', 'test-guild');
+		tagStore.applyMemberHistoryResponse('test-guild', 'member-1', rawHistory);
 
 		cy.mountComponent(TagDetailSheet, { props: { memberId: 'member-1' } });
 
@@ -77,7 +77,7 @@ describe('TagDetailSheet (Component)', () => {
 	});
 
 	it('renders the inline panel (not a dialog)', () => {
-		tagStore.selectMember('member-1');
+		tagStore.selectMember('member-1', 'test-guild');
 
 		cy.mountComponent(TagDetailSheet, { props: { memberId: 'member-1' } });
 

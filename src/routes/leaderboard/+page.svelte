@@ -1,10 +1,10 @@
 <script lang="ts">
 	import LeaderboardView from '$lib/components/leaderboard/LeaderboardView.svelte';
 	import { auth } from '$lib/stores/auth.svelte';
-
 	import { clubService } from '$lib/stores/club.svelte';
+	import { resolveRequestIdentity } from '$lib/utils/requestIdentity';
 
-	let id = $derived(auth.user?.activeClubUuid ?? auth.user?.guildId ?? '');
+	let identity = $derived(resolveRequestIdentity(auth.user));
 </script>
 
 <svelte:head>
@@ -21,8 +21,8 @@
 </svelte:head>
 
 <main class="container mx-auto px-4 py-6">
-	{#if id}
-		<LeaderboardView guildId={id} />
+	{#if identity}
+		<LeaderboardView guildId={identity.guildId ?? undefined} />
 	{:else}
 		<p class="text-slate-400">Sign in to view leaderboard</p>
 	{/if}

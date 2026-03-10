@@ -196,8 +196,7 @@ class DataLoader {
 		roundService.clear();
 		leaderboardService.clear();
 		userProfiles.clear();
-		tagStore.history = [];
-		tagStore.tagList = [];
+		tagStore.reset();
 	}
 }
 

@@ -64,17 +64,10 @@ export default defineConfig(
 			'no-undef': 'off'
 		}
 	},
-	// Relax some rules for test, storybook and cypress files where `any` is
-	// commonly used and namespaces are still present in some helper files.
+	// Relax some rules for test and cypress files where `any` is commonly
+	// used and namespaces are still present in some helper files.
 	{
-		files: [
-			'cypress/**',
-			'tests/**',
-			'**/__tests__/**',
-			'**/*.spec.{ts,js}',
-			'**/*.test.{ts,js}',
-			'**/*.story.svelte'
-		],
+		files: ['cypress/**', 'tests/**', '**/__tests__/**', '**/*.spec.{ts,js}', '**/*.test.{ts,js}'],
 		rules: {
 			'@typescript-eslint/no-explicit-any': 'off',
 			'@typescript-eslint/no-namespace': 'off'

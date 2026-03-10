@@ -11,6 +11,7 @@ import { TagService } from '../tags.svelte';
 import type { TagHistoryResponseRaw } from '../tags.svelte';
 
 function makeRaw(
+	guildId: string,
 	entries: Array<{
 		id: number;
 		tag_number: number;
@@ -20,7 +21,7 @@ function makeRaw(
 		created_at: string;
 	}>
 ): TagHistoryResponseRaw {
-	return { guild_id: 'guild-1', entries };
+	return { guild_id: guildId, entries };
 }
 
 describe('TagService', () => {
@@ -39,15 +40,16 @@ describe('TagService', () => {
 		});
 
 		it('returns empty array when selected member has no cached history', () => {
-			service.selectMember('member-1');
+			service.selectMember('member-1', 'guild-1');
 			expect(service.selectedMemberHistory).toEqual([]);
 		});
 
 		it('returns cached entries for selected member sorted by date descending', () => {
-			service.selectMember('member-1');
+			service.selectMember('member-1', 'guild-1');
 			service.applyMemberHistoryResponse(
+				'guild-1',
 				'member-1',
-				makeRaw([
+				makeRaw('guild-1', [
 					{
 						id: 1,
 						tag_number: 7,
@@ -79,10 +81,11 @@ describe('TagService', () => {
 			expect(result[2].id).toBe(1);
 		});
 
-		it('does not return entries from a different member cache slot', () => {
+		it('does not return entries from a different member or guild cache slot', () => {
 			service.applyMemberHistoryResponse(
+				'guild-2',
 				'member-2',
-				makeRaw([
+				makeRaw('guild-2', [
 					{
 						id: 99,
 						tag_number: 5,
@@ -92,14 +95,15 @@ describe('TagService', () => {
 					}
 				])
 			);
-			service.selectMember('member-1');
+			service.selectMember('member-1', 'guild-1');
 			expect(service.selectedMemberHistory).toEqual([]);
 		});
 
-		it('preserves entries from multiple members independently in the cache', () => {
+		it('keeps the same member separated across guild contexts', () => {
 			service.applyMemberHistoryResponse(
+				'guild-1',
 				'member-1',
-				makeRaw([
+				makeRaw('guild-1', [
 					{
 						id: 1,
 						tag_number: 7,
@@ -110,8 +114,46 @@ describe('TagService', () => {
 				])
 			);
 			service.applyMemberHistoryResponse(
+				'guild-2',
+				'member-1',
+				makeRaw('guild-2', [
+					{
+						id: 2,
+						tag_number: 3,
+						new_member_id: 'member-1',
+						reason: 'challenge',
+						created_at: '2025-01-02T00:00:00Z'
+					}
+				])
+			);
+
+			service.selectMember('member-1', 'guild-1');
+			expect(service.selectedMemberHistory).toHaveLength(1);
+			expect(service.selectedMemberHistory[0].tagNumber).toBe(7);
+
+			service.selectMember('member-1', 'guild-2');
+			expect(service.selectedMemberHistory).toHaveLength(1);
+			expect(service.selectedMemberHistory[0].tagNumber).toBe(3);
+		});
+
+		it('preserves entries from multiple members independently in the cache', () => {
+			service.applyMemberHistoryResponse(
+				'guild-1',
+				'member-1',
+				makeRaw('guild-1', [
+					{
+						id: 1,
+						tag_number: 7,
+						new_member_id: 'member-1',
+						reason: 'won',
+						created_at: '2025-01-01T00:00:00Z'
+					}
+				])
+			);
+			service.applyMemberHistoryResponse(
+				'guild-1',
 				'member-2',
-				makeRaw([
+				makeRaw('guild-1', [
 					{
 						id: 2,
 						tag_number: 3,
@@ -122,11 +164,11 @@ describe('TagService', () => {
 				])
 			);
 
-			service.selectMember('member-1');
+			service.selectMember('member-1', 'guild-1');
 			expect(service.selectedMemberHistory).toHaveLength(1);
 			expect(service.selectedMemberHistory[0].id).toBe(1);
 
-			service.selectMember('member-2');
+			service.selectMember('member-2', 'guild-1');
 			expect(service.selectedMemberHistory).toHaveLength(1);
 			expect(service.selectedMemberHistory[0].id).toBe(2);
 		});
@@ -141,7 +183,7 @@ describe('TagService', () => {
 
 		it('applyMemberHistoryResponse sets historyLoading to false', () => {
 			service.historyLoading = true;
-			service.applyMemberHistoryResponse('member-1', makeRaw([]));
+			service.applyMemberHistoryResponse('guild-1', 'member-1', makeRaw('guild-1', []));
 			expect(service.historyLoading).toBe(false);
 		});
 	});
@@ -162,7 +204,7 @@ describe('TagService', () => {
 			expect(service.historyLoading).toBe(true);
 			expect(service.loading).toBe(false); // guild-wide loading must stay unaffected
 
-			resolveRequest(makeRaw([]));
+			resolveRequest(makeRaw('guild-1', []));
 			await fetchPromise;
 			expect(service.historyLoading).toBe(false);
 		});
@@ -172,7 +214,7 @@ describe('TagService', () => {
 
 			// Pre-populate guild-wide history
 			service.applyHistoryResponse(
-				makeRaw([
+				makeRaw('guild-1', [
 					{
 						id: 99,
 						tag_number: 1,
@@ -184,7 +226,7 @@ describe('TagService', () => {
 			);
 
 			(nats.request as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-				makeRaw([
+				makeRaw('guild-1', [
 					{
 						id: 1,
 						tag_number: 7,
@@ -202,17 +244,18 @@ describe('TagService', () => {
 			expect(service.history[0].id).toBe(99);
 
 			// Member cache populated
-			service.selectMember('member-1');
+			service.selectMember('member-1', 'guild-1');
 			expect(service.selectedMemberHistory).toHaveLength(1);
 			expect(service.selectedMemberHistory[0].tagNumber).toBe(7);
 		});
 
-		it('does not trigger a second network request if cache already has data for that member', async () => {
+		it('does not trigger a second network request if cache already has data for that member in the same guild', async () => {
 			const { nats } = await import('../nats.svelte');
 
 			service.applyMemberHistoryResponse(
+				'guild-1',
 				'member-1',
-				makeRaw([
+				makeRaw('guild-1', [
 					{
 						id: 1,
 						tag_number: 7,
@@ -225,6 +268,44 @@ describe('TagService', () => {
 
 			await service.fetchTagHistory('guild-1', 'member-1');
 			expect(nats.request as ReturnType<typeof vi.fn>).not.toHaveBeenCalled();
+		});
+
+		it('re-fetches the same member when the guild changes', async () => {
+			const { nats } = await import('../nats.svelte');
+
+			service.applyMemberHistoryResponse(
+				'guild-1',
+				'member-1',
+				makeRaw('guild-1', [
+					{
+						id: 1,
+						tag_number: 7,
+						new_member_id: 'member-1',
+						reason: 'won',
+						created_at: '2025-01-01T00:00:00Z'
+					}
+				])
+			);
+
+			(nats.request as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+				makeRaw('guild-2', [
+					{
+						id: 2,
+						tag_number: 3,
+						new_member_id: 'member-1',
+						reason: 'challenge',
+						created_at: '2025-01-02T00:00:00Z'
+					}
+				])
+			);
+
+			await service.fetchTagHistory('guild-2', 'member-1');
+
+			expect(nats.request as ReturnType<typeof vi.fn>).toHaveBeenCalledWith(
+				'leaderboard.tag.history.requested.v1.guild-2',
+				{ guild_id: 'guild-2', member_id: 'member-1', limit: 100 },
+				{ timeout: 5000 }
+			);
 		});
 	});
 
@@ -244,14 +325,14 @@ describe('TagService', () => {
 			expect(service.loading).toBe(true);
 			expect(service.historyLoading).toBe(false); // member loading must stay unaffected
 
-			resolveRequest(makeRaw([]));
+			resolveRequest(makeRaw('guild-1', []));
 			await fetchPromise;
 		});
 
 		it('stores results in history array, not historyCache', async () => {
 			const { nats } = await import('../nats.svelte');
 			(nats.request as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-				makeRaw([
+				makeRaw('guild-1', [
 					{
 						id: 5,
 						tag_number: 3,
@@ -267,7 +348,38 @@ describe('TagService', () => {
 			expect(service.history).toHaveLength(1);
 			expect(service.history[0].id).toBe(5);
 			// historyCache should remain empty
-			service.selectMember('member-A');
+			service.selectMember('member-A', 'guild-1');
+			expect(service.selectedMemberHistory).toEqual([]);
+		});
+	});
+
+	describe('reset', () => {
+		it('clears selection, cache, lists, and loading state', () => {
+			service.history = [
+				{
+					id: 1,
+					tagNumber: 4,
+					newMemberId: 'member-1',
+					reason: 'won',
+					createdAt: '2025-01-01T00:00:00Z'
+				}
+			];
+			service.tagList = [{ memberId: 'member-1', currentTag: 4 }];
+			service.historyLoading = true;
+			service.loading = true;
+			service.error = 'bad';
+			service.applyMemberHistoryResponse('guild-1', 'member-1', makeRaw('guild-1', []));
+			service.selectMember('member-1', 'guild-1');
+
+			service.reset();
+
+			expect(service.history).toEqual([]);
+			expect(service.tagList).toEqual([]);
+			expect(service.historyLoading).toBe(false);
+			expect(service.loading).toBe(false);
+			expect(service.error).toBeNull();
+			expect(service.selectedMemberId).toBeNull();
+			expect(service.selectedMemberGuildId).toBeNull();
 			expect(service.selectedMemberHistory).toEqual([]);
 		});
 	});

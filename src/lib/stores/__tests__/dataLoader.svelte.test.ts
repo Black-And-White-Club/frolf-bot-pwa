@@ -51,6 +51,7 @@ vi.mock('../auth.svelte', () => ({
 describe('DataLoader (dataLoader.svelte.ts)', () => {
 	let dataLoader: any;
 	let mockNats: any;
+	let tagStore: any;
 
 	beforeEach(async () => {
 		vi.resetModules();
@@ -63,6 +64,8 @@ describe('DataLoader (dataLoader.svelte.ts)', () => {
 		// Get fresh module
 		const mod = await import('../dataLoader.svelte');
 		dataLoader = mod.dataLoader;
+		const tagsMod = await import('../tags.svelte');
+		tagStore = tagsMod.tagStore;
 
 		const natsMod = await import('../nats.svelte');
 		mockNats = natsMod.nats;
@@ -130,10 +133,10 @@ describe('DataLoader (dataLoader.svelte.ts)', () => {
 
 			// Verify services received data
 			expect(mockRoundService.setRoundsFromApi).toHaveBeenCalledWith([{ id: 'round-1' }]);
-			expect(mockLeaderboardService.setSnapshotFromApi).toHaveBeenCalledWith(
-				[{ tag: 1, user_id: 'user1' }],
-				'club-123'
-			);
+			expect(mockLeaderboardService.setSnapshotFromApi).toHaveBeenCalledWith({
+				leaderboard: [{ tag: 1, user_id: 'user1' }],
+				profiles: { user2: { display_name: 'Player 2' } }
+			});
 			expect(mockUserProfiles.setProfilesFromApi).toHaveBeenCalledTimes(2);
 
 			expect(dataLoader.loading).toBe(false);
@@ -210,6 +213,8 @@ describe('DataLoader (dataLoader.svelte.ts)', () => {
 
 	describe('clearData', () => {
 		it('resets state and clears all services', () => {
+			const resetSpy = vi.spyOn(tagStore, 'reset');
+
 			dataLoader.clearData();
 
 			expect(dataLoader.loading).toBe(false);
@@ -217,6 +222,7 @@ describe('DataLoader (dataLoader.svelte.ts)', () => {
 			expect(mockRoundService.clear).toHaveBeenCalled();
 			expect(mockLeaderboardService.clear).toHaveBeenCalled();
 			expect(mockUserProfiles.clear).toHaveBeenCalled();
+			expect(resetSpy).toHaveBeenCalled();
 		});
 	});
 });

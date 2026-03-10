@@ -84,6 +84,15 @@ interface TagListRequestPayload {
 	club_uuid?: string;
 }
 
+type SelectedHistoryContext = {
+	guildId: string;
+	memberId: string;
+};
+
+function memberHistoryCacheKey(guildId: string, memberId: string): string {
+	return `${guildId}::${memberId}`;
+}
+
 export class TagService {
 	history = $state<TagHistoryEntry[]>([]);
 	tagList = $state<TagListMember[]>([]);
@@ -91,19 +100,42 @@ export class TagService {
 	historyLoading = $state(false);
 	error = $state<string | null>(null);
 	selectedMemberId = $state<string | null>(null);
+	selectedMemberGuildId = $state<string | null>(null);
 	historyCache = $state<Record<string, TagHistoryEntry[]>>({});
 
-	selectMember(id: string | null) {
-		this.selectedMemberId = id;
+	selectMember(memberId: null): void;
+	selectMember(memberId: string, guildId: string | null): void;
+	selectMember(memberId: string | null, guildId: string | null = null) {
+		if (!memberId) {
+			this.selectedMemberId = null;
+			this.selectedMemberGuildId = null;
+			return;
+		}
+
+		this.selectedMemberId = memberId;
+		this.selectedMemberGuildId = guildId?.trim() || null;
 	}
 
 	get memberList() {
 		return this.tagList;
 	}
 
+	get selectedHistoryContext(): SelectedHistoryContext | null {
+		if (!this.selectedMemberId || !this.selectedMemberGuildId) {
+			return null;
+		}
+
+		return {
+			guildId: this.selectedMemberGuildId,
+			memberId: this.selectedMemberId
+		};
+	}
+
 	get selectedMemberHistory(): TagHistoryEntry[] {
-		if (!this.selectedMemberId) return [];
-		const cached = this.historyCache[this.selectedMemberId];
+		const selected = this.selectedHistoryContext;
+		if (!selected) return [];
+
+		const cached = this.historyCache[memberHistoryCacheKey(selected.guildId, selected.memberId)];
 		if (!cached) return [];
 		return [...cached].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
 	}
@@ -114,10 +146,10 @@ export class TagService {
 		this.error = null;
 	}
 
-	applyMemberHistoryResponse(memberId: string, raw: TagHistoryResponseRaw) {
+	applyMemberHistoryResponse(guildId: string, memberId: string, raw: TagHistoryResponseRaw) {
 		this.historyCache = {
 			...this.historyCache,
-			[memberId]: transformHistoryEntries(raw)
+			[memberHistoryCacheKey(guildId, memberId)]: transformHistoryEntries(raw)
 		};
 		this.historyLoading = false;
 	}
@@ -188,6 +220,17 @@ export class TagService {
 		this.loading = false;
 	}
 
+	reset() {
+		this.history = [];
+		this.tagList = [];
+		this.loading = false;
+		this.historyLoading = false;
+		this.error = null;
+		this.selectedMemberId = null;
+		this.selectedMemberGuildId = null;
+		this.historyCache = {};
+	}
+
 	/**
 	 * Fetch tag history for a member (or guild-wide if memberId omitted).
 	 * Called on-demand from the tags page, not on startup.
@@ -205,7 +248,8 @@ export class TagService {
 	}
 
 	async #fetchMemberHistory(guildId: string, memberId: string, limit: number): Promise<void> {
-		if (this.historyCache[memberId]) return;
+		const cacheKey = memberHistoryCacheKey(guildId, memberId);
+		if (this.historyCache[cacheKey]) return;
 
 		this.historyLoading = true;
 		this.error = null;
@@ -218,7 +262,7 @@ export class TagService {
 				{ timeout: 5000 }
 			);
 			if (response) {
-				this.applyMemberHistoryResponse(memberId, response);
+				this.applyMemberHistoryResponse(guildId, memberId, response);
 			}
 		} catch (e) {
 			const msg = e instanceof Error ? e.message : 'Failed to load tag history';

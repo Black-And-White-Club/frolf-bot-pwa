@@ -7,7 +7,6 @@ A modern progressive web app for disc golf (frolf) round management, scoring, an
 - 🎯 **Real-time Scoring** - Watch round scores update live via WebSocket
 - 🏆 **Dynamic Leaderboards** - Competitive rankings with automatic updates
 - 📊 **Player Statistics** - Track performance over time
-- 🎨 **Component Library** - Reusable UI components built in Storybook
 - 🔐 **Discord OAuth** - Seamless authentication
 - 📱 **Mobile-First** - Responsive design optimized for mobile devices
 - 🌓 **Theme Support** - Custom mint/teal color scheme
@@ -50,7 +49,6 @@ See [LOCAL_DEV_SETUP.md](./LOCAL_DEV_SETUP.md) for detailed configuration instru
 
 - **[QUICK_START.md](./QUICK_START.md)** - Get started in 5 minutes
 - **[LOCAL_DEV_SETUP.md](./LOCAL_DEV_SETUP.md)** - Complete development environment setup
-- **[Component Library](http://localhost:6006)** - Run `bun run storybook`
 
 ## 🏗️ Project Structure
 
@@ -68,16 +66,15 @@ src/
 
 ## 🛠️ Available Scripts
 
-| Command             | Description              |
-| ------------------- | ------------------------ |
-| `bun run dev`       | Start development server |
-| `bun run build`     | Build for production     |
-| `bun run preview`   | Preview production build |
-| `bun run check`     | Run type checking        |
-| `bun run lint`      | Lint code                |
-| `bun run format`    | Format with Prettier     |
-| `bun run test`      | Run tests                |
-| `bun run storybook` | Start Storybook          |
+| Command           | Description              |
+| ----------------- | ------------------------ |
+| `bun run dev`     | Start development server |
+| `bun run build`   | Build for production     |
+| `bun run preview` | Preview production build |
+| `bun run check`   | Run type checking        |
+| `bun run lint`    | Lint code                |
+| `bun run format`  | Format with Prettier     |
+| `bun run test`    | Run tests                |
 
 ## 🧩 Tech Stack
 
@@ -85,7 +82,6 @@ src/
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS 4.x
 - **Auth**: [@auth/sveltekit](https://authjs.dev/)
-- **Component Dev**: Storybook 9.x
 - **Testing**: Vitest
 - **Real-time**: WebSocket (NATS JetStream)
 
@@ -115,8 +111,7 @@ These are required in the backend environment (outside this repo):
 2. **Start backend** (Go API server)
 3. **Start PWA** (`bun run dev`)
 4. Make changes → See live reload
-5. Build components in Storybook
-6. Test with Discord dev application
+5. Test with Discord dev application
 
 See [LOCAL_DEV_SETUP.md](./LOCAL_DEV_SETUP.md) for complete workflow.
 

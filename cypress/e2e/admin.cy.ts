@@ -7,7 +7,8 @@ import {
 } from '../support/event-builders';
 
 describe('Admin Dashboard', () => {
-	const subjectId = 'guild-123';
+	const subjectId = 'club-123';
+	const guildId = 'guild-123';
 
 	const profiles = {
 		'user-1': {
@@ -28,20 +29,20 @@ describe('Admin Dashboard', () => {
 			rounds: [
 				buildRoundCreated({
 					id: 'round-admin-1',
-					guild_id: subjectId,
+					guild_id: guildId,
 					title: 'Admin Round',
 					participants: []
 				})
 			],
 			leaderboard: buildLeaderboardSnapshot({
-				guild_id: subjectId,
+				guild_id: guildId,
 				leaderboard: [
 					{ user_id: 'user-1', tag_number: 1, total_points: 500, rounds_played: 8 },
 					{ user_id: 'user-2', tag_number: 2, total_points: 450, rounds_played: 7 }
 				]
 			}),
 			tags: buildTagListSnapshot({
-				guild_id: subjectId,
+				guild_id: guildId,
 				members: [
 					{ member_id: 'user-1', current_tag: 1 },
 					{ member_id: 'user-2', current_tag: 2 }
@@ -56,7 +57,7 @@ describe('Admin Dashboard', () => {
 		cy.arrangeAuth({
 			path: '/admin',
 			clubUuid: subjectId,
-			guildId: subjectId,
+			guildId,
 			role,
 			linkedProviders: ['discord']
 		});
@@ -176,6 +177,9 @@ describe('Admin Dashboard', () => {
 				reason: string;
 			};
 
+			expect(payload.guild_id).to.eq(guildId);
+			expect(payload.guild_id).not.to.eq(subjectId);
+
 			cy.wsEmit('leaderboard.manual.point.adjustment.success.v2', {
 				guild_id: payload.guild_id,
 				member_id: payload.member_id,
@@ -198,6 +202,9 @@ describe('Admin Dashboard', () => {
 		cy.wsAssertPublished('leaderboard.manual.point.adjustment.v2').then((entries) => {
 			const lastEntry = entries[entries.length - 1];
 			const payload = lastEntry.payload as { guild_id: string };
+
+			expect(payload.guild_id).to.eq(guildId);
+			expect(payload.guild_id).not.to.eq(subjectId);
 
 			cy.wsEmit('leaderboard.manual.point.adjustment.failed.v2', {
 				guild_id: payload.guild_id,
@@ -234,13 +241,73 @@ describe('Admin Dashboard', () => {
 				notes: string;
 			};
 
-			expect(payload.guild_id).to.eq(subjectId);
+			expect(payload.guild_id).to.eq(guildId);
+			expect(payload.guild_id).not.to.eq(subjectId);
 			expect(payload.round_id).to.eq(manualRoundId);
 			expect(payload.file_name).to.eq('scores.csv');
 			expect(payload.source).to.eq('admin_pwa_upload');
 			expect(payload.allow_guest_players).to.eq(true);
 			expect(payload.overwrite_existing_scores).to.eq(true);
 			expect(payload.notes).to.eq('Imported from admin dashboard');
+		});
+	});
+
+	it('uses the Discord guild ID for backfill check and submit when club UUID differs', () => {
+		visitAdmin('admin');
+
+		cy.wsStubRequest(
+			'round.admin.backfill.check.v1',
+			{ subsequent_round_count: 0, round_titles: [] },
+			{ validate: false }
+		);
+		cy.wsStubRequest(
+			'round.admin.backfill.requested.v1',
+			{ round_id: 'round-backfill-1' },
+			{ validate: false }
+		);
+
+		cy.get('#backfill-title').type('Historic Round');
+		cy.get('#backfill-location').type('Pier Park');
+		cy.get('#backfill-date').type('2025-03-08T15:30');
+		cy.wait(700);
+
+		cy.wsAssertPublished('round.admin.backfill.check.v1').then((entries) => {
+			const lastEntry = entries[entries.length - 1];
+			const payload = lastEntry.payload as {
+				guild_id: string;
+				admin_id: string;
+				start_time: string;
+			};
+
+			expect(payload.guild_id).to.eq(guildId);
+			expect(payload.guild_id).not.to.eq(subjectId);
+			expect(payload.admin_id).to.eq('user-1');
+			expect(payload.start_time).to.contain('2025-03-08T');
+		});
+
+		cy.get('#backfill-file').selectFile({
+			contents: Cypress.Buffer.from('Player,+/-\nAlec,-2\n'),
+			fileName: 'historic-round.csv',
+			mimeType: 'text/csv'
+		});
+		cy.contains('button', 'Submit Backfill Round').click();
+
+		cy.wsAssertPublished('round.admin.backfill.requested.v1').then((entries) => {
+			const lastEntry = entries[entries.length - 1];
+			const payload = lastEntry.payload as {
+				guild_id: string;
+				admin_id: string;
+				title: string;
+				location: string;
+				file_name: string;
+			};
+
+			expect(payload.guild_id).to.eq(guildId);
+			expect(payload.guild_id).not.to.eq(subjectId);
+			expect(payload.admin_id).to.eq('user-1');
+			expect(payload.title).to.eq('Historic Round');
+			expect(payload.location).to.eq('Pier Park');
+			expect(payload.file_name).to.eq('historic-round.csv');
 		});
 	});
 });

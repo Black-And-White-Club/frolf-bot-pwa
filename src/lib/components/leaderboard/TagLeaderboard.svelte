@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { tagStore, type TagListMember } from '$lib/stores/tags.svelte';
-	import { clubService } from '$lib/stores/club.svelte';
 	import { auth } from '$lib/stores/auth.svelte';
 	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
@@ -9,6 +8,7 @@
 	import PlayerRow from './PlayerRow.svelte';
 	import TagDetailSheet from './TagDetailSheet.svelte';
 	import { isMobile } from '$lib/stores/theme';
+	import { resolveRequestIdentity } from '$lib/utils/requestIdentity';
 
 	interface Props {
 		members?: TagListMember[];
@@ -43,11 +43,11 @@
 		if (tagStore.selectedMemberId === memberId) {
 			tagStore.selectMember(null);
 		} else {
-			tagStore.selectMember(memberId);
-			const guildId = auth.user?.guildId || clubService.id;
-			if (guildId) {
-				tagStore.fetchTagHistory(guildId, memberId);
-			}
+			const identity = resolveRequestIdentity(auth.user);
+			if (!identity?.guildId) return;
+
+			tagStore.selectMember(memberId, identity.guildId);
+			tagStore.fetchTagHistory(identity.guildId, memberId);
 		}
 	}
 

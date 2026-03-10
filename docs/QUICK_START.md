@@ -48,7 +48,6 @@ bun run check        # Run Svelte type checking
 bun run lint         # Lint code
 bun run format       # Format with Prettier
 bun run test         # Run Vitest tests
-bun run storybook    # Start Storybook component library
 ```
 
 ## Project Structure
@@ -76,13 +75,8 @@ src/
 
 ### Working with Components
 
-1. **Build in Storybook** (isolated development)
-   ```bash
-   bun run storybook
-   ```
-2. **Add to page** (src/routes/+page.svelte)
-
-3. **Test with real data** (connect to backend)
+1. **Add to page** (`src/routes/+page.svelte`)
+2. **Test with real data** (connect to backend)
 
 ### Mock Data vs Real Backend
 
@@ -111,9 +105,6 @@ To connect to real backend:
 ```bash
 # Create component
 touch src/lib/components/NewComponent.svelte
-
-# Create story
-touch src/lib/components/NewComponent.stories.ts
 
 # Add to index
 # Edit src/lib/index.ts
@@ -168,15 +159,9 @@ bun run check
 - Restart dev server: `bun run dev`
 - Check for TypeScript errors: `bun run check`
 
-### Storybook won't start
-
-- Delete cache: `rm -rf node_modules/.cache`
-- Reinstall: `bun install`
-
 ## Tips & Best Practices
 
 ✅ **Use TypeScript** - Catch errors before runtime  
-✅ **Build in Storybook first** - Faster iteration  
 ✅ **Use mock data initially** - Don't depend on backend  
 ✅ **Type your events** - Avoid runtime surprises  
 ✅ **Test with real Discord** - Use dev application  

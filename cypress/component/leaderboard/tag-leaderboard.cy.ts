@@ -39,9 +39,15 @@ describe('TagLeaderboard row expansion', () => {
 		tagStore.selectMember(null);
 		tagStore.historyLoading = false;
 		// Pre-populate cache so the panel has data to show immediately
-		tagStore.applyMemberHistoryResponse('member-1', cachedHistory);
-		tagStore.applyMemberHistoryResponse('member-2', { guild_id: 'test-guild', entries: [] });
-		tagStore.applyMemberHistoryResponse('member-3', { guild_id: 'test-guild', entries: [] });
+		tagStore.applyMemberHistoryResponse('legacy-guild', 'member-1', cachedHistory);
+		tagStore.applyMemberHistoryResponse('legacy-guild', 'member-2', {
+			guild_id: 'legacy-guild',
+			entries: []
+		});
+		tagStore.applyMemberHistoryResponse('legacy-guild', 'member-3', {
+			guild_id: 'legacy-guild',
+			entries: []
+		});
 		// Stub fetchTagHistory so no NATS calls are made
 		cy.stub(tagStore, 'fetchTagHistory').resolves();
 	});
