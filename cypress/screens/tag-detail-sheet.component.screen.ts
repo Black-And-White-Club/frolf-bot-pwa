@@ -3,7 +3,7 @@ export const tagDetailSheetComponentScreen = {
 		return cy.get('.tag-detail-inline');
 	},
 	historyEntries() {
-		return cy.get('.history-entry');
+		return cy.get('.history-group');
 	},
 	loadingState() {
 		return cy.contains('.empty-state', 'Loading history...');

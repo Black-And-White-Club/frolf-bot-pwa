@@ -55,7 +55,7 @@ describe('PointAdjuster', () => {
 		mockAdminStore.errorMessage = null;
 		mockAuth.user = {
 			activeClubUuid: 'club-123',
-			guildId: '',
+			guildId: 'guild-123',
 			id: 'admin-123'
 		};
 		mockTagStore.loading = false;
@@ -65,7 +65,7 @@ describe('PointAdjuster', () => {
 		);
 	});
 
-	it('submits point adjustments for club-only identities', async () => {
+	it('submits point adjustments for guild identities', async () => {
 		const { getByLabelText, getByRole } = render(PointAdjuster);
 
 		await fireEvent.change(getByLabelText(/player/i), {
@@ -85,7 +85,7 @@ describe('PointAdjuster', () => {
 
 		await waitFor(() => {
 			expect(mockAdjustPoints).toHaveBeenCalledWith(
-				'club-123',
+				'guild-123',
 				'admin-123',
 				'member-456',
 				5,

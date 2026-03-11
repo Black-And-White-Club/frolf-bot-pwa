@@ -145,7 +145,7 @@ describe('Leaderboard Route', () => {
 			expect(clubScopedMessages).to.have.length(0);
 		});
 
-		cy.get('.history-entry').should('have.length', 2);
+		cy.get('.history-group').should('have.length', 2);
 		cy.contains('.entry-tag', '#5').should('be.visible');
 	});
 });

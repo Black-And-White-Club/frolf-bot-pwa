@@ -13,13 +13,13 @@
 	const delta = $derived(parseInt(deltaStr));
 	const isValidDelta = $derived(!isNaN(delta) && delta !== 0 && deltaStr !== '');
 	const identity = $derived(resolveRequestIdentity(auth.user));
-	const requestSubjectId = $derived(identity?.requestSubjectId ?? null);
+	const guildId = $derived(identity?.guildId ?? null);
 	const canSubmit = $derived(
 		selectedMemberId !== '' &&
 			isValidDelta &&
 			reason.trim() !== '' &&
 			!adminStore.loading &&
-			!!requestSubjectId
+			!!guildId
 	);
 
 	// Sorted list for the select dropdown
@@ -42,7 +42,7 @@
 		validationError = null;
 		if (!auth.user) return;
 
-		if (!requestSubjectId) {
+		if (!guildId) {
 			validationError = 'Club or Discord guild identity is missing.';
 			return;
 		}
@@ -51,13 +51,7 @@
 
 		const adminId = auth.user.id;
 
-		await adminStore.adjustPoints(
-			requestSubjectId,
-			adminId,
-			selectedMemberId,
-			delta,
-			reason.trim()
-		);
+		await adminStore.adjustPoints(guildId, adminId, selectedMemberId, delta, reason.trim());
 
 		if (adminStore.successMessage) {
 			resetForm();

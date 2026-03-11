@@ -26,20 +26,67 @@
 		return 'involved';
 	}
 
-	function formatDate(dateStr: string): string {
-		return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+	type GroupedTagHistory = {
+		id: string; // group id (e.g. roundId or a fallback)
+		roundId?: string;
+		createdAt: string;
+		reason: string;
+		got: TagHistoryEntry[];
+		gave: TagHistoryEntry[];
+	};
+
+	function matchesLastGroup(
+		entry: TagHistoryEntry,
+		lastGroup: GroupedTagHistory | undefined
+	): boolean {
+		if (!lastGroup) return false;
+		if (entry.roundId && lastGroup.roundId === entry.roundId) return true;
+		if (
+			!entry.roundId &&
+			lastGroup.createdAt === entry.createdAt &&
+			lastGroup.reason === entry.reason
+		)
+			return true;
+		return false;
 	}
 
-	function getCounterparty(entry: TagHistoryEntry, viewingId: string): string | null {
-		if (entry.reason === 'admin_fix') return null;
-		const direction = getDirection(entry, viewingId);
-		if (direction === 'got' && entry.oldMemberId) {
-			return 'from @' + userProfiles.getDisplayName(entry.oldMemberId);
+	function addEntryToGroups(
+		groups: GroupedTagHistory[],
+		entry: TagHistoryEntry,
+		currentMemberId: string
+	) {
+		const direction = getDirection(entry, currentMemberId);
+		if (direction === 'involved') return; // Silently drop 'involved' entries (not relevant for "got/gave" transfer flow)
+
+		const lastGroup = groups[groups.length - 1];
+		if (matchesLastGroup(entry, lastGroup)) {
+			if (direction === 'got') {
+				lastGroup.got.push(entry);
+			} else {
+				lastGroup.gave.push(entry);
+			}
+		} else {
+			groups.push({
+				id: entry.roundId ?? entry.id.toString(),
+				roundId: entry.roundId,
+				createdAt: entry.createdAt,
+				reason: entry.reason,
+				got: direction === 'got' ? [entry] : [],
+				gave: direction === 'gave' ? [entry] : []
+			});
 		}
-		if (direction === 'gave' && entry.newMemberId && entry.newMemberId !== viewingId) {
-			return 'to @' + userProfiles.getDisplayName(entry.newMemberId);
+	}
+
+	const groupedHistory = $derived.by(() => {
+		const groups: GroupedTagHistory[] = [];
+		for (const entry of visibleHistory) {
+			addEntryToGroups(groups, entry, memberId);
 		}
-		return null;
+		return groups;
+	});
+
+	function formatDate(dateStr: string): string {
+		return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 	}
 
 	function reasonLabel(reason: string): string {
@@ -65,25 +112,67 @@
 	<div class="history-list">
 		{#if tagStore.historyLoading}
 			<p class="empty-state">Loading history...</p>
-		{:else if visibleHistory.length === 0}
+		{:else if groupedHistory.length === 0}
 			<p class="empty-state">No tag history available.</p>
 		{:else}
-			{#each visibleHistory as entry (entry.id)}
-				{@const direction = getDirection(entry, memberId)}
-				{@const counterparty = getCounterparty(entry, memberId)}
-				<div class="history-entry">
-					<span class="direction-badge direction-{direction}">
-						{#if direction === 'got'}GOT{:else if direction === 'gave'}GAVE{:else}~{/if}
-					</span>
-					<div class="entry-tag">#{entry.tagNumber}</div>
-					<div class="entry-details">
-						{#if counterparty}
-							<span class="entry-counterparty">{counterparty}</span>
-						{/if}
+			{#each groupedHistory as group (group.id)}
+				<div class="history-group">
+					<svg viewBox="0 0 24 24" class="swap-icon">
+						<path
+							class="arrow-got {group.got.length ? 'active' : 'inactive'}"
+							d="M4 9h16M14 3l6 6"
+							stroke-width="2.5"
+							fill="none"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+						<path
+							class="arrow-gave {group.gave.length ? 'active' : 'inactive'}"
+							d="M20 15H4M10 21l-6-6"
+							stroke-width="2.5"
+							fill="none"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+					</svg>
+
+					<div class="group-content">
+						<div class="tags-container">
+							{#if group.got.length > 0}
+								<div class="tags-row">
+									{#each group.got as entry (entry.id)}
+										<div class="tag-item got">
+											<span class="entry-tag">#{entry.tagNumber}</span>
+											{#if entry.oldMemberId && entry.reason !== 'admin_fix'}
+												<span class="entry-counterparty"
+													>from @{userProfiles.getDisplayName(entry.oldMemberId)}</span
+												>
+											{/if}
+										</div>
+									{/each}
+								</div>
+							{/if}
+
+							{#if group.gave.length > 0}
+								<div class="tags-row">
+									{#each group.gave as entry (entry.id)}
+										<div class="tag-item gave">
+											<span class="entry-tag given">#{entry.tagNumber}</span>
+											{#if entry.newMemberId && entry.newMemberId !== memberId && entry.reason !== 'admin_fix'}
+												<span class="entry-counterparty"
+													>to @{userProfiles.getDisplayName(entry.newMemberId)}</span
+												>
+											{/if}
+										</div>
+									{/each}
+								</div>
+							{/if}
+						</div>
+
 						<div class="entry-meta">
-							<span class="entry-reason reason-{entry.reason}">{reasonLabel(entry.reason)}</span>
-							<time class="entry-time" datetime={entry.createdAt}
-								>{formatDate(entry.createdAt)}</time
+							<span class="entry-reason reason-{group.reason}">{reasonLabel(group.reason)}</span>
+							<time class="entry-time" datetime={group.createdAt}
+								>{formatDate(group.createdAt)}</time
 							>
 						</div>
 					</div>
@@ -126,37 +215,57 @@
 		padding: var(--space-lg, 1.5rem) 0;
 	}
 
-	.history-entry {
+	.history-group {
 		display: flex;
-		align-items: center;
-		gap: var(--space-sm, 0.5rem);
-		padding: var(--space-xs, 0.25rem) 0;
+		align-items: flex-start;
+		gap: var(--space-md, 1rem);
+		padding: var(--space-sm, 0.5rem) 0;
+		position: relative;
 	}
 
-	.direction-badge {
-		font-size: 0.65rem;
-		font-weight: 700;
-		letter-spacing: 0.05em;
-		padding: 2px 6px;
-		border-radius: 4px;
-		min-width: 2.75rem;
-		text-align: center;
+	.swap-icon {
+		width: 1.5rem;
+		height: 1.5rem;
 		flex-shrink: 0;
+		margin-top: 0.25rem;
 	}
 
-	.direction-got {
-		background: rgba(72, 199, 116, 0.15);
-		color: #48c774;
+	.swap-icon .arrow-got.active {
+		stroke: var(--guild-success, #48c774);
 	}
 
-	.direction-gave {
-		background: rgba(255, 107, 107, 0.15);
-		color: #ff6b6b;
+	.swap-icon .arrow-gave.active {
+		stroke: var(--guild-danger, #ff6b6b);
 	}
 
-	.direction-involved {
-		background: rgba(255, 255, 255, 0.08);
-		color: var(--guild-text-secondary);
+	.swap-icon .inactive {
+		stroke: var(--guild-border, rgba(255, 255, 255, 0.1));
+	}
+
+	.group-content {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-xs, 0.25rem);
+		flex: 1;
+		min-width: 0;
+	}
+
+	.tags-container {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.tags-row {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.tag-item {
+		display: flex;
+		align-items: baseline;
+		gap: var(--space-sm, 0.5rem);
 	}
 
 	.entry-tag {
@@ -167,16 +276,15 @@
 		flex-shrink: 0;
 	}
 
-	.entry-details {
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-		min-width: 0;
+	.entry-tag.given {
+		color: var(--guild-text-secondary);
+		text-decoration: line-through;
+		font-size: 1rem;
 	}
 
 	.entry-counterparty {
 		font-size: var(--font-sm, 0.875rem);
-		color: var(--guild-text);
+		color: var(--guild-text-secondary);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;

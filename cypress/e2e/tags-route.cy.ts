@@ -36,12 +36,22 @@ describe('Tags Route', () => {
 			}
 		});
 		cy.arrangeAuth({ path: '/tags', clubUuid: subjectId, guildId: subjectId, role: 'player' });
+
+		cy.wsStubRequest(
+			`leaderboard.tag.history.requested.v1.${subjectId}`,
+			{
+				guild_id: subjectId,
+				entries: []
+			},
+			{ validate: false }
+		);
+
 		cy.wsConnect();
 
 		cy.expectDashboardLoaded();
 		cy.contains('Tag Leaderboard').should('be.visible');
 		cy.get('[aria-label^="Select "]').first().click();
-		cy.contains('Tag History').should('be.visible');
+		cy.get('.tag-detail-inline').should('be.visible');
 		cy.contains('No tag history available.').should('be.visible');
 	});
 });
