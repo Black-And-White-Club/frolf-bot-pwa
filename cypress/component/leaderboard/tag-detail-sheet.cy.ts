@@ -141,8 +141,8 @@ describe('TagDetailSheet (Component)', () => {
 			.historyEntries()
 			.eq(1)
 			.within(() => {
-				cy.get('.entry-tag').should('contain.text', '#7'); // Got tag
-				cy.get('.entry-tag.given').should('contain.text', '#12'); // Gave tag
+				cy.get('.tag-item.got .entry-tag').should('contain.text', '#7'); // Got tag
+				cy.get('.tag-item.gave .entry-tag').should('contain.text', '#12'); // Gave tag
 			});
 	});
 });

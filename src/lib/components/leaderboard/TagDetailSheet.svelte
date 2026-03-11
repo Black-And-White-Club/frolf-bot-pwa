@@ -117,58 +117,101 @@
 		{:else}
 			{#each groupedHistory as group (group.id)}
 				<div class="history-group">
-					<svg viewBox="0 0 24 24" class="swap-icon">
-						<path
-							class="arrow-got {group.got.length ? 'active' : 'inactive'}"
-							d="M4 9h16M14 3l6 6"
-							stroke-width="2.5"
-							fill="none"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						/>
-						<path
-							class="arrow-gave {group.gave.length ? 'active' : 'inactive'}"
-							d="M20 15H4M10 21l-6-6"
-							stroke-width="2.5"
-							fill="none"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						/>
-					</svg>
-
-					<div class="group-content">
-						<div class="tags-container">
-							{#if group.got.length > 0}
-								<div class="tags-row">
-									{#each group.got as entry (entry.id)}
-										<div class="tag-item got">
-											<span class="entry-tag">#{entry.tagNumber}</span>
-											{#if entry.oldMemberId && entry.reason !== 'admin_fix'}
-												<span class="entry-counterparty"
-													>from @{userProfiles.getDisplayName(entry.oldMemberId)}</span
-												>
-											{/if}
-										</div>
-									{/each}
-								</div>
-							{/if}
-
-							{#if group.gave.length > 0}
-								<div class="tags-row">
-									{#each group.gave as entry (entry.id)}
-										<div class="tag-item gave">
-											<span class="entry-tag given">#{entry.tagNumber}</span>
-											{#if entry.newMemberId && entry.newMemberId !== memberId && entry.reason !== 'admin_fix'}
-												<span class="entry-counterparty"
-													>to @{userProfiles.getDisplayName(entry.newMemberId)}</span
-												>
-											{/if}
-										</div>
-									{/each}
-								</div>
-							{/if}
+					<!-- GOT ROW -->
+					{#if group.got.length > 0}
+						<div class="icon-cell">
+							<svg viewBox="0 0 24 16" class="swap-icon">
+								<path
+									class="arrow-got active"
+									d="M20 10H4M10 4l-6 6"
+									stroke-width="2.5"
+									fill="none"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
 						</div>
+						<div class="content-cell">
+							<div class="tags-row">
+								{#each group.got as entry (entry.id)}
+									<div class="tag-item got">
+										<span class="entry-tag">#{entry.tagNumber}</span>
+										{#if entry.oldMemberId && entry.reason !== 'admin_fix'}
+											<span class="entry-counterparty"
+												>from <span class="counterparty-name"
+													>@{userProfiles.getDisplayName(entry.oldMemberId)}</span
+												></span
+											>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						</div>
+					{:else if group.gave.length > 0}
+						<div class="icon-cell">
+							<svg viewBox="0 0 24 16" class="swap-icon">
+								<path
+									class="arrow-got inactive"
+									d="M20 10H4M10 4l-6 6"
+									stroke-width="2.5"
+									fill="none"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+						</div>
+						<div class="content-cell"></div>
+					{/if}
 
+					<!-- GAVE ROW -->
+					{#if group.gave.length > 0}
+						<div class="icon-cell">
+							<svg viewBox="0 0 24 16" class="swap-icon">
+								<path
+									class="arrow-gave active"
+									d="M4 6h16M14 12l6-6"
+									stroke-width="2.5"
+									fill="none"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+						</div>
+						<div class="content-cell">
+							<div class="tags-row">
+								{#each group.gave as entry (entry.id)}
+									<div class="tag-item gave">
+										<span class="entry-tag">#{entry.tagNumber}</span>
+										{#if entry.newMemberId && entry.newMemberId !== memberId && entry.reason !== 'admin_fix'}
+											<span class="entry-counterparty"
+												>to <span class="counterparty-name"
+													>@{userProfiles.getDisplayName(entry.newMemberId)}</span
+												></span
+											>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						</div>
+					{:else if group.got.length > 0}
+						<div class="icon-cell">
+							<svg viewBox="0 0 24 16" class="swap-icon">
+								<path
+									class="arrow-gave inactive"
+									d="M4 6h16M14 12l6-6"
+									stroke-width="2.5"
+									fill="none"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+						</div>
+						<div class="content-cell"></div>
+					{/if}
+
+					<!-- META ROW -->
+					<div class="icon-cell"></div>
+					<div class="content-cell meta-cell">
 						<div class="entry-meta">
 							<span class="entry-reason reason-{group.reason}">{reasonLabel(group.reason)}</span>
 							<time class="entry-time" datetime={group.createdAt}
@@ -216,18 +259,37 @@
 	}
 
 	.history-group {
-		display: flex;
-		align-items: flex-start;
-		gap: var(--space-md, 1rem);
+		display: grid;
+		grid-template-columns: 1.5rem 1fr;
+		column-gap: var(--space-md, 1rem);
+		row-gap: 0.125rem;
+		align-items: center;
 		padding: var(--space-sm, 0.5rem) 0;
 		position: relative;
 	}
 
+	.icon-cell {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+	}
+
+	.content-cell {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		min-width: 0;
+	}
+
+	.meta-cell {
+		margin-top: 0.25rem;
+	}
+
 	.swap-icon {
 		width: 1.5rem;
-		height: 1.5rem;
+		height: 1rem;
 		flex-shrink: 0;
-		margin-top: 0.25rem;
 	}
 
 	.swap-icon .arrow-got.active {
@@ -242,44 +304,34 @@
 		stroke: var(--guild-border, rgba(255, 255, 255, 0.1));
 	}
 
-	.group-content {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-xs, 0.25rem);
-		flex: 1;
-		min-width: 0;
-	}
-
-	.tags-container {
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-	}
-
 	.tags-row {
 		display: flex;
 		flex-direction: column;
-		gap: 2px;
+		gap: 0.25rem;
 	}
 
 	.tag-item {
 		display: flex;
 		align-items: baseline;
 		gap: var(--space-sm, 0.5rem);
+		line-height: 1.2;
 	}
 
 	.entry-tag {
 		font-weight: 700;
-		font-size: 1.1rem;
-		color: var(--guild-accent, #b89b5e);
-		min-width: 2.5rem;
+		font-size: 1rem;
+		min-width: 1.5rem;
 		flex-shrink: 0;
 	}
 
-	.entry-tag.given {
-		color: var(--guild-text-secondary);
-		text-decoration: line-through;
-		font-size: 1rem;
+	.tag-item.got .entry-tag,
+	.tag-item.got .counterparty-name {
+		color: var(--guild-success, #48c774);
+	}
+
+	.tag-item.gave .entry-tag,
+	.tag-item.gave .counterparty-name {
+		color: var(--guild-danger, #ff6b6b);
 	}
 
 	.entry-counterparty {
@@ -309,8 +361,9 @@
 	}
 
 	.reason-round_swap {
-		background: rgba(184, 155, 94, 0.2);
-		color: var(--guild-accent, #b89b5e);
+		background: rgba(139, 123, 184, 0.15); /* amethyst tint */
+		color: var(--guild-secondary, #8b7bb8);
+		border: 1px solid rgba(139, 123, 184, 0.3);
 	}
 
 	.entry-time {
