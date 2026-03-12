@@ -88,6 +88,79 @@ Tied finishers do not earn points for beating each other, but tied players may s
 
 ---
 
+## Challenges
+
+### `/challenge open`
+
+**Permission:** Player
+
+Opens a challenge against another player and posts a public challenge card in the event channel.
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `user` | Yes | The player you want to challenge |
+
+### `/challenge list`
+
+**Permission:** Player
+
+Returns an ephemeral summary of open and accepted challenges, along with an app link to the full challenge board.
+
+### `/challenge schedule`
+
+**Permission:** Challenge participant, Editor, or Admin
+
+Opens the round creation modal for an accepted challenge. The created round is linked automatically after creation.
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `challenge_id` | Yes | The challenge ID shown on the challenge card |
+
+### `/challenge link`
+
+**Permission:** Challenge participant, Editor, or Admin
+
+Links an existing round to an accepted challenge.
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `challenge_id` | Yes | The challenge ID |
+| `round_id` | Yes | The existing round ID to attach |
+
+### `/challenge unlink`
+
+**Permission:** Challenge participant, Editor, or Admin
+
+Removes the currently linked round from a challenge.
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `challenge_id` | Yes | The challenge ID |
+
+### `/challenge withdraw`
+
+**Permission:** Challenge participant, Editor, or Admin
+
+Withdraws an open or accepted challenge.
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `challenge_id` | Yes | The challenge ID |
+
+### `/challenge hide`
+
+**Permission:** Editor or Admin
+
+Archives a challenge from the active board.
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `challenge_id` | Yes | The challenge ID |
+
+See [Challenges](/docs/challenges) for the full PWA flow, Discord button flow, and lifecycle details.
+
+---
+
 ## Season Management
 
 ### `/season start`

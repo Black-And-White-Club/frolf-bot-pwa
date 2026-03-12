@@ -13,6 +13,7 @@ Frolf Bot is an event-driven Discord companion for disc golf communities. It han
 
 - [Getting Started](/docs/getting-started) — Signing up and accessing your dashboard
 - [Rounds](/docs/rounds) — Creating, editing, and RSVPing to rounds
+- [Challenges](/docs/challenges) — Opening, accepting, scheduling, and linking challenge matches
 - [Scoring](/docs/scoring) — Submitting scores, importing UDisc scorecards, and the points system
 - [Tags & Leaderboard](/docs/tags) — Claiming tags, viewing history, and season standings
 - [Admin Reference](/docs/admin) — Server setup, roles, and season management

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 
 	let { children } = $props();
@@ -8,6 +9,7 @@
 		{ href: '/docs/getting-started', label: 'Getting Started' },
 		{ href: '/docs/account', label: 'Account & Invites' },
 		{ href: '/docs/rounds', label: 'Rounds' },
+		{ href: '/docs/challenges', label: 'Challenges' },
 		{ href: '/docs/scoring', label: 'Scoring' },
 		{ href: '/docs/tags', label: 'Tags & Leaderboard' },
 		{ href: '/docs/admin', label: 'Admin Reference' },
@@ -33,10 +35,10 @@
 			</p>
 			<nav aria-label="Documentation navigation">
 				<ul class="space-y-0.5">
-					{#each navItems as item}
+					{#each navItems as item (item.href)}
 						<li>
 							<a
-								href={item.href}
+								href={resolve(item.href)}
 								class="block rounded-md px-3 py-2 text-sm transition-colors {isActive(
 									item.href,
 									item.exact
@@ -83,10 +85,10 @@
 			{#if mobileNavOpen}
 				<nav id="docs-mobile-nav" class="mt-2" aria-label="Documentation navigation">
 					<ul class="space-y-0.5 pb-2">
-						{#each navItems as item}
+						{#each navItems as item (item.href)}
 							<li>
 								<a
-									href={item.href}
+									href={resolve(item.href)}
 									onclick={() => (mobileNavOpen = false)}
 									class="block rounded-md px-3 py-2 text-sm transition-colors {isActive(
 										item.href,

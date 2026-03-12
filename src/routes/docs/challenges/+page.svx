@@ -1,0 +1,167 @@
+<svelte:head>
+  <title>Challenges — Frolf Bot Docs</title>
+  <meta
+    name="description"
+    content="How club challenges work in Frolf Bot from both the PWA and Discord."
+  />
+</svelte:head>
+
+# Challenges
+
+Challenges are the scheduling layer for tag matches. A challenge keeps the matchup visible, tracks its status, and optionally links a normal round to the match.
+
+Use challenges when you want to get a tag match on the calendar without inventing a special round type.
+
+---
+
+## What a challenge does
+
+- Tracks who challenged whom
+- Stores the original tag matchup and shows current tags as they change
+- Lets the challenged player accept or decline
+- Lets participants or club staff attach a round to the challenge
+- Completes automatically when the linked round is finalized
+
+Open and accepted challenges stay visible on the board. Declined, withdrawn, hidden, expired, and completed challenges are archived.
+
+---
+
+## Using Challenges In The PWA
+
+### Open a challenge
+
+The main PWA entrypoint is the leaderboard member sheet.
+
+1. Open the leaderboard or a member detail view
+2. Open the player you want to challenge
+3. Use the challenge action if you have a worse tag than that player
+
+If a challenge already exists for that matchup, the sheet links you straight to that challenge instead of opening a duplicate.
+
+### View the board
+
+The PWA shows active challenges in two places:
+
+- the dashboard challenge panel
+- the full [Challenges](/challenges) page
+
+From there you can open the detail page for any active challenge.
+
+### Respond to a challenge
+
+On a challenge card or detail page:
+
+- the challenged player can **Accept** or **Decline**
+- the challenger or defender can **Withdraw**
+- editors and admins can **Hide**
+
+### Schedule or attach a round
+
+Once a challenge is accepted, the participants or club staff can manage the round from the challenge card:
+
+- **Create Round** opens the normal round form with the challenge preselected
+- **Link Round** attaches an existing upcoming round by round ID
+- **Unlink Round** removes the current round association
+- **Replace Round** starts a new round creation flow when a linked round already exists
+
+When you create a round from an accepted challenge, the PWA returns you to the challenge detail page and the backend links the round automatically after creation.
+
+### What you’ll see on the detail page
+
+The challenge detail page shows:
+
+- current and original tag matchup
+- status and deadlines
+- linked round details when present
+- a simple timeline of opened, accepted, linked, completed, or hidden events
+
+---
+
+## Using Challenges In Discord
+
+Discord supports both slash commands and public challenge cards.
+
+### Open a challenge
+
+```text
+/challenge open user:@player
+```
+
+This posts or refreshes a public challenge card in the configured event channel.
+
+### Respond from the card
+
+Open challenges show:
+
+- **Accept**
+- **Decline**
+- **Open in App**
+
+Accepted challenges without a linked round show:
+
+- **Schedule Round**
+- **Open in App**
+
+The card also includes the challenge ID so you can use the slash commands below when needed.
+
+### List active challenges
+
+```text
+/challenge list
+```
+
+Returns an ephemeral summary of open and accepted challenges, including short challenge IDs and an app link to the full board.
+
+### Schedule a new round from Discord
+
+```text
+/challenge schedule challenge_id:<challenge-id>
+```
+
+This opens the Discord round creation modal with the challenge attached. After the round is created, the backend links it to the challenge automatically.
+
+### Link an existing round
+
+```text
+/challenge link challenge_id:<challenge-id> round_id:<round-id>
+```
+
+Use this when the round already exists and you want to attach it to the accepted challenge.
+
+### Unlink, withdraw, or hide
+
+```text
+/challenge unlink challenge_id:<challenge-id>
+/challenge withdraw challenge_id:<challenge-id>
+/challenge hide challenge_id:<challenge-id>
+```
+
+- `unlink` removes the current round from the challenge
+- `withdraw` removes an open or accepted challenge you are part of
+- `hide` archives a challenge from the board and is limited to editors or admins
+
+### Discord permissions
+
+- Any player can run `/challenge open`
+- The challenged player is the one who accepts or declines
+- Challenge participants, editors, and admins can schedule, link, unlink, or withdraw
+- Only editors and admins can hide a challenge
+
+---
+
+## Deadlines And Status
+
+- **Open** challenges expire if they are ignored for too long
+- **Accepted** challenges show a scheduling deadline until a round is linked
+- **Accepted + linked round** stays active until the round is finalized or removed
+- **Completed** means the linked round finished and the challenge closed automatically
+
+The challenge card always shows the current deadline when one applies.
+
+---
+
+## Related Docs
+
+- [Rounds](/docs/rounds)
+- [Tags & Leaderboard](/docs/tags)
+- [Commands Reference](/docs/commands)
