@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
+	import ChallengeCard from '$lib/components/challenges/ChallengeCard.svelte';
+	import { challengeStore } from '$lib/stores/challenges.svelte';
 	import { tagStore, type TagHistoryEntry } from '$lib/stores/tags.svelte';
 	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
 	import { userProfiles } from '$lib/stores/userProfiles.svelte';
@@ -19,6 +22,15 @@
 
 	const memberHistory = $derived(tagStore.selectedMemberHistory);
 	const visibleHistory = $derived(memberHistory.filter((e) => e.reason !== 'restore'));
+	const memberTag = $derived(
+		tagStore.tagList.find((member) => member.memberId === memberId)?.currentTag ??
+			leaderboardService.getEntryByUserId(memberId)?.tagNumber ??
+			null
+	);
+	const pairChallenge = $derived(challengeStore.getPairChallenge(memberId));
+	const challengeEligibility = $derived(
+		challengeStore.getChallengeEligibility(memberId, memberTag)
+	);
 
 	function getDirection(entry: TagHistoryEntry, viewingId: string): 'got' | 'gave' | 'involved' {
 		if (entry.newMemberId === viewingId) return 'got';
@@ -94,6 +106,10 @@
 		if (reason === 'round_swap') return 'round swap';
 		return reason;
 	}
+
+	async function handleOpenChallenge(): Promise<void> {
+		await challengeStore.openChallenge(memberId);
+	}
 </script>
 
 <div class="tag-detail-inline" transition:slide={{ duration: 200 }}>
@@ -108,6 +124,53 @@
 			/>
 		</div>
 	{/if}
+
+	<div class="challenge-section">
+		<div class="challenge-section__header">
+			<h4>Challenge</h4>
+			{#if pairChallenge}
+				<a class="challenge-section__link" href={resolve(`/challenges/${pairChallenge.id}`)}>
+					Open detail
+				</a>
+			{/if}
+			{#if memberTag !== null}
+				<span>Current tag #{memberTag}</span>
+			{/if}
+		</div>
+
+		{#if pairChallenge}
+			<ChallengeCard challenge={pairChallenge} compact={true} />
+		{:else}
+			<div class="challenge-empty">
+				<p>
+					Use a challenge to get a round on the calendar with {userProfiles.getDisplayName(
+						memberId
+					)}. Normal tag rules still apply to everyone who joins.
+				</p>
+
+				<button
+					type="button"
+					class="challenge-open-btn"
+					disabled={challengeEligibility.allowed === false}
+					onclick={handleOpenChallenge}
+				>
+					Challenge {userProfiles.getDisplayName(memberId)}
+				</button>
+
+				{#if challengeEligibility.reason}
+					<p class="challenge-note">{challengeEligibility.reason}</p>
+				{/if}
+			</div>
+		{/if}
+
+		{#if challengeStore.successMessage}
+			<p class="challenge-feedback challenge-feedback--success">{challengeStore.successMessage}</p>
+		{/if}
+
+		{#if challengeStore.errorMessage}
+			<p class="challenge-feedback challenge-feedback--error">{challengeStore.errorMessage}</p>
+		{/if}
+	</div>
 
 	<div class="history-list">
 		{#if tagStore.historyLoading}
@@ -241,6 +304,82 @@
 	.chart-wrapper {
 		padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
 		border-bottom: 1px solid var(--guild-border);
+	}
+
+	.challenge-section {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-sm, 0.5rem);
+		padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
+		border-bottom: 1px solid var(--guild-border);
+	}
+
+	.challenge-section__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+
+	.challenge-section__link {
+		font-size: 0.82rem;
+		font-weight: 600;
+		color: var(--guild-primary);
+		text-decoration: none;
+	}
+
+	.challenge-section__link:hover {
+		text-decoration: underline;
+	}
+
+	.challenge-section__header h4 {
+		margin: 0;
+		font-size: 0.95rem;
+		color: var(--guild-text);
+	}
+
+	.challenge-section__header span,
+	.challenge-note,
+	.challenge-empty p {
+		margin: 0;
+		font-size: 0.85rem;
+		color: var(--guild-text-secondary);
+	}
+
+	.challenge-empty {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.challenge-open-btn {
+		align-self: flex-start;
+		border: 1px solid rgba(var(--guild-primary-rgb), 0.45);
+		background: rgba(var(--guild-primary-rgb), 0.14);
+		color: var(--guild-primary);
+		border-radius: 999px;
+		padding: 0.5rem 0.9rem;
+		font-size: 0.85rem;
+		font-weight: 600;
+		cursor: pointer;
+	}
+
+	.challenge-open-btn:disabled {
+		cursor: not-allowed;
+		opacity: 0.55;
+	}
+
+	.challenge-feedback {
+		margin: 0;
+		font-size: 0.8rem;
+	}
+
+	.challenge-feedback--success {
+		color: #0f766e;
+	}
+
+	.challenge-feedback--error {
+		color: #b91c1c;
 	}
 
 	.history-list {

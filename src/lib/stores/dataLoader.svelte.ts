@@ -3,6 +3,7 @@ import { roundService, type RoundRaw } from './round.svelte';
 import { leaderboardService, type LeaderboardResponseRaw } from './leaderboard.svelte';
 import { roundActionsService } from './roundActions.svelte';
 import { tagStore, type TagListResponseRaw } from './tags.svelte';
+import { challengeStore } from './challenges.svelte';
 import { auth } from './auth.svelte';
 import { userProfiles, type UserProfileRaw } from './userProfiles.svelte';
 import { log } from '$lib/config';
@@ -79,7 +80,8 @@ class DataLoader {
 			await Promise.all([
 				this.loadRounds(preferredId, clubUuid, guildId),
 				this.loadLeaderboard(preferredId, clubUuid, guildId),
-				this.loadTagList(preferredId, guildId, clubUuid)
+				this.loadTagList(preferredId, guildId, clubUuid),
+				this.loadChallenges()
 			]);
 			log('DataLoader: Initial data loaded successfully');
 		} catch (e) {
@@ -184,6 +186,14 @@ class DataLoader {
 		}
 	}
 
+	private async loadChallenges(): Promise<void> {
+		try {
+			await challengeStore.loadBoard();
+		} catch (error) {
+			log('DataLoader: Challenge board request failed, relying on events', error);
+		}
+	}
+
 	reset(): void {
 		this.initialLoadPromise = null;
 		this.initialLoadId = null;
@@ -197,6 +207,7 @@ class DataLoader {
 		leaderboardService.clear();
 		userProfiles.clear();
 		tagStore.reset();
+		challengeStore.reset();
 	}
 }
 

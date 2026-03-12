@@ -5,6 +5,7 @@ export { leaderboardService } from './leaderboard.svelte';
 export { nats } from './nats.svelte';
 export { subscriptionManager } from './subscriptions.svelte';
 export { appInit } from './init.svelte';
+export { challengeStore } from './challenges.svelte';
 
 // Svelte 4 stores (P1/P2 migration)
 export { currentTheme as theme } from './theme';

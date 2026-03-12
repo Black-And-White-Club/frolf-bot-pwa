@@ -51,7 +51,7 @@ describe('Leaderboard Route', () => {
 		cy.contains('Player 55').should('be.visible');
 	});
 
-	it('uses the Discord guild ID for tag history requests when club UUID differs', () => {
+	it('uses request identity scope for tag history requests when club UUID differs', () => {
 		cy.arrangeSnapshot({
 			subjectId,
 			rounds: [],
@@ -96,7 +96,7 @@ describe('Leaderboard Route', () => {
 			role: 'player'
 		});
 		cy.wsStubRequest(
-			`leaderboard.tag.history.requested.v1.${guildId}`,
+			`leaderboard.tag.history.requested.v1.${subjectId}`,
 			{
 				guild_id: guildId,
 				entries: [
@@ -128,10 +128,11 @@ describe('Leaderboard Route', () => {
 
 		cy.get('[data-testid="leaderboard-row-user-1"]').click();
 
-		cy.wsAssertPublished(`leaderboard.tag.history.requested.v1.${guildId}`).then((entries) => {
+		cy.wsAssertPublished(`leaderboard.tag.history.requested.v1.${subjectId}`).then((entries) => {
 			const lastEntry = entries[entries.length - 1];
 			expect(lastEntry.payload).to.deep.equal({
 				guild_id: guildId,
+				club_uuid: subjectId,
 				member_id: 'user-1',
 				limit: 100
 			});
@@ -140,7 +141,7 @@ describe('Leaderboard Route', () => {
 			const clubScopedMessages = mockNats
 				.getPublishedMessages()
 				.filter((entry: { subject: string }) => {
-					return entry.subject === `leaderboard.tag.history.requested.v1.${subjectId}`;
+					return entry.subject === `leaderboard.tag.history.requested.v1.${guildId}`;
 				});
 			expect(clubScopedMessages).to.have.length(0);
 		});

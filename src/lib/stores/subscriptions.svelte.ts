@@ -125,6 +125,10 @@ interface TagSwapProcessedPayloadV1 {
 	target_id: string;
 }
 
+type ChallengeFactPayloadV1 = {
+	challenge: unknown;
+};
+
 class SubscriptionManager {
 	private unsubscribers: (() => void)[] = [];
 	private id: string | null = null;
@@ -137,6 +141,7 @@ class SubscriptionManager {
 		this.id = id;
 		this.subscribeRoundEvents(id);
 		this.subscribeLeaderboardEvents(id);
+		this.subscribeChallengeEvents(id);
 	}
 
 	/**
@@ -155,7 +160,8 @@ class SubscriptionManager {
 		// Round created
 		this.unsubscribers.push(
 			nats.subscribe(`round.created.v2.${guildId}`, (msg) => {
-				roundService.handleRoundCreated(toRoundRaw(msg.data as RoundCreatedPayloadV1 | RoundRaw));
+				const roundRaw = toRoundRaw(msg.data as RoundCreatedPayloadV1 | RoundRaw);
+				roundService.handleRoundCreated(roundRaw);
 			})
 		);
 
@@ -342,6 +348,29 @@ class SubscriptionManager {
 				tagStore.swapTagMembers(payload.requestor_id, payload.target_id);
 			})
 		);
+	}
+
+	private subscribeChallengeEvents(scopeId: string): void {
+		const subjects = [
+			'club.challenge.opened.v1',
+			'club.challenge.accepted.v1',
+			'club.challenge.declined.v1',
+			'club.challenge.withdrawn.v1',
+			'club.challenge.expired.v1',
+			'club.challenge.hidden.v1',
+			'club.challenge.completed.v1',
+			'club.challenge.round.linked.v1',
+			'club.challenge.round.unlinked.v1',
+			'club.challenge.refreshed.v1'
+		];
+
+		for (const subject of subjects) {
+			this.unsubscribers.push(
+				nats.subscribe(`${subject}.${scopeId}`, (msg) => {
+					challengeStore.handleFact(msg.data as ChallengeFactPayloadV1);
+				})
+			);
+		}
 	}
 }
 

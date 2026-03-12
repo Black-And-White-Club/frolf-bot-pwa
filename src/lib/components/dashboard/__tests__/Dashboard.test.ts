@@ -18,7 +18,8 @@ const {
 	mockAuth,
 	mockAppInit,
 	mockClubService,
-	mockUserProfiles
+	mockUserProfiles,
+	mockChallengeStore
 } = vi.hoisted(() => {
 	return {
 		mockRoundService: {
@@ -46,6 +47,11 @@ const {
 		mockUserProfiles: {
 			getDisplayName: () => 'Test User',
 			getAvatarUrl: () => 'https://example.com/avatar.png'
+		},
+		mockChallengeStore: {
+			board: [],
+			successMessage: null,
+			errorMessage: null
 		}
 	};
 });
@@ -56,6 +62,10 @@ vi.mock('$lib/stores/round.svelte', () => ({
 
 vi.mock('$lib/stores/userProfiles.svelte', () => ({
 	userProfiles: mockUserProfiles
+}));
+
+vi.mock('$lib/stores/challenges.svelte', () => ({
+	challengeStore: mockChallengeStore
 }));
 
 vi.mock('$lib/stores/leaderboard.svelte', () => ({
@@ -92,6 +102,9 @@ describe('Dashboard', () => {
 		mockLeaderboardService.currentView = [];
 		mockLeaderboardService.viewMode = 'points';
 		mockLeaderboardService.isLoading = false;
+		mockChallengeStore.board = [];
+		mockChallengeStore.successMessage = null;
+		mockChallengeStore.errorMessage = null;
 		mockAuth.isAuthenticated = true;
 	});
 

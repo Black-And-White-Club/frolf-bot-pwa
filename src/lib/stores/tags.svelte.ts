@@ -11,6 +11,7 @@
 
 import { nats } from './nats.svelte';
 import type { UserProfileRaw } from './userProfiles.svelte';
+import type { RequestIdentity } from '$lib/utils/requestIdentity';
 
 export interface TagHistoryEntry {
 	id: number;
@@ -75,6 +76,7 @@ function transformTagList(raw: TagListResponseRaw): TagListMember[] {
 // ---- Outbound request payloads ----
 interface TagHistoryRequestPayload {
 	guild_id: string;
+	club_uuid?: string;
 	member_id?: string;
 	limit?: number;
 }
@@ -85,12 +87,62 @@ interface TagListRequestPayload {
 }
 
 type SelectedHistoryContext = {
+	requestSubjectId: string;
 	guildId: string;
+	clubUuid?: string;
 	memberId: string;
 };
 
-function memberHistoryCacheKey(guildId: string, memberId: string): string {
-	return `${guildId}::${memberId}`;
+type TagHistoryRequestIdentity =
+	| Pick<RequestIdentity, 'requestSubjectId' | 'guildId' | 'clubUuid'>
+	| string;
+
+type NormalizedTagHistoryIdentity = {
+	requestSubjectId: string;
+	guildId: string;
+	clubUuid?: string;
+};
+
+function normalizeIdentityValue(value: string | null | undefined): string {
+	return value?.trim() ?? '';
+}
+
+function normalizeTagHistoryIdentity(
+	identity: TagHistoryRequestIdentity | null | undefined
+): NormalizedTagHistoryIdentity | null {
+	if (typeof identity === 'string') {
+		const normalized = normalizeIdentityValue(identity);
+		if (!normalized) {
+			return null;
+		}
+
+		return {
+			requestSubjectId: normalized,
+			guildId: normalized
+		};
+	}
+
+	const requestSubjectId = normalizeIdentityValue(identity?.requestSubjectId);
+	const guildId = normalizeIdentityValue(identity?.guildId) || requestSubjectId;
+	const clubUuid = normalizeIdentityValue(identity?.clubUuid);
+	if (!requestSubjectId || !guildId) {
+		return null;
+	}
+
+	const normalizedIdentity: NormalizedTagHistoryIdentity = {
+		requestSubjectId,
+		guildId
+	};
+
+	if (clubUuid) {
+		normalizedIdentity.clubUuid = clubUuid;
+	}
+
+	return normalizedIdentity;
+}
+
+function memberHistoryCacheKey(requestSubjectId: string, memberId: string): string {
+	return `${requestSubjectId}::${memberId}`;
 }
 
 export class TagService {
@@ -100,20 +152,27 @@ export class TagService {
 	historyLoading = $state(false);
 	error = $state<string | null>(null);
 	selectedMemberId = $state<string | null>(null);
+	selectedMemberRequestSubjectId = $state<string | null>(null);
 	selectedMemberGuildId = $state<string | null>(null);
+	selectedMemberClubUuid = $state<string | null>(null);
 	historyCache = $state<Record<string, TagHistoryEntry[]>>({});
 
 	selectMember(memberId: null): void;
-	selectMember(memberId: string, guildId: string | null): void;
-	selectMember(memberId: string | null, guildId: string | null = null) {
+	selectMember(memberId: string, identity: TagHistoryRequestIdentity | null): void;
+	selectMember(memberId: string | null, identity: TagHistoryRequestIdentity | null = null) {
 		if (!memberId) {
 			this.selectedMemberId = null;
+			this.selectedMemberRequestSubjectId = null;
 			this.selectedMemberGuildId = null;
+			this.selectedMemberClubUuid = null;
 			return;
 		}
 
+		const normalizedIdentity = normalizeTagHistoryIdentity(identity);
 		this.selectedMemberId = memberId;
-		this.selectedMemberGuildId = guildId?.trim() || null;
+		this.selectedMemberRequestSubjectId = normalizedIdentity?.requestSubjectId ?? null;
+		this.selectedMemberGuildId = normalizedIdentity?.guildId ?? null;
+		this.selectedMemberClubUuid = normalizedIdentity?.clubUuid ?? null;
 	}
 
 	get memberList() {
@@ -121,12 +180,18 @@ export class TagService {
 	}
 
 	get selectedHistoryContext(): SelectedHistoryContext | null {
-		if (!this.selectedMemberId || !this.selectedMemberGuildId) {
+		if (
+			!this.selectedMemberId ||
+			!this.selectedMemberRequestSubjectId ||
+			!this.selectedMemberGuildId
+		) {
 			return null;
 		}
 
 		return {
+			requestSubjectId: this.selectedMemberRequestSubjectId,
 			guildId: this.selectedMemberGuildId,
+			...(this.selectedMemberClubUuid ? { clubUuid: this.selectedMemberClubUuid } : {}),
 			memberId: this.selectedMemberId
 		};
 	}
@@ -135,7 +200,8 @@ export class TagService {
 		const selected = this.selectedHistoryContext;
 		if (!selected) return [];
 
-		const cached = this.historyCache[memberHistoryCacheKey(selected.guildId, selected.memberId)];
+		const cached =
+			this.historyCache[memberHistoryCacheKey(selected.requestSubjectId, selected.memberId)];
 		if (!cached) return [];
 		return [...cached].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
 	}
@@ -146,10 +212,14 @@ export class TagService {
 		this.error = null;
 	}
 
-	applyMemberHistoryResponse(guildId: string, memberId: string, raw: TagHistoryResponseRaw) {
+	applyMemberHistoryResponse(
+		requestSubjectId: string,
+		memberId: string,
+		raw: TagHistoryResponseRaw
+	) {
 		this.historyCache = {
 			...this.historyCache,
-			[memberHistoryCacheKey(guildId, memberId)]: transformHistoryEntries(raw)
+			[memberHistoryCacheKey(requestSubjectId, memberId)]: transformHistoryEntries(raw)
 		};
 		this.historyLoading = false;
 	}
@@ -227,7 +297,9 @@ export class TagService {
 		this.historyLoading = false;
 		this.error = null;
 		this.selectedMemberId = null;
+		this.selectedMemberRequestSubjectId = null;
 		this.selectedMemberGuildId = null;
+		this.selectedMemberClubUuid = null;
 		this.historyCache = {};
 	}
 
@@ -239,30 +311,49 @@ export class TagService {
 	 * history is never overwritten, and historyLoading tracks this fetch.
 	 * When no memberId: fetches guild-wide into `history`, uses `loading`.
 	 */
-	async fetchTagHistory(guildId: string, memberId?: string, limit = 100): Promise<void> {
+	async fetchTagHistory(
+		identity: TagHistoryRequestIdentity,
+		memberId?: string,
+		limit = 100
+	): Promise<void> {
+		const normalizedIdentity = normalizeTagHistoryIdentity(identity);
+		if (!normalizedIdentity) {
+			this.setError('Failed to load tag history');
+			return;
+		}
+
 		if (memberId) {
-			await this.#fetchMemberHistory(guildId, memberId, limit);
+			await this.#fetchMemberHistory(normalizedIdentity, memberId, limit);
 		} else {
-			await this.#fetchGuildHistory(guildId, limit);
+			await this.#fetchGuildHistory(normalizedIdentity, limit);
 		}
 	}
 
-	async #fetchMemberHistory(guildId: string, memberId: string, limit: number): Promise<void> {
-		const cacheKey = memberHistoryCacheKey(guildId, memberId);
+	async #fetchMemberHistory(
+		identity: NormalizedTagHistoryIdentity,
+		memberId: string,
+		limit: number
+	): Promise<void> {
+		const cacheKey = memberHistoryCacheKey(identity.requestSubjectId, memberId);
 		if (this.historyCache[cacheKey]) return;
 
 		this.historyLoading = true;
 		this.error = null;
 
 		try {
-			const payload: TagHistoryRequestPayload = { guild_id: guildId, member_id: memberId, limit };
+			const payload: TagHistoryRequestPayload = {
+				guild_id: identity.guildId,
+				...(identity.clubUuid ? { club_uuid: identity.clubUuid } : {}),
+				member_id: memberId,
+				limit
+			};
 			const response = await nats.request<TagHistoryRequestPayload, TagHistoryResponseRaw>(
-				`leaderboard.tag.history.requested.v1.${guildId}`,
+				`leaderboard.tag.history.requested.v1.${identity.requestSubjectId}`,
 				payload,
 				{ timeout: 5000 }
 			);
 			if (response) {
-				this.applyMemberHistoryResponse(guildId, memberId, response);
+				this.applyMemberHistoryResponse(identity.requestSubjectId, memberId, response);
 			}
 		} catch (e) {
 			const msg = e instanceof Error ? e.message : 'Failed to load tag history';
@@ -271,14 +362,18 @@ export class TagService {
 		}
 	}
 
-	async #fetchGuildHistory(guildId: string, limit: number): Promise<void> {
+	async #fetchGuildHistory(identity: NormalizedTagHistoryIdentity, limit: number): Promise<void> {
 		this.loading = true;
 		this.error = null;
 
 		try {
-			const payload: TagHistoryRequestPayload = { guild_id: guildId, limit };
+			const payload: TagHistoryRequestPayload = {
+				guild_id: identity.guildId,
+				...(identity.clubUuid ? { club_uuid: identity.clubUuid } : {}),
+				limit
+			};
 			const response = await nats.request<TagHistoryRequestPayload, TagHistoryResponseRaw>(
-				`leaderboard.tag.history.requested.v1.${guildId}`,
+				`leaderboard.tag.history.requested.v1.${identity.requestSubjectId}`,
 				payload,
 				{ timeout: 5000 }
 			);

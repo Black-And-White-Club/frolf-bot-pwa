@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { createRoundService } from '$lib/stores/createRound.svelte';
 
 	type FieldErrors = {
@@ -20,9 +21,10 @@
 	type Props = {
 		onSuccess?: () => void | Promise<void>;
 		cancelHref?: string;
+		challengeId?: string | null;
 	};
 
-	let { onSuccess, cancelHref = '/rounds' }: Props = $props();
+	let { onSuccess, cancelHref = '/rounds', challengeId = null }: Props = $props();
 
 	const START_TIME_PLACEHOLDER = 'YYYY-MM-DD HH:MM';
 	const FALLBACK_TIMEZONE = 'America/Chicago';
@@ -130,8 +132,9 @@
 
 		errorSummary = null;
 
-		const submitted = await createRoundService.submit(values);
-		if (submitted && onSuccess) {
+		const result = await createRoundService.submitWithResult(values, challengeId);
+
+		if (result.success && onSuccess) {
 			await onSuccess();
 		}
 	}
@@ -147,6 +150,12 @@
 	{#if createRoundService.errorMessage}
 		<div class="form-alert error" role="alert">
 			{createRoundService.errorMessage}
+		</div>
+	{/if}
+
+	{#if challengeId}
+		<div class="form-alert info" role="status">
+			This round will auto-link to the selected challenge after the round is created.
 		</div>
 	{/if}
 
@@ -243,7 +252,8 @@
 	</div>
 
 	<div class="actions">
-		<a class="secondary" data-testid="link-create-round-cancel" href={cancelHref}>Cancel</a>
+		<a class="secondary" data-testid="link-create-round-cancel" href={resolve(cancelHref)}>Cancel</a
+		>
 		<button
 			class="primary"
 			data-testid="btn-create-round-submit"
@@ -312,6 +322,12 @@
 		border: 1px solid rgba(248, 113, 113, 0.45);
 		background: rgba(248, 113, 113, 0.12);
 		color: #fca5a5;
+	}
+
+	.form-alert.info {
+		border: 1px solid rgba(var(--guild-primary-rgb), 0.35);
+		background: rgba(var(--guild-primary-rgb), 0.1);
+		color: var(--guild-primary);
 	}
 
 	.actions {

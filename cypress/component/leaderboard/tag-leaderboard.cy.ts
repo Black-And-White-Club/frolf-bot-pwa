@@ -24,6 +24,12 @@ const cachedHistory = {
 	]
 };
 
+const requestIdentity = {
+	requestSubjectId: 'test-guild',
+	guildId: 'legacy-guild',
+	clubUuid: 'test-guild'
+};
+
 describe('TagLeaderboard row expansion', () => {
 	beforeEach(() => {
 		// Reset store state
@@ -39,12 +45,16 @@ describe('TagLeaderboard row expansion', () => {
 		tagStore.selectMember(null);
 		tagStore.historyLoading = false;
 		// Pre-populate cache so the panel has data to show immediately
-		tagStore.applyMemberHistoryResponse('legacy-guild', 'member-1', cachedHistory);
-		tagStore.applyMemberHistoryResponse('legacy-guild', 'member-2', {
+		tagStore.applyMemberHistoryResponse(
+			requestIdentity.requestSubjectId,
+			'member-1',
+			cachedHistory
+		);
+		tagStore.applyMemberHistoryResponse(requestIdentity.requestSubjectId, 'member-2', {
 			guild_id: 'legacy-guild',
 			entries: []
 		});
-		tagStore.applyMemberHistoryResponse('legacy-guild', 'member-3', {
+		tagStore.applyMemberHistoryResponse(requestIdentity.requestSubjectId, 'member-3', {
 			guild_id: 'legacy-guild',
 			entries: []
 		});
@@ -139,12 +149,11 @@ describe('TagLeaderboard row expansion', () => {
 		cy.wrap(tagStore.fetchTagHistory).should('have.been.called');
 	});
 
-	it('fetchTagHistory is called with Discord guild ID, not club UUID', () => {
+	it('fetchTagHistory is called with request identity and member id', () => {
 		cy.mountComponent(TagLeaderboard, { props: { members } });
 
 		tagLeaderboardComponentScreen.historyBtn('member-1').click();
 
-		// Should use auth.user.guildId ('legacy-guild') not activeClubUuid ('test-guild')
-		cy.wrap(tagStore.fetchTagHistory).should('have.been.calledWith', 'legacy-guild', 'member-1');
+		cy.wrap(tagStore.fetchTagHistory).should('have.been.calledWith', requestIdentity, 'member-1');
 	});
 });
