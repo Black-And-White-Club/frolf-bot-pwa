@@ -1,22 +1,31 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
 	import { auth } from '$lib/stores/auth.svelte';
 	import { clubService } from '$lib/stores/club.svelte';
 	import CreateRoundForm from '$lib/components/round/CreateRoundForm.svelte';
 
 	let canCreateRounds = $derived(auth.isAuthenticated && auth.activeRole !== 'viewer');
+	const challengeId = $derived(page.url.searchParams.get('challenge')?.trim() || null);
+	const cancelHref = $derived(challengeId ? `/challenges/${challengeId}` : '/rounds');
 
 	$effect(() => {
 		if (auth.status === 'validating') {
 			return;
 		}
 		if (!auth.isAuthenticated || !canCreateRounds) {
-			goto('/rounds');
+			goto(resolve('/rounds'));
 		}
 	});
 
 	async function handleCreateSuccess(): Promise<void> {
-		await goto('/rounds?created=requested');
+		if (challengeId) {
+			await goto(resolve(`/challenges/${challengeId}?created=requested`));
+			return;
+		}
+
+		await goto(resolve('/rounds?created=requested'));
 	}
 </script>
 
@@ -26,14 +35,19 @@
 
 <main class="create-round-page" data-testid="create-round-page">
 	<div class="page-shell">
-		<a class="back-link" href="/rounds">← Back to rounds</a>
+		<a class="back-link" href={resolve('/rounds')}>← Back to rounds</a>
 		<header>
 			<h1>Create Round</h1>
-			<p>Schedule a new round for your club. Players can RSVP once it is posted.</p>
+			<p>
+				Schedule a new round for your club. Players can RSVP once it is posted.
+				{#if challengeId}
+					This round will be linked to an accepted challenge after the round is created.
+				{/if}
+			</p>
 		</header>
 
 		{#if canCreateRounds}
-			<CreateRoundForm onSuccess={handleCreateSuccess} />
+			<CreateRoundForm onSuccess={handleCreateSuccess} {cancelHref} {challengeId} />
 		{/if}
 	</div>
 </main>

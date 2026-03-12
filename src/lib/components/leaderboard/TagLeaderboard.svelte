@@ -44,10 +44,10 @@
 			tagStore.selectMember(null);
 		} else {
 			const identity = resolveRequestIdentity(auth.user);
-			if (!identity?.guildId) return;
+			if (!identity) return;
 
-			tagStore.selectMember(memberId, identity.guildId);
-			tagStore.fetchTagHistory(identity.guildId, memberId);
+			tagStore.selectMember(memberId, identity);
+			tagStore.fetchTagHistory(identity, memberId);
 		}
 	}
 

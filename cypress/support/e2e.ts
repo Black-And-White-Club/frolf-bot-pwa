@@ -149,6 +149,12 @@ function attachFailureDiagnostics(error: Error, runnable?: Mocha.Runnable): Erro
 	return error;
 }
 
+Cypress.on('uncaught:exception', (err) => {
+	if (err.message.includes('Failed to register a ServiceWorker')) {
+		return false;
+	}
+});
+
 Cypress.on('window:before:load', (win) => {
 	const mockNats = getMockNats();
 	if (!mockNats) {

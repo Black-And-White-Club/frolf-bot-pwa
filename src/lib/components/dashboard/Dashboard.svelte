@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { leaderboardService } from '$lib/stores/leaderboard.svelte';
 	import Leaderboard from '$lib/components/leaderboard/Leaderboard.svelte';
 	import LeaderboardCompact from '$lib/components/leaderboard/LeaderboardCompact.svelte';
 	import TagLeaderboard from '$lib/components/leaderboard/TagLeaderboard.svelte';
+	import ChallengeBoard from '$lib/components/challenges/ChallengeBoard.svelte';
 	import RoundList from '$lib/components/round/RoundList.svelte';
 
 	interface Props {
@@ -13,7 +15,7 @@
 	let { mode = 'default' }: Props = $props();
 
 	function handleRoundSelect(roundId: string) {
-		goto(`/rounds/${roundId}`);
+		goto(resolve(`/rounds/${roundId}`));
 	}
 
 	// Map leaderboard entries to tag members to ensure the tag list is populated
@@ -67,14 +69,18 @@
 
 			<div class="leaderboard-section" data-testid="leaderboard-panel">
 				{#if leaderboardService.viewMode === 'tags'}
-					<TagLeaderboard members={tagMembers} onViewAll={() => goto('/leaderboard')} />
+					<TagLeaderboard members={tagMembers} onViewAll={() => goto(resolve('/leaderboard'))} />
 				{:else}
 					<Leaderboard
 						entries={leaderboardService.currentView}
 						title="Points Leaderboard"
-						onViewAll={() => goto('/leaderboard')}
+						onViewAll={() => goto(resolve('/leaderboard'))}
 					/>
 				{/if}
+			</div>
+
+			<div class="challenges-section" data-testid="challenge-board-panel">
+				<ChallengeBoard limit={4} />
 			</div>
 		{/if}
 	</main>
@@ -110,6 +116,18 @@
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-md, 1rem);
+	}
+
+	.challenges-section {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-md, 1rem);
+	}
+
+	@media (min-width: 1024px) {
+		.challenges-section {
+			grid-column: 1 / -1;
+		}
 	}
 
 	/* Removed section-heading */

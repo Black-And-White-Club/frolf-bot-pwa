@@ -137,6 +137,2719 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       }
     },
     {
+      "subject": "club.challenge.accepted.v1",
+      "subject_pattern": "club.challenge.accepted.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Accepted",
+      "description": "A challenge was accepted.",
+      "producer": {
+        "service": "frolf-bot-backend",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "pwa",
+          "module": "club"
+        },
+        {
+          "service": "discord",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeFactPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "challenge": {
+            "additionalProperties": false,
+            "properties": {
+              "ChallengeSummary": {
+                "additionalProperties": false,
+                "properties": {
+                  "accepted_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "accepted_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "challenger_external_id": {
+                    "type": "string"
+                  },
+                  "challenger_user_uuid": {
+                    "type": "string"
+                  },
+                  "club_uuid": {
+                    "type": "string"
+                  },
+                  "current_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "defender_external_id": {
+                    "type": "string"
+                  },
+                  "defender_user_uuid": {
+                    "type": "string"
+                  },
+                  "discord_guild_id": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "linked_round": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "is_active": {
+                        "type": "boolean"
+                      },
+                      "linked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "linked_by_user_uuid": {
+                        "type": "string"
+                      },
+                      "round_id": {
+                        "type": "string"
+                      },
+                      "unlinked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "unlinked_by_user_uuid": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "is_active",
+                      "linked_at",
+                      "round_id"
+                    ],
+                    "type": "object"
+                  },
+                  "open_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "opened_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "original_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "challenger_user_uuid",
+                  "club_uuid",
+                  "current_tags",
+                  "defender_user_uuid",
+                  "id",
+                  "opened_at",
+                  "original_tags",
+                  "status"
+                ],
+                "type": "object"
+              },
+              "completed_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_by_user_uuid": {
+                "type": "string"
+              },
+              "message_binding": {
+                "additionalProperties": false,
+                "properties": {
+                  "channel_id": {
+                    "type": "string"
+                  },
+                  "guild_id": {
+                    "type": "string"
+                  },
+                  "message_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "channel_id",
+                  "guild_id",
+                  "message_id"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "ChallengeSummary"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "challenge"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.completed.v1",
+      "subject_pattern": "club.challenge.completed.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Completed",
+      "description": "A challenge was completed.",
+      "producer": {
+        "service": "frolf-bot-backend",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "pwa",
+          "module": "club"
+        },
+        {
+          "service": "discord",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeFactPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "challenge": {
+            "additionalProperties": false,
+            "properties": {
+              "ChallengeSummary": {
+                "additionalProperties": false,
+                "properties": {
+                  "accepted_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "accepted_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "challenger_external_id": {
+                    "type": "string"
+                  },
+                  "challenger_user_uuid": {
+                    "type": "string"
+                  },
+                  "club_uuid": {
+                    "type": "string"
+                  },
+                  "current_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "defender_external_id": {
+                    "type": "string"
+                  },
+                  "defender_user_uuid": {
+                    "type": "string"
+                  },
+                  "discord_guild_id": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "linked_round": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "is_active": {
+                        "type": "boolean"
+                      },
+                      "linked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "linked_by_user_uuid": {
+                        "type": "string"
+                      },
+                      "round_id": {
+                        "type": "string"
+                      },
+                      "unlinked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "unlinked_by_user_uuid": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "is_active",
+                      "linked_at",
+                      "round_id"
+                    ],
+                    "type": "object"
+                  },
+                  "open_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "opened_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "original_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "challenger_user_uuid",
+                  "club_uuid",
+                  "current_tags",
+                  "defender_user_uuid",
+                  "id",
+                  "opened_at",
+                  "original_tags",
+                  "status"
+                ],
+                "type": "object"
+              },
+              "completed_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_by_user_uuid": {
+                "type": "string"
+              },
+              "message_binding": {
+                "additionalProperties": false,
+                "properties": {
+                  "channel_id": {
+                    "type": "string"
+                  },
+                  "guild_id": {
+                    "type": "string"
+                  },
+                  "message_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "channel_id",
+                  "guild_id",
+                  "message_id"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "ChallengeSummary"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "challenge"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.declined.v1",
+      "subject_pattern": "club.challenge.declined.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Declined",
+      "description": "A challenge was declined.",
+      "producer": {
+        "service": "frolf-bot-backend",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "pwa",
+          "module": "club"
+        },
+        {
+          "service": "discord",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeFactPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "challenge": {
+            "additionalProperties": false,
+            "properties": {
+              "ChallengeSummary": {
+                "additionalProperties": false,
+                "properties": {
+                  "accepted_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "accepted_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "challenger_external_id": {
+                    "type": "string"
+                  },
+                  "challenger_user_uuid": {
+                    "type": "string"
+                  },
+                  "club_uuid": {
+                    "type": "string"
+                  },
+                  "current_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "defender_external_id": {
+                    "type": "string"
+                  },
+                  "defender_user_uuid": {
+                    "type": "string"
+                  },
+                  "discord_guild_id": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "linked_round": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "is_active": {
+                        "type": "boolean"
+                      },
+                      "linked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "linked_by_user_uuid": {
+                        "type": "string"
+                      },
+                      "round_id": {
+                        "type": "string"
+                      },
+                      "unlinked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "unlinked_by_user_uuid": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "is_active",
+                      "linked_at",
+                      "round_id"
+                    ],
+                    "type": "object"
+                  },
+                  "open_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "opened_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "original_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "challenger_user_uuid",
+                  "club_uuid",
+                  "current_tags",
+                  "defender_user_uuid",
+                  "id",
+                  "opened_at",
+                  "original_tags",
+                  "status"
+                ],
+                "type": "object"
+              },
+              "completed_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_by_user_uuid": {
+                "type": "string"
+              },
+              "message_binding": {
+                "additionalProperties": false,
+                "properties": {
+                  "channel_id": {
+                    "type": "string"
+                  },
+                  "guild_id": {
+                    "type": "string"
+                  },
+                  "message_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "channel_id",
+                  "guild_id",
+                  "message_id"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "ChallengeSummary"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "challenge"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.detail.request.v1",
+      "subject_pattern": "club.challenge.detail.request.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Detail Requested",
+      "description": "Request a single challenge detail record.",
+      "producer": {
+        "service": "pwa",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "club"
+        },
+        {
+          "service": "pwa",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeDetailRequestPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "challenge_id": {
+            "type": "string"
+          },
+          "club_uuid": {
+            "type": "string"
+          },
+          "guild_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "challenge_id"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.detail.response.v1",
+      "subject_pattern": "club.challenge.detail.response.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Detail Response",
+      "description": "Reply containing a single challenge detail record.",
+      "producer": {
+        "service": "frolf-bot-backend",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "pwa",
+          "module": "club"
+        },
+        {
+          "service": "discord",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeDetailResponsePayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "challenge": {
+            "additionalProperties": false,
+            "properties": {
+              "ChallengeSummary": {
+                "additionalProperties": false,
+                "properties": {
+                  "accepted_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "accepted_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "challenger_external_id": {
+                    "type": "string"
+                  },
+                  "challenger_user_uuid": {
+                    "type": "string"
+                  },
+                  "club_uuid": {
+                    "type": "string"
+                  },
+                  "current_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "defender_external_id": {
+                    "type": "string"
+                  },
+                  "defender_user_uuid": {
+                    "type": "string"
+                  },
+                  "discord_guild_id": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "linked_round": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "is_active": {
+                        "type": "boolean"
+                      },
+                      "linked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "linked_by_user_uuid": {
+                        "type": "string"
+                      },
+                      "round_id": {
+                        "type": "string"
+                      },
+                      "unlinked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "unlinked_by_user_uuid": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "is_active",
+                      "linked_at",
+                      "round_id"
+                    ],
+                    "type": "object"
+                  },
+                  "open_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "opened_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "original_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "challenger_user_uuid",
+                  "club_uuid",
+                  "current_tags",
+                  "defender_user_uuid",
+                  "id",
+                  "opened_at",
+                  "original_tags",
+                  "status"
+                ],
+                "type": "object"
+              },
+              "completed_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_by_user_uuid": {
+                "type": "string"
+              },
+              "message_binding": {
+                "additionalProperties": false,
+                "properties": {
+                  "channel_id": {
+                    "type": "string"
+                  },
+                  "guild_id": {
+                    "type": "string"
+                  },
+                  "message_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "channel_id",
+                  "guild_id",
+                  "message_id"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "ChallengeSummary"
+            ],
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.expire.requested.v1",
+      "subject_pattern": "club.challenge.expire.requested.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Expire Requested",
+      "description": "Internal request to expire a challenge when its timer elapses.",
+      "producer": {
+        "service": "frolf-bot-backend",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeExpireRequestedPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "challenge_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "challenge_id",
+          "reason"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.expired.v1",
+      "subject_pattern": "club.challenge.expired.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Expired",
+      "description": "A challenge expired.",
+      "producer": {
+        "service": "frolf-bot-backend",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "pwa",
+          "module": "club"
+        },
+        {
+          "service": "discord",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeFactPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "challenge": {
+            "additionalProperties": false,
+            "properties": {
+              "ChallengeSummary": {
+                "additionalProperties": false,
+                "properties": {
+                  "accepted_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "accepted_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "challenger_external_id": {
+                    "type": "string"
+                  },
+                  "challenger_user_uuid": {
+                    "type": "string"
+                  },
+                  "club_uuid": {
+                    "type": "string"
+                  },
+                  "current_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "defender_external_id": {
+                    "type": "string"
+                  },
+                  "defender_user_uuid": {
+                    "type": "string"
+                  },
+                  "discord_guild_id": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "linked_round": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "is_active": {
+                        "type": "boolean"
+                      },
+                      "linked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "linked_by_user_uuid": {
+                        "type": "string"
+                      },
+                      "round_id": {
+                        "type": "string"
+                      },
+                      "unlinked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "unlinked_by_user_uuid": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "is_active",
+                      "linked_at",
+                      "round_id"
+                    ],
+                    "type": "object"
+                  },
+                  "open_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "opened_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "original_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "challenger_user_uuid",
+                  "club_uuid",
+                  "current_tags",
+                  "defender_user_uuid",
+                  "id",
+                  "opened_at",
+                  "original_tags",
+                  "status"
+                ],
+                "type": "object"
+              },
+              "completed_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_by_user_uuid": {
+                "type": "string"
+              },
+              "message_binding": {
+                "additionalProperties": false,
+                "properties": {
+                  "channel_id": {
+                    "type": "string"
+                  },
+                  "guild_id": {
+                    "type": "string"
+                  },
+                  "message_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "channel_id",
+                  "guild_id",
+                  "message_id"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "ChallengeSummary"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "challenge"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.hidden.v1",
+      "subject_pattern": "club.challenge.hidden.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Hidden",
+      "description": "A challenge was hidden.",
+      "producer": {
+        "service": "frolf-bot-backend",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "pwa",
+          "module": "club"
+        },
+        {
+          "service": "discord",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeFactPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "challenge": {
+            "additionalProperties": false,
+            "properties": {
+              "ChallengeSummary": {
+                "additionalProperties": false,
+                "properties": {
+                  "accepted_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "accepted_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "challenger_external_id": {
+                    "type": "string"
+                  },
+                  "challenger_user_uuid": {
+                    "type": "string"
+                  },
+                  "club_uuid": {
+                    "type": "string"
+                  },
+                  "current_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "defender_external_id": {
+                    "type": "string"
+                  },
+                  "defender_user_uuid": {
+                    "type": "string"
+                  },
+                  "discord_guild_id": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "linked_round": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "is_active": {
+                        "type": "boolean"
+                      },
+                      "linked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "linked_by_user_uuid": {
+                        "type": "string"
+                      },
+                      "round_id": {
+                        "type": "string"
+                      },
+                      "unlinked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "unlinked_by_user_uuid": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "is_active",
+                      "linked_at",
+                      "round_id"
+                    ],
+                    "type": "object"
+                  },
+                  "open_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "opened_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "original_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "challenger_user_uuid",
+                  "club_uuid",
+                  "current_tags",
+                  "defender_user_uuid",
+                  "id",
+                  "opened_at",
+                  "original_tags",
+                  "status"
+                ],
+                "type": "object"
+              },
+              "completed_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_by_user_uuid": {
+                "type": "string"
+              },
+              "message_binding": {
+                "additionalProperties": false,
+                "properties": {
+                  "channel_id": {
+                    "type": "string"
+                  },
+                  "guild_id": {
+                    "type": "string"
+                  },
+                  "message_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "channel_id",
+                  "guild_id",
+                  "message_id"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "ChallengeSummary"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "challenge"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.hide.requested.v1",
+      "subject_pattern": "club.challenge.hide.requested.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Hide Requested",
+      "description": "Request to hide a challenge.",
+      "producer": {
+        "service": "pwa",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "club"
+        },
+        {
+          "service": "pwa",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeHideRequestedPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "actor_external_id": {
+            "type": "string"
+          },
+          "actor_user_uuid": {
+            "type": "string"
+          },
+          "challenge_id": {
+            "type": "string"
+          },
+          "club_uuid": {
+            "type": "string"
+          },
+          "guild_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "challenge_id"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.list.request.v1",
+      "subject_pattern": "club.challenge.list.request.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge List Requested",
+      "description": "Request challenge board data for a club.",
+      "producer": {
+        "service": "pwa",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "club"
+        },
+        {
+          "service": "pwa",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeListRequestPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "club_uuid": {
+            "type": "string"
+          },
+          "guild_id": {
+            "type": "string"
+          },
+          "statuses": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.list.response.v1",
+      "subject_pattern": "club.challenge.list.response.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge List Response",
+      "description": "Reply containing challenge board data.",
+      "producer": {
+        "service": "frolf-bot-backend",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "pwa",
+          "module": "club"
+        },
+        {
+          "service": "discord",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeListResponsePayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "challenges": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "accepted_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "accepted_expires_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "challenger_external_id": {
+                  "type": "string"
+                },
+                "challenger_user_uuid": {
+                  "type": "string"
+                },
+                "club_uuid": {
+                  "type": "string"
+                },
+                "current_tags": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "challenger": {
+                      "type": "integer"
+                    },
+                    "defender": {
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                },
+                "defender_external_id": {
+                  "type": "string"
+                },
+                "defender_user_uuid": {
+                  "type": "string"
+                },
+                "discord_guild_id": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "linked_round": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "is_active": {
+                      "type": "boolean"
+                    },
+                    "linked_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "linked_by_user_uuid": {
+                      "type": "string"
+                    },
+                    "round_id": {
+                      "type": "string"
+                    },
+                    "unlinked_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "unlinked_by_user_uuid": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "is_active",
+                    "linked_at",
+                    "round_id"
+                  ],
+                  "type": "object"
+                },
+                "open_expires_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "opened_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "original_tags": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "challenger": {
+                      "type": "integer"
+                    },
+                    "defender": {
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                },
+                "status": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "challenger_user_uuid",
+                "club_uuid",
+                "current_tags",
+                "defender_user_uuid",
+                "id",
+                "opened_at",
+                "original_tags",
+                "status"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.message.bind.requested.v1",
+      "subject_pattern": "club.challenge.message.bind.requested.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Message Bind Requested",
+      "description": "Bind a persistent Discord message to a challenge.",
+      "producer": {
+        "service": "discord",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeMessageBindRequestedPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "challenge_id": {
+            "type": "string"
+          },
+          "channel_id": {
+            "type": "string"
+          },
+          "guild_id": {
+            "type": "string"
+          },
+          "message_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "challenge_id",
+          "channel_id",
+          "guild_id",
+          "message_id"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.open.requested.v1",
+      "subject_pattern": "club.challenge.open.requested.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Open Requested",
+      "description": "Request to open a new challenge.",
+      "producer": {
+        "service": "pwa",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "club"
+        },
+        {
+          "service": "pwa",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeOpenRequestedPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "actor_external_id": {
+            "type": "string"
+          },
+          "actor_user_uuid": {
+            "type": "string"
+          },
+          "club_uuid": {
+            "type": "string"
+          },
+          "guild_id": {
+            "type": "string"
+          },
+          "target_external_id": {
+            "type": "string"
+          },
+          "target_user_uuid": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.opened.v1",
+      "subject_pattern": "club.challenge.opened.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Opened",
+      "description": "A challenge was opened.",
+      "producer": {
+        "service": "frolf-bot-backend",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "pwa",
+          "module": "club"
+        },
+        {
+          "service": "discord",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeFactPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "challenge": {
+            "additionalProperties": false,
+            "properties": {
+              "ChallengeSummary": {
+                "additionalProperties": false,
+                "properties": {
+                  "accepted_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "accepted_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "challenger_external_id": {
+                    "type": "string"
+                  },
+                  "challenger_user_uuid": {
+                    "type": "string"
+                  },
+                  "club_uuid": {
+                    "type": "string"
+                  },
+                  "current_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "defender_external_id": {
+                    "type": "string"
+                  },
+                  "defender_user_uuid": {
+                    "type": "string"
+                  },
+                  "discord_guild_id": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "linked_round": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "is_active": {
+                        "type": "boolean"
+                      },
+                      "linked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "linked_by_user_uuid": {
+                        "type": "string"
+                      },
+                      "round_id": {
+                        "type": "string"
+                      },
+                      "unlinked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "unlinked_by_user_uuid": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "is_active",
+                      "linked_at",
+                      "round_id"
+                    ],
+                    "type": "object"
+                  },
+                  "open_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "opened_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "original_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "challenger_user_uuid",
+                  "club_uuid",
+                  "current_tags",
+                  "defender_user_uuid",
+                  "id",
+                  "opened_at",
+                  "original_tags",
+                  "status"
+                ],
+                "type": "object"
+              },
+              "completed_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_by_user_uuid": {
+                "type": "string"
+              },
+              "message_binding": {
+                "additionalProperties": false,
+                "properties": {
+                  "channel_id": {
+                    "type": "string"
+                  },
+                  "guild_id": {
+                    "type": "string"
+                  },
+                  "message_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "channel_id",
+                  "guild_id",
+                  "message_id"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "ChallengeSummary"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "challenge"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.refreshed.v1",
+      "subject_pattern": "club.challenge.refreshed.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Refreshed",
+      "description": "A challenge was refreshed after related data changed.",
+      "producer": {
+        "service": "frolf-bot-backend",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "pwa",
+          "module": "club"
+        },
+        {
+          "service": "discord",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeFactPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "challenge": {
+            "additionalProperties": false,
+            "properties": {
+              "ChallengeSummary": {
+                "additionalProperties": false,
+                "properties": {
+                  "accepted_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "accepted_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "challenger_external_id": {
+                    "type": "string"
+                  },
+                  "challenger_user_uuid": {
+                    "type": "string"
+                  },
+                  "club_uuid": {
+                    "type": "string"
+                  },
+                  "current_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "defender_external_id": {
+                    "type": "string"
+                  },
+                  "defender_user_uuid": {
+                    "type": "string"
+                  },
+                  "discord_guild_id": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "linked_round": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "is_active": {
+                        "type": "boolean"
+                      },
+                      "linked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "linked_by_user_uuid": {
+                        "type": "string"
+                      },
+                      "round_id": {
+                        "type": "string"
+                      },
+                      "unlinked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "unlinked_by_user_uuid": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "is_active",
+                      "linked_at",
+                      "round_id"
+                    ],
+                    "type": "object"
+                  },
+                  "open_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "opened_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "original_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "challenger_user_uuid",
+                  "club_uuid",
+                  "current_tags",
+                  "defender_user_uuid",
+                  "id",
+                  "opened_at",
+                  "original_tags",
+                  "status"
+                ],
+                "type": "object"
+              },
+              "completed_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_by_user_uuid": {
+                "type": "string"
+              },
+              "message_binding": {
+                "additionalProperties": false,
+                "properties": {
+                  "channel_id": {
+                    "type": "string"
+                  },
+                  "guild_id": {
+                    "type": "string"
+                  },
+                  "message_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "channel_id",
+                  "guild_id",
+                  "message_id"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "ChallengeSummary"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "challenge"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.respond.requested.v1",
+      "subject_pattern": "club.challenge.respond.requested.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Respond Requested",
+      "description": "Request to accept or decline a challenge.",
+      "producer": {
+        "service": "pwa",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "club"
+        },
+        {
+          "service": "pwa",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeRespondRequestedPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "actor_external_id": {
+            "type": "string"
+          },
+          "actor_user_uuid": {
+            "type": "string"
+          },
+          "challenge_id": {
+            "type": "string"
+          },
+          "club_uuid": {
+            "type": "string"
+          },
+          "guild_id": {
+            "type": "string"
+          },
+          "response": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "challenge_id",
+          "response"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.round.link.requested.v1",
+      "subject_pattern": "club.challenge.round.link.requested.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Round Link Requested",
+      "description": "Request to link a round to a challenge.",
+      "producer": {
+        "service": "pwa",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "club"
+        },
+        {
+          "service": "pwa",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeRoundLinkRequestedPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "actor_external_id": {
+            "type": "string"
+          },
+          "actor_user_uuid": {
+            "type": "string"
+          },
+          "challenge_id": {
+            "type": "string"
+          },
+          "club_uuid": {
+            "type": "string"
+          },
+          "guild_id": {
+            "type": "string"
+          },
+          "round_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "challenge_id",
+          "round_id"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.round.linked.v1",
+      "subject_pattern": "club.challenge.round.linked.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Round Linked",
+      "description": "A round was linked to a challenge.",
+      "producer": {
+        "service": "frolf-bot-backend",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "pwa",
+          "module": "club"
+        },
+        {
+          "service": "discord",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeFactPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "challenge": {
+            "additionalProperties": false,
+            "properties": {
+              "ChallengeSummary": {
+                "additionalProperties": false,
+                "properties": {
+                  "accepted_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "accepted_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "challenger_external_id": {
+                    "type": "string"
+                  },
+                  "challenger_user_uuid": {
+                    "type": "string"
+                  },
+                  "club_uuid": {
+                    "type": "string"
+                  },
+                  "current_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "defender_external_id": {
+                    "type": "string"
+                  },
+                  "defender_user_uuid": {
+                    "type": "string"
+                  },
+                  "discord_guild_id": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "linked_round": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "is_active": {
+                        "type": "boolean"
+                      },
+                      "linked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "linked_by_user_uuid": {
+                        "type": "string"
+                      },
+                      "round_id": {
+                        "type": "string"
+                      },
+                      "unlinked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "unlinked_by_user_uuid": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "is_active",
+                      "linked_at",
+                      "round_id"
+                    ],
+                    "type": "object"
+                  },
+                  "open_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "opened_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "original_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "challenger_user_uuid",
+                  "club_uuid",
+                  "current_tags",
+                  "defender_user_uuid",
+                  "id",
+                  "opened_at",
+                  "original_tags",
+                  "status"
+                ],
+                "type": "object"
+              },
+              "completed_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_by_user_uuid": {
+                "type": "string"
+              },
+              "message_binding": {
+                "additionalProperties": false,
+                "properties": {
+                  "channel_id": {
+                    "type": "string"
+                  },
+                  "guild_id": {
+                    "type": "string"
+                  },
+                  "message_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "channel_id",
+                  "guild_id",
+                  "message_id"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "ChallengeSummary"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "challenge"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.round.unlink.requested.v1",
+      "subject_pattern": "club.challenge.round.unlink.requested.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Round Unlink Requested",
+      "description": "Request to unlink a round from a challenge.",
+      "producer": {
+        "service": "pwa",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "club"
+        },
+        {
+          "service": "pwa",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeRoundUnlinkRequestedPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "actor_external_id": {
+            "type": "string"
+          },
+          "actor_user_uuid": {
+            "type": "string"
+          },
+          "challenge_id": {
+            "type": "string"
+          },
+          "club_uuid": {
+            "type": "string"
+          },
+          "guild_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "challenge_id"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.round.unlinked.v1",
+      "subject_pattern": "club.challenge.round.unlinked.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Round Unlinked",
+      "description": "A round was unlinked from a challenge.",
+      "producer": {
+        "service": "frolf-bot-backend",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "pwa",
+          "module": "club"
+        },
+        {
+          "service": "discord",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeFactPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "challenge": {
+            "additionalProperties": false,
+            "properties": {
+              "ChallengeSummary": {
+                "additionalProperties": false,
+                "properties": {
+                  "accepted_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "accepted_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "challenger_external_id": {
+                    "type": "string"
+                  },
+                  "challenger_user_uuid": {
+                    "type": "string"
+                  },
+                  "club_uuid": {
+                    "type": "string"
+                  },
+                  "current_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "defender_external_id": {
+                    "type": "string"
+                  },
+                  "defender_user_uuid": {
+                    "type": "string"
+                  },
+                  "discord_guild_id": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "linked_round": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "is_active": {
+                        "type": "boolean"
+                      },
+                      "linked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "linked_by_user_uuid": {
+                        "type": "string"
+                      },
+                      "round_id": {
+                        "type": "string"
+                      },
+                      "unlinked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "unlinked_by_user_uuid": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "is_active",
+                      "linked_at",
+                      "round_id"
+                    ],
+                    "type": "object"
+                  },
+                  "open_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "opened_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "original_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "challenger_user_uuid",
+                  "club_uuid",
+                  "current_tags",
+                  "defender_user_uuid",
+                  "id",
+                  "opened_at",
+                  "original_tags",
+                  "status"
+                ],
+                "type": "object"
+              },
+              "completed_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_by_user_uuid": {
+                "type": "string"
+              },
+              "message_binding": {
+                "additionalProperties": false,
+                "properties": {
+                  "channel_id": {
+                    "type": "string"
+                  },
+                  "guild_id": {
+                    "type": "string"
+                  },
+                  "message_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "channel_id",
+                  "guild_id",
+                  "message_id"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "ChallengeSummary"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "challenge"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.withdraw.requested.v1",
+      "subject_pattern": "club.challenge.withdraw.requested.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Withdraw Requested",
+      "description": "Request to withdraw a challenge.",
+      "producer": {
+        "service": "pwa",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "discord",
+          "module": "club"
+        },
+        {
+          "service": "pwa",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeWithdrawRequestedPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "actor_external_id": {
+            "type": "string"
+          },
+          "actor_user_uuid": {
+            "type": "string"
+          },
+          "challenge_id": {
+            "type": "string"
+          },
+          "club_uuid": {
+            "type": "string"
+          },
+          "guild_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "challenge_id"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "subject": "club.challenge.withdrawn.v1",
+      "subject_pattern": "club.challenge.withdrawn.v1.{scope_id}",
+      "supports_scoped_suffix": true,
+      "summary": "Challenge Withdrawn",
+      "description": "A challenge was withdrawn.",
+      "producer": {
+        "service": "frolf-bot-backend",
+        "module": "club"
+      },
+      "producers": [
+        {
+          "service": "frolf-bot-backend",
+          "module": "club"
+        }
+      ],
+      "consumers": [
+        {
+          "service": "pwa",
+          "module": "club"
+        },
+        {
+          "service": "discord",
+          "module": "club"
+        }
+      ],
+      "payload_type": "*clubevents.ChallengeFactPayloadV1",
+      "payload_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "challenge": {
+            "additionalProperties": false,
+            "properties": {
+              "ChallengeSummary": {
+                "additionalProperties": false,
+                "properties": {
+                  "accepted_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "accepted_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "challenger_external_id": {
+                    "type": "string"
+                  },
+                  "challenger_user_uuid": {
+                    "type": "string"
+                  },
+                  "club_uuid": {
+                    "type": "string"
+                  },
+                  "current_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "defender_external_id": {
+                    "type": "string"
+                  },
+                  "defender_user_uuid": {
+                    "type": "string"
+                  },
+                  "discord_guild_id": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "linked_round": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "is_active": {
+                        "type": "boolean"
+                      },
+                      "linked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "linked_by_user_uuid": {
+                        "type": "string"
+                      },
+                      "round_id": {
+                        "type": "string"
+                      },
+                      "unlinked_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "unlinked_by_user_uuid": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "is_active",
+                      "linked_at",
+                      "round_id"
+                    ],
+                    "type": "object"
+                  },
+                  "open_expires_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "opened_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "original_tags": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "challenger": {
+                        "type": "integer"
+                      },
+                      "defender": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "status": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "challenger_user_uuid",
+                  "club_uuid",
+                  "current_tags",
+                  "defender_user_uuid",
+                  "id",
+                  "opened_at",
+                  "original_tags",
+                  "status"
+                ],
+                "type": "object"
+              },
+              "completed_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "hidden_by_user_uuid": {
+                "type": "string"
+              },
+              "message_binding": {
+                "additionalProperties": false,
+                "properties": {
+                  "channel_id": {
+                    "type": "string"
+                  },
+                  "guild_id": {
+                    "type": "string"
+                  },
+                  "message_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "channel_id",
+                  "guild_id",
+                  "message_id"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "ChallengeSummary"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "challenge"
+        ],
+        "type": "object"
+      }
+    },
+    {
       "subject": "club.info.request.v2",
       "subject_pattern": "club.info.request.v2.{scope_id}",
       "supports_scoped_suffix": true,
@@ -1411,6 +4124,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       "payload_schema": {
         "additionalProperties": false,
         "properties": {
+          "challenge_id": {
+            "type": "string"
+          },
           "channel_id": {
             "type": "string"
           },
@@ -6463,6 +9179,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       "payload_schema": {
         "additionalProperties": false,
         "properties": {
+          "club_uuid": {
+            "type": "string"
+          },
           "guild_id": {
             "type": "string"
           },
@@ -6594,6 +9313,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       "payload_schema": {
         "additionalProperties": false,
         "properties": {
+          "club_uuid": {
+            "type": "string"
+          },
           "guild_id": {
             "type": "string"
           },
@@ -7412,6 +10134,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       "payload_schema": {
         "additionalProperties": false,
         "properties": {
+          "club_uuid": {
+            "type": "string"
+          },
           "guild_id": {
             "type": "string"
           },
@@ -8798,6 +11523,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             },
             "type": "object"
           },
+          "challenge_id": {
+            "type": "string"
+          },
           "channel_id": {
             "type": "string"
           },
@@ -8927,6 +11655,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       "payload_schema": {
         "additionalProperties": false,
         "properties": {
+          "challenge_id": {
+            "type": "string"
+          },
           "channel_id": {
             "type": "string"
           },
@@ -9028,6 +11759,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                   }
                 },
                 "type": "object"
+              },
+              "challenge_id": {
+                "type": "string"
               },
               "guild_id": {
                 "type": "string"
@@ -9667,6 +12401,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       "payload_schema": {
         "additionalProperties": false,
         "properties": {
+          "challenge_id": {
+            "type": "string"
+          },
           "config_fragment": {
             "additionalProperties": false,
             "properties": {
@@ -10236,6 +12973,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       "payload_schema": {
         "additionalProperties": false,
         "properties": {
+          "challenge_id": {
+            "type": "string"
+          },
           "guild_id": {
             "type": "string"
           },
@@ -10312,6 +13052,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
               }
             },
             "type": "object"
+          },
+          "challenge_id": {
+            "type": "string"
           },
           "channel_id": {
             "type": "string"
@@ -14771,6 +17514,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             },
             "type": "object"
           },
+          "challenge_id": {
+            "type": "string"
+          },
           "channel_id": {
             "type": "string"
           },
@@ -17127,6 +19873,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
       "payload_schema": {
         "additionalProperties": false,
         "properties": {
+          "challenge_id": {
+            "type": "string"
+          },
           "config_fragment": {
             "additionalProperties": false,
             "properties": {
@@ -18738,6 +21487,9 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
           "round_create_request_payload": {
             "additionalProperties": false,
             "properties": {
+              "challenge_id": {
+                "type": "string"
+              },
               "channel_id": {
                 "type": "string"
               },

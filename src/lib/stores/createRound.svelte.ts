@@ -19,6 +19,12 @@ type CreateRoundRequestedPayloadV1 = {
 	channel_id: string;
 	timezone: string;
 	request_source: string;
+	challenge_id?: string;
+};
+
+export type CreateRoundSubmissionResult = {
+	success: boolean;
+	correlationId: string | null;
 };
 
 const CREATE_ROUND_SUBJECT = 'round.creation.requested.v2';
@@ -30,7 +36,7 @@ class CreateRoundService {
 	successMessage = $state<string | null>(null);
 	errorMessage = $state<string | null>(null);
 
-	private getSubmissionContext(): { scopeId: string; userId: string } | null {
+	private getSubmissionContext(): { guildId: string; userId: string } | null {
 		if (!auth.isAuthenticated || !auth.user) {
 			this.errorMessage = 'Sign in is required to create rounds.';
 			return null;
@@ -41,23 +47,24 @@ class CreateRoundService {
 			return null;
 		}
 
-		const scopeId = auth.user.activeClubUuid?.trim() || auth.user.guildId?.trim();
+		const guildId = auth.user.guildId?.trim();
 		const userId = auth.user.id?.trim();
 
-		if (!scopeId || !userId) {
-			this.errorMessage = 'Club or guild identity is missing. Refresh and try again.';
+		if (!guildId || !userId) {
+			this.errorMessage = 'Discord guild identity is missing. Refresh and try again.';
 			return null;
 		}
 
-		return { scopeId, userId };
+		return { guildId, userId };
 	}
 
 	private buildPayload(
 		input: CreateRoundInput,
-		context: { scopeId: string; userId: string }
+		context: { guildId: string; userId: string },
+		challengeId?: string | null
 	): CreateRoundRequestedPayloadV1 {
 		const payload: CreateRoundRequestedPayloadV1 = {
-			guild_id: context.scopeId,
+			guild_id: context.guildId,
 			title: input.title.trim(),
 			start_time: input.startTime.trim(),
 			location: input.location.trim(),
@@ -70,6 +77,11 @@ class CreateRoundService {
 		const description = input.description.trim();
 		if (description) {
 			payload.description = description;
+		}
+
+		const normalizedChallengeId = challengeId?.trim();
+		if (normalizedChallengeId) {
+			payload.challenge_id = normalizedChallengeId;
 		}
 
 		return payload;
@@ -92,19 +104,22 @@ class CreateRoundService {
 		this.errorMessage = null;
 	}
 
-	async submit(input: CreateRoundInput): Promise<boolean> {
+	async submitWithResult(
+		input: CreateRoundInput,
+		challengeId?: string | null
+	): Promise<CreateRoundSubmissionResult> {
 		if (this.submitting) {
-			return false;
+			return { success: false, correlationId: null };
 		}
 
 		this.clearMessages();
 
 		const context = this.getSubmissionContext();
 		if (!context) {
-			return false;
+			return { success: false, correlationId: null };
 		}
 
-		const payload = this.buildPayload(input, context);
+		const payload = this.buildPayload(input, context, challengeId);
 		const correlationId = this.createCorrelationId();
 		const submittedAt = new Date().toISOString();
 
@@ -119,14 +134,19 @@ class CreateRoundService {
 				source: ROUND_REQUEST_SOURCE
 			});
 			this.successMessage = 'Round creation requested. It will appear shortly.';
-			return true;
+			return { success: true, correlationId };
 		} catch (error) {
 			this.errorMessage =
 				error instanceof Error ? error.message : 'Failed to submit round creation request.';
-			return false;
+			return { success: false, correlationId: null };
 		} finally {
 			this.submitting = false;
 		}
+	}
+
+	async submit(input: CreateRoundInput): Promise<boolean> {
+		const result = await this.submitWithResult(input);
+		return result.success;
 	}
 }
 

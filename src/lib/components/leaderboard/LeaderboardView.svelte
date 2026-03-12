@@ -3,23 +3,24 @@
 	import { tagStore } from '$lib/stores/tags.svelte';
 	import { userProfiles } from '$lib/stores/userProfiles.svelte';
 	import { auth } from '$lib/stores/auth.svelte';
+	import type { RequestIdentity } from '$lib/utils/requestIdentity';
 	import PlayerRow from './PlayerRow.svelte';
 	import MovementIndicator from './MovementIndicator.svelte';
 	import TagBadge from './TagBadge.svelte';
 	import ViewToggle from './ViewToggle.svelte';
 	import TagDetailSheet from './TagDetailSheet.svelte';
 
-	let { guildId }: { guildId?: string } = $props();
+	let { requestIdentity }: { requestIdentity?: RequestIdentity | null } = $props();
 
 	function handleRowClick(userId: string) {
 		if (tagStore.selectedMemberId === userId) {
 			tagStore.selectMember(null);
 		} else {
-			if (!guildId) {
+			if (!requestIdentity) {
 				return;
 			}
-			tagStore.selectMember(userId, guildId);
-			tagStore.fetchTagHistory(guildId, userId);
+			tagStore.selectMember(userId, requestIdentity);
+			tagStore.fetchTagHistory(requestIdentity, userId);
 		}
 	}
 

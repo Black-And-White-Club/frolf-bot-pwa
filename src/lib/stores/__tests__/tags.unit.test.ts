@@ -307,6 +307,84 @@ describe('TagService', () => {
 				{ timeout: 5000 }
 			);
 		});
+
+		it('uses request identity scope for the subject while keeping guild_id in the payload', async () => {
+			const { nats } = await import('../nats.svelte');
+
+			(nats.request as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+				makeRaw('guild-1', [
+					{
+						id: 4,
+						tag_number: 2,
+						new_member_id: 'member-1',
+						reason: 'challenge',
+						created_at: '2025-01-03T00:00:00Z'
+					}
+				])
+			);
+
+			await service.fetchTagHistory(
+				{ requestSubjectId: 'club-1', guildId: 'guild-1', clubUuid: 'club-1' },
+				'member-1'
+			);
+
+			expect(nats.request as ReturnType<typeof vi.fn>).toHaveBeenCalledWith(
+				'leaderboard.tag.history.requested.v1.club-1',
+				{
+					guild_id: 'guild-1',
+					club_uuid: 'club-1',
+					member_id: 'member-1',
+					limit: 100
+				},
+				{ timeout: 5000 }
+			);
+
+			service.selectMember('member-1', {
+				requestSubjectId: 'club-1',
+				guildId: 'guild-1',
+				clubUuid: 'club-1'
+			});
+			expect(service.selectedMemberHistory).toHaveLength(1);
+
+			service.selectMember('member-1', {
+				requestSubjectId: 'club-2',
+				guildId: 'guild-1',
+				clubUuid: 'club-2'
+			});
+			expect(service.selectedMemberHistory).toEqual([]);
+		});
+
+		it('falls back to request scope for guild_id when a club has no Discord guild mapping', async () => {
+			const { nats } = await import('../nats.svelte');
+
+			(nats.request as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+				makeRaw('club-only', [
+					{
+						id: 9,
+						tag_number: 4,
+						new_member_id: 'member-1',
+						reason: 'challenge',
+						created_at: '2025-01-04T00:00:00Z'
+					}
+				])
+			);
+
+			await service.fetchTagHistory(
+				{ requestSubjectId: 'club-only', guildId: null, clubUuid: 'club-only' },
+				'member-1'
+			);
+
+			expect(nats.request as ReturnType<typeof vi.fn>).toHaveBeenCalledWith(
+				'leaderboard.tag.history.requested.v1.club-only',
+				{
+					guild_id: 'club-only',
+					club_uuid: 'club-only',
+					member_id: 'member-1',
+					limit: 100
+				},
+				{ timeout: 5000 }
+			);
+		});
 	});
 
 	// ── fetchTagHistory without memberId (guild-wide) ─────────────────────────

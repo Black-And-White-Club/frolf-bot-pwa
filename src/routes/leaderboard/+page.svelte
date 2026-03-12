@@ -22,7 +22,7 @@
 
 <main class="container mx-auto px-4 py-6">
 	{#if identity}
-		<LeaderboardView guildId={identity.guildId ?? undefined} />
+		<LeaderboardView requestIdentity={identity} />
 	{:else}
 		<p class="text-slate-400">Sign in to view leaderboard</p>
 	{/if}

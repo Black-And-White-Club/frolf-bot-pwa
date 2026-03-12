@@ -80,7 +80,7 @@ describe('createRoundService', () => {
 		expect(mockPublish).toHaveBeenCalledWith(
 			'round.creation.requested.v2',
 			{
-				guild_id: 'club-123',
+				guild_id: 'guild-123',
 				title: 'Weekly Round',
 				description: 'tags match',
 				start_time: '2026-02-24 18:30',
@@ -99,6 +99,34 @@ describe('createRoundService', () => {
 			}
 		);
 		expect(mod.createRoundService.successMessage).toContain('requested');
+	});
+
+	it('includes challenge_id when round creation starts from an accepted challenge', async () => {
+		mockAuth.isAuthenticated = true;
+		mockAuth.activeRole = 'player';
+		mockAuth.user = { activeClubUuid: 'club-123', guildId: 'guild-123', id: 'user-123' };
+
+		const mod = await import('../createRound.svelte');
+		const result = await mod.createRoundService.submitWithResult(
+			{
+				title: 'Challenge Round',
+				description: 'accepted challenge',
+				startTime: '2026-02-24 18:30',
+				timezone: 'America/Chicago',
+				location: 'Pier Park'
+			},
+			'11111111-1111-1111-1111-111111111111'
+		);
+
+		expect(result.success).toBe(true);
+		expect(mockPublish).toHaveBeenCalledWith(
+			'round.creation.requested.v2',
+			expect.objectContaining({
+				guild_id: 'guild-123',
+				challenge_id: '11111111-1111-1111-1111-111111111111'
+			}),
+			expect.any(Object)
+		);
 	});
 
 	it('falls back to guild id when active club uuid is unavailable', async () => {
@@ -123,6 +151,25 @@ describe('createRoundService', () => {
 			}),
 			expect.any(Object)
 		);
+	});
+
+	it('requires a canonical guild id even when an active club uuid exists', async () => {
+		mockAuth.isAuthenticated = true;
+		mockAuth.activeRole = 'player';
+		mockAuth.user = { activeClubUuid: 'club-123', id: 'user-123' };
+
+		const mod = await import('../createRound.svelte');
+		const result = await mod.createRoundService.submit({
+			title: 'Weekly Round',
+			description: '',
+			startTime: '2026-02-24 18:30',
+			timezone: 'America/Chicago',
+			location: 'Pier Park'
+		});
+
+		expect(result).toBe(false);
+		expect(mockPublish).not.toHaveBeenCalled();
+		expect(mod.createRoundService.errorMessage).toContain('Discord guild identity');
 	});
 
 	it('uses fallback timezone when timezone is blank', async () => {
