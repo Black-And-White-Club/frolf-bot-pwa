@@ -47,11 +47,11 @@ class CreateRoundService {
 			return null;
 		}
 
-		const guildId = auth.user.guildId?.trim();
+		const guildId = auth.user.guildId?.trim() || auth.user.activeClubUuid?.trim();
 		const userId = auth.user.id?.trim();
 
 		if (!guildId || !userId) {
-			this.errorMessage = 'Discord guild identity is missing. Refresh and try again.';
+			this.errorMessage = 'Club or guild identity is missing. Refresh and try again.';
 			return null;
 		}
 

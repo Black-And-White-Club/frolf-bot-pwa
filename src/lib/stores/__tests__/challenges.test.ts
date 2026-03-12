@@ -318,4 +318,26 @@ describe('challengeStore', () => {
 			round_id: '22222222-2222-2222-2222-222222222222'
 		});
 	});
+
+	it('publishes a manual challenge round link request without guild_id for club-only identities', async () => {
+		mockAuth.user = {
+			...mockAuth.user,
+			guildId: ''
+		};
+
+		const mod = await import('../challenges.svelte');
+		const result = await mod.challengeStore.linkRound(
+			'11111111-1111-1111-1111-111111111111',
+			'22222222-2222-2222-2222-222222222222'
+		);
+
+		expect(result).toBe(true);
+		expect(mockPublish).toHaveBeenCalledWith('club.challenge.round.link.requested.v1', {
+			club_uuid: 'club-123',
+			actor_user_uuid: '11111111-1111-4111-8111-111111111111',
+			actor_external_id: 'discord-user-1',
+			challenge_id: '11111111-1111-1111-1111-111111111111',
+			round_id: '22222222-2222-2222-2222-222222222222'
+		});
+	});
 });

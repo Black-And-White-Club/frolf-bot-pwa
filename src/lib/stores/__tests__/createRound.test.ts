@@ -153,23 +153,32 @@ describe('createRoundService', () => {
 		);
 	});
 
-	it('requires a canonical guild id even when an active club uuid exists', async () => {
+	it('falls back to active club uuid when no discord guild id is available', async () => {
 		mockAuth.isAuthenticated = true;
 		mockAuth.activeRole = 'player';
-		mockAuth.user = { activeClubUuid: 'club-123', id: 'user-123' };
+		mockAuth.user = { activeClubUuid: 'club-123', guildId: '', id: 'user-123' };
 
 		const mod = await import('../createRound.svelte');
-		const result = await mod.createRoundService.submit({
-			title: 'Weekly Round',
-			description: '',
-			startTime: '2026-02-24 18:30',
-			timezone: 'America/Chicago',
-			location: 'Pier Park'
-		});
+		const result = await mod.createRoundService.submitWithResult(
+			{
+				title: 'Weekly Round',
+				description: '',
+				startTime: '2026-02-24 18:30',
+				timezone: 'America/Chicago',
+				location: 'Pier Park'
+			},
+			'11111111-1111-1111-1111-111111111111'
+		);
 
-		expect(result).toBe(false);
-		expect(mockPublish).not.toHaveBeenCalled();
-		expect(mod.createRoundService.errorMessage).toContain('Discord guild identity');
+		expect(result.success).toBe(true);
+		expect(mockPublish).toHaveBeenCalledWith(
+			'round.creation.requested.v2',
+			expect.objectContaining({
+				guild_id: 'club-123',
+				challenge_id: '11111111-1111-1111-1111-111111111111'
+			}),
+			expect.any(Object)
+		);
 	});
 
 	it('uses fallback timezone when timezone is blank', async () => {
