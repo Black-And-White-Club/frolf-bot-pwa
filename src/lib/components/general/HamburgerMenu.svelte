@@ -184,6 +184,15 @@
 			>
 				Leaderboard
 			</a>
+			{#if auth.bettingVisible}
+				<a
+					href="/betting"
+					class="block rounded-md px-4 py-2 text-[var(--guild-text)] transition-colors hover:bg-[var(--guild-surface-elevated)]"
+					onclick={closeHamburger}
+				>
+					Betting
+				</a>
+			{/if}
 			<a
 				href="/docs"
 				class="block rounded-md px-4 py-2 text-[var(--guild-text)] transition-colors hover:bg-[var(--guild-surface-elevated)]"

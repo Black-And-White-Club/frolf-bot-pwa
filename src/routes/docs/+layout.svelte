@@ -1,20 +1,29 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import type { Pathname } from '$app/types';
 
 	let { children } = $props();
 
-	const navItems = [
+	type NavItem = { href: Pathname; label: string; exact?: boolean };
+
+	// TypeScript can't unify a Pathname union against resolve's conditional generic overload.
+	function resolvePath(p: Pathname): string {
+		return resolve(p as '/');
+	}
+
+	const navItems: NavItem[] = [
 		{ href: '/docs', label: 'Overview', exact: true },
 		{ href: '/docs/getting-started', label: 'Getting Started' },
 		{ href: '/docs/account', label: 'Account & Invites' },
 		{ href: '/docs/rounds', label: 'Rounds' },
 		{ href: '/docs/challenges', label: 'Challenges' },
 		{ href: '/docs/scoring', label: 'Scoring' },
+		{ href: '/docs/betting', label: 'Betting' },
 		{ href: '/docs/tags', label: 'Tags & Leaderboard' },
 		{ href: '/docs/admin', label: 'Admin Reference' },
 		{ href: '/docs/commands', label: 'Commands Reference' }
-	];
+	] satisfies NavItem[];
 
 	let mobileNavOpen = $state(false);
 
@@ -38,7 +47,7 @@
 					{#each navItems as item (item.href)}
 						<li>
 							<a
-								href={resolve(item.href)}
+								href={resolvePath(item.href)}
 								class="block rounded-md px-3 py-2 text-sm transition-colors {isActive(
 									item.href,
 									item.exact
@@ -88,7 +97,7 @@
 						{#each navItems as item (item.href)}
 							<li>
 								<a
-									href={resolve(item.href)}
+									href={resolvePath(item.href)}
 									onclick={() => (mobileNavOpen = false)}
 									class="block rounded-md px-3 py-2 text-sm transition-colors {isActive(
 										item.href,

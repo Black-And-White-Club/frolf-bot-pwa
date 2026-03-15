@@ -356,6 +356,7 @@ class ChallengeService {
 
 		try {
 			const response = await this.requestDetail(identity, normalizedChallengeId);
+			if (!response) return null;
 			return this.consumeDetailResponse(response);
 		} catch (error) {
 			return this.handleDetailLoadError(error);
@@ -400,7 +401,7 @@ class ChallengeService {
 	private requestDetail(
 		identity: NonNullable<ReturnType<typeof resolveRequestIdentity>>,
 		challengeId: string
-	): Promise<ChallengeDetailResponseRaw> {
+	): Promise<ChallengeDetailResponseRaw | null> {
 		return nats.request<
 			{ guild_id?: string; club_uuid?: string; challenge_id: string },
 			ChallengeDetailResponseRaw

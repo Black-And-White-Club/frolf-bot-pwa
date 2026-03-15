@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import type { Pathname } from '$app/types';
 	import { page } from '$app/state';
 	import { auth } from '$lib/stores/auth.svelte';
 	import { clubService } from '$lib/stores/club.svelte';
@@ -8,7 +9,7 @@
 
 	let canCreateRounds = $derived(auth.isAuthenticated && auth.activeRole !== 'viewer');
 	const challengeId = $derived(page.url.searchParams.get('challenge')?.trim() || null);
-	const cancelHref = $derived(challengeId ? `/challenges/${challengeId}` : '/rounds');
+	const cancelHref = $derived<Pathname>(challengeId ? `/challenges/${challengeId}` : '/rounds');
 
 	$effect(() => {
 		if (auth.status === 'validating') {
@@ -21,11 +22,11 @@
 
 	async function handleCreateSuccess(): Promise<void> {
 		if (challengeId) {
-			await goto(resolve(`/challenges/${challengeId}?created=requested`));
+			await goto(`${resolve(`/challenges/${challengeId}`)}?created=requested`);
 			return;
 		}
 
-		await goto(resolve('/rounds?created=requested'));
+		await goto(`${resolve('/rounds')}?created=requested`);
 	}
 </script>
 

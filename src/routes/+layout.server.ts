@@ -8,6 +8,15 @@ const MOCK_USER: AuthUser = {
 	id: 'user-1',
 	uuid: 'user-uuid-1',
 	activeClubUuid: 'guild-123',
+	activeClubEntitlements: {
+		features: {
+			betting: {
+				key: 'betting',
+				state: 'enabled',
+				source: 'subscription'
+			}
+		}
+	},
 	guildId: 'guild-123',
 	role: 'admin',
 	clubs: [

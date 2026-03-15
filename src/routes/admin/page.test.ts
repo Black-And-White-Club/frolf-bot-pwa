@@ -25,6 +25,8 @@ vi.mock('$lib/components/admin/TagEditor.svelte', () => ({ default: () => {} }))
 vi.mock('$lib/components/admin/PointAdjuster.svelte', () => ({ default: () => {} }));
 vi.mock('$lib/components/admin/AdminScorecardUploader.svelte', () => ({ default: () => {} }));
 vi.mock('$lib/components/admin/AdminBackfillRoundUploader.svelte', () => ({ default: () => {} }));
+vi.mock('$lib/components/admin/BettingMarketManager.svelte', () => ({ default: () => {} }));
+vi.mock('$lib/components/admin/BettingWalletAdjuster.svelte', () => ({ default: () => {} }));
 
 describe('src/routes/admin/+page.svelte', () => {
 	beforeEach(() => {

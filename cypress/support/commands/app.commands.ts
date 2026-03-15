@@ -14,11 +14,25 @@ type ArrangeAuthOptions = {
 	role?: 'viewer' | 'player' | 'editor' | 'admin';
 	linkedProviders?: string[];
 	clubs?: MockTicketClaims['clubs'];
+	entitlements?: ResolvedClubEntitlements;
 	claims?: Partial<MockTicketClaims>;
 	visitOptions?: VisitOptions;
 };
 
 type TicketRole = MockTicketClaims['role'];
+
+type ClubFeatureAccess = {
+	key: string;
+	state: 'disabled' | 'enabled' | 'frozen';
+	source: string;
+	reason?: string;
+	expires_at?: string;
+};
+
+type ResolvedClubEntitlements = {
+	features?: Record<string, ClubFeatureAccess>;
+	resolved_at?: string;
+};
 
 type MockTicketClaims = {
 	sub: string;
@@ -33,6 +47,7 @@ type MockTicketClaims = {
 		avatar_url: string;
 	}>;
 	linked_providers: string[];
+	active_club_entitlements?: ResolvedClubEntitlements;
 	exp: number;
 	iat: number;
 };
@@ -108,6 +123,7 @@ function buildArrangeAuthTicket(options: ArrangeAuthOptions): string {
 		role,
 		clubs: options.clubs ?? defaultClubs,
 		linked_providers: options.linkedProviders ?? ['discord'],
+		...(options.entitlements ? { active_club_entitlements: options.entitlements } : {}),
 		...options.claims
 	});
 }

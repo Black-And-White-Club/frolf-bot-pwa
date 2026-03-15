@@ -1,6 +1,13 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import type { Pathname } from '$app/types';
 	import { createRoundService } from '$lib/stores/createRound.svelte';
+
+	// TypeScript can't unify a Pathname union against resolve's conditional generic overload.
+	// This wrapper casts safely since cancelHref is already validated as Pathname.
+	function resolvePath(p: Pathname): string {
+		return resolve(p as '/');
+	}
 
 	type FieldErrors = {
 		title?: string;
@@ -20,7 +27,7 @@
 
 	type Props = {
 		onSuccess?: () => void | Promise<void>;
-		cancelHref?: string;
+		cancelHref?: Pathname;
 		challengeId?: string | null;
 	};
 
@@ -252,7 +259,8 @@
 	</div>
 
 	<div class="actions">
-		<a class="secondary" data-testid="link-create-round-cancel" href={resolve(cancelHref)}>Cancel</a
+		<a class="secondary" data-testid="link-create-round-cancel" href={resolvePath(cancelHref)}
+			>Cancel</a
 		>
 		<button
 			class="primary"

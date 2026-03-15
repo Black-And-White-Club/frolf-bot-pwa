@@ -260,6 +260,7 @@ describe('AuthService HTTP methods (auth.svelte.ts)', () => {
 				id: '789',
 				uuid: 'uuid-789',
 				activeClubUuid: 'club-abc',
+				activeClubEntitlements: {},
 				guildId: 'guild-xyz',
 				role: 'admin',
 				clubs: [{ club_uuid: 'club-abc', role: 'admin' }],

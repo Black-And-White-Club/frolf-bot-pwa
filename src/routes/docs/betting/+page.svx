@@ -1,0 +1,127 @@
+<svelte:head>
+  <title>Betting — Frolf Bot Docs</title>
+  <meta name="description" content="How seasonal betting works in Frolf Bot — wallets, markets, odds, and payouts." />
+</svelte:head>
+
+# Betting
+
+Betting lets you put your season points where your mouth is. Predict round outcomes — who wins, who places, whether someone goes over or under their expected score — and collect if you're right.
+
+---
+
+## Overview
+
+- Betting is a seasonal prediction market on round outcomes — no separate currency, no real money
+- You get a separate **betting wallet** that mirrors your season points as a starting balance — your actual season standing is never touched
+- Wins and losses only affect your betting wallet, not your leaderboard position
+- Everything is per-club, per-season; your wallet resets when a new season starts
+- Betting must be enabled for your club by an admin before you can access it
+
+---
+
+## Accessing Betting
+
+- **Discord**: use the `/bet` command to get an ephemeral link directly to the betting page
+- **PWA**: "Betting" appears in the navbar when it's enabled for your club
+- If betting is frozen or disabled for your club, you'll see a banner explaining why instead of the usual interface
+
+---
+
+## Your Wallet
+
+Three cards show your current financial picture:
+
+| Card | What it shows |
+|------|--------------|
+| Available | Points you can bet right now — your mirror balance minus any reserved stakes |
+| Season Mirror | A snapshot of your current season standing, used as the starting balance for your betting wallet |
+| Ledger Delta | Net change from bet wins, losses, and any admin adjustments — only affects your betting wallet |
+
+**Reserved** points are locked in bets that haven't settled yet. They're yours — just not available for new bets until the market resolves.
+
+Wallet values update automatically when markets settle or your season standing changes.
+
+---
+
+## Market Types
+
+When a round has enough opted-in players, up to five markets are generated automatically. You'll see them as tabs on the betting page.
+
+### Round Winner
+
+Pick who finishes first. One winner (or multiple if tied). This is the only market where you can bet on yourself.
+
+### 2nd Place
+
+Pick who finishes exactly second. Available when a round has 3 or more players.
+
+### 3rd Place
+
+Pick who finishes exactly third. Available when a round has 4 or more players.
+
+### Last Place
+
+Pick who finishes dead last. Available when a round has 3 or more players. Ties count — if two players share the worst score, both are winners for this market.
+
+### Score Over/Under
+
+Each player gets a personal score line based on their recent performance. Pick whether a player will score **over** or **under** that line. If the actual score lands exactly on the line, under wins.
+
+> **Note:** You cannot bet on yourself in placement or over/under markets. Your own options will appear greyed out. Winner markets are unrestricted — feel free to back yourself.
+
+---
+
+## Odds
+
+Odds reflect each player's recent form heading into the round. A heavy favourite pays out less; an underdog pays more.
+
+- **Winner and placement**: odds are based on simulated outcomes using each player's historical performance
+- **Over/under**: the score line is each player's expected score based on recent rounds, and the odds reflect the probability of going over or under that number
+
+All odds are displayed as decimal odds (e.g., 2.50 means a 100-point stake returns 250 points on a win).
+
+---
+
+## Placing a Bet
+
+1. Select a market tab (Winner, Placement, or Score O/U)
+2. For placement, choose which position (2nd, 3rd, or Last)
+3. Pick your selection from the available options
+4. Enter your stake — minimum 1 point, maximum your available balance
+5. Review the potential return shown (stake × odds)
+6. Click **Place Bet**
+
+Your stake is reserved immediately. You'll see a confirmation and your wallet balance updates on the spot.
+
+---
+
+## Results & Payouts
+
+Markets settle automatically when a round is finalized.
+
+- **Win**: you receive `stake × odds` credited to your wallet
+- **Loss**: your reserved stake is consumed — no refund
+- **Void**: if a market is voided (e.g., the round is deleted), your full stake is refunded automatically
+- **DNF**: if the player you bet on doesn't finish, your bet is voided and your stake is refunded
+
+Every credit and debit appears as a line item in your **Wallet Journal**, accessible from the betting page.
+
+---
+
+## Settings
+
+At the bottom of the betting page you'll find one preference:
+
+**Targeting preference** — opt out if you'd rather not be a betting target for other players. You can still place bets yourself regardless of this setting. Other players just won't see you as an option in any market.
+
+---
+
+## Access States
+
+| State | What you can do |
+|-------|----------------|
+| Enabled | Full access — place bets, view markets, change settings |
+| Frozen | Read-only — view your wallet history and past results, but no new bets or setting changes |
+| Disabled | No access — betting link is hidden and the page redirects home |
+
+> **Note:** Access is set at the club level by admins. If your club's betting is frozen or disabled, talk to your club admin.

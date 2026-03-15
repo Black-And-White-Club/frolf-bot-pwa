@@ -35,6 +35,7 @@ function claimsToUser(claims: TokenClaims): AuthUser {
 		id: claims.sub?.replace('user:', '') || '',
 		uuid: claims.user_uuid,
 		activeClubUuid: claims.active_club_uuid,
+		activeClubEntitlements: claims.active_club_entitlements || {},
 		guildId: claims.guild || '',
 		role: (claims.role || 'viewer') as AuthUser['role'],
 		clubs: claims.clubs || [],
