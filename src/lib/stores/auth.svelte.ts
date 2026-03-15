@@ -1,4 +1,5 @@
 // src/lib/stores/auth.svelte.ts
+import { SvelteURLSearchParams } from 'svelte/reactivity';
 
 export interface ClubRole {
 	club_uuid: string;
@@ -7,10 +8,30 @@ export interface ClubRole {
 	avatar_url?: string;
 }
 
+export interface ClubFeatureAccess {
+	key: string;
+	state: 'disabled' | 'enabled' | 'frozen';
+	source: string;
+	reason?: string;
+	expires_at?: string;
+}
+
+export interface ResolvedClubEntitlements {
+	features?: Record<string, ClubFeatureAccess>;
+	resolved_at?: string;
+}
+
+const defaultBettingAccess: ClubFeatureAccess = {
+	key: 'betting',
+	state: 'disabled',
+	source: 'none'
+};
+
 export interface AuthUser {
 	id: string; // Discord ID (legacy)
 	uuid: string; // Internal User UUID
 	activeClubUuid: string; // Internal Club UUID
+	activeClubEntitlements?: ResolvedClubEntitlements;
 	guildId: string; // Discord Guild ID (legacy)
 	role: 'viewer' | 'player' | 'editor' | 'admin';
 	clubs: ClubRole[];
@@ -21,6 +42,7 @@ export interface TokenClaims {
 	sub: string; // Discord ID
 	user_uuid: string;
 	active_club_uuid: string;
+	active_club_entitlements?: ResolvedClubEntitlements;
 	clubs: ClubRole[];
 	linked_providers: string[]; // OAuth providers linked to this account
 	guild: string; // Legacy Guild ID
@@ -54,8 +76,24 @@ export class AuthService {
 	});
 	canEdit = $derived(this.activeRole === 'editor' || this.activeRole === 'admin');
 	canAdmin = $derived(this.activeRole === 'admin');
+	bettingAccess = $derived.by(() => {
+		return this.user?.activeClubEntitlements?.features?.betting ?? defaultBettingAccess;
+	});
+	bettingAvailable = $derived(this.bettingAccess.state === 'enabled');
+	bettingVisible = $derived(
+		this.bettingAccess.state === 'enabled' || this.bettingAccess.state === 'frozen'
+	);
 	private switchClubPromise: Promise<boolean> | null = null;
 	private switchClubTarget: string | null = null;
+
+	/**
+	 * Update active club entitlements from a real-time guild.feature_access.updated.v1 event.
+	 * Triggers reactive re-derivation of bettingAccess, bettingVisible, canLoad, etc.
+	 */
+	updateEntitlements(entitlements: ResolvedClubEntitlements): void {
+		if (!this.user) return;
+		this.user = { ...this.user, activeClubEntitlements: entitlements };
+	}
 
 	/**
 	 * Extract token from URL hash/query parameter t
@@ -65,9 +103,9 @@ export class AuthService {
 		if (typeof window === 'undefined') return null;
 
 		const { pathname, search, hash } = window.location;
-		/* eslint-disable svelte/prefer-svelte-reactivity */
-		const queryParams = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
-		/* eslint-enable svelte/prefer-svelte-reactivity */
+		const queryParams = new SvelteURLSearchParams(
+			search.startsWith('?') ? search.slice(1) : search
+		);
 		const { rawHash, hashParams, hashToken } = this.parseHashToken(hash || '');
 		const queryToken = queryParams.get('t');
 		const token = hashToken || queryToken;
@@ -93,10 +131,8 @@ export class AuthService {
 		hashToken: string | null;
 	} {
 		const rawHash = hash.startsWith('#') ? hash.slice(1) : hash;
-		/* eslint-disable svelte/prefer-svelte-reactivity */
 		const looksLikeParams = rawHash.includes('=') || rawHash.includes('&');
-		const hashParams = looksLikeParams ? new URLSearchParams(rawHash) : null;
-		/* eslint-enable svelte/prefer-svelte-reactivity */
+		const hashParams = looksLikeParams ? new SvelteURLSearchParams(rawHash) : null;
 		return { rawHash, hashParams, hashToken: hashParams?.get('t') ?? null };
 	}
 
@@ -258,6 +294,7 @@ export class AuthService {
 			id: claims.sub?.replace('user:', '') || '',
 			uuid: claims.user_uuid,
 			activeClubUuid: claims.active_club_uuid,
+			activeClubEntitlements: claims.active_club_entitlements || {},
 			guildId: claims.guild || '',
 			role: (claims.role || 'viewer') as AuthUser['role'],
 			clubs: claims.clubs || [],

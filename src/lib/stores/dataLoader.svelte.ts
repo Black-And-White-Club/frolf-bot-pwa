@@ -6,6 +6,7 @@ import { tagStore, type TagListResponseRaw } from './tags.svelte';
 import { challengeStore } from './challenges.svelte';
 import { auth } from './auth.svelte';
 import { userProfiles, type UserProfileRaw } from './userProfiles.svelte';
+import { betting, type BettingMarketSnapshot } from './betting.svelte';
 import { log } from '$lib/config';
 
 // Update response type for rounds
@@ -68,6 +69,18 @@ class DataLoader {
 		await this.loadInitialData();
 	}
 
+	/**
+	 * Refresh only the betting snapshot. Used when a new betting market is
+	 * created so we avoid reloading unrelated data (rounds, leaderboard, etc).
+	 */
+	async refreshBettingSnapshot(): Promise<void> {
+		const user = auth.user;
+		if (!user || !nats.isConnected) return;
+		const clubUuid = user.activeClubUuid;
+		if (!clubUuid) return;
+		await this.loadBettingSnapshot(clubUuid);
+	}
+
 	private async loadInitialDataForId(
 		preferredId: string,
 		clubUuid: string,
@@ -81,7 +94,8 @@ class DataLoader {
 				this.loadRounds(preferredId, clubUuid, guildId),
 				this.loadLeaderboard(preferredId, clubUuid, guildId),
 				this.loadTagList(preferredId, guildId, clubUuid),
-				this.loadChallenges()
+				this.loadChallenges(),
+				...(clubUuid ? [this.loadBettingSnapshot(clubUuid)] : [])
 			]);
 			log('DataLoader: Initial data loaded successfully');
 		} catch (e) {
@@ -191,6 +205,26 @@ class DataLoader {
 			await challengeStore.loadBoard();
 		} catch (error) {
 			log('DataLoader: Challenge board request failed, relying on events', error);
+		}
+	}
+
+	private async loadBettingSnapshot(clubUuid: string): Promise<void> {
+		// Only request snapshot if betting is accessible (enabled or frozen).
+		if (!betting.canLoad) return;
+
+		try {
+			const response = await nats.request<{ club_uuid: string }, BettingMarketSnapshot>(
+				`betting.snapshot.request.v1.${clubUuid}`,
+				{ club_uuid: clubUuid },
+				{ timeout: 5000 }
+			);
+
+			if (response) {
+				betting.setNextMarketFromSnapshot(response);
+			}
+		} catch (e) {
+			// Non-fatal: market will arrive via betting.market.generated.v1 subscription.
+			log('DataLoader: Betting snapshot request failed, relying on events', e);
 		}
 	}
 

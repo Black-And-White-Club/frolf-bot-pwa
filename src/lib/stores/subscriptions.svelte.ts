@@ -15,6 +15,16 @@ import { leaderboardService } from './leaderboard.svelte';
 import { roundActionsService } from './roundActions.svelte';
 import { tagStore } from './tags.svelte';
 import { dataLoader } from './dataLoader.svelte';
+import { challengeStore } from './challenges.svelte';
+import {
+	betting,
+	type BettingMarketOpenedPayload,
+	type BettingMarketLockedPayload,
+	type BettingMarketSettledPayload,
+	type BettingMarketVoidedPayload,
+	type BettingMarketSuspendedPayload
+} from './betting.svelte';
+import { auth, type ResolvedClubEntitlements } from './auth.svelte';
 
 type WireRoundID = string | number[];
 
@@ -129,6 +139,11 @@ type ChallengeFactPayloadV1 = {
 	challenge: unknown;
 };
 
+interface GuildFeatureAccessUpdatedPayloadV1 {
+	guild_id: string;
+	entitlements: ResolvedClubEntitlements;
+}
+
 class SubscriptionManager {
 	private unsubscribers: (() => void)[] = [];
 	private id: string | null = null;
@@ -142,6 +157,8 @@ class SubscriptionManager {
 		this.subscribeRoundEvents(id);
 		this.subscribeLeaderboardEvents(id);
 		this.subscribeChallengeEvents(id);
+		this.subscribeBettingEvents(id);
+		this.subscribeEntitlementEvents(id);
 	}
 
 	/**
@@ -371,6 +388,66 @@ class SubscriptionManager {
 				})
 			);
 		}
+	}
+
+	/**
+	 * Subscribe to betting market lifecycle events.
+	 * Scoped by club_uuid (betting is club-level, not guild-level).
+	 * Wallet/ticket data stays HTTP — only non-sensitive market events come via NATS.
+	 */
+	private subscribeBettingEvents(clubUuid: string): void {
+		// betting.market.generated.v1 — new market created for this club
+		this.unsubscribers.push(
+			nats.subscribe(`betting.market.generated.v1.${clubUuid}`, (msg) => {
+				betting.handleMarketOpened(msg.data as BettingMarketOpenedPayload);
+				// Request a fresh snapshot so we get full market data (targeted refresh only).
+				void dataLoader.refreshBettingSnapshot();
+			})
+		);
+
+		// betting.market.locked.v1 — market locked, no new bets
+		this.unsubscribers.push(
+			nats.subscribe(`betting.market.locked.v1.${clubUuid}`, (msg) => {
+				betting.handleMarketLocked(msg.data as BettingMarketLockedPayload);
+			})
+		);
+
+		// betting.market.settled.v1 — market settled; also triggers wallet reload
+		this.unsubscribers.push(
+			nats.subscribe(`betting.market.settled.v1.${clubUuid}`, (msg) => {
+				betting.handleMarketSettled(msg.data as BettingMarketSettledPayload);
+			})
+		);
+
+		// betting.market.voided.v1 — market voided
+		this.unsubscribers.push(
+			nats.subscribe(`betting.market.voided.v1.${clubUuid}`, (msg) => {
+				betting.handleMarketVoided(msg.data as BettingMarketVoidedPayload);
+			})
+		);
+
+		// betting.market.suspended.v1 — market temporarily suspended
+		this.unsubscribers.push(
+			nats.subscribe(`betting.market.suspended.v1.${clubUuid}`, (msg) => {
+				betting.handleMarketSuspended(msg.data as BettingMarketSuspendedPayload);
+			})
+		);
+	}
+
+	/**
+	 * Subscribe to guild/club entitlement changes.
+	 * When an operator grants or revokes feature access, the backend publishes
+	 * guild.feature_access.updated.v1 — we update auth state in real-time so
+	 * bettingAccess, bettingVisible, canLoad, and nav visibility all re-derive
+	 * immediately without waiting for a JWT refresh.
+	 */
+	private subscribeEntitlementEvents(guildId: string): void {
+		this.unsubscribers.push(
+			nats.subscribe(`guild.feature_access.updated.v1.${guildId}`, (msg) => {
+				const payload = msg.data as GuildFeatureAccessUpdatedPayloadV1;
+				auth.updateEntitlements(payload.entitlements);
+			})
+		);
 	}
 }
 

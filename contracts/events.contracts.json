@@ -95,6 +95,448 @@
 			}
 		},
 		{
+			"subject": "betting.bet.placed.v1",
+			"subject_pattern": "betting.bet.placed.v1.{scope_id}",
+			"supports_scoped_suffix": true,
+			"summary": "Betting Bet Placed",
+			"description": "A member successfully placed a bet on a market.",
+			"producer": {
+				"service": "frolf-bot-backend",
+				"module": "betting"
+			},
+			"producers": [
+				{
+					"service": "frolf-bot-backend",
+					"module": "betting"
+				}
+			],
+			"consumers": [
+				{
+					"service": "pwa",
+					"module": "betting"
+				}
+			],
+			"payload_type": "*bettingevents.BettingBetPlacedPayloadV1",
+			"payload_schema": {
+				"additionalProperties": false,
+				"properties": {
+					"bet_id": {
+						"type": "integer"
+					},
+					"club_uuid": {
+						"type": "string"
+					},
+					"guild_id": {
+						"type": "string"
+					},
+					"market_id": {
+						"type": "integer"
+					},
+					"member_id": {
+						"type": "string"
+					},
+					"round_id": {
+						"items": {
+							"minimum": 0,
+							"type": "integer"
+						},
+						"type": "array"
+					},
+					"selection_key": {
+						"type": "string"
+					},
+					"stake": {
+						"type": "integer"
+					},
+					"user_uuid": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"bet_id",
+					"club_uuid",
+					"guild_id",
+					"market_id",
+					"member_id",
+					"round_id",
+					"selection_key",
+					"stake",
+					"user_uuid"
+				],
+				"type": "object"
+			}
+		},
+		{
+			"subject": "betting.market.generated.v1",
+			"subject_pattern": "betting.market.generated.v1.{scope_id}",
+			"supports_scoped_suffix": true,
+			"summary": "Betting Market Generated",
+			"description": "A winner market was created or repriced for an upcoming round.",
+			"producer": {
+				"service": "frolf-bot-backend",
+				"module": "betting"
+			},
+			"producers": [
+				{
+					"service": "frolf-bot-backend",
+					"module": "betting"
+				}
+			],
+			"consumers": [
+				{
+					"service": "pwa",
+					"module": "betting"
+				}
+			],
+			"payload_type": "*bettingevents.BettingMarketGeneratedPayloadV1",
+			"payload_schema": {
+				"additionalProperties": false,
+				"properties": {
+					"club_uuid": {
+						"type": "string"
+					},
+					"guild_id": {
+						"type": "string"
+					},
+					"market_id": {
+						"type": "integer"
+					},
+					"market_type": {
+						"type": "string"
+					},
+					"round_id": {
+						"items": {
+							"minimum": 0,
+							"type": "integer"
+						},
+						"type": "array"
+					}
+				},
+				"required": ["club_uuid", "guild_id", "market_id", "market_type", "round_id"],
+				"type": "object"
+			}
+		},
+		{
+			"subject": "betting.market.locked.v1",
+			"subject_pattern": "betting.market.locked.v1.{scope_id}",
+			"supports_scoped_suffix": true,
+			"summary": "Betting Market Locked",
+			"description": "A betting market has locked; no further bets are accepted.",
+			"producer": {
+				"service": "frolf-bot-backend",
+				"module": "betting"
+			},
+			"producers": [
+				{
+					"service": "frolf-bot-backend",
+					"module": "betting"
+				}
+			],
+			"consumers": [
+				{
+					"service": "pwa",
+					"module": "betting"
+				},
+				{
+					"service": "discord",
+					"module": "betting"
+				}
+			],
+			"payload_type": "*bettingevents.BettingMarketLockedPayloadV1",
+			"payload_schema": {
+				"additionalProperties": false,
+				"properties": {
+					"club_uuid": {
+						"type": "string"
+					},
+					"guild_id": {
+						"type": "string"
+					},
+					"market_id": {
+						"type": "integer"
+					},
+					"round_id": {
+						"items": {
+							"minimum": 0,
+							"type": "integer"
+						},
+						"type": "array"
+					}
+				},
+				"required": ["club_uuid", "guild_id", "market_id", "round_id"],
+				"type": "object"
+			}
+		},
+		{
+			"subject": "betting.market.settled.v1",
+			"subject_pattern": "betting.market.settled.v1.{scope_id}",
+			"supports_scoped_suffix": true,
+			"summary": "Betting Market Settled",
+			"description": "A betting market was settled after round finalisation.",
+			"producer": {
+				"service": "frolf-bot-backend",
+				"module": "betting"
+			},
+			"producers": [
+				{
+					"service": "frolf-bot-backend",
+					"module": "betting"
+				}
+			],
+			"consumers": [
+				{
+					"service": "pwa",
+					"module": "betting"
+				},
+				{
+					"service": "discord",
+					"module": "betting"
+				}
+			],
+			"payload_type": "*bettingevents.BettingMarketSettledPayloadV1",
+			"payload_schema": {
+				"additionalProperties": false,
+				"properties": {
+					"club_uuid": {
+						"type": "string"
+					},
+					"guild_id": {
+						"type": "string"
+					},
+					"market_id": {
+						"type": "integer"
+					},
+					"result_summary": {
+						"type": "string"
+					},
+					"round_id": {
+						"items": {
+							"minimum": 0,
+							"type": "integer"
+						},
+						"type": "array"
+					},
+					"settlement_version": {
+						"type": "integer"
+					}
+				},
+				"required": [
+					"club_uuid",
+					"guild_id",
+					"market_id",
+					"result_summary",
+					"round_id",
+					"settlement_version"
+				],
+				"type": "object"
+			}
+		},
+		{
+			"subject": "betting.market.voided.v1",
+			"subject_pattern": "betting.market.voided.v1.{scope_id}",
+			"supports_scoped_suffix": true,
+			"summary": "Betting Market Voided",
+			"description": "A betting market was voided due to round deletion or admin action.",
+			"producer": {
+				"service": "frolf-bot-backend",
+				"module": "betting"
+			},
+			"producers": [
+				{
+					"service": "frolf-bot-backend",
+					"module": "betting"
+				}
+			],
+			"consumers": [
+				{
+					"service": "pwa",
+					"module": "betting"
+				}
+			],
+			"payload_type": "*bettingevents.BettingMarketVoidedPayloadV1",
+			"payload_schema": {
+				"additionalProperties": false,
+				"properties": {
+					"club_uuid": {
+						"type": "string"
+					},
+					"guild_id": {
+						"type": "string"
+					},
+					"market_id": {
+						"type": "integer"
+					},
+					"reason": {
+						"type": "string"
+					},
+					"round_id": {
+						"items": {
+							"minimum": 0,
+							"type": "integer"
+						},
+						"type": "array"
+					}
+				},
+				"required": ["club_uuid", "guild_id", "market_id", "reason", "round_id"],
+				"type": "object"
+			}
+		},
+		{
+			"subject": "betting.snapshot.request.v1",
+			"subject_pattern": "betting.snapshot.request.v1.{scope_id}",
+			"supports_scoped_suffix": true,
+			"summary": "Betting Snapshot Request",
+			"description": "PWA client requests the current market snapshot for a club (request/reply).",
+			"producer": {
+				"service": "pwa",
+				"module": "betting"
+			},
+			"producers": [
+				{
+					"service": "pwa",
+					"module": "betting"
+				}
+			],
+			"consumers": [
+				{
+					"service": "frolf-bot-backend",
+					"module": "betting"
+				}
+			],
+			"payload_type": "*bettingevents.BettingSnapshotRequestPayloadV1",
+			"payload_schema": {
+				"additionalProperties": false,
+				"properties": {
+					"club_uuid": {
+						"type": "string"
+					}
+				},
+				"required": ["club_uuid"],
+				"type": "object"
+			}
+		},
+		{
+			"subject": "betting.snapshot.response.v1",
+			"subject_pattern": "betting.snapshot.response.v1.{scope_id}",
+			"supports_scoped_suffix": true,
+			"summary": "Betting Snapshot Response",
+			"description": "Backend reply to a market snapshot request. Contains public market data, no wallet data.",
+			"producer": {
+				"service": "frolf-bot-backend",
+				"module": "betting"
+			},
+			"producers": [
+				{
+					"service": "frolf-bot-backend",
+					"module": "betting"
+				}
+			],
+			"consumers": [
+				{
+					"service": "pwa",
+					"module": "betting"
+				}
+			],
+			"payload_type": "*bettingevents.BettingSnapshotResponsePayloadV1",
+			"payload_schema": {
+				"additionalProperties": false,
+				"properties": {
+					"access_state": {
+						"type": "string"
+					},
+					"club_uuid": {
+						"type": "string"
+					},
+					"error": {
+						"type": "string"
+					},
+					"guild_id": {
+						"type": "string"
+					},
+					"market": {
+						"additionalProperties": false,
+						"properties": {
+							"ephemeral": {
+								"type": "boolean"
+							},
+							"id": {
+								"type": "integer"
+							},
+							"locks_at": {
+								"type": "string"
+							},
+							"options": {
+								"items": {
+									"additionalProperties": false,
+									"properties": {
+										"decimal_odds": {
+											"type": "number"
+										},
+										"label": {
+											"type": "string"
+										},
+										"member_id": {
+											"type": "string"
+										},
+										"option_key": {
+											"type": "string"
+										},
+										"probability_percent": {
+											"type": "integer"
+										}
+									},
+									"required": [
+										"decimal_odds",
+										"label",
+										"member_id",
+										"option_key",
+										"probability_percent"
+									],
+									"type": "object"
+								},
+								"type": "array"
+							},
+							"result": {
+								"type": "string"
+							},
+							"status": {
+								"type": "string"
+							},
+							"title": {
+								"type": "string"
+							},
+							"type": {
+								"type": "string"
+							}
+						},
+						"required": ["ephemeral", "id", "locks_at", "status", "title", "type"],
+						"type": "object"
+					},
+					"round": {
+						"additionalProperties": false,
+						"properties": {
+							"id": {
+								"type": "string"
+							},
+							"start_time": {
+								"type": "string"
+							},
+							"title": {
+								"type": "string"
+							}
+						},
+						"required": ["id", "start_time", "title"],
+						"type": "object"
+					},
+					"season_id": {
+						"type": "string"
+					}
+				},
+				"required": ["club_uuid"],
+				"type": "object"
+			}
+		},
+		{
 			"subject": "club.challenge.accepted.v1",
 			"subject_pattern": "club.challenge.accepted.v1.{scope_id}",
 			"supports_scoped_suffix": true,
@@ -2713,6 +3155,42 @@
 				"properties": {
 					"discord_guild_id": {
 						"type": "string"
+					},
+					"entitlements": {
+						"additionalProperties": false,
+						"properties": {
+							"features": {
+								"additionalProperties": {
+									"additionalProperties": false,
+									"properties": {
+										"expires_at": {
+											"format": "date-time",
+											"type": "string"
+										},
+										"key": {
+											"type": "string"
+										},
+										"reason": {
+											"type": "string"
+										},
+										"source": {
+											"type": "string"
+										},
+										"state": {
+											"type": "string"
+										}
+									},
+									"required": ["key", "source", "state"],
+									"type": "object"
+								},
+								"type": "object"
+							},
+							"resolved_at": {
+								"format": "date-time",
+								"type": "string"
+							}
+						},
+						"type": "object"
 					},
 					"icon_url": {
 						"type": "string"
@@ -5606,6 +6084,42 @@
 							"editor_role_id": {
 								"type": "string"
 							},
+							"entitlements": {
+								"additionalProperties": false,
+								"properties": {
+									"features": {
+										"additionalProperties": {
+											"additionalProperties": false,
+											"properties": {
+												"expires_at": {
+													"format": "date-time",
+													"type": "string"
+												},
+												"key": {
+													"type": "string"
+												},
+												"reason": {
+													"type": "string"
+												},
+												"source": {
+													"type": "string"
+												},
+												"state": {
+													"type": "string"
+												}
+											},
+											"required": ["key", "source", "state"],
+											"type": "object"
+										},
+										"type": "object"
+									},
+									"resolved_at": {
+										"format": "date-time",
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
 							"event_channel_id": {
 								"type": "string"
 							},
@@ -6170,6 +6684,42 @@
 							"editor_role_id": {
 								"type": "string"
 							},
+							"entitlements": {
+								"additionalProperties": false,
+								"properties": {
+									"features": {
+										"additionalProperties": {
+											"additionalProperties": false,
+											"properties": {
+												"expires_at": {
+													"format": "date-time",
+													"type": "string"
+												},
+												"key": {
+													"type": "string"
+												},
+												"reason": {
+													"type": "string"
+												},
+												"source": {
+													"type": "string"
+												},
+												"state": {
+													"type": "string"
+												}
+											},
+											"required": ["key", "source", "state"],
+											"type": "object"
+										},
+										"type": "object"
+									},
+									"resolved_at": {
+										"format": "date-time",
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
 							"event_channel_id": {
 								"type": "string"
 							},
@@ -6405,6 +6955,42 @@
 							"editor_role_id": {
 								"type": "string"
 							},
+							"entitlements": {
+								"additionalProperties": false,
+								"properties": {
+									"features": {
+										"additionalProperties": {
+											"additionalProperties": false,
+											"properties": {
+												"expires_at": {
+													"format": "date-time",
+													"type": "string"
+												},
+												"key": {
+													"type": "string"
+												},
+												"reason": {
+													"type": "string"
+												},
+												"source": {
+													"type": "string"
+												},
+												"state": {
+													"type": "string"
+												}
+											},
+											"required": ["key", "source", "state"],
+											"type": "object"
+										},
+										"type": "object"
+									},
+									"resolved_at": {
+										"format": "date-time",
+										"type": "string"
+									}
+								},
+								"type": "object"
+							},
 							"event_channel_id": {
 								"type": "string"
 							},
@@ -6503,6 +7089,80 @@
 					}
 				},
 				"required": ["config", "guild_id"],
+				"type": "object"
+			}
+		},
+		{
+			"subject": "guild.feature_access.updated.v1",
+			"subject_pattern": "guild.feature_access.updated.v1.{scope_id}",
+			"supports_scoped_suffix": true,
+			"summary": "Guild Feature Access Updated",
+			"description": "Resolved club feature access changed.",
+			"producer": {
+				"service": "frolf-bot-backend",
+				"module": "guild"
+			},
+			"producers": [
+				{
+					"service": "frolf-bot-backend",
+					"module": "guild"
+				}
+			],
+			"consumers": [
+				{
+					"service": "discord",
+					"module": "guild"
+				},
+				{
+					"service": "pwa",
+					"module": "guild"
+				}
+			],
+			"payload_type": "*guildevents.GuildFeatureAccessUpdatedPayloadV1",
+			"payload_schema": {
+				"additionalProperties": false,
+				"properties": {
+					"entitlements": {
+						"additionalProperties": false,
+						"properties": {
+							"features": {
+								"additionalProperties": {
+									"additionalProperties": false,
+									"properties": {
+										"expires_at": {
+											"format": "date-time",
+											"type": "string"
+										},
+										"key": {
+											"type": "string"
+										},
+										"reason": {
+											"type": "string"
+										},
+										"source": {
+											"type": "string"
+										},
+										"state": {
+											"type": "string"
+										}
+									},
+									"required": ["key", "source", "state"],
+									"type": "object"
+								},
+								"type": "object"
+							},
+							"resolved_at": {
+								"format": "date-time",
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"guild_id": {
+						"type": "string"
+					}
+				},
+				"required": ["entitlements", "guild_id"],
 				"type": "object"
 			}
 		},

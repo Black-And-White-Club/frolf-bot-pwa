@@ -137,16 +137,16 @@
 		await challengeStore.unlinkRound(challenge.id);
 	}
 
-	function roundHref(roundId: string): string {
+	function roundHref(roundId: string): `/rounds/${string}` {
 		return `/rounds/${roundId}`;
 	}
 
-	function challengeHref(challengeId: string): string {
+	function challengeHref(challengeId: string): `/challenges/${string}` {
 		return `/challenges/${challengeId}`;
 	}
 
-	function createRoundHref(challengeId: string): string {
-		return `/rounds/create?challenge=${challengeId}`;
+	function createRoundBase(): '/rounds/create' {
+		return '/rounds/create';
 	}
 </script>
 
@@ -241,14 +241,20 @@
 					</select>
 
 					<button type="button" class="action" onclick={handleLinkRound}>Link Round</button>
-					<a class="action action--link" href={resolve(createRoundHref(challenge.id))}>
+					<a
+						class="action action--link"
+						href={`${resolve(createRoundBase())}?challenge=${challenge.id}`}
+					>
 						Create Round
 					</a>
 				</div>
 			{:else if canManageRound && challenge.linkedRound?.isActive}
 				<div class="challenge-card__scheduler">
 					<button type="button" class="action" onclick={handleUnlinkRound}>Unlink Round</button>
-					<a class="action action--link" href={resolve(createRoundHref(challenge.id))}>
+					<a
+						class="action action--link"
+						href={`${resolve(createRoundBase())}?challenge=${challenge.id}`}
+					>
 						Replace Round
 					</a>
 				</div>

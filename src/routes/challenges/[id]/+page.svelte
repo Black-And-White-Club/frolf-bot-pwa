@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import type { Pathname } from '$app/types';
 	import { page } from '$app/state';
 	import ChallengeCard from '$lib/components/challenges/ChallengeCard.svelte';
 	import ChallengeDetailLoader from '$lib/components/challenges/ChallengeDetailLoader.svelte';
@@ -13,6 +14,11 @@
 	import { nats } from '$lib/stores/nats.svelte';
 	import { roundService } from '$lib/stores/round.svelte';
 	import { resolveRequestIdentity } from '$lib/utils/requestIdentity';
+
+	// TypeScript can't unify a Pathname union against resolve's conditional generic overload.
+	function resolvePath(p: Pathname): string {
+		return resolve(p as '/');
+	}
 
 	const identity = $derived(resolveRequestIdentity(auth.user));
 	const challengeId = $derived(page.params.id?.trim() ?? '');
@@ -50,17 +56,17 @@
 		});
 	}
 
-	function roundHref(roundId: string): string {
+	function roundHref(roundId: string): `/rounds/${string}` {
 		return `/rounds/${roundId}`;
 	}
 
 	type DetailItem = {
 		label: string;
 		value: string;
-		href?: string;
+		href?: Pathname;
 	};
 
-	function createTimelineItem(label: string, value: string, href?: string): DetailItem {
+	function createTimelineItem(label: string, value: string, href?: Pathname): DetailItem {
 		return { label, value, href };
 	}
 
@@ -113,7 +119,7 @@
 			createTimelineItem(
 				challenge.linkedRound?.isActive ? 'Linked round' : 'Last linked round',
 				linkedRound?.title ?? roundId,
-				resolve(roundHref(roundId))
+				roundHref(roundId)
 			)
 		];
 	}
@@ -191,7 +197,10 @@
 							<div class="detail-item">
 								<span class="detail-item__label">{item.label}</span>
 								{#if item.href}
-									<a class="detail-item__value detail-item__value--link" href={resolve(item.href)}>
+									<a
+										class="detail-item__value detail-item__value--link"
+										href={resolvePath(item.href)}
+									>
 										{item.value}
 									</a>
 								{:else}

@@ -142,7 +142,16 @@ class MockDataProvider {
 		clubService.info = {
 			id: 'guild-123',
 			name: 'Black & White Club',
-			icon: 'https://cdn.discordapp.com/icons/123456789/abcdef.png'
+			icon: 'https://cdn.discordapp.com/icons/123456789/abcdef.png',
+			entitlements: {
+				features: {
+					betting: {
+						key: 'betting',
+						state: 'enabled',
+						source: 'subscription'
+					}
+				}
+			}
 		};
 		clubService.knownClubs['guild-123'] = clubService.info;
 

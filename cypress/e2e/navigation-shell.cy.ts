@@ -91,4 +91,37 @@ describe('Navigation Shell', () => {
 			navScreen.hamburgerDialog().should('not.exist');
 		});
 	});
+
+	it('shows betting nav link when entitlements are enabled', () => {
+		cy.arrangeSnapshot({
+			subjectId,
+			rounds: [],
+			leaderboard: buildLeaderboardSnapshot({ guild_id: subjectId, leaderboard: [] }),
+			tags: buildTagListSnapshot({ guild_id: subjectId, members: [] }),
+			profiles: {}
+		});
+		cy.arrangeAuth({
+			path: '/',
+			clubUuid: subjectId,
+			guildId: subjectId,
+			role: 'player',
+			linkedProviders: ['discord'],
+			entitlements: {
+				features: {
+					betting: { key: 'betting', state: 'enabled', source: 'subscription', reason: '' }
+				}
+			}
+		});
+		cy.wsConnect();
+
+		navScreen.expectLinkVisible('Betting', '/betting');
+	});
+
+	it('hides betting nav link when entitlements are disabled (omitted)', () => {
+		arrangeHome('player');
+
+		navScreen.withPrimaryNavigation(() => {
+			cy.get('a[href="/betting"]').should('not.exist');
+		});
+	});
 });

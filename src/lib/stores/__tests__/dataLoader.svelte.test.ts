@@ -36,6 +36,22 @@ vi.mock('../userProfiles.svelte', () => ({
 	userProfiles: mockUserProfiles
 }));
 
+const mockChallengeStore = {
+	loadBoard: vi.fn().mockResolvedValue(undefined),
+	reset: vi.fn()
+};
+vi.mock('../challenges.svelte', () => ({
+	challengeStore: mockChallengeStore
+}));
+
+const mockBetting = {
+	canLoad: true,
+	setNextMarketFromSnapshot: vi.fn()
+};
+vi.mock('../betting.svelte', () => ({
+	betting: mockBetting
+}));
+
 vi.mock('$lib/config', () => ({
 	log: vi.fn()
 }));
@@ -60,6 +76,10 @@ describe('DataLoader (dataLoader.svelte.ts)', () => {
 		// Reset mock state
 		mockAuth.user = null;
 		mockNatsRequest.mockReset();
+		mockBetting.canLoad = true;
+		mockBetting.setNextMarketFromSnapshot.mockReset();
+		mockChallengeStore.loadBoard.mockReset();
+		mockChallengeStore.loadBoard.mockResolvedValue(undefined);
 
 		// Get fresh module
 		const mod = await import('../dataLoader.svelte');
@@ -223,6 +243,95 @@ describe('DataLoader (dataLoader.svelte.ts)', () => {
 			expect(mockLeaderboardService.clear).toHaveBeenCalled();
 			expect(mockUserProfiles.clear).toHaveBeenCalled();
 			expect(resetSpy).toHaveBeenCalled();
+		});
+	});
+
+	describe('refreshBettingSnapshot', () => {
+		it('does nothing when user not authenticated', async () => {
+			mockAuth.user = null;
+			(mockNats as any).isConnected = true;
+
+			await dataLoader.refreshBettingSnapshot();
+
+			expect(mockNatsRequest).not.toHaveBeenCalled();
+		});
+
+		it('does nothing when nats not connected', async () => {
+			mockAuth.user = { activeClubUuid: 'club-123', guildId: 'guild-456' };
+			(mockNats as any).isConnected = false;
+
+			await dataLoader.refreshBettingSnapshot();
+
+			expect(mockNatsRequest).not.toHaveBeenCalled();
+		});
+
+		it('does nothing when user has no club UUID', async () => {
+			mockAuth.user = { guildId: 'guild-only' };
+			(mockNats as any).isConnected = true;
+
+			await dataLoader.refreshBettingSnapshot();
+
+			expect(mockNatsRequest).not.toHaveBeenCalled();
+		});
+
+		it('does nothing when betting canLoad is false', async () => {
+			mockAuth.user = { activeClubUuid: 'club-123', guildId: 'guild-456' };
+			(mockNats as any).isConnected = true;
+			mockBetting.canLoad = false;
+
+			await dataLoader.refreshBettingSnapshot();
+
+			expect(mockNatsRequest).not.toHaveBeenCalled();
+		});
+
+		it('requests snapshot for the correct subject and updates betting store', async () => {
+			mockAuth.user = { activeClubUuid: 'club-123', guildId: 'guild-456' };
+			(mockNats as any).isConnected = true;
+			const snapshot = {
+				market: { id: 'mkt-1', round_id: 'round-1', status: 'open', options: [] }
+			};
+			mockNatsRequest.mockResolvedValueOnce(snapshot);
+
+			await dataLoader.refreshBettingSnapshot();
+
+			expect(mockNatsRequest).toHaveBeenCalledTimes(1);
+			expect(mockNatsRequest).toHaveBeenCalledWith(
+				'betting.snapshot.request.v1.club-123',
+				{ club_uuid: 'club-123' },
+				{ timeout: 5000 }
+			);
+			expect(mockBetting.setNextMarketFromSnapshot).toHaveBeenCalledWith(snapshot);
+		});
+
+		it('passes null to setNextMarketFromSnapshot when response has no market', async () => {
+			mockAuth.user = { activeClubUuid: 'club-123', guildId: 'guild-456' };
+			(mockNats as any).isConnected = true;
+			mockNatsRequest.mockResolvedValueOnce({ market: null });
+
+			await dataLoader.refreshBettingSnapshot();
+
+			expect(mockBetting.setNextMarketFromSnapshot).toHaveBeenCalledWith(null);
+		});
+
+		it('handles snapshot request failure without throwing', async () => {
+			mockAuth.user = { activeClubUuid: 'club-123', guildId: 'guild-456' };
+			(mockNats as any).isConnected = true;
+			mockNatsRequest.mockRejectedValueOnce(new Error('Timeout'));
+
+			await expect(dataLoader.refreshBettingSnapshot()).resolves.not.toThrow();
+			expect(mockBetting.setNextMarketFromSnapshot).not.toHaveBeenCalled();
+		});
+
+		it('only issues one nats request (no round/leaderboard/tag reloads)', async () => {
+			mockAuth.user = { activeClubUuid: 'club-123', guildId: 'guild-456' };
+			(mockNats as any).isConnected = true;
+			mockNatsRequest.mockResolvedValueOnce({ market: { id: 'mkt-1' } });
+
+			await dataLoader.refreshBettingSnapshot();
+
+			expect(mockNatsRequest).toHaveBeenCalledTimes(1);
+			expect(mockRoundService.setRoundsFromApi).not.toHaveBeenCalled();
+			expect(mockLeaderboardService.setSnapshotFromApi).not.toHaveBeenCalled();
 		});
 	});
 });

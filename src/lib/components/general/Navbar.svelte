@@ -104,6 +104,14 @@
 					>
 						Leaderboard
 					</a>
+					{#if auth.bettingVisible}
+						<a
+							href="/betting"
+							class="text-[var(--guild-text-secondary)] transition-colors hover:text-[var(--guild-text)]"
+						>
+							Betting
+						</a>
+					{/if}
 					<a
 						href="/docs"
 						class="text-[var(--guild-text-secondary)] transition-colors hover:text-[var(--guild-text)]"

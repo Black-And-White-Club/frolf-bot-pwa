@@ -1,10 +1,12 @@
 import { auth } from './auth.svelte';
 import { log, config } from '$lib/config';
+import type { ResolvedClubEntitlements } from './auth.svelte';
 
 interface ClubInfo {
 	id: string;
 	name: string;
 	icon?: string;
+	entitlements?: ResolvedClubEntitlements;
 }
 
 class ClubService {
@@ -152,7 +154,8 @@ class ClubService {
 				return {
 					id: response.uuid || id,
 					name: response.name,
-					icon: response.icon_url || response.icon
+					icon: response.icon_url || response.icon,
+					entitlements: response.entitlements
 				};
 			}
 		} catch (e) {
@@ -184,7 +187,7 @@ class ClubService {
 			}
 
 			const baseUrl = config.api.url || '';
-			const url = `${baseUrl}/clubs/${id}`;
+			const url = `${baseUrl}/api/clubs/${id}`;
 
 			const res = await fetch(url, { headers });
 			if (res.ok) {
@@ -192,7 +195,8 @@ class ClubService {
 				return {
 					id: data.id || data.uuid || id,
 					name: data.name,
-					icon: data.icon_url || data.icon
+					icon: data.icon_url || data.icon,
+					entitlements: data.entitlements
 				};
 			}
 		} catch (e) {

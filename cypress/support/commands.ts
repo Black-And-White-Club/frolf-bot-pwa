@@ -53,6 +53,18 @@ type ArrangeAuthOptions = {
 	}>;
 	claims?: Record<string, unknown>;
 	visitOptions?: VisitOptions;
+	entitlements?: {
+		features?: Record<
+			string,
+			{
+				key: string;
+				state: 'disabled' | 'enabled' | 'frozen';
+				source: string;
+				reason?: string;
+				expires_at?: string;
+			}
+		>;
+	};
 };
 
 type ArrangeGuestOptions = {

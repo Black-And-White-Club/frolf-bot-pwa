@@ -22,7 +22,6 @@ class AppInitializer {
 	private reconnectUnsubscribe: (() => void) | null = null;
 	private reconnectReloadTimer: ReturnType<typeof setTimeout> | null = null;
 	// Lazily-loaded live-mode singletons — null until first live connection
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	private liveModules: {
 		nats: any;
 		subscriptionManager: any;
@@ -185,6 +184,15 @@ class AppInitializer {
 			id: 'user-1',
 			uuid: 'user-uuid-1',
 			activeClubUuid: 'guild-123',
+			activeClubEntitlements: {
+				features: {
+					betting: {
+						key: 'betting',
+						state: 'enabled',
+						source: 'subscription'
+					}
+				}
+			},
 			guildId: 'guild-123',
 			role: 'admin',
 			clubs: [

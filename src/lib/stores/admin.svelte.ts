@@ -28,6 +28,43 @@ type PointAdjustPayload = {
 	admin_id: string;
 };
 
+type BettingWalletAdjustPayload = {
+	club_uuid: string;
+	member_id: string;
+	amount: number;
+	reason: string;
+};
+
+type BettingMarketActionPayload = {
+	club_uuid: string;
+	market_id: number;
+	action: 'void' | 'resettle';
+	reason: string;
+};
+
+export type AdminBettingMarket = {
+	id: number;
+	round_id: string;
+	round_title: string;
+	market_type: string;
+	title: string;
+	status: string;
+	locks_at: string;
+	settled_at: string | null;
+	result_summary: string;
+	settlement_version: number;
+	ticket_count: number;
+	exposure: number;
+	accepted_tickets: number;
+	won_tickets: number;
+	lost_tickets: number;
+	voided_tickets: number;
+};
+
+type AdminBettingMarketsResponse = {
+	markets: AdminBettingMarket[];
+};
+
 type AdminScorecardUploadInput = {
 	guildId: string;
 	userId: string;
@@ -80,8 +117,10 @@ const ADMIN_BACKFILL_REQUESTED_SUBJECT = 'round.admin.backfill.requested.v1';
 
 class AdminService {
 	loading = $state(false);
+	bettingMarketsLoading = $state(false);
 	successMessage = $state<string | null>(null);
 	errorMessage = $state<string | null>(null);
+	bettingMarkets = $state<AdminBettingMarket[]>([]);
 
 	private clearTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -244,6 +283,146 @@ class AdminService {
 				}
 			}, OPERATION_TIMEOUT_MS);
 		});
+	}
+
+	async adjustBettingWallet(
+		clubUuid: string,
+		memberId: string,
+		amount: number,
+		reason: string
+	): Promise<void> {
+		this.loading = true;
+		this.successMessage = null;
+		this.errorMessage = null;
+
+		const payload: BettingWalletAdjustPayload = {
+			club_uuid: clubUuid,
+			member_id: memberId,
+			amount,
+			reason
+		};
+
+		try {
+			const res = await fetch('/api/betting/admin/wallet-adjustments', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(payload)
+			});
+
+			const data = (await res.json().catch(() => null)) as {
+				amount?: number;
+				reason?: string;
+				error?: string;
+			} | null;
+
+			if (!res.ok) {
+				this.errorMessage = data?.error ?? 'Betting wallet adjustment failed';
+				this.scheduleMessageClear();
+				return;
+			}
+
+			const sign = amount > 0 ? '+' : '';
+			this.successMessage = `Betting wallet adjusted: ${sign}${amount} (${data?.reason ?? reason})`;
+			this.scheduleMessageClear();
+		} catch {
+			this.errorMessage = 'Betting wallet adjustment failed';
+			this.scheduleMessageClear();
+		} finally {
+			this.loading = false;
+		}
+	}
+
+	async loadBettingMarkets(clubUuid: string): Promise<void> {
+		if (!clubUuid) {
+			this.bettingMarkets = [];
+			return;
+		}
+
+		this.bettingMarketsLoading = true;
+		this.errorMessage = null;
+
+		try {
+			const res = await fetch(
+				`/api/betting/admin/markets?club_uuid=${encodeURIComponent(clubUuid)}`,
+				{
+					headers: {
+						Accept: 'application/json'
+					}
+				}
+			);
+
+			const data = (await res.json().catch(() => null)) as
+				| (AdminBettingMarketsResponse & { error?: string })
+				| null;
+
+			if (!res.ok) {
+				this.errorMessage = data?.error ?? 'Failed to load betting markets';
+				this.scheduleMessageClear();
+				return;
+			}
+
+			this.bettingMarkets = data?.markets ?? [];
+		} catch {
+			this.errorMessage = 'Failed to load betting markets';
+			this.scheduleMessageClear();
+		} finally {
+			this.bettingMarketsLoading = false;
+		}
+	}
+
+	async applyBettingMarketAction(
+		clubUuid: string,
+		marketId: number,
+		action: 'void' | 'resettle',
+		reason: string
+	): Promise<boolean> {
+		this.loading = true;
+		this.successMessage = null;
+		this.errorMessage = null;
+
+		const payload: BettingMarketActionPayload = {
+			club_uuid: clubUuid,
+			market_id: marketId,
+			action,
+			reason
+		};
+
+		try {
+			const res = await fetch('/api/betting/admin/market-actions', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(payload)
+			});
+
+			const data = (await res.json().catch(() => null)) as {
+				result_summary?: string;
+				error?: string;
+			} | null;
+
+			if (!res.ok) {
+				this.errorMessage = data?.error ?? 'Betting market action failed';
+				this.scheduleMessageClear();
+				return false;
+			}
+
+			this.successMessage =
+				action === 'void'
+					? `Market voided. ${data?.result_summary ?? ''}`.trim()
+					: `Market resettled. ${data?.result_summary ?? ''}`.trim();
+			this.scheduleMessageClear();
+			await this.loadBettingMarkets(clubUuid);
+			return true;
+		} catch {
+			this.errorMessage = 'Betting market action failed';
+			this.scheduleMessageClear();
+			return false;
+		} finally {
+			this.loading = false;
+		}
 	}
 
 	private toBase64(data: Uint8Array): string {
