@@ -247,6 +247,9 @@
 		<main id="main-content" class="min-h-screen bg-[var(--guild-background)]">
 			{@render children?.()}
 		</main>
+	{:else if page.url.pathname.startsWith('/activity')}
+		<!-- Discord Activity — uses its own SDK auth (token exchange), not cookie auth -->
+		{@render children?.()}
 	{:else if page.url.pathname === '/privacy' || page.url.pathname === '/tos'}
 		<!-- Public legal pages — no auth required -->
 		<main id="main-content" class="min-h-screen bg-[var(--guild-background)]">

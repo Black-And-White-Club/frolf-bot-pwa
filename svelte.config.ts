@@ -25,7 +25,10 @@ const config = {
 			'$tests/*': 'tests/*'
 		},
 		csp: {
-			mode: 'nonce',
+			// 'auto' uses hash for prerendered pages and nonce for SSR pages,
+			// allowing the activity route to be prerendered while keeping
+			// nonce-based CSP for all other server-rendered routes.
+			mode: 'auto',
 			directives: {
 				'default-src': ["'self'"],
 				'script-src': ["'self'"],
@@ -42,7 +45,12 @@ const config = {
 				'manifest-src': ["'self'"],
 				'object-src': ["'none'"],
 				'base-uri': ["'self'"],
-				'frame-ancestors': ["'none'"]
+				'frame-ancestors': [
+					"'none'",
+					'https://discord.com',
+					'https://*.discord.com',
+					'https://*.discordsays.com'
+				]
 			}
 		}
 	},

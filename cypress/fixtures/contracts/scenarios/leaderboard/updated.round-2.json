@@ -7,7 +7,7 @@
 			"payload_overrides": {
 				"guild_id": "guild-123",
 				"leaderboard_id": 1,
-				"round_id": [2]
+				"round_id": "round-2"
 			}
 		}
 	]
