@@ -58,6 +58,13 @@ class NatsService {
 			return;
 		}
 
+		// If called while the library is mid-reconnect, close the existing
+		// connection first so we don't leak the old connection's status loop.
+		if (this.status === 'reconnecting' && this.connection) {
+			await this.connection.close();
+			this.connection = null;
+		}
+
 		const bridge = this.getCypressBridge();
 		if (bridge) {
 			this.cypressBridge = bridge;
@@ -74,6 +81,10 @@ class NatsService {
 			this.codec = this.natsLib.StringCodec();
 		}
 
+		await this.connectToNatsServer(token);
+	}
+
+	private async connectToNatsServer(token: string): Promise<void> {
 		const tracer = getTracer();
 		const span = tracer.startSpan('nats.connect', {
 			attributes: { 'messaging.system': 'nats' }
@@ -84,7 +95,7 @@ class NatsService {
 		log('Connecting to NATS with token length:', token?.length);
 
 		try {
-			this.connection = await this.natsLib.connect({
+			this.connection = await this.natsLib!.connect({
 				servers: config.nats.url,
 				user: 'frolf-pwa-user', // Dummy user required for NATS to include the password in Auth Callout
 				pass: token,
@@ -99,24 +110,7 @@ class NatsService {
 			log('Connected to NATS:', config.nats.url);
 			span.end();
 
-			// Monitor connection status
-			(async () => {
-				for await (const status of this.connection!.status()) {
-					switch (status.type) {
-						case 'disconnect':
-							this.status = 'reconnecting';
-							break;
-						case 'reconnect':
-							this.status = 'connected';
-							this.reconnectAttempts = 0;
-							void this.emitReconnect();
-							break;
-						case 'error':
-							this.lastError = status.data?.toString() ?? 'Unknown error';
-							break;
-					}
-				}
-			})();
+			this.monitorConnectionStatus();
 		} catch (err) {
 			this.status = 'error';
 			this.lastError = err instanceof Error ? err.message : 'Connection failed';
@@ -131,6 +125,26 @@ class NatsService {
 			return null;
 		}
 		return (window as CypressWindowBridge).__FROLF_CYPRESS_NATS__ ?? null;
+	}
+
+	private monitorConnectionStatus(): void {
+		(async () => {
+			for await (const status of this.connection!.status()) {
+				switch (status.type) {
+					case 'disconnect':
+						this.status = 'reconnecting';
+						break;
+					case 'reconnect':
+						this.status = 'connected';
+						this.reconnectAttempts = 0;
+						void this.emitReconnect();
+						break;
+					case 'error':
+						this.lastError = status.data?.toString() ?? 'Unknown error';
+						break;
+				}
+			}
+		})();
 	}
 
 	/**

@@ -168,11 +168,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					selection_key: {
 						type: 'string'
@@ -237,11 +234,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['club_uuid', 'guild_id', 'market_id', 'market_type', 'round_id'],
@@ -288,11 +282,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'integer'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['club_uuid', 'guild_id', 'market_id', 'round_id'],
@@ -342,11 +333,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					settlement_version: {
 						type: 'integer'
@@ -360,6 +348,54 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 					'round_id',
 					'settlement_version'
 				],
+				type: 'object'
+			}
+		},
+		{
+			subject: 'betting.market.suspended.v1',
+			subject_pattern: 'betting.market.suspended.v1.{scope_id}',
+			supports_scoped_suffix: true,
+			summary: 'Betting Market Suspended',
+			description:
+				'Open markets for a club were suspended due to a betting entitlement loss (freeze or disable). Accepted bets are unaffected.',
+			producer: {
+				service: 'frolf-bot-backend',
+				module: 'betting'
+			},
+			producers: [
+				{
+					service: 'frolf-bot-backend',
+					module: 'betting'
+				}
+			],
+			consumers: [
+				{
+					service: 'pwa',
+					module: 'betting'
+				}
+			],
+			payload_type: '*bettingevents.BettingMarketSuspendedPayloadV1',
+			payload_schema: {
+				additionalProperties: false,
+				properties: {
+					club_uuid: {
+						type: 'string'
+					},
+					guild_id: {
+						type: 'string'
+					},
+					market_id: {
+						type: 'integer'
+					},
+					reason: {
+						type: 'string'
+					},
+					round_id: {
+						format: 'uuid',
+						type: 'string'
+					}
+				},
+				required: ['club_uuid', 'guild_id', 'market_id', 'round_id'],
 				type: 'object'
 			}
 		},
@@ -402,11 +438,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['club_uuid', 'guild_id', 'market_id', 'reason', 'round_id'],
@@ -511,11 +544,17 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 										member_id: {
 											type: 'string'
 										},
+										metadata: {
+											type: 'string'
+										},
 										option_key: {
 											type: 'string'
 										},
 										probability_percent: {
 											type: 'integer'
+										},
+										self_bet_restricted: {
+											type: 'boolean'
 										}
 									},
 									required: [
@@ -544,6 +583,74 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						},
 						required: ['ephemeral', 'id', 'locks_at', 'status', 'title', 'type'],
 						type: 'object'
+					},
+					markets: {
+						items: {
+							additionalProperties: false,
+							properties: {
+								ephemeral: {
+									type: 'boolean'
+								},
+								id: {
+									type: 'integer'
+								},
+								locks_at: {
+									type: 'string'
+								},
+								options: {
+									items: {
+										additionalProperties: false,
+										properties: {
+											decimal_odds: {
+												type: 'number'
+											},
+											label: {
+												type: 'string'
+											},
+											member_id: {
+												type: 'string'
+											},
+											metadata: {
+												type: 'string'
+											},
+											option_key: {
+												type: 'string'
+											},
+											probability_percent: {
+												type: 'integer'
+											},
+											self_bet_restricted: {
+												type: 'boolean'
+											}
+										},
+										required: [
+											'decimal_odds',
+											'label',
+											'member_id',
+											'option_key',
+											'probability_percent'
+										],
+										type: 'object'
+									},
+									type: 'array'
+								},
+								result: {
+									type: 'string'
+								},
+								status: {
+									type: 'string'
+								},
+								title: {
+									type: 'string'
+								},
+								type: {
+									type: 'string'
+								}
+							},
+							required: ['ephemeral', 'id', 'locks_at', 'status', 'title', 'type'],
+							type: 'object'
+						},
+						type: 'array'
 					},
 					round: {
 						additionalProperties: false,
@@ -3360,11 +3467,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'array'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['execute_at', 'original_subject', 'round_id'],
@@ -4098,11 +4202,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					title: {
 						type: 'string'
@@ -4188,11 +4289,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -4238,11 +4336,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['channel_id', 'guild_id', 'message_id', 'round_id'],
@@ -4285,11 +4380,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['channel_id', 'guild_id', 'message_id', 'round_id'],
@@ -4399,11 +4491,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'boolean'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -4446,11 +4535,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					tag_number: {
 						type: 'integer'
@@ -4500,11 +4586,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					score: {
 						type: 'integer'
@@ -4553,11 +4636,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					round_title: {
 						type: 'string'
@@ -4609,11 +4689,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					score: {
 						type: 'integer'
@@ -4668,11 +4745,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					start_time: {
 						type: 'string'
@@ -4733,11 +4807,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					start_time: {
 						additionalProperties: false,
@@ -4797,11 +4868,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					start_time: {
 						additionalProperties: false,
@@ -4892,11 +4960,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					updates: {
 						items: {
@@ -4912,11 +4977,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 									type: 'string'
 								},
 								round_id: {
-									items: {
-										minimum: 0,
-										type: 'integer'
-									},
-									type: 'array'
+									format: 'uuid',
+									type: 'string'
 								},
 								score: {
 									type: 'integer'
@@ -4980,11 +5042,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					total_requested: {
 						type: 'integer'
@@ -5047,11 +5106,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -5097,11 +5153,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					score: {
 						type: 'integer'
@@ -5153,11 +5206,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					score: {
 						type: 'integer'
@@ -7477,11 +7527,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					source: {
 						type: 'string'
@@ -8074,11 +8121,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 									type: 'string'
 								},
 								round_id: {
-									items: {
-										minimum: 0,
-										type: 'integer'
-									},
-									type: 'array'
+									format: 'uuid',
+									type: 'string'
 								},
 								season_id: {
 									type: 'string'
@@ -8181,11 +8225,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'object'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['guild_id', 'round_id'],
@@ -8222,11 +8263,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['guild_id', 'round_id'],
@@ -8263,11 +8301,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					sorted_participant_tags: {
 						items: {
@@ -8310,11 +8345,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -8747,11 +8779,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 				additionalProperties: false,
 				properties: {
 					assignment_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					guild_id: {
 						type: 'string'
@@ -8893,11 +8922,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'integer'
 					},
 					update_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					update_type: {
 						type: 'string'
@@ -9029,11 +9055,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -9121,11 +9144,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					tag_number: {
 						type: 'integer'
@@ -9831,11 +9851,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -10159,11 +10176,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['guild_id', 'reason', 'round_id'],
@@ -10216,11 +10230,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'array'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					sorted_participant_tags: {
 						items: {
@@ -10320,11 +10331,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'integer'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['guild_id', 'leaderboard_id', 'round_id'],
@@ -10476,11 +10484,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							import_channel_id: {
 								type: 'string'
@@ -10634,11 +10639,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'object'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					round_mode: {
 						type: 'string'
@@ -10839,11 +10841,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							import_channel_id: {
 								type: 'string'
@@ -10997,11 +10996,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'object'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					round_mode: {
 						type: 'string'
@@ -11145,11 +11141,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							import_channel_id: {
 								type: 'string'
@@ -11303,11 +11296,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'object'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['guild_id', 'round_data', 'round_id'],
@@ -11354,11 +11344,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							round_id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							start_time: {
 								additionalProperties: false,
@@ -11580,11 +11567,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 										type: 'string'
 									},
 									round_id: {
-										items: {
-											minimum: 0,
-											type: 'integer'
-										},
-										type: 'array'
+										format: 'uuid',
+										type: 'string'
 									},
 									start_time: {
 										additionalProperties: false,
@@ -11647,11 +11631,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['guild_id', 'round_id'],
@@ -11694,11 +11675,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							round_id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							}
 						},
 						required: ['guild_id', 'requesting_user_user_id', 'round_id'],
@@ -11746,11 +11724,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['guild_id', 'requesting_user_user_id', 'round_id'],
@@ -11793,11 +11768,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['guild_id', 'reason', 'requesting_user_user_id', 'round_id'],
@@ -11837,11 +11809,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							round_id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							}
 						},
 						required: ['guild_id', 'requesting_user_user_id', 'round_id'],
@@ -11895,11 +11864,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['discord_message_id', 'guild_id', 'round_id'],
@@ -12267,11 +12233,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							import_channel_id: {
 								type: 'string'
@@ -12493,11 +12456,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							import_channel_id: {
 								type: 'string'
@@ -12688,11 +12648,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['error', 'guild_id', 'round_id'],
@@ -12735,11 +12692,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'boolean'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['guild_id', 'round_id'],
@@ -12782,11 +12736,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							round_id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							start_time: {
 								additionalProperties: false,
@@ -12961,11 +12912,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							import_channel_id: {
 								type: 'string'
@@ -13134,11 +13082,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							round_id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							start_time: {
 								additionalProperties: false,
@@ -13187,11 +13132,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['error', 'guild_id', 'round_id'],
@@ -13225,11 +13167,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['error', 'guild_id', 'round_id'],
@@ -13266,11 +13205,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['guild_id', 'round_id'],
@@ -13366,11 +13302,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'array'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					start_time: {
 						additionalProperties: false,
@@ -13525,11 +13458,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							import_channel_id: {
 								type: 'string'
@@ -13683,11 +13613,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'object'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['guild_id', 'round_data', 'round_id'],
@@ -13727,11 +13654,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -13817,11 +13741,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'integer'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					round_mode: {
 						type: 'string'
@@ -13945,11 +13866,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -14012,11 +13930,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					timestamp: {
 						format: 'date-time',
@@ -14079,11 +13994,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -14136,11 +14048,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					tag_number: {
 						type: 'integer'
@@ -14192,11 +14101,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -14233,11 +14139,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['error', 'guild_id', 'round_id'],
@@ -14277,11 +14180,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['discord_event_id', 'guild_id', 'round_id'],
@@ -14364,11 +14264,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['discord_event_id', 'found', 'guild_id', 'message_id', 'round_id'],
@@ -14405,11 +14302,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['discord_event_id', 'error', 'guild_id', 'round_id'],
@@ -14443,11 +14337,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['discord_event_id', 'guild_id', 'round_id'],
@@ -14487,11 +14378,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					timestamp: {
 						format: 'date-time',
@@ -14574,11 +14462,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -14664,11 +14549,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							round_id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							tag_number: {
 								type: 'integer'
@@ -14759,11 +14641,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					tag_number: {
 						type: 'integer'
@@ -14852,11 +14731,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							round_id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							tag_number: {
 								type: 'integer'
@@ -14900,11 +14776,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -15076,11 +14949,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'boolean'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					tentative_participants: {
 						items: {
@@ -15158,11 +15028,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -15206,11 +15073,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -15379,11 +15243,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					tentative_participants: {
 						items: {
@@ -15559,11 +15420,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'array'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					score: {
 						type: 'integer'
@@ -15603,11 +15461,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -15644,11 +15499,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -15688,11 +15540,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					status: {
 						type: 'string'
@@ -15735,11 +15584,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -15782,11 +15628,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -15871,11 +15714,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							import_channel_id: {
 								type: 'string'
@@ -16029,11 +15869,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'object'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['guild_id', 'metadata', 'round', 'round_id'],
@@ -16129,11 +15966,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'object'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					start_time: {
 						additionalProperties: false,
@@ -16217,11 +16051,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['error', 'guild_id', 'round_id'],
@@ -16267,11 +16098,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					round_title: {
 						type: 'string'
@@ -16344,11 +16172,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					round_title: {
 						type: 'string'
@@ -16403,11 +16228,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['error', 'guild_id', 'round_id'],
@@ -16475,11 +16297,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							import_channel_id: {
 								type: 'string'
@@ -16671,11 +16490,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 					},
 					round_ids: {
 						items: {
-							items: {
-								minimum: 0,
-								type: 'integer'
-							},
-							type: 'array'
+							format: 'uuid',
+							type: 'string'
 						},
 						type: 'array'
 					}
@@ -16711,11 +16527,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['error', 'guild_id', 'round_id'],
@@ -16749,11 +16562,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					start_time: {
 						additionalProperties: false,
@@ -16839,11 +16649,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 									type: 'integer'
 								},
 								round_id: {
-									items: {
-										minimum: 0,
-										type: 'integer'
-									},
-									type: 'array'
+									format: 'uuid',
+									type: 'string'
 								},
 								start_time: {
 									additionalProperties: false,
@@ -16955,11 +16762,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							round_id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							start_time: {
 								additionalProperties: false,
@@ -17065,11 +16869,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					updates: {
 						items: {
@@ -17085,11 +16886,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 									type: 'string'
 								},
 								round_id: {
-									items: {
-										minimum: 0,
-										type: 'integer'
-									},
-									type: 'array'
+									format: 'uuid',
+									type: 'string'
 								},
 								score: {
 									type: 'integer'
@@ -17153,11 +16951,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							round_id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							score: {
 								type: 'integer'
@@ -17214,11 +17009,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					score: {
 						type: 'integer'
@@ -17273,11 +17065,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							round_id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							score: {
 								type: 'integer'
@@ -17355,11 +17144,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'boolean'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					source: {
 						type: 'string'
@@ -17479,11 +17265,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'array'
 							},
 							round_id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							teams: {
 								items: {
@@ -17535,11 +17318,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'boolean'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					source: {
 						type: 'string'
@@ -17601,11 +17381,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					timestamp: {
 						format: 'date-time',
@@ -17683,11 +17460,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'boolean'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					source: {
 						type: 'string'
@@ -17816,11 +17590,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'array'
 							},
 							round_id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							start_time: {
 								format: 'date-time',
@@ -17831,11 +17602,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'object'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					source: {
 						type: 'string'
@@ -17955,11 +17723,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'array'
 							},
 							round_id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							start_time: {
 								format: 'date-time',
@@ -17970,11 +17735,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'object'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					source: {
 						type: 'string'
@@ -18094,11 +17856,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'array'
 							},
 							round_id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							start_time: {
 								format: 'date-time',
@@ -18109,11 +17868,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'object'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					source: {
 						type: 'string'
@@ -18199,11 +17955,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'boolean'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					source: {
 						type: 'string'
@@ -18273,11 +18026,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					timestamp: {
 						format: 'date-time',
@@ -18383,11 +18133,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'array'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['channel_id', 'discord_message_id', 'guild_id', 'round_id'],
@@ -18474,11 +18221,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'array'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					scores: {
 						items: {
@@ -18566,11 +18310,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					timestamp: {
 						format: 'date-time',
@@ -18622,11 +18363,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					scores: {
 						items: {
@@ -18735,11 +18473,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'array'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					score: {
 						type: 'integer'
@@ -18846,11 +18581,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['error', 'guild_id', 'round_id'],
@@ -18885,11 +18617,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['guild_id', 'round_id'],
@@ -19000,11 +18729,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'array'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					start_time: {
 						additionalProperties: false,
@@ -19089,11 +18815,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					start_time: {
 						additionalProperties: false,
@@ -19138,11 +18861,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					state: {
 						type: 'string'
@@ -19253,11 +18973,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							import_channel_id: {
 								type: 'string'
@@ -19455,11 +19172,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -19518,11 +19232,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					tag_number: {
 						type: 'integer'
@@ -19584,11 +19295,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					tag_number: {
 						type: 'integer'
@@ -19640,11 +19348,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -19779,11 +19484,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'array'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					team: {
 						additionalProperties: false,
@@ -19887,11 +19589,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							import_channel_id: {
 								type: 'string'
@@ -20054,11 +19753,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							round_id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							}
 						},
 						required: ['guild_id', 'requesting_user_user_id', 'round_id'],
@@ -20154,11 +19850,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							round_id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							start_time: {
 								additionalProperties: false,
@@ -20226,11 +19919,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					start_time: {
 						type: 'string'
@@ -20282,11 +19972,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					start_time: {
 						additionalProperties: false,
@@ -20331,11 +20018,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['guild_id', 'round_id'],
@@ -20381,11 +20065,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 								type: 'string'
 							},
 							round_id: {
-								items: {
-									minimum: 0,
-									type: 'integer'
-								},
-								type: 'array'
+								format: 'uuid',
+								type: 'string'
 							},
 							start_time: {
 								additionalProperties: false,
@@ -20441,11 +20122,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['guild_id', 'round_id'],
@@ -20485,11 +20163,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -20529,11 +20204,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -20579,11 +20251,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'boolean'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -20745,11 +20414,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					updates: {
 						items: {
@@ -20759,11 +20425,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 									type: 'string'
 								},
 								round_id: {
-									items: {
-										minimum: 0,
-										type: 'integer'
-									},
-									type: 'array'
+									format: 'uuid',
+									type: 'string'
 								},
 								score: {
 									type: 'integer'
@@ -20815,11 +20478,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					total_requested: {
 						type: 'integer'
@@ -20862,11 +20522,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['error', 'guild_id', 'round_id'],
@@ -20906,11 +20563,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					}
 				},
 				required: ['guild_id', 'reason', 'round_id'],
@@ -20994,11 +20648,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'array'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					round_mode: {
 						type: 'string'
@@ -21076,11 +20727,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					tag_mappings: {
 						items: {
@@ -21136,11 +20784,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					user_id: {
 						type: 'string'
@@ -21180,11 +20825,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					score: {
 						type: 'integer'
@@ -21234,11 +20876,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					score: {
 						type: 'integer'
@@ -22455,11 +22094,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 						type: 'string'
 					},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					timestamp: {
 						format: 'date-time',
@@ -22532,11 +22168,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
 					},
 					parsed_scores: {},
 					round_id: {
-						items: {
-							minimum: 0,
-							type: 'integer'
-						},
-						type: 'array'
+						format: 'uuid',
+						type: 'string'
 					},
 					timestamp: {
 						format: 'date-time',

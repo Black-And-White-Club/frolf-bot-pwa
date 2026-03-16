@@ -136,11 +136,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"selection_key": {
 						"type": "string"
@@ -205,11 +202,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["club_uuid", "guild_id", "market_id", "market_type", "round_id"],
@@ -256,11 +250,8 @@
 						"type": "integer"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["club_uuid", "guild_id", "market_id", "round_id"],
@@ -310,11 +301,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"settlement_version": {
 						"type": "integer"
@@ -328,6 +316,53 @@
 					"round_id",
 					"settlement_version"
 				],
+				"type": "object"
+			}
+		},
+		{
+			"subject": "betting.market.suspended.v1",
+			"subject_pattern": "betting.market.suspended.v1.{scope_id}",
+			"supports_scoped_suffix": true,
+			"summary": "Betting Market Suspended",
+			"description": "Open markets for a club were suspended due to a betting entitlement loss (freeze or disable). Accepted bets are unaffected.",
+			"producer": {
+				"service": "frolf-bot-backend",
+				"module": "betting"
+			},
+			"producers": [
+				{
+					"service": "frolf-bot-backend",
+					"module": "betting"
+				}
+			],
+			"consumers": [
+				{
+					"service": "pwa",
+					"module": "betting"
+				}
+			],
+			"payload_type": "*bettingevents.BettingMarketSuspendedPayloadV1",
+			"payload_schema": {
+				"additionalProperties": false,
+				"properties": {
+					"club_uuid": {
+						"type": "string"
+					},
+					"guild_id": {
+						"type": "string"
+					},
+					"market_id": {
+						"type": "integer"
+					},
+					"reason": {
+						"type": "string"
+					},
+					"round_id": {
+						"format": "uuid",
+						"type": "string"
+					}
+				},
+				"required": ["club_uuid", "guild_id", "market_id", "round_id"],
 				"type": "object"
 			}
 		},
@@ -370,11 +405,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["club_uuid", "guild_id", "market_id", "reason", "round_id"],
@@ -478,11 +510,17 @@
 										"member_id": {
 											"type": "string"
 										},
+										"metadata": {
+											"type": "string"
+										},
 										"option_key": {
 											"type": "string"
 										},
 										"probability_percent": {
 											"type": "integer"
+										},
+										"self_bet_restricted": {
+											"type": "boolean"
 										}
 									},
 									"required": [
@@ -511,6 +549,74 @@
 						},
 						"required": ["ephemeral", "id", "locks_at", "status", "title", "type"],
 						"type": "object"
+					},
+					"markets": {
+						"items": {
+							"additionalProperties": false,
+							"properties": {
+								"ephemeral": {
+									"type": "boolean"
+								},
+								"id": {
+									"type": "integer"
+								},
+								"locks_at": {
+									"type": "string"
+								},
+								"options": {
+									"items": {
+										"additionalProperties": false,
+										"properties": {
+											"decimal_odds": {
+												"type": "number"
+											},
+											"label": {
+												"type": "string"
+											},
+											"member_id": {
+												"type": "string"
+											},
+											"metadata": {
+												"type": "string"
+											},
+											"option_key": {
+												"type": "string"
+											},
+											"probability_percent": {
+												"type": "integer"
+											},
+											"self_bet_restricted": {
+												"type": "boolean"
+											}
+										},
+										"required": [
+											"decimal_odds",
+											"label",
+											"member_id",
+											"option_key",
+											"probability_percent"
+										],
+										"type": "object"
+									},
+									"type": "array"
+								},
+								"result": {
+									"type": "string"
+								},
+								"status": {
+									"type": "string"
+								},
+								"title": {
+									"type": "string"
+								},
+								"type": {
+									"type": "string"
+								}
+							},
+							"required": ["ephemeral", "id", "locks_at", "status", "title", "type"],
+							"type": "object"
+						},
+						"type": "array"
 					},
 					"round": {
 						"additionalProperties": false,
@@ -3327,11 +3433,8 @@
 						"type": "array"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["execute_at", "original_subject", "round_id"],
@@ -4072,11 +4175,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"title": {
 						"type": "string"
@@ -4162,11 +4262,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -4212,11 +4309,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["channel_id", "guild_id", "message_id", "round_id"],
@@ -4259,11 +4353,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["channel_id", "guild_id", "message_id", "round_id"],
@@ -4373,11 +4464,8 @@
 						"type": "boolean"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -4420,11 +4508,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"tag_number": {
 						"type": "integer"
@@ -4473,11 +4558,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"score": {
 						"type": "integer"
@@ -4526,11 +4608,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"round_title": {
 						"type": "string"
@@ -4582,11 +4661,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"score": {
 						"type": "integer"
@@ -4641,11 +4717,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"start_time": {
 						"type": "string"
@@ -4706,11 +4779,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"start_time": {
 						"additionalProperties": false,
@@ -4770,11 +4840,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"start_time": {
 						"additionalProperties": false,
@@ -4865,11 +4932,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"updates": {
 						"items": {
@@ -4885,11 +4949,8 @@
 									"type": "string"
 								},
 								"round_id": {
-									"items": {
-										"minimum": 0,
-										"type": "integer"
-									},
-									"type": "array"
+									"format": "uuid",
+									"type": "string"
 								},
 								"score": {
 									"type": "integer"
@@ -4953,11 +5014,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"total_requested": {
 						"type": "integer"
@@ -5020,11 +5078,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -5070,11 +5125,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"score": {
 						"type": "integer"
@@ -5126,11 +5178,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"score": {
 						"type": "integer"
@@ -7450,11 +7499,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"source": {
 						"type": "string"
@@ -8047,11 +8093,8 @@
 									"type": "string"
 								},
 								"round_id": {
-									"items": {
-										"minimum": 0,
-										"type": "integer"
-									},
-									"type": "array"
+									"format": "uuid",
+									"type": "string"
 								},
 								"season_id": {
 									"type": "string"
@@ -8154,11 +8197,8 @@
 						"type": "object"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["guild_id", "round_id"],
@@ -8195,11 +8235,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["guild_id", "round_id"],
@@ -8236,11 +8273,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"sorted_participant_tags": {
 						"items": {
@@ -8283,11 +8317,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -8720,11 +8751,8 @@
 				"additionalProperties": false,
 				"properties": {
 					"assignment_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"guild_id": {
 						"type": "string"
@@ -8866,11 +8894,8 @@
 						"type": "integer"
 					},
 					"update_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"update_type": {
 						"type": "string"
@@ -9002,11 +9027,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -9094,11 +9116,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"tag_number": {
 						"type": "integer"
@@ -9804,11 +9823,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -10132,11 +10148,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["guild_id", "reason", "round_id"],
@@ -10189,11 +10202,8 @@
 						"type": "array"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"sorted_participant_tags": {
 						"items": {
@@ -10293,11 +10303,8 @@
 						"type": "integer"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["guild_id", "leaderboard_id", "round_id"],
@@ -10449,11 +10456,8 @@
 								"type": "string"
 							},
 							"id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"import_channel_id": {
 								"type": "string"
@@ -10607,11 +10611,8 @@
 						"type": "object"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"round_mode": {
 						"type": "string"
@@ -10812,11 +10813,8 @@
 								"type": "string"
 							},
 							"id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"import_channel_id": {
 								"type": "string"
@@ -10970,11 +10968,8 @@
 						"type": "object"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"round_mode": {
 						"type": "string"
@@ -11118,11 +11113,8 @@
 								"type": "string"
 							},
 							"id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"import_channel_id": {
 								"type": "string"
@@ -11276,11 +11268,8 @@
 						"type": "object"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["guild_id", "round_data", "round_id"],
@@ -11327,11 +11316,8 @@
 								"type": "string"
 							},
 							"round_id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"start_time": {
 								"additionalProperties": false,
@@ -11553,11 +11539,8 @@
 										"type": "string"
 									},
 									"round_id": {
-										"items": {
-											"minimum": 0,
-											"type": "integer"
-										},
-										"type": "array"
+										"format": "uuid",
+										"type": "string"
 									},
 									"start_time": {
 										"additionalProperties": false,
@@ -11620,11 +11603,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["guild_id", "round_id"],
@@ -11667,11 +11647,8 @@
 								"type": "string"
 							},
 							"round_id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							}
 						},
 						"required": ["guild_id", "requesting_user_user_id", "round_id"],
@@ -11719,11 +11696,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["guild_id", "requesting_user_user_id", "round_id"],
@@ -11766,11 +11740,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["guild_id", "reason", "requesting_user_user_id", "round_id"],
@@ -11810,11 +11781,8 @@
 								"type": "string"
 							},
 							"round_id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							}
 						},
 						"required": ["guild_id", "requesting_user_user_id", "round_id"],
@@ -11868,11 +11836,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["discord_message_id", "guild_id", "round_id"],
@@ -12240,11 +12205,8 @@
 								"type": "string"
 							},
 							"id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"import_channel_id": {
 								"type": "string"
@@ -12466,11 +12428,8 @@
 								"type": "string"
 							},
 							"id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"import_channel_id": {
 								"type": "string"
@@ -12661,11 +12620,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["error", "guild_id", "round_id"],
@@ -12708,11 +12664,8 @@
 						"type": "boolean"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["guild_id", "round_id"],
@@ -12755,11 +12708,8 @@
 								"type": "string"
 							},
 							"round_id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"start_time": {
 								"additionalProperties": false,
@@ -12934,11 +12884,8 @@
 								"type": "string"
 							},
 							"id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"import_channel_id": {
 								"type": "string"
@@ -13107,11 +13054,8 @@
 								"type": "string"
 							},
 							"round_id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"start_time": {
 								"additionalProperties": false,
@@ -13160,11 +13104,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["error", "guild_id", "round_id"],
@@ -13198,11 +13139,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["error", "guild_id", "round_id"],
@@ -13239,11 +13177,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["guild_id", "round_id"],
@@ -13339,11 +13274,8 @@
 						"type": "array"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"start_time": {
 						"additionalProperties": false,
@@ -13498,11 +13430,8 @@
 								"type": "string"
 							},
 							"id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"import_channel_id": {
 								"type": "string"
@@ -13656,11 +13585,8 @@
 						"type": "object"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["guild_id", "round_data", "round_id"],
@@ -13700,11 +13626,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -13790,11 +13713,8 @@
 						"type": "integer"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"round_mode": {
 						"type": "string"
@@ -13918,11 +13838,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -13985,11 +13902,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"timestamp": {
 						"format": "date-time",
@@ -14052,11 +13966,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -14109,11 +14020,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"tag_number": {
 						"type": "integer"
@@ -14165,11 +14073,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -14206,11 +14111,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["error", "guild_id", "round_id"],
@@ -14250,11 +14152,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["discord_event_id", "guild_id", "round_id"],
@@ -14337,11 +14236,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["discord_event_id", "found", "guild_id", "message_id", "round_id"],
@@ -14378,11 +14274,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["discord_event_id", "error", "guild_id", "round_id"],
@@ -14416,11 +14309,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["discord_event_id", "guild_id", "round_id"],
@@ -14460,11 +14350,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"timestamp": {
 						"format": "date-time",
@@ -14547,11 +14434,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -14637,11 +14521,8 @@
 								"type": "string"
 							},
 							"round_id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"tag_number": {
 								"type": "integer"
@@ -14732,11 +14613,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"tag_number": {
 						"type": "integer"
@@ -14825,11 +14703,8 @@
 								"type": "string"
 							},
 							"round_id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"tag_number": {
 								"type": "integer"
@@ -14873,11 +14748,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -15049,11 +14921,8 @@
 						"type": "boolean"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"tentative_participants": {
 						"items": {
@@ -15131,11 +15000,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -15179,11 +15045,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -15352,11 +15215,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"tentative_participants": {
 						"items": {
@@ -15532,11 +15392,8 @@
 						"type": "array"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"score": {
 						"type": "integer"
@@ -15583,11 +15440,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -15624,11 +15478,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -15668,11 +15519,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"status": {
 						"type": "string"
@@ -15715,11 +15563,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -15762,11 +15607,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -15851,11 +15693,8 @@
 								"type": "string"
 							},
 							"id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"import_channel_id": {
 								"type": "string"
@@ -16009,11 +15848,8 @@
 						"type": "object"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["guild_id", "metadata", "round", "round_id"],
@@ -16109,11 +15945,8 @@
 						"type": "object"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"start_time": {
 						"additionalProperties": false,
@@ -16197,11 +16030,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["error", "guild_id", "round_id"],
@@ -16247,11 +16077,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"round_title": {
 						"type": "string"
@@ -16324,11 +16151,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"round_title": {
 						"type": "string"
@@ -16383,11 +16207,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["error", "guild_id", "round_id"],
@@ -16455,11 +16276,8 @@
 								"type": "string"
 							},
 							"id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"import_channel_id": {
 								"type": "string"
@@ -16651,11 +16469,8 @@
 					},
 					"round_ids": {
 						"items": {
-							"items": {
-								"minimum": 0,
-								"type": "integer"
-							},
-							"type": "array"
+							"format": "uuid",
+							"type": "string"
 						},
 						"type": "array"
 					}
@@ -16691,11 +16506,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["error", "guild_id", "round_id"],
@@ -16729,11 +16541,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"start_time": {
 						"additionalProperties": false,
@@ -16818,11 +16627,8 @@
 									"type": "integer"
 								},
 								"round_id": {
-									"items": {
-										"minimum": 0,
-										"type": "integer"
-									},
-									"type": "array"
+									"format": "uuid",
+									"type": "string"
 								},
 								"start_time": {
 									"additionalProperties": false,
@@ -16934,11 +16740,8 @@
 								"type": "string"
 							},
 							"round_id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"start_time": {
 								"additionalProperties": false,
@@ -17044,11 +16847,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"updates": {
 						"items": {
@@ -17064,11 +16864,8 @@
 									"type": "string"
 								},
 								"round_id": {
-									"items": {
-										"minimum": 0,
-										"type": "integer"
-									},
-									"type": "array"
+									"format": "uuid",
+									"type": "string"
 								},
 								"score": {
 									"type": "integer"
@@ -17132,11 +16929,8 @@
 								"type": "string"
 							},
 							"round_id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"score": {
 								"type": "integer"
@@ -17193,11 +16987,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"score": {
 						"type": "integer"
@@ -17252,11 +17043,8 @@
 								"type": "string"
 							},
 							"round_id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"score": {
 								"type": "integer"
@@ -17334,11 +17122,8 @@
 						"type": "boolean"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"source": {
 						"type": "string"
@@ -17458,11 +17243,8 @@
 								"type": "array"
 							},
 							"round_id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"teams": {
 								"items": {
@@ -17514,11 +17296,8 @@
 						"type": "boolean"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"source": {
 						"type": "string"
@@ -17580,11 +17359,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"timestamp": {
 						"format": "date-time",
@@ -17662,11 +17438,8 @@
 						"type": "boolean"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"source": {
 						"type": "string"
@@ -17795,11 +17568,8 @@
 								"type": "array"
 							},
 							"round_id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"start_time": {
 								"format": "date-time",
@@ -17810,11 +17580,8 @@
 						"type": "object"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"source": {
 						"type": "string"
@@ -17934,11 +17701,8 @@
 								"type": "array"
 							},
 							"round_id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"start_time": {
 								"format": "date-time",
@@ -17949,11 +17713,8 @@
 						"type": "object"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"source": {
 						"type": "string"
@@ -18073,11 +17834,8 @@
 								"type": "array"
 							},
 							"round_id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"start_time": {
 								"format": "date-time",
@@ -18088,11 +17846,8 @@
 						"type": "object"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"source": {
 						"type": "string"
@@ -18178,11 +17933,8 @@
 						"type": "boolean"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"source": {
 						"type": "string"
@@ -18252,11 +18004,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"timestamp": {
 						"format": "date-time",
@@ -18362,11 +18111,8 @@
 						"type": "array"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["channel_id", "discord_message_id", "guild_id", "round_id"],
@@ -18453,11 +18199,8 @@
 						"type": "array"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"scores": {
 						"items": {
@@ -18545,11 +18288,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"timestamp": {
 						"format": "date-time",
@@ -18601,11 +18341,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"scores": {
 						"items": {
@@ -18714,11 +18451,8 @@
 						"type": "array"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"score": {
 						"type": "integer"
@@ -18825,11 +18559,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["error", "guild_id", "round_id"],
@@ -18864,11 +18595,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["guild_id", "round_id"],
@@ -18979,11 +18707,8 @@
 						"type": "array"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"start_time": {
 						"additionalProperties": false,
@@ -19068,11 +18793,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"start_time": {
 						"additionalProperties": false,
@@ -19117,11 +18839,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"state": {
 						"type": "string"
@@ -19232,11 +18951,8 @@
 								"type": "string"
 							},
 							"id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"import_channel_id": {
 								"type": "string"
@@ -19434,11 +19150,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -19497,11 +19210,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"tag_number": {
 						"type": "integer"
@@ -19563,11 +19273,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"tag_number": {
 						"type": "integer"
@@ -19619,11 +19326,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -19757,11 +19461,8 @@
 						"type": "array"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"team": {
 						"additionalProperties": false,
@@ -19865,11 +19566,8 @@
 								"type": "string"
 							},
 							"id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"import_channel_id": {
 								"type": "string"
@@ -20032,11 +19730,8 @@
 								"type": "string"
 							},
 							"round_id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							}
 						},
 						"required": ["guild_id", "requesting_user_user_id", "round_id"],
@@ -20132,11 +19827,8 @@
 								"type": "string"
 							},
 							"round_id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"start_time": {
 								"additionalProperties": false,
@@ -20204,11 +19896,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"start_time": {
 						"type": "string"
@@ -20260,11 +19949,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"start_time": {
 						"additionalProperties": false,
@@ -20309,11 +19995,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["guild_id", "round_id"],
@@ -20359,11 +20042,8 @@
 								"type": "string"
 							},
 							"round_id": {
-								"items": {
-									"minimum": 0,
-									"type": "integer"
-								},
-								"type": "array"
+								"format": "uuid",
+								"type": "string"
 							},
 							"start_time": {
 								"additionalProperties": false,
@@ -20419,11 +20099,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["guild_id", "round_id"],
@@ -20463,11 +20140,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -20507,11 +20181,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -20557,11 +20228,8 @@
 						"type": "boolean"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -20723,11 +20391,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"updates": {
 						"items": {
@@ -20737,11 +20402,8 @@
 									"type": "string"
 								},
 								"round_id": {
-									"items": {
-										"minimum": 0,
-										"type": "integer"
-									},
-									"type": "array"
+									"format": "uuid",
+									"type": "string"
 								},
 								"score": {
 									"type": "integer"
@@ -20793,11 +20455,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"total_requested": {
 						"type": "integer"
@@ -20840,11 +20499,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["error", "guild_id", "round_id"],
@@ -20884,11 +20540,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					}
 				},
 				"required": ["guild_id", "reason", "round_id"],
@@ -20972,11 +20625,8 @@
 						"type": "array"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"round_mode": {
 						"type": "string"
@@ -21054,11 +20704,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"tag_mappings": {
 						"items": {
@@ -21114,11 +20761,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"user_id": {
 						"type": "string"
@@ -21158,11 +20802,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"score": {
 						"type": "integer"
@@ -21212,11 +20853,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"score": {
 						"type": "integer"
@@ -22433,11 +22071,8 @@
 						"type": "string"
 					},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"timestamp": {
 						"format": "date-time",
@@ -22510,11 +22145,8 @@
 					},
 					"parsed_scores": {},
 					"round_id": {
-						"items": {
-							"minimum": 0,
-							"type": "integer"
-						},
-						"type": "array"
+						"format": "uuid",
+						"type": "string"
 					},
 					"timestamp": {
 						"format": "date-time",
