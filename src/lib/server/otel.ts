@@ -83,8 +83,23 @@ export function initServerOtel(): void {
 			]);
 		};
 
+		// Emit a startup log so Loki registers this service immediately.
+		// Without this, frolf-pwa won't appear in Grafana's log drilldown
+		// until a 4xx/5xx error occurs.
+		logs.getLogger(SERVICE_NAME).emit({
+			severityNumber: SeverityNumber.INFO,
+			severityText: 'INFO',
+			body: 'frolf-pwa server started',
+			attributes: {
+				'service.version': SERVICE_VERSION,
+				'deployment.environment': environment
+			}
+		});
+
 		initialized = true;
 	} catch (err) {
+		// OTel init failure: can't log to OTel itself, so stderr is the only option.
+		// This will surface in kubectl logs / container stdout.
 		console.error('[OTel] Failed to initialize server OTel:', err);
 	}
 }

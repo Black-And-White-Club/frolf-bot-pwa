@@ -180,6 +180,12 @@ const otelHandle: Handle = async ({ event, resolve }) => {
 					[ATTR_HTTP_ROUTE]: route,
 					[ATTR_HTTP_RESPONSE_STATUS_CODE]: status
 				});
+			} else if (status >= 400) {
+				emitServerLog(SeverityNumber.WARN, `${method} ${route} → ${status}`, {
+					[ATTR_HTTP_REQUEST_METHOD]: method,
+					[ATTR_HTTP_ROUTE]: route,
+					[ATTR_HTTP_RESPONSE_STATUS_CODE]: status
+				});
 			}
 
 			_requestCount.add(1, {
