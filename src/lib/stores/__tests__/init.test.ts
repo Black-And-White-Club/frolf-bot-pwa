@@ -63,6 +63,14 @@ vi.mock('$lib/otel/tracing', () => ({
 	initTracing: vi.fn(async () => {})
 }));
 
+vi.mock('$lib/otel/metrics', () => ({
+	initMetrics: vi.fn(async () => {})
+}));
+
+vi.mock('$lib/otel/logging', () => ({
+	initLogs: vi.fn(async () => {})
+}));
+
 describe('appInit reconnect recovery', () => {
 	beforeEach(() => {
 		vi.resetModules();

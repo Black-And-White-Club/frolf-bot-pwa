@@ -64,8 +64,12 @@ class AppInitializer {
 			return;
 		}
 
-		const { initTracing } = await import('$lib/otel/tracing');
-		await initTracing();
+		const [{ initTracing }, { initMetrics }, { initLogs }] = await Promise.all([
+			import('$lib/otel/tracing'),
+			import('$lib/otel/metrics'),
+			import('$lib/otel/logging')
+		]);
+		await Promise.all([initTracing(), initMetrics(), initLogs()]);
 		const authResult = await this.authenticateAndLoadGuild(opts);
 		await this.completeAuthenticatedInitialization(authResult);
 	}

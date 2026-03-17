@@ -16,43 +16,45 @@ export function getTracer(name: string = 'frolf-pwa'): Tracer {
 }
 
 // Create a span for an operation
+// Uses startActiveSpan so the span is pushed onto the OTel context stack,
+// enabling trace-log correlation via trace.getActiveSpan().
 export function withSpan<T>(
 	name: string,
 	fn: () => T,
 	attributes?: Record<string, string | number | boolean>
 ): T {
-	const tracer = getTracer();
-	const span = tracer.startSpan(name, { attributes });
-
-	try {
-		const result = fn();
-		span.end();
-		return result;
-	} catch (err) {
-		span.recordException(err as Error);
-		span.end();
-		throw err;
-	}
+	return getTracer().startActiveSpan(name, { attributes }, (span) => {
+		try {
+			const result = fn();
+			span.end();
+			return result;
+		} catch (err) {
+			span.recordException(err as Error);
+			span.end();
+			throw err;
+		}
+	});
 }
 
 // Create async span
+// Uses startActiveSpan so the span is pushed onto the OTel context stack,
+// enabling trace-log correlation via trace.getActiveSpan().
 export async function withAsyncSpan<T>(
 	name: string,
 	fn: () => Promise<T>,
 	attributes?: Record<string, string | number | boolean>
 ): Promise<T> {
-	const tracer = getTracer();
-	const span = tracer.startSpan(name, { attributes });
-
-	try {
-		const result = await fn();
-		span.end();
-		return result;
-	} catch (err) {
-		span.recordException(err as Error);
-		span.end();
-		throw err;
-	}
+	return getTracer().startActiveSpan(name, { attributes }, async (span) => {
+		try {
+			const result = await fn();
+			span.end();
+			return result;
+		} catch (err) {
+			span.recordException(err as Error);
+			span.end();
+			throw err;
+		}
+	});
 }
 
 // Extract traceparent from headers
@@ -96,11 +98,14 @@ export async function initTracing(): Promise<void> {
 	if (initialized) return;
 
 	try {
-		const endpoint = env.PUBLIC_OTEL_ENDPOINT;
+		// PUBLIC_OTEL_ENDPOINT is now the base URL (e.g. https://frolf-bot.duckdns.org).
+		// Each signal exporter appends its own path (/v1/traces, /v1/metrics, /v1/logs).
+		const baseUrl = env.PUBLIC_OTEL_ENDPOINT;
 
 		// Strictly require an endpoint to be configured to enable tracing.
 		// This avoids loading OTel SDK/exporter code in sessions where tracing is disabled.
-		if (!endpoint) {
+		if (!baseUrl) {
+			initialized = true;
 			return;
 		}
 
@@ -119,12 +124,12 @@ export async function initTracing(): Promise<void> {
 
 		const resource = resourceFromAttributes({
 			'service.name': 'frolf-pwa',
-			'service.version': '0.4.0',
+			'service.version': __APP_VERSION__,
 			'deployment.environment': import.meta.env.MODE
 		});
 
 		const exporter = new OTLPTraceExporter({
-			url: endpoint || 'http://localhost:4318/v1/traces'
+			url: `${baseUrl}/v1/traces`
 		});
 
 		const provider = new WebTracerProvider({

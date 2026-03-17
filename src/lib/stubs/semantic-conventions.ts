@@ -15,3 +15,9 @@ export const ATTR_PROCESS_RUNTIME_DESCRIPTION = 'process.runtime.description';
 export const ATTR_EXCEPTION_MESSAGE = 'exception.message';
 export const ATTR_EXCEPTION_STACKTRACE = 'exception.stacktrace';
 export const ATTR_EXCEPTION_TYPE = 'exception.type';
+
+// HTTP semconv 1.21+ (replaces deprecated http.method, http.url, http.status_code)
+export const ATTR_HTTP_REQUEST_METHOD = 'http.request.method';
+export const ATTR_HTTP_ROUTE = 'http.route';
+export const ATTR_URL_PATH = 'url.path';
+export const ATTR_HTTP_RESPONSE_STATUS_CODE = 'http.response.status_code';

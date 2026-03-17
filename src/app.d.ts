@@ -43,6 +43,9 @@ declare module '*.svelte' {
 import type { AuthUser } from '$lib/stores/auth.svelte';
 
 declare global {
+	// Injected at build time by Vite define — resolves to the version in package.json.
+	const __APP_VERSION__: string;
+
 	namespace App {
 		// interface Error {}
 		interface Locals {

@@ -4,8 +4,31 @@ import { env } from '$env/dynamic/public';
 import { serverConfig } from '$lib/server/config';
 import { forwardSetCookieHeaders } from '$lib/server/http';
 import type { AuthUser, TokenClaims } from '$lib/stores/auth.svelte';
+import { initServerOtel, getServerTracer, getServerMeter, emitServerLog } from '$lib/server/otel';
+import { SeverityNumber } from '@opentelemetry/api-logs';
+import { SpanStatusCode } from '@opentelemetry/api';
+import {
+	ATTR_HTTP_REQUEST_METHOD,
+	ATTR_HTTP_ROUTE,
+	ATTR_URL_PATH,
+	ATTR_HTTP_RESPONSE_STATUS_CODE
+} from '@opentelemetry/semantic-conventions';
+
+// Initialize server-side OTel once at module load time.
+initServerOtel();
 
 const isDev = import.meta.env.DEV;
+
+// Instruments are created once at module scope to avoid per-request allocation leaks.
+const _tracer = getServerTracer();
+const _meter = getServerMeter();
+const _requestCount = _meter.createCounter('http.server.request.count', {
+	description: 'Total HTTP requests handled by the SvelteKit server'
+});
+const _requestDuration = _meter.createHistogram('http.server.request.duration', {
+	description: 'HTTP request duration in milliseconds',
+	unit: 'ms'
+});
 
 function toOrigin(value: string | undefined): string | null {
 	if (!value) return null;
@@ -131,4 +154,55 @@ const cspHandle: Handle = async ({ event, resolve }) => {
 	return response;
 };
 
-export const handle = sequence(authHandle, cspHandle);
+// Instrument every incoming HTTP request: span, duration metric, error logging.
+const otelHandle: Handle = async ({ event, resolve }) => {
+	const route = event.route.id ?? event.url.pathname;
+	const method = event.request.method;
+	const startMs = performance.now();
+
+	return _tracer.startActiveSpan(`${method} ${route}`, async (span) => {
+		span.setAttributes({
+			[ATTR_HTTP_REQUEST_METHOD]: method,
+			[ATTR_HTTP_ROUTE]: route,
+			[ATTR_URL_PATH]: event.url.pathname
+		});
+
+		try {
+			const response = await resolve(event);
+			const status = response.status;
+			const durationMs = performance.now() - startMs;
+
+			span.setAttribute(ATTR_HTTP_RESPONSE_STATUS_CODE, status);
+			if (status >= 500) {
+				span.setStatus({ code: SpanStatusCode.ERROR, message: `HTTP ${status}` });
+				emitServerLog(SeverityNumber.ERROR, `${method} ${route} → ${status}`, {
+					[ATTR_HTTP_REQUEST_METHOD]: method,
+					[ATTR_HTTP_ROUTE]: route,
+					[ATTR_HTTP_RESPONSE_STATUS_CODE]: status
+				});
+			}
+
+			_requestCount.add(1, {
+				[ATTR_HTTP_REQUEST_METHOD]: method,
+				[ATTR_HTTP_ROUTE]: route,
+				[ATTR_HTTP_RESPONSE_STATUS_CODE]: status
+			});
+			_requestDuration.record(durationMs, {
+				[ATTR_HTTP_REQUEST_METHOD]: method,
+				[ATTR_HTTP_ROUTE]: route,
+				[ATTR_HTTP_RESPONSE_STATUS_CODE]: status
+			});
+
+			span.end();
+
+			return response;
+		} catch (err) {
+			span.recordException(err as Error);
+			span.setStatus({ code: SpanStatusCode.ERROR });
+			span.end();
+			throw err;
+		}
+	});
+};
+
+export const handle = sequence(otelHandle, authHandle, cspHandle);

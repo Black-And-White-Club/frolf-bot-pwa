@@ -6,15 +6,20 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vitest/config';
 import { sveltekit } from '@sveltejs/kit/vite';
 import path from 'path';
+import { readFileSync } from 'fs';
+
+const pkg = JSON.parse(readFileSync('./package.json', 'utf8')) as { version: string };
 
 export default defineConfig({
+	define: {
+		__APP_VERSION__: JSON.stringify(pkg.version)
+	},
 	resolve: {
 		conditions: ['browser'],
 		alias: {
 			$lib: path.resolve('./src/lib'),
 			$tests: path.resolve('./tests'),
-			'$tests/*': path.resolve('./tests/*'),
-			'@opentelemetry/semantic-conventions': path.resolve('./src/lib/stubs/semantic-conventions.ts')
+			'$tests/*': path.resolve('./tests/*')
 		}
 	},
 
@@ -32,6 +37,18 @@ export default defineConfig({
 	},
 
 	plugins: [
+		// Redirect @opentelemetry/semantic-conventions to a lightweight stub in
+		// browser builds only — the real package is ~300KB and unused client-side.
+		// SSR/Node builds resolve the real package so hooks.server.ts stays accurate.
+		{
+			name: 'browser-stub-semantic-conventions',
+			enforce: 'pre',
+			resolveId(id, _importer, options) {
+				if (id === '@opentelemetry/semantic-conventions' && !options.ssr) {
+					return path.resolve('./src/lib/stubs/semantic-conventions.ts');
+				}
+			}
+		},
 		tailwindcss(),
 		sveltekit(),
 		devtoolsJson(),
