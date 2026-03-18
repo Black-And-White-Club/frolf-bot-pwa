@@ -93,4 +93,11 @@ describe('PointAdjuster', () => {
 			);
 		});
 	});
+
+	it('submit button has correct brand classes for light-mode visibility', () => {
+		const { getByRole } = render(PointAdjuster);
+		const btn = getByRole('button', { name: /adjust points/i });
+		expect(btn.className).toContain('bg-liquid-skobeloff');
+		expect(btn.className).toContain('text-white');
+	});
 });

@@ -56,4 +56,8 @@
 	.bg-guild-gold-gradient {
 		background: var(--guild-gold-gradient);
 	}
+
+	.bg-liquid-skobeloff {
+		background: var(--liquid-skobeloff);
+	}
 }
