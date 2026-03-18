@@ -102,30 +102,33 @@ const authHandle: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
+function buildConnectSrc(): string {
+	const origins = new Set<string>(["'self'", 'https://api.github.com']);
+	origins.add(toOrigin(env.PUBLIC_API_URL) || 'https://api.frolf-bot.com');
+	origins.add(toOrigin(env.PUBLIC_NATS_URL || env.PUBLIC_WS_URL) || 'wss://nats.frolf-bot.com');
+	if (env.PUBLIC_OTEL_ENDPOINT) {
+		const otelOrigin = toOrigin(env.PUBLIC_OTEL_ENDPOINT);
+		if (otelOrigin) origins.add(otelOrigin);
+	}
+	if (isDev) {
+		origins.add('http://localhost:5173');
+		origins.add('ws://localhost:5173');
+		origins.add('http://localhost:8080');
+		origins.add('ws://localhost:8080');
+	}
+	return `connect-src ${Array.from(origins).join(' ')}`;
+}
+
 // Minimal security headers suitable for this app.
 // CSP is partially handled in svelte.config.ts (nonces).
 // We dynamically append connect-src here.
 const cspHandle: Handle = async ({ event, resolve }) => {
 	const response = await resolve(event);
 
-	const connectSrc = new Set<string>(["'self'", 'https://api.github.com']);
-	connectSrc.add(toOrigin(env.PUBLIC_API_URL) || 'https://api.frolf-bot.com');
-	connectSrc.add(toOrigin(env.PUBLIC_NATS_URL || env.PUBLIC_WS_URL) || 'wss://nats.frolf-bot.com');
-	if (env.PUBLIC_OTEL_ENDPOINT) {
-		const otelOrigin = toOrigin(env.PUBLIC_OTEL_ENDPOINT);
-		if (otelOrigin) connectSrc.add(otelOrigin);
-	}
-
-	if (isDev) {
-		connectSrc.add('http://localhost:5173');
-		connectSrc.add('ws://localhost:5173');
-		connectSrc.add('http://localhost:8080');
-		connectSrc.add('ws://localhost:8080');
-	}
+	const connectSrcPolicy = buildConnectSrc();
 
 	// Retrieve CSP if SvelteKit already set it (from svelte.config.js)
 	let csp = response.headers.get('Content-Security-Policy') || '';
-	const connectSrcPolicy = `connect-src ${Array.from(connectSrc).join(' ')}`;
 
 	if (csp) {
 		// connect-src is intentionally omitted from svelte.config.ts — managed here dynamically.
@@ -139,13 +142,15 @@ const cspHandle: Handle = async ({ event, resolve }) => {
 			"default-src 'self'",
 			"object-src 'none'",
 			"base-uri 'self'",
-			"frame-ancestors 'none'",
+			"frame-ancestors 'none' https://discord.com https://*.discord.com https://*.discordsays.com",
 			connectSrcPolicy
 		].join('; ');
 	}
 
 	response.headers.set('Content-Security-Policy', csp);
-	response.headers.set('X-Frame-Options', 'DENY');
+	if (!event.url.pathname.startsWith('/activity')) {
+		response.headers.set('X-Frame-Options', 'DENY');
+	}
 	response.headers.set('X-Content-Type-Options', 'nosniff');
 	response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 	response.headers.set('Permissions-Policy', 'geolocation=(), microphone=()');

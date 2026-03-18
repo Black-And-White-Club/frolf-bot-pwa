@@ -46,7 +46,6 @@ const config = {
 				'object-src': ["'none'"],
 				'base-uri': ["'self'"],
 				'frame-ancestors': [
-					"'none'",
 					'https://discord.com',
 					'https://*.discord.com',
 					'https://*.discordsays.com'
