@@ -27,7 +27,9 @@
 
 	let { round }: Props = $props();
 
-	let holes = $derived(Array.from({ length: round.holes ?? 18 }, (_, i) => i + 1));
+	let holes = $derived(
+		Array.from({ length: round.holes ?? round.parValues?.length ?? 18 }, (_, i) => i + 1)
+	);
 
 	let parValues = $derived(round.parValues ?? holes.map(() => 3));
 
