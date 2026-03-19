@@ -29,10 +29,21 @@ function getActiveSdk(): DiscordSDK | Record<string, unknown> {
 	return getDiscordSdk();
 }
 
+function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
+	return Promise.race([
+		promise,
+		new Promise<never>((_, reject) => setTimeout(() => reject(new Error(message)), ms))
+	]);
+}
+
 export async function initDiscord(): Promise<DiscordInitResult> {
 	const sdk = getActiveSdk();
 
-	await (sdk as DiscordSDK).ready();
+	await withTimeout(
+		(sdk as DiscordSDK).ready(),
+		8000,
+		'Discord did not respond — close this Activity and try again from Discord'
+	);
 
 	const { code } = await (sdk as DiscordSDK).commands.authorize({
 		client_id: import.meta.env.VITE_DISCORD_CLIENT_ID as string,
