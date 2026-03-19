@@ -34,7 +34,7 @@
 		  the user's OS preference. This enables Tailwind's class-based dark
 		  mode and ensures colors are correct on first render (avoids flash).
 		-->
-		<script>
+		<script nonce="%sveltekit.nonce%">
 			(function () {
 				try {
 					const prefers = localStorage.getItem('frolf:prefers_dark');
