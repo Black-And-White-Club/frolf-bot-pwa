@@ -55,12 +55,14 @@ class ActivityAuth {
 				this.status = 'authenticated';
 				return;
 			} catch (e) {
-				if (attempt < maxRetries) {
+				const noRetry = e instanceof Error && (e as any).noRetry;
+				if (!noRetry && attempt < maxRetries) {
 					await delay(1000 * 2 ** attempt); // 1s, 2s, 4s
 					continue;
 				}
 				this.error = e instanceof Error ? e.message : 'Authentication failed';
 				this.status = 'error';
+				return;
 			}
 		}
 	}
@@ -71,8 +73,12 @@ class ActivityAuth {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ code })
 		});
-		// 429 is treated as a retryable error — Discord's proxy rate-limits by
-		// IP, and the caller's retry loop handles backoff for all non-ok statuses.
+		// 401 means the code was rejected by Discord (invalid_grant / already used).
+		// OAuth codes are one-time-use — retrying with the same code will always fail.
+		// Throw a non-retryable sentinel so the retry loop can bail out immediately.
+		if (res.status === 401)
+			throw Object.assign(new Error('Token exchange failed: 401'), { noRetry: true });
+		// 429 and 5xx are retryable — the caller's backoff loop handles them.
 		if (!res.ok) throw new Error(`Token exchange failed: ${res.status}`);
 		const data: unknown = await res.json();
 		if (!isTokenExchangeResponse(data)) {
