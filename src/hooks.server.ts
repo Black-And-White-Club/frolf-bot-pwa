@@ -159,6 +159,18 @@ const cspHandle: Handle = async ({ event, resolve }) => {
 	return response;
 };
 
+// When Discord launches the Activity it opens the root URL with ?frame_id=<id>.
+// Redirect that to /activity so the correct page loads, preserving all query params.
+const discordActivityHandle: Handle = async ({ event, resolve }) => {
+	if (event.url.pathname === '/' && event.url.searchParams.has('frame_id')) {
+		return new Response(null, {
+			status: 302,
+			headers: { Location: `/activity?${event.url.searchParams.toString()}` }
+		});
+	}
+	return resolve(event);
+};
+
 // Instrument every incoming HTTP request: span, duration metric, error logging.
 const otelHandle: Handle = async ({ event, resolve }) => {
 	const route = event.route.id ?? event.url.pathname;
@@ -216,4 +228,4 @@ const otelHandle: Handle = async ({ event, resolve }) => {
 	});
 };
 
-export const handle = sequence(otelHandle, authHandle, cspHandle);
+export const handle = sequence(discordActivityHandle, otelHandle, authHandle, cspHandle);
