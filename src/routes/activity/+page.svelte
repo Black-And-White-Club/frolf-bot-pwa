@@ -4,6 +4,7 @@
 	import { initDiscord, subscribeToParticipants } from '$lib/discord';
 	import type { ActivityParticipant } from '$lib/discord';
 	import { activityAuth } from '$lib/stores/activity-auth.svelte';
+	import { activityNatsUrl } from '$lib/activity-utils';
 	import {
 		ActivityBettingService,
 		extractClubUuidFromTicket
@@ -74,7 +75,7 @@
 			phaseMessage = 'Loading markets…';
 
 			if (activityAuth.ticket) {
-				await nats.connect(activityAuth.ticket);
+				await nats.connect(activityAuth.ticket, activityNatsUrl());
 				setupNatsSubscriptions();
 
 				// The NATS library auto-reconnects with the existing connection.

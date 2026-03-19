@@ -53,7 +53,7 @@ class NatsService {
 	/**
 	 * Connect to NATS server with JWT token
 	 */
-	async connect(token: string): Promise<void> {
+	async connect(token: string, serverUrl?: string): Promise<void> {
 		if (this.status === 'connecting' || this.status === 'connected') {
 			return;
 		}
@@ -81,10 +81,10 @@ class NatsService {
 			this.codec = this.natsLib.StringCodec();
 		}
 
-		await this.connectToNatsServer(token);
+		await this.connectToNatsServer(token, serverUrl);
 	}
 
-	private async connectToNatsServer(token: string): Promise<void> {
+	private async connectToNatsServer(token: string, serverUrl?: string): Promise<void> {
 		const tracer = getTracer();
 		const span = tracer.startSpan('nats.connect', {
 			attributes: { 'messaging.system': 'nats' }
@@ -96,7 +96,7 @@ class NatsService {
 
 		try {
 			this.connection = await this.natsLib!.connect({
-				servers: config.nats.url,
+				servers: serverUrl ?? config.nats.url,
 				user: 'frolf-pwa-user', // Dummy user required for NATS to include the password in Auth Callout
 				pass: token,
 				name: 'frolf-pwa',

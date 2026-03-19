@@ -124,6 +124,33 @@
 	});
 
 	onMount(() => {
+		// Keep the meta theme-color in sync with the active guild's primary colour.
+		// Runs after mount rather than inline in app.html so CSP hashing isn't needed.
+		const updateMetaThemeColor = () => {
+			const meta = document.querySelector('meta[name="theme-color"]');
+			if (!meta) return;
+			const rgb = getComputedStyle(document.documentElement)
+				.getPropertyValue('--guild-primary-rgb')
+				.trim();
+			if (rgb) {
+				meta.setAttribute('content', `rgb(${rgb})`);
+				return;
+			}
+			meta.setAttribute(
+				'content',
+				document.documentElement.classList.contains('dark') ? '#0f0f0f' : '#007474'
+			);
+		};
+		updateMetaThemeColor();
+		const observer = new MutationObserver(updateMetaThemeColor);
+		observer.observe(document.documentElement, {
+			attributes: true,
+			attributeFilter: ['style', 'class']
+		});
+		return () => observer.disconnect();
+	});
+
+	onMount(() => {
 		// Defer heavy initialization (NATS, OTel) until the main thread is idle
 		// This significantly improves Total Blocking Time (TBT) and LCP
 		const initWork = async () => {
