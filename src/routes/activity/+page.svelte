@@ -46,6 +46,7 @@
 	// on reconnect without killing the participant listener.
 	let natsUnsubs: Array<() => void> = [];
 	let participantUnsubs: Array<() => void> = [];
+	let natsReconnectUnsub: (() => void) | null = null;
 
 	// ── Settlement: auto-show SettledView when lastSettled changes ─────────────
 	$effect(() => {
@@ -55,7 +56,7 @@
 	});
 
 	// ── Main initialisation ───────────────────────────────────────────────────
-	onMount(async () => {
+	async function runInitFlow() {
 		try {
 			// 1. SDK handshake + OAuth code
 			const { code } = await initDiscord();
@@ -82,7 +83,8 @@
 				// Refresh the in-memory ticket for future API calls, re-register
 				// subscriptions (they survive reconnect but need re-setup after
 				// any explicit disconnect), and reload stale data.
-				nats.onReconnect(async () => {
+				natsReconnectUnsub?.();
+				natsReconnectUnsub = nats.onReconnect(async () => {
 					await activityAuth.refreshSession();
 					setupNatsSubscriptions();
 					if (clubUuid) await betting.loadOverview(clubUuid);
@@ -102,14 +104,22 @@
 			phase = 'ready';
 		} catch (e) {
 			console.error('[activity] init failed', e);
-			activityAuth.error = e instanceof Error ? e.message : 'Unexpected error';
+			activityAuth.error =
+				e instanceof Error
+					? e.message || `Error: ${e.constructor.name}`
+					: String(e) || 'Unexpected error';
 			phase = 'error';
 		}
+	}
+
+	onMount(() => {
+		void runInitFlow();
 	});
 
 	onDestroy(() => {
 		natsUnsubs.forEach((fn) => fn());
 		participantUnsubs.forEach((fn) => fn());
+		natsReconnectUnsub?.();
 		nats.disconnect();
 	});
 
@@ -156,12 +166,19 @@
 	}
 
 	// ── Retry ─────────────────────────────────────────────────────────────────
-	function retry() {
+	async function retry() {
 		activityAuth.reset();
 		betting.clear();
+		natsUnsubs.forEach((fn) => fn());
+		natsUnsubs = [];
+		participantUnsubs.forEach((fn) => fn());
+		participantUnsubs = [];
+		natsReconnectUnsub?.();
+		natsReconnectUnsub = null;
+		await nats.disconnect();
 		phase = 'sdk_init';
 		phaseMessage = 'Connecting to Discord…';
-		window.location.reload();
+		void runInitFlow();
 	}
 
 	// ── Settlement dismiss ────────────────────────────────────────────────────
