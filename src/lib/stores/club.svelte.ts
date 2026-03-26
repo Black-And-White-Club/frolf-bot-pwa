@@ -9,6 +9,10 @@ interface ClubInfo {
 	entitlements?: ResolvedClubEntitlements;
 }
 
+const CLUB_CACHE_TTL_MS = 3_600_000; // 1 hour
+
+type CachedClubEntry = { data: ClubInfo; cached_at: number };
+
 class ClubService {
 	info = $state<ClubInfo | null>(null);
 	knownClubs = $state<Record<string, ClubInfo>>({});
@@ -207,10 +211,21 @@ class ClubService {
 
 	private getCachedClub(id: string): ClubInfo | null {
 		if (typeof window === 'undefined') return null;
-		const cached = localStorage.getItem(`club:${id}`);
-		if (!cached) return null;
+		const raw = localStorage.getItem(`club:${id}`);
+		if (!raw) return null;
 		try {
-			return JSON.parse(cached);
+			const entry = JSON.parse(raw) as CachedClubEntry | ClubInfo;
+			// Support both the new {data, cached_at} shape and legacy bare ClubInfo objects.
+			if ('cached_at' in entry && 'data' in entry) {
+				if (Date.now() - entry.cached_at > CLUB_CACHE_TTL_MS) {
+					localStorage.removeItem(`club:${id}`);
+					return null;
+				}
+				return entry.data;
+			}
+			// Legacy cache entry without TTL — treat as expired.
+			localStorage.removeItem(`club:${id}`);
+			return null;
 		} catch {
 			return null;
 		}
@@ -218,7 +233,8 @@ class ClubService {
 
 	private cacheClub(club: ClubInfo): void {
 		if (typeof window === 'undefined') return;
-		localStorage.setItem(`club:${club.id}`, JSON.stringify(club));
+		const entry: CachedClubEntry = { data: club, cached_at: Date.now() };
+		localStorage.setItem(`club:${club.id}`, JSON.stringify(entry));
 	}
 
 	clear(): void {

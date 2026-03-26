@@ -310,7 +310,7 @@ describe('BettingService', () => {
 	});
 
 	describe('handleMarketOpened', () => {
-		it('clears nextMarket for matching club so snapshot refresh is triggered', () => {
+		it('keeps existing nextMarket visible while snapshot refresh loads', () => {
 			betting.setNextMarketFromSnapshot(mockSnapshot);
 
 			betting.handleMarketOpened({
@@ -321,7 +321,8 @@ describe('BettingService', () => {
 				market_type: 'round_winner'
 			});
 
-			expect(betting.nextMarket).toBeNull();
+			// Snapshot stays visible until setNextMarketFromSnapshot overwrites it.
+			expect(betting.nextMarket).not.toBeNull();
 		});
 
 		it('does nothing for a different club', () => {

@@ -94,8 +94,8 @@ class DataLoader {
 				this.loadRounds(preferredId, clubUuid, guildId),
 				this.loadLeaderboard(preferredId, clubUuid, guildId),
 				this.loadTagList(preferredId, guildId, clubUuid),
-				this.loadChallenges(),
-				...(clubUuid ? [this.loadBettingSnapshot(clubUuid)] : [])
+				this.loadChallenges(preferredId),
+				...(clubUuid ? [this.loadBettingSnapshot(clubUuid, preferredId)] : [])
 			]);
 			log('DataLoader: Initial data loaded successfully');
 		} catch (e) {
@@ -104,6 +104,16 @@ class DataLoader {
 		} finally {
 			this.loading = false;
 		}
+	}
+
+	/**
+	 * Returns true when the active identity still matches the one that kicked off a load.
+	 * Guards against stale NATS responses arriving after reload() or a club switch.
+	 */
+	private isStillActive(expectedId: string): boolean {
+		const user = auth.user;
+		const currentId = user?.activeClubUuid || user?.guildId;
+		return currentId === expectedId;
 	}
 
 	private async loadRounds(subjectId: string, clubUuid: string, guildId: string): Promise<void> {
@@ -122,6 +132,10 @@ class DataLoader {
 				{ timeout: 5000 }
 			);
 
+			if (!this.isStillActive(subjectId)) {
+				log('DataLoader: Discarding stale rounds response for', subjectId);
+				return;
+			}
 			if (response?.rounds) {
 				roundService.setRoundsFromApi(response.rounds);
 				roundActionsService.reconcileAllFromSnapshot();
@@ -157,6 +171,10 @@ class DataLoader {
 				{ timeout: 5000 }
 			);
 
+			if (!this.isStillActive(subjectId)) {
+				log('DataLoader: Discarding stale leaderboard response for', subjectId);
+				return;
+			}
 			if (response?.leaderboard !== undefined) {
 				leaderboardService.setSnapshotFromApi(response);
 			}
@@ -186,6 +204,10 @@ class DataLoader {
 				TagListResponseRaw
 			>(`leaderboard.tag.list.requested.v1.${subjectId}`, payload, { timeout: 5000 });
 
+			if (!this.isStillActive(subjectId)) {
+				log('DataLoader: Discarding stale tag list response for', subjectId);
+				return;
+			}
 			if (response?.members) {
 				tagStore.applyTagListResponse(response);
 			}
@@ -200,15 +222,19 @@ class DataLoader {
 		}
 	}
 
-	private async loadChallenges(): Promise<void> {
+	private async loadChallenges(expectedId?: string): Promise<void> {
 		try {
 			await challengeStore.loadBoard();
+			if (expectedId && !this.isStillActive(expectedId)) {
+				log('DataLoader: Discarding stale challenges response for', expectedId);
+				challengeStore.reset();
+			}
 		} catch (error) {
 			log('DataLoader: Challenge board request failed, relying on events', error);
 		}
 	}
 
-	private async loadBettingSnapshot(clubUuid: string): Promise<void> {
+	private async loadBettingSnapshot(clubUuid: string, expectedId?: string): Promise<void> {
 		// Only request snapshot if betting is accessible (enabled or frozen).
 		if (!betting.canLoad) return;
 
@@ -219,6 +245,10 @@ class DataLoader {
 				{ timeout: 5000 }
 			);
 
+			if (expectedId && !this.isStillActive(expectedId)) {
+				log('DataLoader: Discarding stale betting snapshot for', expectedId);
+				return;
+			}
 			if (response) {
 				betting.setNextMarketFromSnapshot(response);
 			}

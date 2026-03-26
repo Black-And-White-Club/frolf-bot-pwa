@@ -26,7 +26,11 @@ export class HttpWebSocketTransport implements Transport {
 				if (!GlobalWebSocket) throw new Error('no WebSocket available');
 				const wsInstance = new GlobalWebSocket(this.opts.wsUrl);
 				this.ws = wsInstance;
-				wsInstance.onopen = () => resolve();
+				let settled = false;
+				wsInstance.onopen = () => {
+					settled = true;
+					resolve();
+				};
 				wsInstance.onmessage = (ev: { data: unknown }) => {
 					try {
 						const raw = typeof ev.data === 'string' ? ev.data : String(ev.data);
@@ -38,10 +42,16 @@ export class HttpWebSocketTransport implements Transport {
 					}
 				};
 				wsInstance.onerror = () => {
-					// noop for now
+					if (!settled) {
+						settled = true;
+						reject(new Error('WebSocket connection error'));
+					} else {
+						console.warn('[HttpWebSocketTransport] WebSocket error after connect');
+					}
 				};
 				wsInstance.onclose = () => {
-					// noop
+					// Log so the disconnect is visible; upstream reconnect is the caller's responsibility.
+					console.warn('[HttpWebSocketTransport] WebSocket closed');
 				};
 			} catch {
 				return reject(new Error('failed to construct WebSocket'));

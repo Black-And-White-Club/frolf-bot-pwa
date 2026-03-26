@@ -36,7 +36,8 @@ export const config = {
 	nats: {
 		url: env.PUBLIC_NATS_URL || env.PUBLIC_WS_URL || 'wss://nats.frolf-bot.com:443',
 		reconnectAttempts: 10,
-		reconnectDelayMs: 1000
+		reconnectDelayMs: 1000,
+		reconnectReloadDelayMs: Number(env.PUBLIC_NATS_RECONNECT_RELOAD_DELAY_MS) || 400
 	},
 	otel: {
 		endpoint: env.PUBLIC_OTEL_ENDPOINT || 'http://localhost:4318/v1/traces',

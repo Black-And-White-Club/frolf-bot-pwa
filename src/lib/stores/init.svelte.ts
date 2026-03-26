@@ -6,6 +6,7 @@
 
 import { browser } from '$app/environment';
 import { auth, type AuthInitializeResult } from './auth.svelte';
+import { config } from '$lib/config';
 import { env } from '$env/dynamic/public';
 
 type InitStatus = 'idle' | 'initializing' | 'ready' | 'error';
@@ -305,7 +306,7 @@ class AppInitializer {
 				// Re-establish subscriptions and fetch fresh snapshots in case events were missed.
 				subscriptionManager.start(subscriptionId);
 				await dataLoader.loadInitialData();
-			}, 400);
+			}, config.nats.reconnectReloadDelayMs);
 		});
 	}
 

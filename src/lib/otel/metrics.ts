@@ -7,6 +7,13 @@ export function getMeter(name: string = 'frolf-pwa'): Meter {
 	return metrics.getMeter(name);
 }
 
+/** Counter incremented each time a NATS message fails to parse. */
+export function getNatsParseErrorCounter() {
+	return getMeter().createCounter('nats.message_parse_errors', {
+		description: 'Number of NATS messages that failed JSON parsing'
+	});
+}
+
 export async function initMetrics(): Promise<void> {
 	if (initialized) return;
 

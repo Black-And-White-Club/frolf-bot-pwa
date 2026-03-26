@@ -6,6 +6,7 @@
 import type { NatsConnection, Subscription, Codec } from 'nats.ws'; // Types only
 import { getTracer, injectTraceContext, createChildSpan } from '$lib/otel/tracing';
 import { config, log } from '$lib/config';
+import { getNatsParseErrorCounter } from '$lib/otel/metrics';
 
 // ============ Types ============
 
@@ -225,6 +226,7 @@ class NatsService {
 				} catch (err) {
 					span.recordException(err as Error);
 					span.end();
+					getNatsParseErrorCounter().add(1, { subject });
 					console.error(`Error processing message on ${subject}:`, err);
 				}
 			}

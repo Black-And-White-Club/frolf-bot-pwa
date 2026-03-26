@@ -201,16 +201,9 @@ export class BettingService {
 	/** betting.market.generated.v1 — a new market was created for this club. */
 	handleMarketOpened(payload: BettingMarketOpenedPayload): void {
 		if (payload.club_uuid !== this.currentClubUuid) return;
-		// The snapshot doesn't carry full market data, so request a refresh by
-		// clearing and letting dataLoader request a new snapshot. For now we
-		// mark nextMarket dirty so the UI knows to expect an update.
-		// If nextMarket is already set for this club, leave it; the snapshot
-		// will be requested on the next dataLoader cycle. For immediate UX,
-		// if club matches we clear to trigger a re-bootstrap.
-		if (this.nextMarket && this.nextMarket.club_uuid === payload.club_uuid) {
-			// Signal that a new market is incoming — dataLoader will push a fresh snapshot.
-			this.nextMarket = null;
-		}
+		// Keep the existing snapshot visible while dataLoader fetches the fresh one.
+		// setNextMarketFromSnapshot will overwrite it once the request/reply completes,
+		// avoiding a blank flash in the UI between the event and the snapshot arrival.
 	}
 
 	/** betting.market.locked.v1 — market is locked, no new bets. */
@@ -394,12 +387,21 @@ export class BettingService {
 		this.error = null;
 		this.errorCode = null;
 
-		try {
-			const res = await fetch(`/api/betting/overview?club_uuid=${encodeURIComponent(clubUuid)}`, {
-				headers: {
-					Accept: 'application/json'
-				}
+		const attemptFetch = async (): Promise<Response> => {
+			return fetch(`/api/betting/overview?club_uuid=${encodeURIComponent(clubUuid)}`, {
+				headers: { Accept: 'application/json' }
 			});
+		};
+
+		try {
+			let res: Response;
+			try {
+				res = await attemptFetch();
+			} catch {
+				// First attempt failed (network error) — wait 1s and retry once.
+				await new Promise((r) => setTimeout(r, 1000));
+				res = await attemptFetch();
+			}
 
 			const data = (await res.json().catch(() => null)) as BettingOverview | BettingApiError | null;
 			if (!res.ok) {

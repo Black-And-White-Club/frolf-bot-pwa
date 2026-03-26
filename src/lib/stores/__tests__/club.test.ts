@@ -87,7 +87,10 @@ describe('ClubService (club.svelte.ts)', () => {
 
 		it('returns cached club info if available', async () => {
 			const cachedClub = { id: 'club-123', name: 'Cached Club', icon: 'icon.png' };
-			localStorage.setItem('club:club-123', JSON.stringify(cachedClub));
+			localStorage.setItem(
+				'club:club-123',
+				JSON.stringify({ data: cachedClub, cached_at: Date.now() })
+			);
 			mockAuth.user = { activeClubUuid: 'club-123' };
 
 			// Mock successful NATS response for background refresh
@@ -159,7 +162,10 @@ describe('ClubService (club.svelte.ts)', () => {
 
 			const cached = localStorage.getItem('club:club-cache-test');
 			expect(cached).not.toBeNull();
-			expect(JSON.parse(cached!)).toEqual({
+			const parsed = JSON.parse(cached!);
+			expect(parsed).toHaveProperty('data');
+			expect(parsed).toHaveProperty('cached_at');
+			expect(parsed.data).toEqual({
 				id: 'club-cache-test',
 				name: 'Cached Club',
 				icon: 'icon.png'
