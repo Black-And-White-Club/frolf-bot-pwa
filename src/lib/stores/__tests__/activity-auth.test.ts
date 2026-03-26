@@ -58,7 +58,8 @@ describe('ActivityAuth', () => {
 		});
 
 		it('sets error status after all retries exhaust on non-ok response', async () => {
-			// 4 calls total: initial + 3 retries
+			// 401 is non-retryable (OAuth codes are one-time-use), so only 1 call is made.
+			// 429/5xx are retryable; this test specifically covers the 401 bail-out path.
 			fetchMock.mockResolvedValue(fail(401));
 
 			const promise = activityAuth.authenticate('bad-code');
@@ -68,7 +69,7 @@ describe('ActivityAuth', () => {
 			expect(activityAuth.status).toBe('error');
 			expect(activityAuth.error).toMatch(/401/);
 			expect(activityAuth.isAuthenticated).toBe(false);
-			expect(fetchMock).toHaveBeenCalledTimes(4);
+			expect(fetchMock).toHaveBeenCalledTimes(1);
 		});
 
 		it('sets error status after all retries exhaust on network failure', async () => {
