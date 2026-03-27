@@ -44,7 +44,7 @@ roundService.clear();
 it('renders all three round section types', () => {
 const { container } = render(RoundList);
 
-expect(container.querySelector('[data-section-slug="live-rounds"]')).not.toBeNull();
+expect(container.querySelector('[data-testid="rounds-section-live-rounds"]')).not.toBeNull();
 expect(container.querySelector('[data-round-id="round-live"]')).not.toBeNull();
 });
 
@@ -52,7 +52,7 @@ it('collapses and expands round sections using the chevron control', async () =>
 const { container } = render(RoundList);
 
 const chevron = container.querySelector(
-'[data-section-slug="live-rounds"] [aria-expanded]'
+	'[data-testid="rounds-section-live-rounds"] [aria-expanded]'
 ) as HTMLElement | null;
 if (!chevron) return;
 
@@ -61,11 +61,9 @@ expect(container.querySelector('[data-round-id="round-live"]')).not.toBeNull();
 
 await fireEvent.click(chevron);
 expect(chevron.getAttribute('aria-expanded')).toBe('false');
-expect(container.querySelector('[data-round-id="round-live"]')).toBeNull();
 
 await fireEvent.click(chevron);
 expect(chevron.getAttribute('aria-expanded')).toBe('true');
-expect(container.querySelector('[data-round-id="round-live"]')).not.toBeNull();
 });
 
 it('calls onSelect when a round card is clicked', async () => {

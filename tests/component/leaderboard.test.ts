@@ -30,7 +30,7 @@ testid: 'ct-leaderboard'
 }
 });
 
-const rows = container.querySelectorAll('[data-testid="leaderboard-row"]');
+const rows = container.querySelectorAll('[data-testid^="leaderboard-row-"]');
 expect(rows.length).toBe(2);
 
 const viewAllBtn = container.querySelector('[data-testid="leaderboard-view-all"]');
@@ -50,7 +50,7 @@ testid: 'ct-leaderboard'
 }
 });
 
-const rows = container.querySelectorAll('[data-testid="leaderboard-row"]');
+const rows = container.querySelectorAll('[data-testid^="leaderboard-row-"]');
 expect(rows.length).toBe(5);
 });
 
@@ -64,7 +64,7 @@ testid: 'ct-leaderboard'
 }
 });
 
-const rows = container.querySelectorAll('[data-testid="leaderboard-row"]');
+const rows = container.querySelectorAll('[data-testid^="leaderboard-row-"]');
 expect(rows.length).toBe(7);
 
 const viewAllBtn = container.querySelector('[data-testid="leaderboard-view-all"]');

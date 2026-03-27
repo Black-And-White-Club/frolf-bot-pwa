@@ -45,7 +45,7 @@ participants: [{ userId: '', rawName: 'Alice', score: holeTotal, scores: holeSco
 }
 });
 
-const cells = Array.from(container.querySelectorAll('.score-cell'));
+const cells = Array.from(container.querySelectorAll('.participant-row-grid .score-cell'));
 const texts = cells.map((el) => el.textContent?.trim());
 holeScores9.forEach((s) => {
 expect(texts).toContain(String(s));
@@ -61,9 +61,9 @@ participants: [{ userId: '', rawName: 'Alice', score: 31, scores: undefined }]
 }
 });
 
-const cells = Array.from(container.querySelectorAll('.score-cell'));
+const cells = Array.from(container.querySelectorAll('.participant-row-grid .score-cell'));
 cells.forEach((cell) => {
-expect(cell.textContent?.trim()).toBe('-');
+	expect(cell.textContent?.trim()).toBe('-');
 });
 });
 });

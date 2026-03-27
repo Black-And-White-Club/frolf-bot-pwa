@@ -4,11 +4,15 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import HamburgerMenu from '../../src/lib/components/general/HamburgerMenu.svelte';
 import { auth } from '../../src/lib/stores/auth.svelte';
 
+vi.mock('$env/dynamic/public', () => ({
+	env: { PUBLIC_API_URL: 'http://localhost:8080', PUBLIC_NATS_URL: 'ws://localhost' }
+}));
 vi.mock('$app/state', () => ({
-page: {
-url: new URL('http://localhost/') as any,
-params: {}
-}
+	page: {
+		url: new URL('http://localhost/') as any,
+		params: {},
+		data: { session: null }
+	}
 }));
 
 vi.mock('$app/navigation', () => ({

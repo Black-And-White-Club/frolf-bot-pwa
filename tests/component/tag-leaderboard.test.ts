@@ -5,8 +5,11 @@ import TagLeaderboard from '../../src/lib/components/leaderboard/TagLeaderboard.
 import { auth } from '../../src/lib/stores/auth.svelte';
 import { tagStore } from '../../src/lib/stores/tags.svelte';
 
+vi.mock('$env/dynamic/public', () => ({
+	env: { PUBLIC_API_URL: 'http://localhost:8080', PUBLIC_NATS_URL: 'ws://localhost' }
+}));
 vi.mock('$app/state', () => ({
-page: { url: new URL('http://localhost/tags') as any, params: {} }
+	page: { url: new URL('http://localhost/tags') as any, params: {}, data: {} }
 }));
 vi.mock('$app/navigation', () => ({ goto: vi.fn() }));
 
