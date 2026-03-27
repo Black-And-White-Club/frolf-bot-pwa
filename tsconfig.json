@@ -20,7 +20,8 @@
 		"integration_tests/**",
 		"**/*.spec.ts",
 		"**/*.e2e.ts",
-		"**/playwright.config.*"
+		"**/playwright.config.*",
+		"tests/e2e/**"
 	],
 	"compilerOptions": {
 		"module": "esnext",

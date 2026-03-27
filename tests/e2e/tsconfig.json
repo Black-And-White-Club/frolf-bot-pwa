@@ -1,0 +1,17 @@
+{
+"extends": "../../.svelte-kit/tsconfig.json",
+"include": [
+"**/*.ts"
+],
+"compilerOptions": {
+"module": "esnext",
+"moduleResolution": "node",
+"strict": true,
+"esModuleInterop": true,
+"skipLibCheck": true,
+"allowJs": true,
+"forceConsistentCasingInFileNames": true,
+"noEmit": true,
+"types": ["@playwright/test", "node"]
+}
+}
