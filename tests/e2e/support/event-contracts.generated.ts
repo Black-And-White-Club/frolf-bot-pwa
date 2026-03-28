@@ -5174,9 +5174,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "title": {
             "type": "string"
@@ -5241,9 +5240,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "title": {
             "type": "string"
@@ -11411,9 +11409,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -11792,9 +11789,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -12113,9 +12109,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -12244,9 +12239,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                 "type": "string"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "title": {
                 "type": "string"
@@ -12492,9 +12486,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                     "type": "string"
                   },
                   "start_time": {
-                    "additionalProperties": false,
-                    "properties": {},
-                    "type": "object"
+                    "format": "date-time",
+                    "type": "string"
                   },
                   "title": {
                     "type": "string"
@@ -12523,9 +12516,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "type": "object"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           }
         },
         "required": [
@@ -13309,9 +13301,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -13545,9 +13536,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -13759,9 +13749,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                 "type": "string"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "title": {
                 "type": "string"
@@ -14034,9 +14023,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -14128,9 +14116,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                 "type": "string"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "title": {
                 "type": "string"
@@ -14370,9 +14357,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "teams": {
             "items": {
@@ -14629,9 +14615,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -17065,9 +17050,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -17249,9 +17233,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "teams": {
             "items": {
@@ -17396,9 +17379,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "user_ids": {
             "items": {
@@ -17470,9 +17452,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "user_ids": {
             "items": {
@@ -17680,9 +17661,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -17877,9 +17857,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "title": {
             "type": "string"
@@ -17968,9 +17947,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                   "type": "string"
                 },
                 "start_time": {
-                  "additionalProperties": false,
-                  "properties": {},
-                  "type": "object"
+                  "format": "date-time",
+                  "type": "string"
                 },
                 "title": {
                   "type": "string"
@@ -18087,9 +18065,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                 "type": "string"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "title": {
                 "type": "string"
@@ -20234,9 +20211,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "title": {
             "type": "string"
@@ -20328,9 +20304,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "title": {
             "type": "string"
@@ -20589,9 +20564,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -21260,9 +21234,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -21456,9 +21429,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                 "type": "string"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "title": {
                 "type": "string"
@@ -21591,9 +21563,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "title": {
             "type": "string"
@@ -21692,9 +21663,8 @@ export const EVENT_CONTRACT_CATALOG: EventContractCatalog = {
                 "type": "string"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "title": {
                 "type": "string"

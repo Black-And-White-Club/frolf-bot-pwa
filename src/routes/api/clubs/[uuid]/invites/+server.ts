@@ -1,5 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { serverConfig } from '$lib/server/config';
+import { isE2EMode } from '$lib/server/e2e';
 
 /**
  * GET  /api/clubs/:uuid/invites  — list all invite codes for a club
@@ -7,11 +8,18 @@ import { serverConfig } from '$lib/server/config';
  */
 
 export const GET: RequestHandler = async ({ fetch, request, params }) => {
-	const res = await fetch(`${serverConfig.backendUrl}/api/clubs/${params.uuid}/invites`, {
-		headers: { cookie: request.headers.get('cookie') || '' }
-	});
-	const data = await res.json().catch(() => ({ error: 'Request failed' }));
-	return json(data, { status: res.status });
+	try {
+		const res = await fetch(`${serverConfig.backendUrl}/api/clubs/${params.uuid}/invites`, {
+			headers: { cookie: request.headers.get('cookie') || '' }
+		});
+		const data = await res.json().catch(() => ({ error: 'Request failed' }));
+		return json(data, { status: res.status });
+	} catch (err) {
+		if (isE2EMode) {
+			return json([], { status: 200 });
+		}
+		throw err;
+	}
 };
 
 export const POST: RequestHandler = async ({ fetch, request, params }) => {

@@ -2,6 +2,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { serverConfig } from '$lib/server/config';
 import { hasTrustedOrigin, makeRequestId } from '$lib/server/security';
 import { forwardSetCookieHeaders } from '$lib/server/http';
+import { isE2EMode } from '$lib/server/e2e';
 
 const CLUB_ID_PATTERN = /^[A-Za-z0-9-]{1,128}$/;
 
@@ -58,6 +59,9 @@ export const POST: RequestHandler = async ({ fetch, request, url }) => {
 
 		return json(data, { headers });
 	} catch (e) {
+		if (isE2EMode) {
+			return json({ error: 'Unauthorized' }, { status: 401 });
+		}
 		console.error(`[Auth ticket ${requestId}] proxy error:`, e);
 		return json({ error: 'Internal Server Error', requestId }, { status: 500 });
 	}

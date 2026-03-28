@@ -13,6 +13,7 @@ import {
 	ATTR_URL_PATH,
 	ATTR_HTTP_RESPONSE_STATUS_CODE
 } from '@opentelemetry/semantic-conventions';
+import { isE2EMode } from '$lib/server/e2e';
 
 // Initialize server-side OTel once at module load time.
 initServerOtel();
@@ -69,6 +70,9 @@ function claimsToUser(claims: TokenClaims): AuthUser {
 const authHandle: Handle = async ({ event, resolve }) => {
 	// Skip API routes — they handle auth themselves
 	if (event.url.pathname.startsWith('/api/')) return resolve(event);
+
+	// No backend available during Playwright E2E — skip SSR auth refresh entirely
+	if (isE2EMode) return resolve(event);
 
 	const refreshToken = event.cookies.get('refresh_token');
 	if (!refreshToken) return resolve(event);

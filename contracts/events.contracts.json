@@ -5142,9 +5142,8 @@
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "title": {
             "type": "string"
@@ -5209,9 +5208,8 @@
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "title": {
             "type": "string"
@@ -11379,9 +11377,8 @@
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -11760,9 +11757,8 @@
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -12081,9 +12077,8 @@
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -12212,9 +12207,8 @@
                 "type": "string"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "title": {
                 "type": "string"
@@ -12460,9 +12454,8 @@
                     "type": "string"
                   },
                   "start_time": {
-                    "additionalProperties": false,
-                    "properties": {},
-                    "type": "object"
+                    "format": "date-time",
+                    "type": "string"
                   },
                   "title": {
                     "type": "string"
@@ -12491,9 +12484,8 @@
             "type": "object"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           }
         },
         "required": [
@@ -13277,9 +13269,8 @@
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -13513,9 +13504,8 @@
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -13727,9 +13717,8 @@
                 "type": "string"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "title": {
                 "type": "string"
@@ -14002,9 +13991,8 @@
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -14096,9 +14084,8 @@
                 "type": "string"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "title": {
                 "type": "string"
@@ -14338,9 +14325,8 @@
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "teams": {
             "items": {
@@ -14597,9 +14583,8 @@
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -17033,9 +17018,8 @@
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -17217,9 +17201,8 @@
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "teams": {
             "items": {
@@ -17364,9 +17347,8 @@
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "user_ids": {
             "items": {
@@ -17438,9 +17420,8 @@
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "user_ids": {
             "items": {
@@ -17648,9 +17629,8 @@
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -17845,9 +17825,8 @@
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "title": {
             "type": "string"
@@ -17936,9 +17915,8 @@
                   "type": "string"
                 },
                 "start_time": {
-                  "additionalProperties": false,
-                  "properties": {},
-                  "type": "object"
+                  "format": "date-time",
+                  "type": "string"
                 },
                 "title": {
                   "type": "string"
@@ -18055,9 +18033,8 @@
                 "type": "string"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "title": {
                 "type": "string"
@@ -20202,9 +20179,8 @@
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "title": {
             "type": "string"
@@ -20296,9 +20272,8 @@
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "title": {
             "type": "string"
@@ -20557,9 +20532,8 @@
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -21228,9 +21202,8 @@
                 "type": "array"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "state": {
                 "type": "string"
@@ -21424,9 +21397,8 @@
                 "type": "string"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "title": {
                 "type": "string"
@@ -21559,9 +21531,8 @@
             "type": "string"
           },
           "start_time": {
-            "additionalProperties": false,
-            "properties": {},
-            "type": "object"
+            "format": "date-time",
+            "type": "string"
           },
           "title": {
             "type": "string"
@@ -21660,9 +21631,8 @@
                 "type": "string"
               },
               "start_time": {
-                "additionalProperties": false,
-                "properties": {},
-                "type": "object"
+                "format": "date-time",
+                "type": "string"
               },
               "title": {
                 "type": "string"
