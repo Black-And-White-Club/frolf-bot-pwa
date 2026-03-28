@@ -16,59 +16,59 @@ vi.mock('$app/state', () => ({
 }));
 
 vi.mock('$app/navigation', () => ({
-goto: vi.fn()
+	goto: vi.fn()
 }));
 
 describe('HamburgerMenu (Component)', () => {
-beforeEach(() => {
-auth.user = {
-id: 'user-1',
-uuid: 'user-1-uuid',
-activeClubUuid: 'club-1',
-guildId: 'guild-1',
-role: 'admin',
-clubs: [
-{
-club_uuid: 'club-1',
-role: 'admin',
-display_name: 'Test User',
-avatar_url: ''
-}
-],
-linkedProviders: ['discord']
-};
-auth.status = 'authenticated';
-});
+	beforeEach(() => {
+		auth.user = {
+			id: 'user-1',
+			uuid: 'user-1-uuid',
+			activeClubUuid: 'club-1',
+			guildId: 'guild-1',
+			role: 'admin',
+			clubs: [
+				{
+					club_uuid: 'club-1',
+					role: 'admin',
+					display_name: 'Test User',
+					avatar_url: ''
+				}
+			],
+			linkedProviders: ['discord']
+		};
+		auth.status = 'authenticated';
+	});
 
-afterEach(() => {
-auth.user = null;
-auth.status = 'idle';
-});
+	afterEach(() => {
+		auth.user = null;
+		auth.status = 'idle';
+	});
 
-it('renders the hamburger menu dialog', () => {
-const closeHamburger = vi.fn();
-const { container } = render(HamburgerMenu, { props: { closeHamburger } });
+	it('renders the hamburger menu dialog', () => {
+		const closeHamburger = vi.fn();
+		const { container } = render(HamburgerMenu, { props: { closeHamburger } });
 
-const dialog = container.querySelector('[role="dialog"]') ?? container.querySelector('nav');
-expect(dialog).not.toBeNull();
-});
+		const dialog = container.querySelector('[role="dialog"]') ?? container.querySelector('nav');
+		expect(dialog).not.toBeNull();
+	});
 
-it('calls close handler when Escape key is pressed', async () => {
-const closeHamburger = vi.fn();
-const { container } = render(HamburgerMenu, { props: { closeHamburger } });
+	it('calls close handler when Escape key is pressed', async () => {
+		const closeHamburger = vi.fn();
+		render(HamburgerMenu, { props: { closeHamburger } });
 
-await fireEvent.keyDown(document, { key: 'Escape', bubbles: true, cancelable: true });
-expect(closeHamburger).toHaveBeenCalled();
-});
+		await fireEvent.keyDown(document, { key: 'Escape', bubbles: true, cancelable: true });
+		expect(closeHamburger).toHaveBeenCalled();
+	});
 
-it('calls close handler when backdrop is clicked', async () => {
-const closeHamburger = vi.fn();
-const { container } = render(HamburgerMenu, { props: { closeHamburger } });
+	it('calls close handler when backdrop is clicked', async () => {
+		const closeHamburger = vi.fn();
+		const { container } = render(HamburgerMenu, { props: { closeHamburger } });
 
-const backdrop = container.querySelector('[data-testid="hamburger-backdrop"]');
-if (backdrop) {
-await fireEvent.click(backdrop);
-expect(closeHamburger).toHaveBeenCalled();
-}
-});
+		const backdrop = container.querySelector('[data-testid="hamburger-backdrop"]');
+		if (backdrop) {
+			await fireEvent.click(backdrop);
+			expect(closeHamburger).toHaveBeenCalled();
+		}
+	});
 });

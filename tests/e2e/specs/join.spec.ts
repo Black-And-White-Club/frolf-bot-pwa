@@ -4,163 +4,154 @@ import { buildLeaderboardSnapshot, buildTagListSnapshot } from '../support/event
 import { expectDashboardLoaded } from '../support/helpers';
 
 test.describe('Join Page', () => {
-const subjectId = 'guild-123';
+	const subjectId = 'guild-123';
 
-async function arrangeAuthenticated(
-{
-arrangeSnapshot,
-arrangeAuth,
-wsConnect
-}: {
-arrangeSnapshot: (o?: object) => void;
-arrangeAuth: (o?: object) => Promise<void>;
-wsConnect: () => Promise<void>;
-},
-path: string
-) {
-arrangeSnapshot({
-subjectId,
-rounds: [],
-leaderboard: buildLeaderboardSnapshot({ guild_id: subjectId, leaderboard: [] }),
-tags: buildTagListSnapshot({ guild_id: subjectId, members: [] })
-});
-await arrangeAuth({
-path,
-clubUuid: subjectId,
-guildId: subjectId,
-role: 'player',
-linkedProviders: ['discord']
-});
-await wsConnect();
-}
+	async function arrangeAuthenticated(
+		{
+			arrangeSnapshot,
+			arrangeAuth,
+			wsConnect
+		}: {
+			arrangeSnapshot: (o?: object) => void;
+			arrangeAuth: (o?: object) => Promise<void>;
+			wsConnect: () => Promise<void>;
+		},
+		path: string
+	) {
+		arrangeSnapshot({
+			subjectId,
+			rounds: [],
+			leaderboard: buildLeaderboardSnapshot({ guild_id: subjectId, leaderboard: [] }),
+			tags: buildTagListSnapshot({ guild_id: subjectId, members: [] })
+		});
+		await arrangeAuth({
+			path,
+			clubUuid: subjectId,
+			guildId: subjectId,
+			role: 'player',
+			linkedProviders: ['discord']
+		});
+		await wsConnect();
+	}
 
-test('shows invite code lookup form when no code is provided', async ({
-page,
-arrangeSnapshot,
-arrangeAuth,
-wsConnect
-}) => {
-const join = new JoinPage(page);
-await arrangeAuthenticated({ arrangeSnapshot, arrangeAuth, wsConnect }, '/join');
+	test('shows invite code lookup form when no code is provided', async ({
+		page,
+		arrangeSnapshot,
+		arrangeAuth,
+		wsConnect
+	}) => {
+		const join = new JoinPage(page);
+		await arrangeAuthenticated({ arrangeSnapshot, arrangeAuth, wsConnect }, '/join');
 
-await expect(join.codeInput()).toBeVisible();
-await expect(join.lookupButton()).toBeVisible();
-});
+		await expect(join.codeInput()).toBeVisible();
+		await expect(join.lookupButton()).toBeVisible();
+	});
 
-test('navigates to join code preview after looking up a code', async ({
-page,
-arrangeSnapshot,
-arrangeAuth,
-wsConnect
-}) => {
-const join = new JoinPage(page);
-await page.route('**/api/clubs/preview?code=ABC123', (route) =>
-route.fulfill({
-status: 200,
-contentType: 'application/json',
-body: JSON.stringify({ club_uuid: subjectId, club_name: 'Pier Park Club', role: 'player' })
-})
-);
-await arrangeAuthenticated({ arrangeSnapshot, arrangeAuth, wsConnect }, '/join');
+	test('navigates to join code preview after looking up a code', async ({
+		page,
+		arrangeSnapshot,
+		arrangeAuth,
+		wsConnect
+	}) => {
+		const join = new JoinPage(page);
+		await page.route('**/api/clubs/preview?code=ABC123', (route) =>
+			route.fulfill({
+				status: 200,
+				contentType: 'application/json',
+				body: JSON.stringify({ club_uuid: subjectId, club_name: 'Pier Park Club', role: 'player' })
+			})
+		);
+		await arrangeAuthenticated({ arrangeSnapshot, arrangeAuth, wsConnect }, '/join');
 
-await join.codeInput().fill('ABC123');
-const previewResponse = page.waitForResponse('**/api/clubs/preview?code=ABC123');
-await join.lookupButton().click();
-await previewResponse;
+		await join.codeInput().fill('ABC123');
+		const previewResponse = page.waitForResponse('**/api/clubs/preview?code=ABC123');
+		await join.lookupButton().click();
+		await previewResponse;
 
-expect(new URL(page.url()).search).toBe('?code=ABC123');
-await join.expectPreviewClub('Pier Park Club');
-});
+		expect(new URL(page.url()).search).toBe('?code=ABC123');
+		await join.expectPreviewClub('Pier Park Club');
+	});
 
-test('shows an invalid invite state when preview endpoint fails', async ({
-page,
-arrangeSnapshot,
-arrangeAuth,
-wsConnect
-}) => {
-const join = new JoinPage(page);
-await page.route('**/api/clubs/preview?code=BADCODE', (route) =>
-route.fulfill({
-status: 404,
-contentType: 'application/json',
-body: JSON.stringify({ error: 'Invalid or expired invite code' })
-})
-);
-await arrangeAuthenticated(
-{ arrangeSnapshot, arrangeAuth, wsConnect },
-'/join?code=BADCODE'
-);
+	test('shows an invalid invite state when preview endpoint fails', async ({
+		page,
+		arrangeSnapshot,
+		arrangeAuth,
+		wsConnect
+	}) => {
+		const join = new JoinPage(page);
+		await page.route('**/api/clubs/preview?code=BADCODE', (route) =>
+			route.fulfill({
+				status: 404,
+				contentType: 'application/json',
+				body: JSON.stringify({ error: 'Invalid or expired invite code' })
+			})
+		);
+		await arrangeAuthenticated({ arrangeSnapshot, arrangeAuth, wsConnect }, '/join?code=BADCODE');
 
-await page.waitForResponse('**/api/clubs/preview?code=BADCODE');
-await join.expectInvalidInvite('Invalid or expired invite code');
-});
+		await page.waitForResponse('**/api/clubs/preview?code=BADCODE');
+		await join.expectInvalidInvite('Invalid or expired invite code');
+	});
 
-test('joins club successfully from invite preview and redirects home', async ({
-page,
-arrangeSnapshot,
-arrangeAuth,
-wsConnect
-}) => {
-const join = new JoinPage(page);
-await page.route('**/api/clubs/preview?code=GOODCODE', (route) =>
-route.fulfill({
-status: 200,
-contentType: 'application/json',
-body: JSON.stringify({ club_uuid: subjectId, club_name: 'Pier Park Club', role: 'player' })
-})
-);
-await page.route('**/api/clubs/join-by-code', (route) =>
-route.fulfill({
-status: 200,
-contentType: 'application/json',
-body: JSON.stringify({ ok: true })
-})
-);
-await arrangeAuthenticated(
-{ arrangeSnapshot, arrangeAuth, wsConnect },
-'/join?code=GOODCODE'
-);
+	test('joins club successfully from invite preview and redirects home', async ({
+		page,
+		arrangeSnapshot,
+		arrangeAuth,
+		wsConnect
+	}) => {
+		const join = new JoinPage(page);
+		await page.route('**/api/clubs/preview?code=GOODCODE', (route) =>
+			route.fulfill({
+				status: 200,
+				contentType: 'application/json',
+				body: JSON.stringify({ club_uuid: subjectId, club_name: 'Pier Park Club', role: 'player' })
+			})
+		);
+		await page.route('**/api/clubs/join-by-code', (route) =>
+			route.fulfill({
+				status: 200,
+				contentType: 'application/json',
+				body: JSON.stringify({ ok: true })
+			})
+		);
+		await arrangeAuthenticated({ arrangeSnapshot, arrangeAuth, wsConnect }, '/join?code=GOODCODE');
 
-await page.waitForResponse('**/api/clubs/preview?code=GOODCODE');
-const joinResponse = page.waitForResponse('**/api/clubs/join-by-code');
-await join.joinButton().click();
-await joinResponse;
+		await page.waitForResponse('**/api/clubs/preview?code=GOODCODE');
+		const joinResponse = page.waitForResponse('**/api/clubs/join-by-code');
+		await join.joinButton().click();
+		await joinResponse;
 
-expect(new URL(page.url()).pathname).toBe('/');
-await expectDashboardLoaded(page);
-});
+		await expect.poll(() => new URL(page.url()).pathname).toBe('/');
+		await expectDashboardLoaded(page);
+	});
 
-test('shows error when join-by-code request fails', async ({
-page,
-arrangeSnapshot,
-arrangeAuth,
-wsConnect
-}) => {
-const join = new JoinPage(page);
-await page.route('**/api/clubs/preview?code=USED001', (route) =>
-route.fulfill({
-status: 200,
-contentType: 'application/json',
-body: JSON.stringify({ club_uuid: subjectId, club_name: 'Pier Park Club', role: 'player' })
-})
-);
-await page.route('**/api/clubs/join-by-code', (route) =>
-route.fulfill({
-status: 400,
-contentType: 'application/json',
-body: JSON.stringify({ error: 'Invite already used' })
-})
-);
-await arrangeAuthenticated(
-{ arrangeSnapshot, arrangeAuth, wsConnect },
-'/join?code=USED001'
-);
+	test('shows error when join-by-code request fails', async ({
+		page,
+		arrangeSnapshot,
+		arrangeAuth,
+		wsConnect
+	}) => {
+		const join = new JoinPage(page);
+		await page.route('**/api/clubs/preview?code=USED001', (route) =>
+			route.fulfill({
+				status: 200,
+				contentType: 'application/json',
+				body: JSON.stringify({ club_uuid: subjectId, club_name: 'Pier Park Club', role: 'player' })
+			})
+		);
+		await page.route('**/api/clubs/join-by-code', (route) =>
+			route.fulfill({
+				status: 400,
+				contentType: 'application/json',
+				body: JSON.stringify({ error: 'Invite already used' })
+			})
+		);
+		await arrangeAuthenticated({ arrangeSnapshot, arrangeAuth, wsConnect }, '/join?code=USED001');
 
-await page.waitForResponse('**/api/clubs/preview?code=USED001');
-const joinResponse = page.waitForResponse('**/api/clubs/join-by-code');
-await join.joinButton().click();
-await joinResponse;
+		await page.waitForResponse('**/api/clubs/preview?code=USED001');
+		const joinResponse = page.waitForResponse('**/api/clubs/join-by-code');
+		await join.joinButton().click();
+		await joinResponse;
 
-await expect(page.getByText('Invite already used')).toBeVisible();
-});
+		await expect(page.getByText('Invite already used')).toBeVisible();
+	});
 });

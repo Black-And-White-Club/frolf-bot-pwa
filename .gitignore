@@ -67,3 +67,7 @@ docs/INTEGRATION_TESTING.md
 cypress/screenshots
 cypress/videos
 AGENTS.md
+test-results/
+playwright-report/
+playwright-report/index.html
+/playwright-report

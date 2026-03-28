@@ -3,13 +3,14 @@
 	import { auth } from '$lib/stores/auth.svelte';
 	import { challengeStore } from '$lib/stores/challenges.svelte';
 	import { clubService } from '$lib/stores/club.svelte';
+	import { nats } from '$lib/stores/nats.svelte';
 	import { resolveRequestIdentity } from '$lib/utils/requestIdentity';
 
 	const identity = $derived(resolveRequestIdentity(auth.user));
 	const canViewChallenges = $derived(auth.isAuthenticated && identity !== null);
 
 	$effect(() => {
-		if (!canViewChallenges) {
+		if (!canViewChallenges || !nats.isConnected) {
 			return;
 		}
 

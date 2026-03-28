@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import TagEditor from '$lib/components/admin/TagEditor.svelte';
 	import PointAdjuster from '$lib/components/admin/PointAdjuster.svelte';
 	import BettingMarketManager from '$lib/components/admin/BettingMarketManager.svelte';
@@ -7,15 +6,20 @@
 	import AdminScorecardUploader from '$lib/components/admin/AdminScorecardUploader.svelte';
 	import AdminBackfillRoundUploader from '$lib/components/admin/AdminBackfillRoundUploader.svelte';
 	import { auth } from '$lib/stores/auth.svelte';
+	import { nats } from '$lib/stores/nats.svelte';
 	import { tagStore } from '$lib/stores/tags.svelte';
 	import { resolveRequestIdentity } from '$lib/utils/requestIdentity';
 
-	onMount(async () => {
-		// Fetch tag list if not already loaded (may already be populated from startup)
-		const identity = resolveRequestIdentity(auth.user);
-		if (tagStore.tagList.length === 0 && identity) {
-			await tagStore.fetchTagList(identity.requestSubjectId);
+	let hasRequestedTagList = false;
+	let identity = $derived(resolveRequestIdentity(auth.user));
+
+	$effect(() => {
+		if (!nats.isConnected || !identity || tagStore.tagList.length > 0 || hasRequestedTagList) {
+			return;
 		}
+
+		hasRequestedTagList = true;
+		void tagStore.fetchTagList(identity.guildId, identity.clubUuid);
 	});
 </script>
 

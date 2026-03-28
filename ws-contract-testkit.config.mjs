@@ -8,12 +8,12 @@ export default {
 			process.env.EVENT_CONTRACTS_SOURCE ??
 			'../frolf-bot-shared/artifacts/contracts/events.contracts.json',
 		outJsonPath: 'contracts/events.contracts.json',
-		outTsPath: 'cypress/support/event-contracts.generated.ts',
+		outTsPath: 'tests/e2e/support/event-contracts.generated.ts',
 		sourceName: 'scripts/sync-event-contracts.mjs'
 	},
 	fixtures: {
 		contractsPath: 'contracts/events.contracts.json',
-		fixturesRoot: 'cypress/fixtures/contracts',
+		fixturesRoot: 'tests/e2e/scenarios',
 		allowlistPath: 'contracts/contract-fixture-exceptions.json',
 		placeholders: ['{scope_id}', '{scope}']
 	}

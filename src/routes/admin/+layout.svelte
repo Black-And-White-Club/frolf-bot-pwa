@@ -1,12 +1,17 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { browser } from '$app/environment';
+	import { auth } from '$lib/stores/auth.svelte';
 
 	let { children } = $props();
 
-	onMount(async () => {
-		const { auth } = await import('$lib/stores/auth.svelte');
-		if (!auth.canAdmin) goto('/');
+	$effect(() => {
+		if (!browser || auth.status === 'validating') {
+			return;
+		}
+
+		if (!auth.canAdmin) {
+			window.location.replace('/');
+		}
 	});
 </script>
 

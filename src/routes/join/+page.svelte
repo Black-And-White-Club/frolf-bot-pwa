@@ -62,11 +62,13 @@
 			joinStatus = 'success';
 			// Refresh session to pick up new membership, then reconnect NATS
 			await auth.refreshSession();
+			await goto('/');
 			if (auth.token) {
-				await nats.disconnect();
-				await nats.connect(auth.token);
+				void (async () => {
+					await nats.disconnect();
+					await nats.connect(auth.token!);
+				})();
 			}
-			goto('/');
 		} catch {
 			joinStatus = 'error';
 			joinError = 'Something went wrong. Please try again.';
