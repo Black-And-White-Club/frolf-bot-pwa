@@ -1,11 +1,6 @@
-// @vitest-environment jsdom
-import { render } from '@testing-library/svelte';
-import { describe, it, expect, vi } from 'vitest';
-import MarketView from '../../src/lib/components/activity/MarketView.svelte';
-import type {
-	BettingMarketSnapshot,
-	BettingOverview
-} from '../../src/lib/stores/activity-betting.svelte';
+import { test, expect } from '@playwright/experimental-ct-svelte';
+import MarketView from '$lib/components/activity/MarketView.svelte';
+import type { BettingMarketSnapshot, BettingOverview } from '$lib/stores/activity-betting.svelte';
 
 const mockOverview: BettingOverview = {
 	club_uuid: 'club-1',
@@ -18,7 +13,7 @@ const mockOverview: BettingOverview = {
 	wallet: { season_points: 200, adjustment_balance: 0, available: 200, reserved: 0 },
 	settings: { opt_out_targeting: false, updated_at: '' },
 	journal: []
-} as any;
+} as unknown as BettingOverview;
 
 const mockMarket: BettingMarketSnapshot = {
 	club_uuid: 'club-1',
@@ -54,31 +49,31 @@ const mockMarket: BettingMarketSnapshot = {
 			}
 		]
 	}
-} as any;
+} as unknown as BettingMarketSnapshot;
 
-describe('MarketView (Activity Component)', () => {
-	it('renders wallet balance', () => {
-		const { container } = render(MarketView, {
+test.describe('MarketView (Activity Component)', () => {
+	test('renders wallet balance', async ({ mount, page }) => {
+		await mount(MarketView, {
 			props: {
 				market: mockMarket,
 				overview: mockOverview,
-				onPlaceBet: vi.fn()
+				onPlaceBet: () => {}
 			}
 		});
 
-		expect(container.textContent).toContain('200');
+		await expect(page.getByText('200')).toBeVisible();
 	});
 
-	it('renders market options for the active tab', () => {
-		const { container } = render(MarketView, {
+	test('renders market options for the active tab', async ({ mount, page }) => {
+		await mount(MarketView, {
 			props: {
 				market: mockMarket,
 				overview: mockOverview,
-				onPlaceBet: vi.fn()
+				onPlaceBet: () => {}
 			}
 		});
 
-		expect(container.textContent).toContain('Player One');
-		expect(container.textContent).toContain('Player Two');
+		await expect(page.getByText('Player One')).toBeVisible();
+		await expect(page.getByText('Player Two')).toBeVisible();
 	});
 });

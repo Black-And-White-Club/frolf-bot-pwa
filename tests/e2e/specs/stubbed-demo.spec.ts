@@ -44,39 +44,24 @@ test.describe('Dashboard Snapshot + Live Events', () => {
 		);
 	}
 
-	async function applyDashboardEvent(
-		page: import('@playwright/test').Page,
+	function applyDashboardEvent(
+		wsEmit: (subject: string, payload: unknown) => void,
 		event:
 			| { type: 'round-created'; round: ReturnType<typeof buildRoundCreated> }
 			| { type: 'tag-updated'; userId: string; oldTag?: number; newTag?: number }
-	): Promise<void> {
-		await page.evaluate(async (nextEvent) => {
-			const [{ roundService }, { leaderboardService }, { tagStore }] = await Promise.all([
-				import('/src/lib/stores/round.svelte.ts'),
-				import('/src/lib/stores/leaderboard.svelte.ts'),
-				import('/src/lib/stores/tags.svelte.ts')
-			]);
-			switch (nextEvent.type) {
-				case 'round-created':
-					roundService.handleRoundCreated(nextEvent.round);
-					roundService.setLoading(false);
-					break;
-				case 'tag-updated':
-					leaderboardService.applyPatch({
-						op: 'upsert_entry',
-						entry: {
-							userId: nextEvent.userId,
-							tagNumber: nextEvent.newTag,
-							previousTagNumber: nextEvent.oldTag
-						}
-					});
-					tagStore.upsertTagMember({
-						memberId: nextEvent.userId,
-						currentTag: nextEvent.newTag ?? null
-					});
-					break;
-			}
-		}, event);
+	): void {
+		switch (event.type) {
+			case 'round-created':
+				wsEmit(`round.created.v2.${subjectId}`, event.round);
+				break;
+			case 'tag-updated':
+				wsEmit(`leaderboard.tag.updated.v2.${subjectId}`, {
+					user_id: event.userId,
+					old_tag: event.oldTag,
+					new_tag: event.newTag
+				});
+				break;
+		}
 	}
 
 	test.beforeEach(async ({ arrangeSnapshot, arrangeAuth, wsConnect, page }) => {
@@ -131,7 +116,9 @@ test.describe('Dashboard Snapshot + Live Events', () => {
 		});
 
 		await arrangeAuth({ clubUuid: subjectId, guildId: subjectId });
-		await wsConnect();
+		await wsConnect({
+			requiredSubjects: [`round.created.v2.${subjectId}`, `leaderboard.tag.updated.v2.${subjectId}`]
+		});
 		await expectDashboardLoaded(page);
 		await seedDashboardState(page, { rounds, leaderboard, tags, profiles });
 	});
@@ -146,13 +133,13 @@ test.describe('Dashboard Snapshot + Live Events', () => {
 		await expect(page.getByText('Stubbed Player One')).toBeVisible();
 	});
 
-	test('applies live websocket events after initial snapshot', async ({ page }) => {
+	test('applies live websocket events after initial snapshot', async ({ page, wsEmit }) => {
 		const round = new RoundPage(page);
 		const leaderboard = new LeaderboardPage(page);
 
 		await expect(round.cards()).toHaveCount(1);
 
-		await applyDashboardEvent(page, {
+		applyDashboardEvent(wsEmit, {
 			type: 'round-created',
 			round: buildRoundCreated({
 				id: 'round-live-2',
@@ -161,7 +148,7 @@ test.describe('Dashboard Snapshot + Live Events', () => {
 				location: 'Pier Park'
 			})
 		});
-		await applyDashboardEvent(page, {
+		applyDashboardEvent(wsEmit, {
 			type: 'tag-updated',
 			userId: 'user-2',
 			oldTag: 5,

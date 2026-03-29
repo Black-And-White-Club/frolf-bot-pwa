@@ -32,8 +32,8 @@ test.describe('Leaderboard Flow', () => {
 		);
 	}
 
-	async function applyLeaderboardEvent(
-		page: import('@playwright/test').Page,
+	function applyLeaderboardEvent(
+		wsEmit: (subject: string, payload: unknown) => void,
 		event:
 			| {
 					type: 'tag-updated';
@@ -42,37 +42,22 @@ test.describe('Leaderboard Flow', () => {
 					newTag?: number;
 			  }
 			| { type: 'tag-swapped'; userIdA: string; userIdB: string }
-	): Promise<void> {
-		await page.evaluate(async (nextEvent) => {
-			const [{ leaderboardService }, { tagStore }] = await Promise.all([
-				import('/src/lib/stores/leaderboard.svelte.ts'),
-				import('/src/lib/stores/tags.svelte.ts')
-			]);
-			switch (nextEvent.type) {
-				case 'tag-updated':
-					leaderboardService.applyPatch({
-						op: 'upsert_entry',
-						entry: {
-							userId: nextEvent.userId,
-							tagNumber: nextEvent.newTag,
-							previousTagNumber: nextEvent.oldTag
-						}
-					});
-					tagStore.upsertTagMember({
-						memberId: nextEvent.userId,
-						currentTag: nextEvent.newTag ?? null
-					});
-					break;
-				case 'tag-swapped':
-					leaderboardService.applyPatch({
-						op: 'swap_tags',
-						userIdA: nextEvent.userIdA,
-						userIdB: nextEvent.userIdB
-					});
-					tagStore.swapTagMembers(nextEvent.userIdA, nextEvent.userIdB);
-					break;
-			}
-		}, event);
+	): void {
+		switch (event.type) {
+			case 'tag-updated':
+				wsEmit(`leaderboard.tag.updated.v2.${subjectId}`, {
+					user_id: event.userId,
+					old_tag: event.oldTag,
+					new_tag: event.newTag
+				});
+				break;
+			case 'tag-swapped':
+				wsEmit(`leaderboard.tag.swap.processed.v2.${subjectId}`, {
+					requestor_id: event.userIdA,
+					target_id: event.userIdB
+				});
+				break;
+		}
 	}
 
 	test.beforeEach(async ({ arrangeSnapshot, arrangeAuth, wsConnect, page }) => {
@@ -99,7 +84,12 @@ test.describe('Leaderboard Flow', () => {
 			tags
 		});
 		await arrangeAuth({ path: '/leaderboard', clubUuid: subjectId, guildId: subjectId });
-		await wsConnect();
+		await wsConnect({
+			requiredSubjects: [
+				`leaderboard.tag.updated.v2.${subjectId}`,
+				`leaderboard.tag.swap.processed.v2.${subjectId}`
+			]
+		});
 		await seedLeaderboardState(page, { leaderboard: initialLeaderboard, tags });
 		const leaderboardPage = new LeaderboardPage(page);
 		await leaderboardPage.expectLoaded({ minRows: 3 });
@@ -112,7 +102,7 @@ test.describe('Leaderboard Flow', () => {
 		await leaderboard.expectFirstUser('user-1');
 	});
 
-	test('reorders rows after leaderboard.tag.updated', async ({ page, arrangeSnapshot }) => {
+	test('reorders rows after leaderboard.tag.updated', async ({ page, arrangeSnapshot, wsEmit }) => {
 		const leaderboard = new LeaderboardPage(page);
 		const snapshot = buildLeaderboardSnapshot({
 			guild_id: subjectId,
@@ -137,7 +127,7 @@ test.describe('Leaderboard Flow', () => {
 
 		await leaderboard.expectFirstUser('user-1');
 
-		await applyLeaderboardEvent(page, {
+		applyLeaderboardEvent(wsEmit, {
 			type: 'tag-updated',
 			userId: 'user-2',
 			oldTag: 5,
@@ -146,7 +136,11 @@ test.describe('Leaderboard Flow', () => {
 		await leaderboard.expectFirstUser('user-2');
 	});
 
-	test('swaps tags after leaderboard.tag.swap.processed', async ({ page, arrangeSnapshot }) => {
+	test('swaps tags after leaderboard.tag.swap.processed', async ({
+		page,
+		arrangeSnapshot,
+		wsEmit
+	}) => {
 		const leaderboard = new LeaderboardPage(page);
 		const snapshot = buildLeaderboardSnapshot({
 			guild_id: subjectId,
@@ -169,7 +163,7 @@ test.describe('Leaderboard Flow', () => {
 		});
 		await seedLeaderboardState(page, { leaderboard: snapshot, tags });
 
-		await applyLeaderboardEvent(page, {
+		applyLeaderboardEvent(wsEmit, {
 			type: 'tag-swapped',
 			userIdA: 'user-1',
 			userIdB: 'user-2'

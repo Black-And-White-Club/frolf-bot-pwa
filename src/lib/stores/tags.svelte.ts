@@ -82,7 +82,7 @@ interface TagHistoryRequestPayload {
 }
 
 interface TagListRequestPayload {
-	guild_id: string;
+	guild_id: string | null;
 	club_uuid?: string;
 }
 
@@ -389,7 +389,7 @@ export class TagService {
 	/**
 	 * Re-fetch the tag list on-demand (e.g. after reconnect or if startup load failed).
 	 */
-	async fetchTagList(guildId: string, clubUuid?: string): Promise<void> {
+	async fetchTagList(guildId: string | null, clubUuid?: string): Promise<void> {
 		this.loading = true;
 		this.error = null;
 

@@ -92,7 +92,7 @@ export default defineConfig({
 						'src/lib/components/**/__tests__/**/*.{test,spec}.{js,ts}',
 						'tests/**/*.{test,spec}.{js,ts}'
 					],
-					exclude: ['src/lib/server/**'],
+					exclude: ['src/lib/server/**', 'tests/e2e/**', 'tests/ct/**'],
 					server: {
 						deps: {
 							inline: [

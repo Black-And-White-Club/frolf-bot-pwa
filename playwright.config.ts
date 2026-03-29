@@ -17,6 +17,20 @@ export default defineConfig({
 		{
 			name: 'chromium',
 			use: { ...devices['Desktop Chrome'] }
+		},
+		{
+			// Viewport-sensitive specs only — tests the hamburger nav, compact layouts,
+			// and responsive behaviour that never runs at the desktop 1280px breakpoint.
+			name: 'mobile-chrome',
+			use: { ...devices['Pixel 5'] },
+			testMatch: ['**/navigation-shell.spec.ts', '**/dashboard.spec.ts', '**/pwa-shell.spec.ts']
+		},
+		{
+			// Portrait TV (1080×1920) — tall narrow layout that triggers its own responsive
+			// breakpoints distinct from both phone and desktop.
+			name: 'tv-portrait',
+			use: { ...devices['Desktop Chrome'], viewport: { width: 1080, height: 1920 } },
+			testMatch: ['**/navigation-shell.spec.ts', '**/dashboard.spec.ts', '**/pwa-shell.spec.ts']
 		}
 	],
 	testIgnore: process.env.PLAYWRIGHT_INCLUDE_SMOKE ? [] : ['**/smoke/**'],

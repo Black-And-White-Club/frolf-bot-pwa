@@ -14,7 +14,3 @@ export const VIEWPORT_MATRIX: readonly ViewportProfile[] = [
 ] as const;
 
 export const DESKTOP_VIEWPORT: ViewportProfile = VIEWPORT_MATRIX[0];
-
-export function viewportConfig(profile: ViewportProfile): string {
-	return `viewportWidth=${profile.width},viewportHeight=${profile.height}`;
-}
