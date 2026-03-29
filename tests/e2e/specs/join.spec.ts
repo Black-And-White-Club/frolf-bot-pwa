@@ -128,7 +128,8 @@ test.describe('Join Page', () => {
 	test('first-time club join: transitions from needs-club to live mode', async ({
 		page,
 		arrangeSnapshot,
-		arrangeAuth
+		arrangeAuth,
+		wsConnect
 	}) => {
 		const join = new JoinPage(page);
 		const newClubUuid = 'club-first-456';
@@ -166,6 +167,9 @@ test.describe('Join Page', () => {
 			role: 'viewer',
 			linkedProviders: ['discord']
 		});
+		// No NATS connection during init (user has no clubs), but we still call wsConnect
+		// to ensure the mock WebSocket handler is active before onClubJoined fires.
+		await wsConnect({ minSubscriptions: 0 });
 
 		// After join, ticket requests return a token that includes the new club.
 		const postJoinTicket = buildMockTicket({

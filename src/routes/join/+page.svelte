@@ -67,7 +67,7 @@
 				await appInit.onClubJoined(preview.club_uuid);
 			}
 			await goto('/');
-		} catch {
+		} catch (err) {
 			joinStatus = 'error';
 			joinError = 'Something went wrong. Please try again.';
 		}

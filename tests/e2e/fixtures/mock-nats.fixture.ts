@@ -28,7 +28,7 @@ export class PlaywrightMockNats {
 	private localHandlerErrors: string[] = [];
 
 	handleConnection(ws: WebSocketRoute): void {
-		const client: NatsClient = { send: (data) => ws.send(data) };
+		const client: NatsClient = { send: (data) => ws.send(Buffer.from(data)) };
 		this.clients.push(client);
 
 		client.send(
@@ -36,7 +36,7 @@ export class PlaywrightMockNats {
 		);
 
 		ws.onMessage((msg) => {
-			const text = typeof msg === 'string' ? msg : Buffer.from(msg as Buffer).toString();
+			const text = typeof msg === 'string' ? msg : Buffer.from(msg as Buffer).toString('utf8');
 			this.processProtocolMessage(text, client.send.bind(client));
 		});
 
@@ -168,6 +168,16 @@ export class PlaywrightMockNats {
 		const frame = msg.slice(frameCursor, frameCursor + totalBytes);
 		let nextCursor = frameCursor + totalBytes;
 		if (msg.slice(nextCursor, nextCursor + 2) === '\r\n') nextCursor += 2;
+
+		// Parse reply_to from header section when not present in control line.
+		// The nats.ws library sends reply_to as a NATS header (e.g. `reply_to: _INBOX.xxx`)
+		// rather than embedding it in the HPUB control line.
+		if (!replyTo && headerBytes > 0) {
+			const headerSection = frame.slice(0, headerBytes);
+			const match = headerSection.match(/^reply_to:\s*(.+)$/im);
+			if (match) replyTo = match[1].trim();
+		}
+
 		const payloadRaw = frame.slice(headerBytes).replace(/^\r\n+/, '');
 
 		return { subject, replyTo, payload: this.parsePayload(payloadRaw), nextCursor };

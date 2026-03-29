@@ -41,6 +41,12 @@ class AppInitializer {
 	async onClubJoined(clubUuid: string): Promise<void> {
 		if (!browser) return;
 
+		// If initialize() is still in flight (e.g. mid-way through connectAndLoad()),
+		// wait for it to settle before we disconnect NATS. Without this, nats.disconnect()
+		// can close the connection that connectAndLoad() is using to await data replies,
+		// causing unpredictable errors or a silent early-return from the next nats.connect().
+		if (this.initPromise) await this.initPromise.catch(() => {});
+
 		const wasNeedsClub = this.needsClub;
 
 		// Always populate liveModules before accessing them. Idempotent if already loaded.

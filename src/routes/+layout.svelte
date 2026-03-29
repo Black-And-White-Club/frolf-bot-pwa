@@ -204,7 +204,24 @@
 	{#if UpdateSnackbarClient}
 		<UpdateSnackbarClient />
 	{/if}
-	{#if appInit.isLoading && !isAuthenticatedView}
+	{#if page.url.pathname.startsWith('/activity')}
+		<!-- Discord Activity — uses its own SDK auth (token exchange), not cookie auth.
+		     The global init loading overlay must never cover it. Once the activity user
+		     is authenticated but has no club, fall through to ClubDiscovery. -->
+		{#if isAuthenticatedView && appInit.needsClub}
+			{#if ClubDiscovery}
+				<ClubDiscovery />
+			{:else}
+				<div class="flex min-h-screen items-center justify-center bg-[#081212]">
+					<div
+						class="h-8 w-8 animate-spin rounded-full border-2 border-[#007474] border-t-transparent"
+					></div>
+				</div>
+			{/if}
+		{:else}
+			{@render children?.()}
+		{/if}
+	{:else if appInit.isLoading && !isAuthenticatedView}
 		<div class="flex min-h-screen items-center justify-center bg-[#081212]">
 			<div class="text-center">
 				<div
@@ -274,9 +291,6 @@
 		<main id="main-content" class="min-h-screen bg-[var(--guild-background)]">
 			{@render children?.()}
 		</main>
-	{:else if page.url.pathname.startsWith('/activity')}
-		<!-- Discord Activity — uses its own SDK auth (token exchange), not cookie auth -->
-		{@render children?.()}
 	{:else if page.url.pathname === '/privacy' || page.url.pathname === '/tos'}
 		<!-- Public legal pages — no auth required -->
 		<main id="main-content" class="min-h-screen bg-[var(--guild-background)]">

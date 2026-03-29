@@ -124,6 +124,7 @@ export function arrangeSnapshot(
 	stubLeaderboard(mockNats, subjectId, options);
 	stubTags(mockNats, subjectId, options);
 	stubClubInfo(mockNats, subjectId, options);
+	stubChallenges(mockNats, subjectId);
 }
 
 function stubRoundList(
@@ -167,6 +168,10 @@ function stubClubInfo(
 		icon_url: options.clubInfo?.icon_url ?? null
 	};
 	mockNats.stubRequest(`club.info.request.v2.${subjectId}`, payload);
+}
+
+function stubChallenges(mockNats: PlaywrightMockNats, subjectId: string): void {
+	mockNats.stubRequest(`club.challenge.list.request.v1.${subjectId}`, { challenges: [] });
 }
 
 export function wsEmit(
