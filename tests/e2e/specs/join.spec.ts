@@ -1,4 +1,5 @@
 import { test, expect } from '../fixtures';
+import { buildMockTicket } from '../fixtures/auth.fixture';
 import { JoinPage } from '../pages/join.page';
 import { buildLeaderboardSnapshot, buildTagListSnapshot } from '../support/event-builders';
 import { expectDashboardLoaded } from '../support/helpers';
@@ -116,6 +117,79 @@ test.describe('Join Page', () => {
 		await arrangeAuthenticated({ arrangeSnapshot, arrangeAuth, wsConnect }, '/join?code=GOODCODE');
 
 		await page.waitForResponse('**/api/clubs/preview?code=GOODCODE');
+		const joinResponse = page.waitForResponse('**/api/clubs/join-by-code');
+		await join.joinButton().click();
+		await joinResponse;
+
+		await expect.poll(() => new URL(page.url()).pathname).toBe('/');
+		await expectDashboardLoaded(page);
+	});
+
+	test('first-time club join: transitions from needs-club to live mode', async ({
+		page,
+		arrangeSnapshot,
+		arrangeAuth
+	}) => {
+		const join = new JoinPage(page);
+		const newClubUuid = 'club-first-456';
+
+		// Snapshot stubs for the new club (used by dataLoader.loadInitialData after join)
+		arrangeSnapshot({
+			subjectId: newClubUuid,
+			rounds: [],
+			leaderboard: buildLeaderboardSnapshot({ guild_id: newClubUuid, leaderboard: [] }),
+			tags: buildTagListSnapshot({ guild_id: newClubUuid, members: [] })
+		});
+
+		await page.route('**/api/clubs/preview?code=FIRSTJOIN', (route) =>
+			route.fulfill({
+				status: 200,
+				contentType: 'application/json',
+				body: JSON.stringify({ club_uuid: newClubUuid, club_name: 'First Club', role: 'player' })
+			})
+		);
+		await page.route('**/api/clubs/join-by-code', (route) =>
+			route.fulfill({
+				status: 200,
+				contentType: 'application/json',
+				body: JSON.stringify({ ok: true })
+			})
+		);
+
+		// Initial auth: no clubs — puts app in needsClub state.
+		// The /join route is exempt from the ClubDiscovery overlay.
+		await arrangeAuth({
+			path: '/join?code=FIRSTJOIN',
+			clubs: [],
+			activeClubUuid: '',
+			guildId: newClubUuid,
+			role: 'viewer',
+			linkedProviders: ['discord']
+		});
+
+		// After join, ticket requests return a token that includes the new club.
+		const postJoinTicket = buildMockTicket({
+			active_club_uuid: newClubUuid,
+			guild: newClubUuid,
+			role: 'player',
+			clubs: [
+				{
+					club_uuid: newClubUuid,
+					role: 'player',
+					display_name: 'Test User',
+					avatar_url: ''
+				}
+			]
+		});
+		await page.route('**/api/auth/ticket', (route) =>
+			route.fulfill({
+				status: 200,
+				contentType: 'application/json',
+				body: JSON.stringify({ ticket: postJoinTicket })
+			})
+		);
+
+		await page.waitForResponse('**/api/clubs/preview?code=FIRSTJOIN');
 		const joinResponse = page.waitForResponse('**/api/clubs/join-by-code');
 		await join.joinButton().click();
 		await joinResponse;

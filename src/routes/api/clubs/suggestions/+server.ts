@@ -19,6 +19,7 @@ export const GET: RequestHandler = async ({ fetch, request }) => {
 		return json(data);
 	} catch (err) {
 		if (isE2EMode) {
+			console.warn('[E2E] clubs/suggestions backend unreachable, returning empty fallback');
 			return json([], { status: 200 });
 		}
 		throw err;

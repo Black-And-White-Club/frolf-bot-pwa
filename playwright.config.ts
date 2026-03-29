@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
 	testDir: './tests/e2e/specs',
-	fullyParallel: false,
+	fullyParallel: false, // Tests share a single dev server on :5173; parallel file execution causes port conflicts
 	forbidOnly: !!process.env.CI,
 	retries: process.env.CI ? 1 : 0,
 	workers: process.env.CI ? 2 : undefined,

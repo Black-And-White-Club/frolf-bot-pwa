@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { auth } from '$lib/stores/auth.svelte';
-	import { nats } from '$lib/stores/nats.svelte';
+	import { appInit } from '$lib/stores/init.svelte';
 	import { goto } from '$app/navigation';
 
 	type InvitePreview = {
@@ -60,15 +60,13 @@
 				return;
 			}
 			joinStatus = 'success';
-			// Refresh session to pick up new membership, then reconnect NATS
+			// Refresh session to pick up new membership in JWT claims, then hand
+			// off the full lifecycle (NATS reconnect, subscriptions, data reload) to appInit.
 			await auth.refreshSession();
-			await goto('/');
-			if (auth.token) {
-				void (async () => {
-					await nats.disconnect();
-					await nats.connect(auth.token!);
-				})();
+			if (preview?.club_uuid) {
+				await appInit.onClubJoined(preview.club_uuid);
 			}
+			await goto('/');
 		} catch {
 			joinStatus = 'error';
 			joinError = 'Something went wrong. Please try again.';

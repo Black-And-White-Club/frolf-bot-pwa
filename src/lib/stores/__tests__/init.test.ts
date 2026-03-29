@@ -134,7 +134,10 @@ describe('onClubJoined', () => {
 	});
 
 	it('first club join: reconnects NATS and transitions from needs-club to live mode', async () => {
-		authState.initialize.mockResolvedValue({ authenticated: true, switchedClubWithDataLoad: false });
+		authState.initialize.mockResolvedValue({
+			authenticated: true,
+			switchedClubWithDataLoad: false
+		});
 		authState.user = { ...authState.user, clubs: [] };
 		const { appInit } = await import('../init.svelte');
 		await appInit.initialize();
