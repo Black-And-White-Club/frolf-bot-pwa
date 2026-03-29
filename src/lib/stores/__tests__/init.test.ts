@@ -22,11 +22,13 @@ const authState = {
 	},
 	status: 'authenticated',
 	initialize: vi.fn(async () => ({ authenticated: true, switchedClubWithDataLoad: true })),
+	switchClub: vi.fn(async () => true),
 	signOut: vi.fn()
 };
 
 const natsState = {
 	connect: vi.fn(async () => {}),
+	disconnect: vi.fn(async () => {}),
 	onReconnect: vi.fn(() => () => {}),
 	destroy: vi.fn()
 };
@@ -48,7 +50,8 @@ vi.mock('../subscriptions.svelte', () => ({
 
 vi.mock('../dataLoader.svelte', () => ({
 	dataLoader: {
-		loadInitialData: vi.fn(async () => {})
+		loadInitialData: vi.fn(async () => {}),
+		clearData: vi.fn()
 	}
 }));
 
@@ -92,6 +95,61 @@ describe('appInit reconnect recovery', () => {
 
 		expect(authState.initialize).toHaveBeenCalledTimes(1);
 		expect(natsState.connect).not.toHaveBeenCalled();
+		expect(natsState.onReconnect).toHaveBeenCalledTimes(1);
+	});
+});
+
+describe('onClubJoined', () => {
+	beforeEach(() => {
+		vi.resetModules();
+		natsState.connect.mockClear();
+		natsState.disconnect.mockClear();
+		natsState.onReconnect.mockClear();
+		authState.initialize.mockClear();
+		authState.switchClub.mockClear();
+		authState.switchClub.mockResolvedValue(true);
+		authState.isAuthenticated = true;
+		authState.token = 'test-token';
+		// Restore clubs to default between tests
+		authState.user = {
+			activeClubUuid: 'club-123',
+			guildId: 'guild-123',
+			clubs: [{ club_uuid: 'club-123', role: 'admin' }],
+			linkedProviders: []
+		};
+	});
+
+	it('returning member: fetches scoped token, reconnects NATS, preserves live mode', async () => {
+		authState.initialize.mockResolvedValue({ authenticated: true, switchedClubWithDataLoad: true });
+		const { appInit } = await import('../init.svelte');
+		await appInit.initialize();
+
+		await appInit.onClubJoined('club-new');
+
+		expect(authState.switchClub).toHaveBeenCalledWith('club-new', { reloadData: false });
+		expect(natsState.disconnect).toHaveBeenCalledTimes(1);
+		expect(natsState.connect).toHaveBeenCalledWith('test-token');
+		expect(appInit.needsClub).toBe(false);
+		expect(appInit.mode).toBe('live');
+	});
+
+	it('first club join: reconnects NATS and transitions from needs-club to live mode', async () => {
+		authState.initialize.mockResolvedValue({ authenticated: true, switchedClubWithDataLoad: false });
+		authState.user = { ...authState.user, clubs: [] };
+		const { appInit } = await import('../init.svelte');
+		await appInit.initialize();
+
+		expect(appInit.needsClub).toBe(true);
+		expect(natsState.onReconnect).not.toHaveBeenCalled();
+
+		await appInit.onClubJoined('club-new');
+
+		expect(authState.switchClub).toHaveBeenCalledWith('club-new', { reloadData: false });
+		expect(natsState.disconnect).toHaveBeenCalledTimes(1);
+		expect(natsState.connect).toHaveBeenCalledWith('test-token');
+		expect(appInit.needsClub).toBe(false);
+		expect(appInit.mode).toBe('live');
+		expect(appInit.status).toBe('ready');
 		expect(natsState.onReconnect).toHaveBeenCalledTimes(1);
 	});
 });

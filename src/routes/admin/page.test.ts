@@ -21,6 +21,10 @@ vi.mock('$lib/stores/tags.svelte', () => ({
 	tagStore: mockTagStore
 }));
 
+vi.mock('$lib/stores/nats.svelte', () => ({
+	nats: { isConnected: true }
+}));
+
 vi.mock('$lib/components/admin/TagEditor.svelte', () => ({ default: () => {} }));
 vi.mock('$lib/components/admin/PointAdjuster.svelte', () => ({ default: () => {} }));
 vi.mock('$lib/components/admin/AdminScorecardUploader.svelte', () => ({ default: () => {} }));
@@ -44,7 +48,8 @@ describe('src/routes/admin/+page.svelte', () => {
 		render(Page);
 
 		await waitFor(() => {
-			expect(mockTagStore.fetchTagList).toHaveBeenCalledWith('club-123');
+			// guildId normalizes to null for club-only users; clubUuid is passed as second arg
+			expect(mockTagStore.fetchTagList).toHaveBeenCalledWith(null, 'club-123');
 		});
 	});
 });

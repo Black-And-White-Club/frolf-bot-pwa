@@ -33,6 +33,48 @@ class AppInitializer {
 	isReady = $derived(this.status === 'ready');
 	isLoading = $derived(this.status === 'initializing');
 
+	/**
+	 * Called after successfully joining a new club via invite link.
+	 * Handles NATS reconnection, subscription restart, and data reload.
+	 * For first-time club joins (needsClub=true), also transitions app to live mode.
+	 */
+	async onClubJoined(clubUuid: string): Promise<void> {
+		if (!browser) return;
+
+		const wasNeedsClub = this.needsClub;
+
+		// Always populate liveModules before accessing them. Idempotent if already loaded.
+		// Needed for the returning-member path when initialize() hasn't run yet (e.g. fast E2E clicks).
+		await this.ensureLiveModules();
+
+		// Fetch club-scoped token only; skip the blocking reloadAfterClubSwitch.
+		await auth.switchClub(clubUuid, { reloadData: false });
+
+		const { nats, subscriptionManager, dataLoader, clubService } = this.liveModules!;
+
+		// Reconnect NATS with the new scoped token and restart subscriptions.
+		await nats.disconnect();
+		await nats.connect(auth.token as string);
+		subscriptionManager.start(clubUuid);
+		dataLoader.clearData();
+
+		// Non-blocking: data loads in background; home page shows loading states.
+		void Promise.all([
+			clubService.loadClubInfo().catch((e: unknown) => {
+				console.warn('[AppInit] Club info load failed after join:', e);
+			}),
+			dataLoader.loadInitialData().catch((e: unknown) => {
+				console.warn('[AppInit] Initial data load failed after join:', e);
+			})
+		]);
+
+		if (wasNeedsClub) {
+			this.ensureReconnectRecovery();
+			this.needsClub = false;
+			this.setLiveReady();
+		}
+	}
+
 	async initialize(opts?: { serverTicket?: string | null }): Promise<void> {
 		if (!browser || this.status === 'ready') return;
 		if (this.initPromise) return this.initPromise;
