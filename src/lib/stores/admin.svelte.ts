@@ -114,6 +114,10 @@ const ADMIN_SCORECARD_UPLOAD_SUBJECT = 'round.scorecard.admin.upload.requested.v
 const ADMIN_SCORECARD_UPLOAD_SOURCE = 'admin_pwa_upload';
 const ADMIN_BACKFILL_CHECK_SUBJECT = 'round.admin.backfill.check.v1';
 const ADMIN_BACKFILL_REQUESTED_SUBJECT = 'round.admin.backfill.requested.v1';
+const ADMIN_UDISC_IDENTITY_UPDATE_SUBJECT = 'user.udisc.identity.update.requested.v1';
+const ADMIN_UDISC_IDENTITY_UPDATED_SUBJECT = 'user.udisc.identity.updated.v1';
+const ADMIN_UDISC_IDENTITY_FAILED_SUBJECT = 'user.udisc.identity.update.failed.v1';
+const ADMIN_ROUND_EMBED_REPUBLISH_SUBJECT = 'round.admin.republish.embed.requested.v1';
 
 class AdminService {
 	loading = $state(false);
@@ -573,6 +577,108 @@ class AdminService {
 		} catch (error) {
 			this.errorMessage =
 				error instanceof Error ? error.message : 'Failed to submit backfill round';
+			this.scheduleMessageClear();
+		} finally {
+			this.loading = false;
+		}
+	}
+
+	/**
+	 * Set UDisc username and/or display name for any user.
+	 * Publishes user.udisc.identity.update.requested.v1 and waits for success/failure.
+	 */
+	async updateUDiscIdentity(
+		guildId: string,
+		targetUserId: string,
+		username?: string,
+		name?: string
+	): Promise<void> {
+		this.loading = true;
+		this.successMessage = null;
+		this.errorMessage = null;
+
+		return new Promise((resolve) => {
+			let resolved = false;
+
+			const cleanup = () => {
+				nats.unsubscribe(ADMIN_UDISC_IDENTITY_UPDATED_SUBJECT);
+				nats.unsubscribe(ADMIN_UDISC_IDENTITY_FAILED_SUBJECT);
+				resolve();
+			};
+
+			nats.subscribe(ADMIN_UDISC_IDENTITY_UPDATED_SUBJECT, (msg: any) => {
+				if (resolved) return;
+				if (msg.data.user_id && msg.data.user_id !== targetUserId) return;
+				resolved = true;
+				this.loading = false;
+				this.successMessage = 'UDisc identity updated successfully.';
+				this.scheduleMessageClear();
+				cleanup();
+			});
+
+			nats.subscribe(ADMIN_UDISC_IDENTITY_FAILED_SUBJECT, (msg: any) => {
+				if (resolved) return;
+				if (msg.data.user_id && msg.data.user_id !== targetUserId) return;
+				resolved = true;
+				this.loading = false;
+				this.errorMessage = msg.data.reason ?? 'UDisc identity update failed';
+				this.scheduleMessageClear();
+				cleanup();
+			});
+
+			const payload: Record<string, unknown> = {
+				guild_id: guildId,
+				user_id: targetUserId
+			};
+			if (username !== undefined && username !== '') payload.username = username;
+			if (name !== undefined && name !== '') payload.name = name;
+
+			nats.publish(ADMIN_UDISC_IDENTITY_UPDATE_SUBJECT, payload);
+
+			setTimeout(() => {
+				if (!resolved) {
+					resolved = true;
+					this.loading = false;
+					this.errorMessage = 'Request timed out. Please verify results manually.';
+					this.scheduleMessageClear();
+					cleanup();
+				}
+			}, OPERATION_TIMEOUT_MS);
+		});
+	}
+
+	/**
+	 * Re-publish the finalized Discord embed for a round.
+	 * Uses NATS request-reply so the backend confirms receipt before returning.
+	 */
+	async republishRoundEmbed(
+		guildId: string,
+		adminId: string,
+		roundId: string
+	): Promise<void> {
+		this.loading = true;
+		this.successMessage = null;
+		this.errorMessage = null;
+
+		try {
+			const response = await nats.request<
+				{ guild_id: string; round_id: string; admin_id: string },
+				{ round_id: string; error?: string }
+			>(
+				ADMIN_ROUND_EMBED_REPUBLISH_SUBJECT,
+				{ guild_id: guildId, round_id: roundId, admin_id: adminId },
+				{ timeout: OPERATION_TIMEOUT_MS }
+			);
+
+			if (response?.error) {
+				throw new Error(response.error);
+			}
+
+			this.successMessage = 'Embed republish triggered. Discord message should update shortly.';
+			this.scheduleMessageClear();
+		} catch (error) {
+			this.errorMessage =
+				error instanceof Error ? error.message : 'Failed to republish round embed';
 			this.scheduleMessageClear();
 		} finally {
 			this.loading = false;

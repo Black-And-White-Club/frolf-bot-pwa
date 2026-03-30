@@ -5,6 +5,8 @@
 	import BettingWalletAdjuster from '$lib/components/admin/BettingWalletAdjuster.svelte';
 	import AdminScorecardUploader from '$lib/components/admin/AdminScorecardUploader.svelte';
 	import AdminBackfillRoundUploader from '$lib/components/admin/AdminBackfillRoundUploader.svelte';
+	import UDiscIdentityEditor from '$lib/components/admin/UDiscIdentityEditor.svelte';
+	import RoundEmbedRepublisher from '$lib/components/admin/RoundEmbedRepublisher.svelte';
 	import { auth } from '$lib/stores/auth.svelte';
 	import { nats } from '$lib/stores/nats.svelte';
 	import { tagStore } from '$lib/stores/tags.svelte';
@@ -112,6 +114,24 @@
 				Backfill Past Round
 			</h2>
 			<AdminBackfillRoundUploader />
+		</section>
+
+		<section class="space-y-3">
+			<h2
+				class="font-['Space_Grotesk'] text-sm font-semibold tracking-wide text-[var(--guild-text-secondary)] uppercase"
+			>
+				UDisc Identity Editor
+			</h2>
+			<UDiscIdentityEditor />
+		</section>
+
+		<section class="space-y-3">
+			<h2
+				class="font-['Space_Grotesk'] text-sm font-semibold tracking-wide text-[var(--guild-text-secondary)] uppercase"
+			>
+				Republish Round Embed
+			</h2>
+			<RoundEmbedRepublisher />
 		</section>
 	</div>
 </div>
