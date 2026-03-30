@@ -433,6 +433,145 @@ test.describe('Admin Dashboard', () => {
 		expect(payload.notes).toBe('Imported from admin dashboard');
 	});
 
+	test('UDisc identity save button is disabled until user and at least one field are provided', async ({
+		page,
+		arrangeSnapshot,
+		arrangeAuth,
+		wsConnect
+	}) => {
+		const admin = new AdminPage(page);
+		await visitAdmin({ page, arrangeSnapshot, arrangeAuth, wsConnect }, 'admin');
+
+		await expect(admin.saveUDiscButton()).toBeDisabled();
+
+		await admin.udiscUserSelect().selectOption('user-1');
+		await expect(admin.saveUDiscButton()).toBeDisabled();
+
+		await admin.udiscUsernameInput().fill('standstillpower');
+		await expect(admin.saveUDiscButton()).toBeEnabled();
+	});
+
+	test('submits UDisc identity update and handles success event', async ({
+		page,
+		arrangeSnapshot,
+		arrangeAuth,
+		wsConnect
+	}) => {
+		const admin = new AdminPage(page);
+		await visitAdmin({ page, arrangeSnapshot, arrangeAuth, wsConnect }, 'admin');
+
+		await admin.udiscUserSelect().selectOption('user-1');
+		await admin.udiscUsernameInput().fill('standstillpower');
+		await admin.udiscNameInput().fill('Kevin Kunkel');
+		await expect(admin.saveUDiscButton()).toBeEnabled();
+		await admin.saveUDiscButton().click();
+
+		const entries = await getAdminPublished(page, 'user.udisc.identity.update.requested.v1');
+		expect(entries.length).toBeGreaterThan(0);
+		const payload = entries[entries.length - 1].payload as {
+			guild_id: string;
+			user_id: string;
+			username: string;
+			name: string;
+		};
+		expect(payload.guild_id).toBe(guildId);
+		expect(payload.user_id).toBe('user-1');
+		expect(payload.username).toBe('standstillpower');
+		expect(payload.name).toBe('Kevin Kunkel');
+
+		await emitAdminEvent(page, 'user.udisc.identity.updated.v1', {
+			guild_id: payload.guild_id,
+			user_id: payload.user_id,
+			username: payload.username,
+			name: payload.name
+		});
+
+		await expect(page.getByText('UDisc identity updated successfully').first()).toBeVisible();
+	});
+
+	test('shows UDisc identity update failure from backend event', async ({
+		page,
+		arrangeSnapshot,
+		arrangeAuth,
+		wsConnect
+	}) => {
+		const admin = new AdminPage(page);
+		await visitAdmin({ page, arrangeSnapshot, arrangeAuth, wsConnect }, 'admin');
+
+		await admin.udiscManualIdInput().fill('999888777666555444');
+		await admin.udiscUsernameInput().fill('unknownuser');
+		await admin.saveUDiscButton().click();
+
+		const entries = await getAdminPublished(page, 'user.udisc.identity.update.requested.v1');
+		expect(entries.length).toBeGreaterThan(0);
+		const payload = entries[entries.length - 1].payload as { user_id: string; guild_id: string };
+
+		await emitAdminEvent(page, 'user.udisc.identity.update.failed.v1', {
+			guild_id: payload.guild_id,
+			user_id: payload.user_id,
+			reason: 'User not found'
+		});
+
+		await expect(page.getByText('User not found').first()).toBeVisible();
+	});
+
+	test('republish embed button is disabled until a round is selected', async ({
+		page,
+		arrangeSnapshot,
+		arrangeAuth,
+		wsConnect
+	}) => {
+		const admin = new AdminPage(page);
+		await visitAdmin({ page, arrangeSnapshot, arrangeAuth, wsConnect }, 'admin');
+
+		await expect(admin.republishButton()).toBeDisabled();
+
+		await admin.republishRoundIdInput().fill('1bd0d342-19ef-4d25-b6a7-b537e523fb34');
+		await expect(admin.republishButton()).toBeEnabled();
+	});
+
+	test('submits republish embed request and shows success', async ({
+		page,
+		arrangeSnapshot,
+		arrangeAuth,
+		wsConnect
+	}) => {
+		const admin = new AdminPage(page);
+		await visitAdmin({ page, arrangeSnapshot, arrangeAuth, wsConnect }, 'admin');
+
+		const roundId = '1bd0d342-19ef-4d25-b6a7-b537e523fb34';
+		await stubAdminRequest(page, 'round.admin.republish.embed.requested.v1', {
+			round_id: roundId
+		});
+
+		await admin.republishRoundIdInput().fill(roundId);
+		await expect(admin.republishButton()).toBeEnabled();
+		await admin.republishButton().click();
+
+		await expect
+			.poll(async () => {
+				const entries = await getAdminPublished(
+					page,
+					'round.admin.republish.embed.requested.v1'
+				);
+				return entries.length;
+			})
+			.toBeGreaterThan(0);
+
+		const entries = await getAdminPublished(page, 'round.admin.republish.embed.requested.v1');
+		const payload = entries[entries.length - 1].payload as {
+			guild_id: string;
+			round_id: string;
+			admin_id: string;
+		};
+		expect(payload.guild_id).toBe(guildId);
+		expect(payload.round_id).toBe(roundId);
+
+		await expect(
+			page.getByText('Embed republish triggered').first()
+		).toBeVisible();
+	});
+
 	test('uses the Discord guild ID for backfill check and submit when club UUID differs', async ({
 		page,
 		arrangeSnapshot,
