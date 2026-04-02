@@ -63,11 +63,11 @@
 			</div>
 		{:else}
 			<!-- Default Dashboard Layout -->
-			<div class="rounds-section" data-testid="rounds-panel">
+			<div class="rounds-section" data-testid="dashboard-rounds-panel">
 				<RoundList onSelect={handleRoundSelect} />
 			</div>
 
-			<div class="leaderboard-section" data-testid="leaderboard-panel">
+			<div class="leaderboard-section" data-testid="dashboard-leaderboard-panel">
 				{#if leaderboardService.viewMode === 'tags'}
 					<TagLeaderboard members={tagMembers} onViewAll={() => goto(resolve('/leaderboard'))} />
 				{:else}

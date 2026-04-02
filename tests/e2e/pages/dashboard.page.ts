@@ -1,38 +1,29 @@
 import type { Page, Locator } from '@playwright/test';
-import { expect } from '@playwright/test';
-import { selectors } from '../support/selectors';
 
 export class DashboardPage {
 	constructor(private page: Page) {}
 
 	root(): Locator {
-		return this.page.locator(selectors.dashboard);
+		return this.page.getByTestId('dashboard');
 	}
+
 	roundsPanel(): Locator {
-		return this.page.locator(selectors.roundsPanel);
+		return this.page.getByTestId('dashboard-rounds-panel');
 	}
+
 	leaderboardPanel(): Locator {
-		return this.page.locator(selectors.leaderboardPanel);
+		return this.page.getByTestId('dashboard-leaderboard-panel');
 	}
-	loadingSkeleton(): Locator {
-		return this.page.locator(selectors.loadingSkeleton);
+
+	roundCard(roundId: string): Locator {
+		return this.page.getByTestId(`dashboard-round-card-${roundId}`);
 	}
+
 	roundCards(): Locator {
-		return this.page.locator(selectors.roundCard);
+		return this.page.locator('[data-testid^="dashboard-round-card-"]');
 	}
 
-	async expectLoaded(): Promise<void> {
-		await expect(this.root()).toBeVisible({ timeout: 15000 });
-		await expect(this.roundsPanel()).toBeVisible();
-		await expect(this.leaderboardPanel()).toBeVisible();
-	}
-
-	async expectRoundCountAtLeast(minCount: number): Promise<void> {
-		const count = await this.roundCards().count();
-		expect(count).toBeGreaterThanOrEqual(minCount);
-	}
-
-	async expectContainsText(text: string): Promise<void> {
-		await expect(this.root()).toContainText(text);
+	loadingSkeleton(): Locator {
+		return this.page.getByTestId('loading-skeleton');
 	}
 }

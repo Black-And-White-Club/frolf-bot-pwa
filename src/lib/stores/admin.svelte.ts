@@ -654,11 +654,7 @@ class AdminService {
 	 * Re-publish the finalized Discord embed for a round.
 	 * Uses NATS request-reply so the backend confirms receipt before returning.
 	 */
-	async republishRoundEmbed(
-		guildId: string,
-		adminId: string,
-		roundId: string
-	): Promise<void> {
+	async republishRoundEmbed(guildId: string, adminId: string, roundId: string): Promise<void> {
 		this.loading = true;
 		this.successMessage = null;
 		this.errorMessage = null;

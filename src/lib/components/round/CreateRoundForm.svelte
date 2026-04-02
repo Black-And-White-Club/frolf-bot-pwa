@@ -170,7 +170,7 @@
 		<label for="create-round-title">Title</label>
 		<input
 			id="create-round-title"
-			data-testid="input-create-round-title"
+			data-testid="create-round-form-title-input"
 			bind:value={title}
 			bind:this={titleInput}
 			type="text"
@@ -189,7 +189,7 @@
 		<label for="create-round-description">Description (optional)</label>
 		<textarea
 			id="create-round-description"
-			data-testid="input-create-round-description"
+			data-testid="create-round-form-description-input"
 			bind:value={description}
 			bind:this={descriptionInput}
 			rows={4}
@@ -206,7 +206,7 @@
 		<label for="create-round-start-time">Start Time</label>
 		<input
 			id="create-round-start-time"
-			data-testid="input-create-round-start-time"
+			data-testid="create-round-form-start-time-input"
 			bind:value={startTime}
 			bind:this={startTimeInput}
 			type="text"
@@ -225,7 +225,7 @@
 		<label for="create-round-timezone">Timezone</label>
 		<input
 			id="create-round-timezone"
-			data-testid="input-create-round-timezone"
+			data-testid="create-round-form-timezone-input"
 			bind:value={timezone}
 			bind:this={timezoneInput}
 			type="text"
@@ -243,7 +243,7 @@
 		<label for="create-round-location">Location</label>
 		<input
 			id="create-round-location"
-			data-testid="input-create-round-location"
+			data-testid="create-round-form-location-input"
 			bind:value={location}
 			bind:this={locationInput}
 			type="text"
@@ -259,12 +259,12 @@
 	</div>
 
 	<div class="actions">
-		<a class="secondary" data-testid="link-create-round-cancel" href={resolvePath(cancelHref)}
+		<a class="secondary" data-testid="create-round-form-cancel-link" href={resolvePath(cancelHref)}
 			>Cancel</a
 		>
 		<button
 			class="primary"
-			data-testid="btn-create-round-submit"
+			data-testid="create-round-form-submit-btn"
 			type="submit"
 			disabled={createRoundService.submitting}
 		>

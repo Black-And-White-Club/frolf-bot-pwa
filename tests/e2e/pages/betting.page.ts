@@ -1,5 +1,4 @@
 import type { Page, Locator } from '@playwright/test';
-import { expect } from '@playwright/test';
 
 export class BettingPage {
 	constructor(private page: Page) {}
@@ -15,9 +14,5 @@ export class BettingPage {
 	}
 	stakeInput(): Locator {
 		return this.page.locator('input[type="number"]').first();
-	}
-
-	async expectAccessBadge(text: string | RegExp): Promise<void> {
-		await expect(this.accessBadge()).toContainText(text);
 	}
 }

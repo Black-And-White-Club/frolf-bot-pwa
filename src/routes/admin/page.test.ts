@@ -3,6 +3,10 @@ import { render, waitFor } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Page from './+page.svelte';
 
+vi.mock('$env/dynamic/public', () => ({
+	env: {}
+}));
+
 const { mockAuth, mockTagStore } = vi.hoisted(() => ({
 	mockAuth: {
 		user: null as { activeClubUuid?: string; guildId?: string } | null

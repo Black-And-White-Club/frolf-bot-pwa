@@ -50,6 +50,7 @@
 
 		{#if oauthError}
 			<div
+				data-testid="signin-oauth-error"
 				class="rounded-lg border border-[var(--guild-error-border)] bg-[var(--guild-error-bg)] p-3 text-center [font-family:var(--font-secondary)] text-sm text-[var(--guild-error-text)]"
 			>
 				Sign-in failed. Please try again.
@@ -59,6 +60,7 @@
 		<div class="space-y-3">
 			<a
 				href={withRedirect('/api/auth/discord/login')}
+				data-testid="signin-discord-btn"
 				class="flex w-full items-center justify-center gap-3 rounded-lg bg-[image:var(--liquid-skobeloff)] px-4 py-3 [font-family:var(--font-secondary)] text-sm font-semibold text-white transition hover:brightness-110 focus-visible:ring-2 focus-visible:ring-[var(--guild-primary)] focus-visible:ring-offset-2 focus-visible:outline-none"
 			>
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 127.14 96.36">
@@ -72,6 +74,7 @@
 
 			<a
 				href={withRedirect('/api/auth/google/login')}
+				data-testid="signin-google-btn"
 				class="flex w-full items-center justify-center gap-3 rounded-lg border border-[var(--guild-border)] bg-[var(--guild-surface-elevated,var(--guild-surface))] px-4 py-3 [font-family:var(--font-secondary)] text-sm font-semibold text-[var(--guild-text)] transition hover:border-[var(--guild-primary)]/50 hover:bg-[var(--guild-surface)] focus-visible:ring-2 focus-visible:ring-[var(--guild-primary)] focus-visible:ring-offset-2 focus-visible:outline-none"
 			>
 				<svg

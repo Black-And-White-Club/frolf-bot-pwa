@@ -1,50 +1,49 @@
 import type { Page, Locator } from '@playwright/test';
-import { expect } from '@playwright/test';
-import { selectors } from '../support/selectors';
 
 export class CreateRoundPage {
 	constructor(private page: Page) {}
 
-	createRouteButton(): Locator {
-		return this.page.locator(selectors.createRoundRouteButton);
+	createRouteBtn(): Locator {
+		return this.page.getByTestId('rounds-create-btn');
 	}
+
 	createPage(): Locator {
-		return this.page.locator(selectors.createRoundPage);
+		return this.page.getByTestId('create-round-page');
 	}
+
 	form(): Locator {
-		return this.page.locator(selectors.createRoundForm);
+		return this.page.getByTestId('create-round-form');
 	}
 
-	async fillForm(values: {
-		title: string;
-		description?: string;
-		startTime: string;
-		timezone?: string;
-		location: string;
-	}): Promise<void> {
-		await this.page.locator('[data-testid="input-create-round-title"]').clear();
-		await this.page.locator('[data-testid="input-create-round-title"]').fill(values.title);
-		await this.page.locator('[data-testid="input-create-round-description"]').clear();
-		if (values.description) {
-			await this.page
-				.locator('[data-testid="input-create-round-description"]')
-				.fill(values.description);
-		}
-		await this.page.locator('[data-testid="input-create-round-start-time"]').clear();
-		await this.page.locator('[data-testid="input-create-round-start-time"]').fill(values.startTime);
-		await this.page.locator('[data-testid="input-create-round-timezone"]').clear();
-		if (values.timezone) {
-			await this.page.locator('[data-testid="input-create-round-timezone"]').fill(values.timezone);
-		}
-		await this.page.locator('[data-testid="input-create-round-location"]').clear();
-		await this.page.locator('[data-testid="input-create-round-location"]').fill(values.location);
+	titleInput(): Locator {
+		return this.page.getByTestId('create-round-form-title-input');
 	}
 
-	async submit(): Promise<void> {
-		await this.page.locator('[data-testid="btn-create-round-submit"]').click();
+	descriptionInput(): Locator {
+		return this.page.getByTestId('create-round-form-description-input');
 	}
 
-	async expectRequestedBannerVisible(): Promise<void> {
-		await expect(this.page.locator(selectors.createRoundRequestedBanner)).toBeVisible();
+	startTimeInput(): Locator {
+		return this.page.getByTestId('create-round-form-start-time-input');
+	}
+
+	timezoneInput(): Locator {
+		return this.page.getByTestId('create-round-form-timezone-input');
+	}
+
+	locationInput(): Locator {
+		return this.page.getByTestId('create-round-form-location-input');
+	}
+
+	submitBtn(): Locator {
+		return this.page.getByTestId('create-round-form-submit-btn');
+	}
+
+	cancelLink(): Locator {
+		return this.page.getByTestId('create-round-form-cancel-link');
+	}
+
+	requestedBanner(): Locator {
+		return this.page.getByTestId('rounds-create-requested-banner');
 	}
 }

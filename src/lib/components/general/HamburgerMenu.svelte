@@ -23,7 +23,7 @@
 		dataTestId ? `${dataTestId}-form-signout` : 'form-signout-mobile'
 	);
 	const btnSignoutTestId = $derived(
-		dataTestId ? `${dataTestId}-btn-signout` : 'btn-signout-mobile'
+		dataTestId ? `${dataTestId}-btn-signout` : 'nav-hamburger-signout-btn'
 	);
 
 	function handleSignOut() {
@@ -132,6 +132,7 @@
 	role="dialog"
 	aria-modal="true"
 	aria-labelledby="hamburger-title"
+	data-testid="nav-hamburger-dialog"
 	bind:this={menuEl}
 	tabindex="-1"
 >
@@ -142,6 +143,7 @@
 				onclick={closeHamburger}
 				class="hover:bg-guild-surface/80 rounded-md p-2 text-[var(--guild-text-secondary)] hover:text-[var(--guild-text)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--guild-primary)]/30"
 				aria-label="Close menu"
+				data-testid="nav-hamburger-close"
 			>
 				<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path

@@ -1,18 +1,21 @@
 import type { Page, Locator } from '@playwright/test';
-import { selectors } from '../support/selectors';
 
 export class PwaPage {
 	constructor(private page: Page) {}
+
 	offlineBanner(): Locator {
-		return this.page.locator(selectors.offlineBanner);
+		return this.page.getByTestId('pwa-offline-banner');
 	}
+
 	installPrompt(): Locator {
-		return this.page.locator(selectors.installPrompt);
+		return this.page.getByTestId('pwa-install-prompt');
 	}
-	async dismissInstallPrompt(): Promise<void> {
-		await this.page.locator(selectors.installPromptDismiss).click();
+
+	installPromptDismissBtn(): Locator {
+		return this.page.getByTestId('pwa-install-prompt-dismiss-btn');
 	}
-	async clickInstall(): Promise<void> {
-		await this.page.locator(selectors.installPromptInstall).click();
+
+	installPromptInstallBtn(): Locator {
+		return this.page.getByTestId('pwa-install-prompt-install-btn');
 	}
 }

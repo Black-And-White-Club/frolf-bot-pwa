@@ -11,9 +11,7 @@
 	const recentRounds = $derived(roundService.recentCompletedRounds);
 	const resolvedRoundId = $derived((manualRoundId.trim() || selectedRoundId).trim());
 
-	const selectedRound = $derived(
-		recentRounds.find((r) => r.id === resolvedRoundId) ?? null
-	);
+	const selectedRound = $derived(recentRounds.find((r) => r.id === resolvedRoundId) ?? null);
 
 	const canSubmit = $derived(resolvedRoundId.length > 0 && !adminStore.loading && !!auth.user);
 

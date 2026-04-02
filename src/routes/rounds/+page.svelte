@@ -34,7 +34,7 @@
 		{#if canCreateRounds}
 			<a
 				href="/rounds/create"
-				data-testid="btn-create-round-route"
+				data-testid="rounds-create-btn"
 				class="bg-liquid-skobeloff rounded-lg px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110"
 			>
 				Create Round
@@ -48,7 +48,7 @@
 				class="mb-4 rounded-lg border border-[#007474]/40 bg-[#007474]/10 px-4 py-3 text-sm text-[#4dd0d0]"
 				role="status"
 				aria-live="polite"
-				data-testid="create-round-requested-banner"
+				data-testid="rounds-create-requested-banner"
 			>
 				Round creation requested. It will appear shortly.
 			</div>

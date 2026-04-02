@@ -100,9 +100,9 @@ test.describe('Rounds Routes', () => {
 		await expect(page.getByText('Upcoming Rounds')).toBeVisible();
 		await expect(page.getByText('Recent Rounds')).toBeVisible();
 
-		await round.expectCardVisible('round-started');
-		await round.expectCardVisible('round-scheduled');
-		await round.expectCardVisible('round-finalized');
+		await expect(round.cardById('round-started')).toBeVisible();
+		await expect(round.cardById('round-scheduled')).toBeVisible();
+		await expect(round.cardById('round-finalized')).toBeVisible();
 
 		await page.goto('/rounds/round-started');
 		await seedRoundsState(page, rounds);
@@ -139,7 +139,7 @@ test.describe('Rounds Routes', () => {
 	}) => {
 		await arrangeGuest({ path: '/rounds' });
 
-		await expect(page.locator('[data-testid="btn-signin"]')).toBeVisible();
+		await expect(page.getByTestId('signin-cta-btn')).toBeVisible();
 		await expect(
 			page.getByText('Sign in with Discord or Google to access your disc golf games.')
 		).toBeVisible();

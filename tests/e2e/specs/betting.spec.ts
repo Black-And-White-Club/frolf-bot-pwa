@@ -420,6 +420,20 @@ test.describe('Betting Feature', () => {
 	});
 
 	test.describe('navigation', () => {
+		async function withPrimaryNavigation(
+			nav: NavPage,
+			assertions: () => Promise<void>
+		): Promise<void> {
+			const isCompact = await nav.hamburgerOpenBtn().isVisible();
+			if (isCompact) {
+				await nav.hamburgerOpenBtn().click();
+				await assertions();
+				await nav.hamburgerCloseBtn().click();
+			} else {
+				await assertions();
+			}
+		}
+
 		test('shows betting nav link when entitlements are enabled', async ({
 			page,
 			arrangeSnapshot,
@@ -438,7 +452,13 @@ test.describe('Betting Feature', () => {
 			});
 			await wsConnect();
 
-			await nav.expectLinkVisible('Betting', '/betting');
+			await withPrimaryNavigation(nav, async () => {
+				await expect(page.getByRole('link', { name: 'Betting' })).toBeVisible();
+				await expect(page.getByRole('link', { name: 'Betting' })).toHaveAttribute(
+					'href',
+					'/betting'
+				);
+			});
 		});
 
 		test('shows betting nav link when entitlements are frozen', async ({
@@ -459,7 +479,13 @@ test.describe('Betting Feature', () => {
 			});
 			await wsConnect();
 
-			await nav.expectLinkVisible('Betting', '/betting');
+			await withPrimaryNavigation(nav, async () => {
+				await expect(page.getByRole('link', { name: 'Betting' })).toBeVisible();
+				await expect(page.getByRole('link', { name: 'Betting' })).toHaveAttribute(
+					'href',
+					'/betting'
+				);
+			});
 		});
 
 		test('hides betting nav link when no entitlements (disabled)', async ({
@@ -479,7 +505,7 @@ test.describe('Betting Feature', () => {
 			});
 			await wsConnect();
 
-			await nav.withPrimaryNavigation(async () => {
+			await withPrimaryNavigation(nav, async () => {
 				await expect(page.locator('a[href="/betting"]')).toHaveCount(0);
 			});
 		});

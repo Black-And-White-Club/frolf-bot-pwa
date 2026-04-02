@@ -73,7 +73,7 @@ test.describe('PWA Shell UX', () => {
 		await page.evaluate(() => window.dispatchEvent(new Event('pointerdown')));
 		await expect(pwa.installPrompt()).toBeVisible();
 
-		await pwa.dismissInstallPrompt();
+		await pwa.installPromptDismissBtn().click();
 		await expect(pwa.installPrompt()).toHaveCount(0);
 		const dismissed = await page.evaluate(() =>
 			window.sessionStorage.getItem('pwa-prompt-dismissed')
@@ -109,7 +109,7 @@ test.describe('PWA Shell UX', () => {
 		await page.evaluate(() => window.dispatchEvent(new Event('pointerdown')));
 		await expect(pwa.installPrompt()).toBeVisible();
 
-		await pwa.clickInstall();
+		await pwa.installPromptInstallBtn().click();
 		await expect(pwa.installPrompt()).toHaveCount(0);
 	});
 });

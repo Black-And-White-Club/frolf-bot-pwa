@@ -44,7 +44,7 @@
 	{onclick}
 	type="button"
 	aria-label="View round: {round.title}"
-	data-testid="round-card"
+	data-testid="dashboard-round-card-{round.id}"
 	data-round-id={round.id}
 	data-state={round.state}
 >

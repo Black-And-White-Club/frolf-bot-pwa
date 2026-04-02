@@ -29,10 +29,7 @@
 	);
 
 	const canSubmit = $derived(
-		targetUserId.length > 0 &&
-			hasAtLeastOneField &&
-			!adminStore.loading &&
-			!!guildId
+		targetUserId.length > 0 && hasAtLeastOneField && !adminStore.loading && !!guildId
 	);
 
 	function resetForm() {

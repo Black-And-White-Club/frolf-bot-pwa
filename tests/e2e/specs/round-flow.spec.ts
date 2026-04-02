@@ -90,9 +90,9 @@ test.describe('Round Flow', () => {
 			})
 		]);
 
-		await round.expectCardVisible('round-1');
-		await round.expectCardContains('round-1', 'Weekly Tag Round');
-		await round.expectCardContains('round-1', 'Pier Park');
+		await expect(round.cardById('round-1')).toBeVisible();
+		await expect(round.cardById('round-1')).toContainText('Weekly Tag Round');
+		await expect(round.cardById('round-1')).toContainText('Pier Park');
 	});
 
 	test('updates card state when round.started is received', async ({ page }) => {
@@ -100,7 +100,7 @@ test.describe('Round Flow', () => {
 		await seedRounds(page, [buildRoundCreated({ id: 'round-1', guild_id: subjectId })]);
 		await applyRoundUpdate(page, { type: 'started', roundId: 'round-1' });
 
-		await round.expectCardState('round-1', 'started');
+		await expect(round.cardById('round-1')).toHaveAttribute('data-state', 'started');
 	});
 
 	test('updates participant count when round.participant.joined is received', async ({ page }) => {
@@ -112,7 +112,7 @@ test.describe('Round Flow', () => {
 			participants: [{ userId: 'user-2', response: 'accepted', score: null, tagNumber: 5 }]
 		});
 
-		await round.expectParticipantLabel('round-1', 1);
+		await expect(round.cardById('round-1')).toContainText(/1\s*player/i);
 	});
 
 	test('shows score preview after round.participant.score.updated on finalized rounds', async ({
@@ -134,15 +134,15 @@ test.describe('Round Flow', () => {
 			score: -3
 		});
 
-		await round.expectCardContains('round-1', '-3');
+		await expect(round.cardById('round-1')).toContainText('-3');
 	});
 
 	test('removes the round card when round.deleted is received', async ({ page }) => {
 		const round = new RoundPage(page);
 		await seedRounds(page, [buildRoundCreated({ id: 'round-1', guild_id: subjectId })]);
-		await round.expectCardVisible('round-1');
+		await expect(round.cardById('round-1')).toBeVisible();
 
 		await applyRoundUpdate(page, { type: 'deleted', roundId: 'round-1' });
-		await round.expectCardMissing('round-1');
+		await expect(round.cardById('round-1')).toHaveCount(0);
 	});
 });

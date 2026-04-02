@@ -17,6 +17,20 @@ test.describe('Navigation Shell', () => {
 		{ label: 'Account', href: '/account' }
 	];
 
+	async function withPrimaryNavigation(
+		nav: NavPage,
+		assertions: () => Promise<void>
+	): Promise<void> {
+		const isCompact = await nav.hamburgerOpenBtn().isVisible();
+		if (isCompact) {
+			await nav.hamburgerOpenBtn().click();
+			await assertions();
+			await nav.hamburgerCloseBtn().click();
+		} else {
+			await assertions();
+		}
+	}
+
 	async function arrangeHome(
 		{
 			arrangeSnapshot,
@@ -77,13 +91,19 @@ test.describe('Navigation Shell', () => {
 		await expectDashboardLoaded(page);
 
 		for (const link of requiredLinks) {
-			await nav.expectLinkVisible(link.label, link.href);
+			await withPrimaryNavigation(nav, async () => {
+				await expect(page.getByRole('link', { name: link.label })).toBeVisible();
+				await expect(page.getByRole('link', { name: link.label })).toHaveAttribute(
+					'href',
+					link.href
+				);
+			});
 		}
-		await nav.expectAdminLinkVisible();
-		await expect(page.locator('[data-testid="skip-link"]')).toHaveAttribute(
-			'href',
-			'#main-content'
-		);
+		await withPrimaryNavigation(nav, async () => {
+			await expect(page.getByRole('link', { name: 'Admin' })).toBeVisible();
+			await expect(page.getByRole('link', { name: 'Admin' })).toHaveAttribute('href', '/admin');
+		});
+		await expect(nav.skipLink()).toHaveAttribute('href', '#main-content');
 	});
 
 	test('hides admin navigation link for non-admin users', async ({
@@ -96,9 +116,11 @@ test.describe('Navigation Shell', () => {
 		await arrangeHome({ arrangeSnapshot, arrangeAuth, wsConnect }, 'player');
 		await expectDashboardLoaded(page);
 
-		await nav.expectLinkVisible('Home', '/');
-		await nav.expectLinkVisible('Account', '/account');
-		await nav.expectAdminLinkMissing();
+		await withPrimaryNavigation(nav, async () => {
+			await expect(page.getByRole('link', { name: 'Home' })).toBeVisible();
+			await expect(page.getByRole('link', { name: 'Account' })).toBeVisible();
+			await expect(page.locator('a[href="/admin"]')).toHaveCount(0);
+		});
 	});
 
 	test('shows the expected menu controls for the active layout', async ({
@@ -111,18 +133,17 @@ test.describe('Navigation Shell', () => {
 		await arrangeHome({ arrangeSnapshot, arrangeAuth, wsConnect }, 'admin');
 		await expectDashboardLoaded(page);
 
-		await nav.expectSignOutControlVisible();
-
-		const isCompact = await nav.isCompactLayout();
+		const isCompact = await nav.hamburgerOpenBtn().isVisible();
 		if (!isCompact) {
+			await expect(nav.signOutBtn()).toBeVisible();
 			return;
 		}
 
-		await nav.openHamburger();
+		await nav.hamburgerOpenBtn().click();
 		await expect(nav.hamburgerDialog()).toBeVisible();
 		await expect(nav.hamburgerDialog().locator('a[href="/admin"]')).toBeVisible();
-		await expect(nav.hamburgerDialog().locator('[data-testid="btn-signout-mobile"]')).toBeVisible();
-		await nav.closeHamburger();
+		await expect(nav.hamburgerSignOutBtn()).toBeVisible();
+		await nav.hamburgerCloseBtn().click();
 		await expect(nav.hamburgerDialog()).toHaveCount(0);
 	});
 
@@ -154,7 +175,10 @@ test.describe('Navigation Shell', () => {
 		});
 		await wsConnect();
 
-		await nav.expectLinkVisible('Betting', '/betting');
+		await withPrimaryNavigation(nav, async () => {
+			await expect(page.getByRole('link', { name: 'Betting' })).toBeVisible();
+			await expect(page.getByRole('link', { name: 'Betting' })).toHaveAttribute('href', '/betting');
+		});
 	});
 
 	test('hides betting nav link when entitlements are disabled (omitted)', async ({
@@ -167,7 +191,7 @@ test.describe('Navigation Shell', () => {
 		await arrangeHome({ arrangeSnapshot, arrangeAuth, wsConnect }, 'player');
 		await expectDashboardLoaded(page);
 
-		await nav.withPrimaryNavigation(async () => {
+		await withPrimaryNavigation(nav, async () => {
 			await expect(page.locator('a[href="/betting"]')).toHaveCount(0);
 		});
 	});

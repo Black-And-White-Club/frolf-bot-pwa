@@ -70,7 +70,7 @@ test.describe('Join Page', () => {
 		await previewResponse;
 
 		expect(new URL(page.url()).search).toBe('?code=ABC123');
-		await join.expectPreviewClub('Pier Park Club');
+		await expect(page.getByRole('heading', { name: 'Pier Park Club' })).toBeVisible();
 	});
 
 	test('shows an invalid invite state when preview endpoint fails', async ({
@@ -79,7 +79,6 @@ test.describe('Join Page', () => {
 		arrangeAuth,
 		wsConnect
 	}) => {
-		const join = new JoinPage(page);
 		await page.route('**/api/clubs/preview?code=BADCODE', (route) =>
 			route.fulfill({
 				status: 404,
@@ -90,7 +89,8 @@ test.describe('Join Page', () => {
 		await arrangeAuthenticated({ arrangeSnapshot, arrangeAuth, wsConnect }, '/join?code=BADCODE');
 
 		await page.waitForResponse('**/api/clubs/preview?code=BADCODE');
-		await join.expectInvalidInvite('Invalid or expired invite code');
+		await expect(page.getByRole('heading', { name: 'Invalid Invite' })).toBeVisible();
+		await expect(page.getByText('Invalid or expired invite code')).toBeVisible();
 	});
 
 	test('joins club successfully from invite preview and redirects home', async ({

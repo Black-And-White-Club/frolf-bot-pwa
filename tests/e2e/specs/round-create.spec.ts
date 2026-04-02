@@ -145,6 +145,32 @@ test.describe('Round Create Route', () => {
 		await wsConnect();
 	}
 
+	async function fillForm(
+		createRound: CreateRoundPage,
+		values: {
+			title: string;
+			description?: string;
+			startTime: string;
+			timezone?: string;
+			location: string;
+		}
+	): Promise<void> {
+		await createRound.titleInput().clear();
+		await createRound.titleInput().fill(values.title);
+		await createRound.descriptionInput().clear();
+		if (values.description) {
+			await createRound.descriptionInput().fill(values.description);
+		}
+		await createRound.startTimeInput().clear();
+		await createRound.startTimeInput().fill(values.startTime);
+		await createRound.timezoneInput().clear();
+		if (values.timezone) {
+			await createRound.timezoneInput().fill(values.timezone);
+		}
+		await createRound.locationInput().clear();
+		await createRound.locationInput().fill(values.location);
+	}
+
 	test('allows player to submit create-round request and returns to rounds route', async ({
 		page,
 		arrangeSnapshot,
@@ -158,20 +184,20 @@ test.describe('Round Create Route', () => {
 			'/rounds'
 		);
 
-		await expect(createRound.createRouteButton()).toBeVisible();
-		await expect(createRound.createRouteButton()).toHaveAttribute('href', '/rounds/create');
+		await expect(createRound.createRouteBtn()).toBeVisible();
+		await expect(createRound.createRouteBtn()).toHaveAttribute('href', '/rounds/create');
 		await page.goto('/rounds/create');
 		await expect.poll(() => new URL(page.url()).pathname).toBe('/rounds/create');
 		await expect(createRound.createPage()).toBeVisible();
 
-		await createRound.fillForm({
+		await fillForm(createRound, {
 			title: 'PWA Created Round',
 			description: 'Testing web create flow',
 			startTime: '2026-02-24 18:30',
 			timezone: 'America/Chicago',
 			location: 'Pier Park'
 		});
-		await createRound.submit();
+		await createRound.submitBtn().click();
 
 		await expect.poll(() => new URL(page.url()).pathname).toBe('/rounds');
 		await expect.poll(() => new URL(page.url()).search).toContain('created=requested');
@@ -191,7 +217,7 @@ test.describe('Round Create Route', () => {
 			'/rounds'
 		);
 
-		await expect(createRound.createRouteButton()).toHaveCount(0);
+		await expect(createRound.createRouteBtn()).toHaveCount(0);
 
 		await page.goto('/rounds/create');
 		await expect.poll(() => new URL(page.url()).pathname).toBe('/rounds');
@@ -247,19 +273,16 @@ test.describe('Round Create Route', () => {
 				'This round will be linked to an accepted challenge after the round is created.'
 			)
 		).toBeVisible();
-		await expect(page.locator('[data-testid="link-create-round-cancel"]')).toHaveAttribute(
-			'href',
-			`/challenges/${challengeId}`
-		);
+		await expect(createRound.cancelLink()).toHaveAttribute('href', `/challenges/${challengeId}`);
 
-		await createRound.fillForm({
+		await fillForm(createRound, {
 			title: 'Challenge Match',
 			description: 'Created from a challenge detail route',
 			startTime: '2026-03-14 16:00',
 			timezone: 'America/New_York',
 			location: 'Pier Park'
 		});
-		await createRound.submit();
+		await createRound.submitBtn().click();
 
 		await expect.poll(() => new URL(page.url()).pathname).toBe(`/challenges/${challengeId}`);
 		await expect.poll(() => new URL(page.url()).search).toContain('created=requested');
@@ -315,14 +338,14 @@ test.describe('Round Create Route', () => {
 		await expect.poll(() => new URL(page.url()).pathname).toBe('/rounds/create');
 		expect(new URL(page.url()).search).toContain(`challenge=${challengeId}`);
 
-		await createRound.fillForm({
+		await fillForm(createRound, {
 			title: 'Club Scoped Challenge Match',
 			description: 'Created without a discord guild mapping',
 			startTime: '2026-03-15 16:00',
 			timezone: 'America/New_York',
 			location: 'Pier Park'
 		});
-		await createRound.submit();
+		await createRound.submitBtn().click();
 
 		await expect.poll(() => new URL(page.url()).pathname).toBe(`/challenges/${challengeId}`);
 		await expect.poll(() => new URL(page.url()).search).toContain('created=requested');

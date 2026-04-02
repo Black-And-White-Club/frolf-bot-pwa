@@ -76,7 +76,7 @@
 	});
 </script>
 
-<nav class="site-header">
+<nav class="site-header" data-testid="nav-bar">
 	<div class="site-header__inner mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 		<div class="flex w-full items-center justify-between">
 			<div class="flex items-center gap-8">
@@ -171,6 +171,7 @@
 							onclick={toggleHamburger}
 							class="hover:bg-guild-surface/80 rounded-md p-2 text-[var(--guild-text-secondary)] hover:text-[var(--guild-text)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--guild-primary)]/30"
 							aria-label="Open menu"
+							data-testid="nav-hamburger-open"
 						>
 							<!-- Hamburger icon -->
 							<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -194,7 +195,7 @@
 							<button
 								onclick={() => auth.signOut()}
 								class="text-sm text-[var(--guild-primary)] hover:text-[var(--guild-primary)]/80"
-								data-testid="btn-signout-magic"
+								data-testid="nav-signout-btn"
 							>
 								Sign out
 							</button>

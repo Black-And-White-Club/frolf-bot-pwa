@@ -22,7 +22,7 @@
 </script>
 
 {#if !isOnline}
-	<div class="offline-banner">
+	<div class="offline-banner" data-testid="pwa-offline-banner">
 		<span>📡</span>
 		<span>You're offline. Data may be outdated.</span>
 	</div>

@@ -128,8 +128,8 @@ test.describe('Dashboard Snapshot + Live Events', () => {
 		const leaderboard = new LeaderboardPage(page);
 
 		await expect(round.cards()).toHaveCount(1);
-		await round.expectCardContains('round-stub-1', 'Stubbed Round');
-		await leaderboard.expectRowCount(2);
+		await expect(round.cardById('round-stub-1')).toContainText('Stubbed Round');
+		await expect(leaderboard.rows()).toHaveCount(2);
 		await expect(page.getByText('Stubbed Player One')).toBeVisible();
 	});
 
@@ -156,7 +156,7 @@ test.describe('Dashboard Snapshot + Live Events', () => {
 		});
 
 		await expect(round.cards()).toHaveCount(2);
-		await round.expectCardContains('round-live-2', 'Live Round from WS');
-		await leaderboard.expectFirstUser('user-2');
+		await expect(round.cardById('round-live-2')).toContainText('Live Round from WS');
+		await expect(leaderboard.rows().first()).toHaveAttribute('data-user-id', 'user-2');
 	});
 });

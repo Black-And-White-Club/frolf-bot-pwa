@@ -1,6 +1,5 @@
 import { test, expect } from '../fixtures';
 import { DashboardPage } from '../pages/dashboard.page';
-import { LeaderboardPage } from '../pages/leaderboard.page';
 import { RoundPage } from '../pages/round.page';
 import {
 	buildLeaderboardSnapshot,
@@ -38,8 +37,9 @@ test.describe('Dashboard', () => {
 			const dashboard = new DashboardPage(page);
 			await visitMockMode();
 
-			await expectDashboardLoaded(page);
 			await expect(dashboard.root()).toBeVisible();
+			await expect(dashboard.roundsPanel()).toBeVisible();
+			await expect(dashboard.leaderboardPanel()).toBeVisible();
 		});
 
 		test('shows loading state and then round cards', async ({ page, visitMockMode }) => {
@@ -61,8 +61,7 @@ test.describe('Dashboard', () => {
 			await arrangeAuth({ clubUuid: subjectId, guildId: subjectId });
 			await wsConnect();
 			await expectDashboardLoaded(page);
-			const leaderboard = new LeaderboardPage(page);
-			await leaderboard.setMode('points');
+			await page.getByRole('tab', { name: 'Points' }).click();
 		});
 
 		test('renders newly created round from event stream', async ({ page }) => {
@@ -77,7 +76,7 @@ test.describe('Dashboard', () => {
 				})
 			);
 
-			await round.expectCardContains('round-live-2', 'Live Round from WS');
+			await expect(round.cardById('round-live-2')).toContainText('Live Round from WS');
 		});
 
 		test('reloads leaderboard snapshot after leaderboard.updated event', async ({

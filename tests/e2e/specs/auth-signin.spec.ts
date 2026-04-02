@@ -12,7 +12,8 @@ test.describe('Auth and Sign-in Routes', () => {
 		const signin = new SigninPage(page);
 		await arrangeGuest({ path: '/' });
 
-		await signin.expectGuestSignInCta();
+		await expect(signin.signInCtaBtn()).toBeVisible();
+		await expect(signin.signInCtaBtn()).toContainText('Sign In');
 		await expect(page.getByRole('link', { name: 'Privacy Policy' })).toHaveAttribute(
 			'href',
 			'/privacy'
@@ -27,9 +28,10 @@ test.describe('Auth and Sign-in Routes', () => {
 		const signin = new SigninPage(page);
 		await arrangeGuest({ path: '/auth/signin' });
 
-		await signin.expectOAuthOnlyUi();
-		await expect(signin.discordButton()).toHaveAttribute('href', '/api/auth/discord/login');
-		await expect(signin.googleButton()).toHaveAttribute('href', '/api/auth/google/login');
+		await expect(page.locator('#email')).toHaveCount(0);
+		await expect(page.getByRole('button', { name: 'Send Magic Link' })).toHaveCount(0);
+		await expect(signin.discordBtn()).toHaveAttribute('href', '/api/auth/discord/login');
+		await expect(signin.googleBtn()).toHaveAttribute('href', '/api/auth/google/login');
 	});
 
 	test('preserves redirect query on oauth links', async ({
@@ -53,11 +55,11 @@ test.describe('Auth and Sign-in Routes', () => {
 		});
 		await wsConnect();
 
-		await expect(signin.discordButton()).toHaveAttribute(
+		await expect(signin.discordBtn()).toHaveAttribute(
 			'href',
 			'/api/auth/discord/login?redirect=%2Fjoin%3Fcode%3Dclub-abc'
 		);
-		await expect(signin.googleButton()).toHaveAttribute(
+		await expect(signin.googleBtn()).toHaveAttribute(
 			'href',
 			'/api/auth/google/login?redirect=%2Fjoin%3Fcode%3Dclub-abc'
 		);
@@ -84,6 +86,7 @@ test.describe('Auth and Sign-in Routes', () => {
 		});
 		await wsConnect();
 
-		await signin.expectOAuthError();
+		await expect(signin.oauthError()).toBeVisible();
+		await expect(signin.oauthError()).toContainText('Sign-in failed');
 	});
 });

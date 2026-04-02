@@ -66,7 +66,7 @@
 />
 
 {#if showPrompt}
-	<div class="install-prompt">
+	<div class="install-prompt" data-testid="pwa-install-prompt">
 		<div class="prompt-content">
 			<span class="prompt-icon">📲</span>
 			<div class="prompt-text">
@@ -75,8 +75,16 @@
 			</div>
 		</div>
 		<div class="prompt-actions">
-			<button class="btn-dismiss" onclick={handleDismiss}>Not now</button>
-			<button class="btn-install" onclick={handleInstall}>Install</button>
+			<button
+				class="btn-dismiss"
+				data-testid="pwa-install-prompt-dismiss-btn"
+				onclick={handleDismiss}>Not now</button
+			>
+			<button
+				class="btn-install"
+				data-testid="pwa-install-prompt-install-btn"
+				onclick={handleInstall}>Install</button
+			>
 		</div>
 	</div>
 {/if}

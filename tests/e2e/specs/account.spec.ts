@@ -171,7 +171,7 @@ test.describe('Account Page', () => {
 			),
 			account.createInviteButton().click()
 		]);
-		await account.expectInvitePresent('NEWCODE123');
+		await expect(account.inviteCode('NEWCODE123')).toBeVisible();
 	});
 
 	test('renders invite creation errors from the API', async ({
@@ -242,9 +242,9 @@ test.describe('Account Page', () => {
 
 		await Promise.all([
 			page.waitForResponse(`**/api/clubs/${subjectId}/invites/REVOKE001`),
-			account.clickRevoke('REVOKE001')
+			account.revokeBtn('REVOKE001').click()
 		]);
-		await account.expectInviteMissing('REVOKE001');
+		await expect(account.inviteCode('REVOKE001')).toHaveCount(0);
 	});
 
 	test('hides invite management for non-editor roles', async ({

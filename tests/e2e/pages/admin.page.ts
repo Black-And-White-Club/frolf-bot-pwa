@@ -1,7 +1,5 @@
 import type { Page, Locator } from '@playwright/test';
 
-import { selectors } from '../support/selectors';
-
 export class AdminPage {
 	constructor(private page: Page) {}
 
@@ -24,13 +22,13 @@ export class AdminPage {
 		return this.tagSection().getByRole('button', { name: 'Submit Batch' });
 	}
 	pointMemberSelect(): Locator {
-		return this.page.locator(selectors.pointMemberSelect);
+		return this.page.locator('#point-member');
 	}
 	pointDeltaInput(): Locator {
-		return this.page.locator(selectors.pointDeltaInput);
+		return this.page.locator('#point-delta');
 	}
 	pointReasonInput(): Locator {
-		return this.page.locator(selectors.pointReasonInput);
+		return this.page.locator('#point-reason');
 	}
 	adjustPointsButton(): Locator {
 		return this.pointSection().getByRole('button', { name: 'Adjust Points' });
@@ -70,11 +68,5 @@ export class AdminPage {
 	}
 	republishButton(): Locator {
 		return this.republishSection().getByRole('button', { name: 'Republish Embed' });
-	}
-
-	async setTagForPlayer(displayName: string, newTag: string): Promise<void> {
-		const row = this.tagSection().locator('tr').filter({ hasText: displayName });
-		await row.locator('input[type="number"]').clear();
-		await row.locator('input[type="number"]').fill(newTag);
 	}
 }

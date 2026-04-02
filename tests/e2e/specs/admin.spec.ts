@@ -28,6 +28,16 @@ test.describe('Admin Dashboard', () => {
 		{ member_id: 'user-2', current_tag: 2 }
 	];
 
+	async function setTagForPlayer(
+		admin: AdminPage,
+		displayName: string,
+		newTag: string
+	): Promise<void> {
+		const row = admin.tagSection().locator('tr').filter({ hasText: displayName });
+		await row.locator('input[type="number"]').clear();
+		await row.locator('input[type="number"]').fill(newTag);
+	}
+
 	async function installAdminNatsBridge(page: import('@playwright/test').Page): Promise<void> {
 		await page.evaluate(
 			async ({ guildId, members, profiles }) => {
@@ -222,8 +232,8 @@ test.describe('Admin Dashboard', () => {
 		const admin = new AdminPage(page);
 		await visitAdmin({ page, arrangeSnapshot, arrangeAuth, wsConnect }, 'admin');
 
-		await admin.setTagForPlayer('Player One', '7');
-		await admin.setTagForPlayer('Player Two', '7');
+		await setTagForPlayer(admin, 'Player One', '7');
+		await setTagForPlayer(admin, 'Player Two', '7');
 
 		await expect(page.getByText('#7 is already assigned to another row').first()).toBeVisible();
 		await expect(admin.submitBatchButton()).toBeDisabled();
@@ -238,7 +248,7 @@ test.describe('Admin Dashboard', () => {
 		const admin = new AdminPage(page);
 		await visitAdmin({ page, arrangeSnapshot, arrangeAuth, wsConnect }, 'admin');
 
-		await admin.setTagForPlayer('Player One', '3');
+		await setTagForPlayer(admin, 'Player One', '3');
 		await expect(admin.submitBatchButton()).toBeEnabled();
 		await admin.submitBatchButton().click();
 
@@ -276,7 +286,7 @@ test.describe('Admin Dashboard', () => {
 		const admin = new AdminPage(page);
 		await visitAdmin({ page, arrangeSnapshot, arrangeAuth, wsConnect }, 'admin');
 
-		await admin.setTagForPlayer('Player Two', '4');
+		await setTagForPlayer(admin, 'Player Two', '4');
 		await expect(admin.submitBatchButton()).toBeEnabled();
 		await admin.submitBatchButton().click();
 
@@ -550,10 +560,7 @@ test.describe('Admin Dashboard', () => {
 
 		await expect
 			.poll(async () => {
-				const entries = await getAdminPublished(
-					page,
-					'round.admin.republish.embed.requested.v1'
-				);
+				const entries = await getAdminPublished(page, 'round.admin.republish.embed.requested.v1');
 				return entries.length;
 			})
 			.toBeGreaterThan(0);
@@ -567,9 +574,7 @@ test.describe('Admin Dashboard', () => {
 		expect(payload.guild_id).toBe(guildId);
 		expect(payload.round_id).toBe(roundId);
 
-		await expect(
-			page.getByText('Embed republish triggered').first()
-		).toBeVisible();
+		await expect(page.getByText('Embed republish triggered').first()).toBeVisible();
 	});
 
 	test('uses the Discord guild ID for backfill check and submit when club UUID differs', async ({

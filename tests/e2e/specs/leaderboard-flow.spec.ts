@@ -1,4 +1,4 @@
-import { test } from '../fixtures';
+import { test, expect } from '../fixtures';
 import { LeaderboardPage } from '../pages/leaderboard.page';
 import { buildLeaderboardSnapshot, buildTagListSnapshot } from '../support/event-builders';
 
@@ -91,15 +91,19 @@ test.describe('Leaderboard Flow', () => {
 			]
 		});
 		await seedLeaderboardState(page, { leaderboard: initialLeaderboard, tags });
-		const leaderboardPage = new LeaderboardPage(page);
-		await leaderboardPage.expectLoaded({ minRows: 3 });
+		const leaderboard = new LeaderboardPage(page);
+		await expect
+			.poll(async () => await leaderboard.rows().count(), { timeout: 15000 })
+			.toBeGreaterThanOrEqual(3);
 	});
 
 	test('displays leaderboard rows from snapshot', async ({ page }) => {
 		const leaderboard = new LeaderboardPage(page);
-		await leaderboard.expectLoaded({ minRows: 3 });
-		await leaderboard.expectRowCount(3);
-		await leaderboard.expectFirstUser('user-1');
+		await expect
+			.poll(async () => await leaderboard.rows().count(), { timeout: 15000 })
+			.toBeGreaterThanOrEqual(3);
+		await expect(leaderboard.rows()).toHaveCount(3);
+		await expect(leaderboard.rows().first()).toHaveAttribute('data-user-id', 'user-1');
 	});
 
 	test('reorders rows after leaderboard.tag.updated', async ({ page, arrangeSnapshot, wsEmit }) => {
@@ -125,7 +129,7 @@ test.describe('Leaderboard Flow', () => {
 		});
 		await seedLeaderboardState(page, { leaderboard: snapshot, tags });
 
-		await leaderboard.expectFirstUser('user-1');
+		await expect(leaderboard.rows().first()).toHaveAttribute('data-user-id', 'user-1');
 
 		applyLeaderboardEvent(wsEmit, {
 			type: 'tag-updated',
@@ -133,7 +137,7 @@ test.describe('Leaderboard Flow', () => {
 			oldTag: 5,
 			newTag: 1
 		});
-		await leaderboard.expectFirstUser('user-2');
+		await expect(leaderboard.rows().first()).toHaveAttribute('data-user-id', 'user-2');
 	});
 
 	test('swaps tags after leaderboard.tag.swap.processed', async ({
@@ -169,12 +173,12 @@ test.describe('Leaderboard Flow', () => {
 			userIdB: 'user-2'
 		});
 
-		await leaderboard.expectFirstUser('user-2');
+		await expect(leaderboard.rows().first()).toHaveAttribute('data-user-id', 'user-2');
 	});
 
 	test('reloads snapshot after leaderboard.updated event', async ({ page, wsStubRequest }) => {
 		const leaderboard = new LeaderboardPage(page);
-		await leaderboard.expectRowCount(3);
+		await expect(leaderboard.rows()).toHaveCount(3);
 
 		const updatedSnapshot = buildLeaderboardSnapshot({
 			guild_id: subjectId,
@@ -198,6 +202,6 @@ test.describe('Leaderboard Flow', () => {
 		wsStubRequest(`leaderboard.tag.list.requested.v1.${subjectId}`, updatedTags);
 
 		await seedLeaderboardState(page, { leaderboard: updatedSnapshot, tags: updatedTags });
-		await leaderboard.expectRowCount(4);
+		await expect(leaderboard.rows()).toHaveCount(4);
 	});
 });

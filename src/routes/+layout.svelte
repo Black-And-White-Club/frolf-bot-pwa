@@ -192,7 +192,7 @@
 </svelte:head>
 
 <!-- Skip link for keyboard/mobile users -->
-<a href="#main-content" class="sr-only p-2 focus:not-sr-only" data-testid="skip-link"
+<a href="#main-content" class="sr-only p-2 focus:not-sr-only" data-testid="nav-skip-link"
 	>Skip to content</a
 >
 
@@ -317,7 +317,7 @@
 				<div>
 					<a
 						href="/auth/signin"
-						data-testid="btn-signin"
+						data-testid="signin-cta-btn"
 						class="group text-guild-surface bg-liquid-skobeloff relative flex w-full justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium hover:brightness-110 focus:ring-2 focus:ring-[var(--guild-primary)] focus:ring-offset-2 focus:outline-none"
 					>
 						Sign In
