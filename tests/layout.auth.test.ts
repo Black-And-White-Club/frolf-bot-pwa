@@ -140,13 +140,13 @@ describe('Root layout auth bootstrap', () => {
 	it('falls back to the guest shell after sign-out even if page.data.user is still populated', async () => {
 		const { queryByTestId, getByTestId } = render(Layout);
 
-		expect(queryByTestId('btn-signin')).toBeNull();
+		expect(queryByTestId('signin-cta-btn')).toBeNull();
 
 		auth.signOut();
 		await tick();
 
 		await waitFor(() => {
-			expect(getByTestId('btn-signin')).toBeTruthy();
+			expect(getByTestId('signin-cta-btn')).toBeTruthy();
 		});
 	});
 });

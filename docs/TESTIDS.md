@@ -5,7 +5,7 @@ This file documents the `data-testid` naming conventions used across the app and
 ## Naming conventions
 
 - Buttons: `btn-<area>-<action>`
-  - `btn-signin`, `btn-signin-discord`, `btn-signout`, `btn-view-all`, `btn-view-profile`
+  - `signin-cta-btn`, `btn-signin-discord`, `btn-signout`, `btn-view-all`, `btn-view-profile`
 - Cards: `card-<type>-<id>` or `round-card-<round_id>`
 - Status / Badge: `status-<id>` (e.g., `status-<round_id>`)
 - Titles / Headings: `round-title-<round_id>`
