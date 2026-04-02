@@ -118,6 +118,9 @@ const ADMIN_UDISC_IDENTITY_UPDATE_SUBJECT = 'user.udisc.identity.update.requeste
 const ADMIN_UDISC_IDENTITY_UPDATED_SUBJECT = 'user.udisc.identity.updated.v1';
 const ADMIN_UDISC_IDENTITY_FAILED_SUBJECT = 'user.udisc.identity.update.failed.v1';
 const ADMIN_ROUND_EMBED_REPUBLISH_SUBJECT = 'round.admin.republish.embed.requested.v1';
+const LEADERBOARD_RECALCULATE_SUBJECT = 'leaderboard.recalculate.round.v1';
+const LEADERBOARD_RECALCULATE_SUCCESS = 'leaderboard.recalculate.round.success.v1';
+const LEADERBOARD_RECALCULATE_FAILED = 'leaderboard.recalculate.round.failed.v1';
 
 class AdminService {
 	loading = $state(false);
@@ -683,6 +686,62 @@ class AdminService {
 		} finally {
 			this.loading = false;
 		}
+	}
+
+	/**
+	 * Trigger recalculation of points and tag swaps for a finalized round.
+	 * Publishes leaderboard.recalculate.round.v1 and waits for success/failure.
+	 */
+	async recalculateRound(guildId: string, roundId: string): Promise<void> {
+		this.loading = true;
+		this.successMessage = null;
+		this.errorMessage = null;
+
+		return new Promise((resolve) => {
+			let resolved = false;
+
+			const cleanup = () => {
+				nats.unsubscribe(LEADERBOARD_RECALCULATE_SUCCESS);
+				nats.unsubscribe(LEADERBOARD_RECALCULATE_FAILED);
+				resolve();
+			};
+
+			nats.subscribe(LEADERBOARD_RECALCULATE_SUCCESS, (msg: any) => {
+				if (resolved) return;
+				if (msg.data.round_id && msg.data.round_id !== roundId) return;
+				resolved = true;
+				this.loading = false;
+				const count = msg.data.points_awarded ? Object.keys(msg.data.points_awarded).length : 0;
+				this.successMessage = `Points recalculated successfully (${count} player${count !== 1 ? 's' : ''})`;
+				this.scheduleMessageClear();
+				cleanup();
+			});
+
+			nats.subscribe(LEADERBOARD_RECALCULATE_FAILED, (msg: any) => {
+				if (resolved) return;
+				if (msg.data.round_id && msg.data.round_id !== roundId) return;
+				resolved = true;
+				this.loading = false;
+				this.errorMessage = msg.data.reason ?? 'Recalculation failed';
+				this.scheduleMessageClear();
+				cleanup();
+			});
+
+			nats.publish(LEADERBOARD_RECALCULATE_SUBJECT, {
+				guild_id: guildId,
+				round_id: roundId
+			});
+
+			setTimeout(() => {
+				if (!resolved) {
+					resolved = true;
+					this.loading = false;
+					this.errorMessage = 'Request timed out. Please verify results manually.';
+					this.scheduleMessageClear();
+					cleanup();
+				}
+			}, OPERATION_TIMEOUT_MS);
+		});
 	}
 
 	async uploadScorecard({

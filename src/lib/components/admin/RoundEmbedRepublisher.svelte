@@ -44,6 +44,28 @@
 			resetForm();
 		}
 	}
+
+	async function handleRecalculate() {
+		validationError = null;
+
+		if (!auth.user) return;
+
+		const identity = resolveRequestIdentity(auth.user);
+		if (!identity?.guildId) {
+			validationError = 'Discord guild identity is missing.';
+			return;
+		}
+		if (!resolvedRoundId) {
+			validationError = 'Select or enter a round.';
+			return;
+		}
+
+		await adminStore.recalculateRound(identity.guildId, resolvedRoundId);
+
+		if (adminStore.successMessage) {
+			resetForm();
+		}
+	}
 </script>
 
 <div class="space-y-4 rounded-xl border border-[#007474]/20 bg-[var(--guild-surface)] px-5 py-4">
@@ -113,10 +135,15 @@
 		</div>
 	{/if}
 
-	<div class="flex items-center justify-between border-t border-[#007474]/10 pt-3">
-		<p class="font-['Space_Grotesk'] text-xs text-[var(--guild-text-secondary)]">
-			Re-publishes the finalized embed to Discord. The existing message will be edited.
-		</p>
+	<div class="flex items-center justify-end gap-2 border-t border-[#007474]/10 pt-3">
+		<button
+			type="button"
+			onclick={handleRecalculate}
+			disabled={!canSubmit}
+			class="rounded-lg border border-[#007474]/40 px-4 py-2 font-['Space_Grotesk'] text-sm font-medium text-[#007474] transition-all hover:bg-[#007474]/10 disabled:cursor-not-allowed disabled:opacity-40"
+		>
+			{adminStore.loading ? 'Recalculating…' : 'Recalculate Points'}
+		</button>
 		<button
 			type="button"
 			onclick={handleSubmit}
